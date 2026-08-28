@@ -2,7 +2,7 @@ import Image from "next/image";
 import { site, type Vertical } from "@/lib/config";
 
 const demos: {
-  key: Vertical;
+  key: Exclude<Vertical, "cafe">;
   label: string;
   blurb: string;
 }[] = [
@@ -43,8 +43,10 @@ function MessageLink({
 }
 
 export default function Home() {
+  const cafeHref = site.demos.cafe;
+
   return (
-    <div className="relative overflow-x-hidden bg-charcoal text-bone">
+    <div className="site-grain relative overflow-x-hidden bg-charcoal text-bone">
       <header className="absolute inset-x-0 top-0 z-20">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 md:px-8">
           <a href="#top" className="flex items-center gap-2.5">
@@ -124,13 +126,44 @@ export default function Home() {
               Samples
             </p>
             <h2 className="mt-3 max-w-xl font-[family-name:var(--font-display)] text-3xl leading-tight text-bone md:text-5xl">
-              Three verticals. Labeled demos only.
+              Labeled demos only.
             </h2>
             <p className="mt-4 max-w-lg text-concrete">
               Demo site by KantoCo — sample only. Not real client work.
             </p>
 
-            <ul className="mt-12 grid gap-6 md:grid-cols-3">
+            <article className="mt-12 grid overflow-hidden border border-amber/40 bg-white/[0.03] md:grid-cols-[1.1fr_0.9fr]">
+              <div className="p-6 md:p-8">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber">
+                  Portfolio piece
+                </p>
+                <p className="mt-3 font-[family-name:var(--font-display)] text-3xl text-bone md:text-4xl">
+                  Concordia’s Cafe
+                </p>
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
+                  All-day cafe on Aguirre Ave, BF Homes — coffee, pasta, steaks,
+                  cakes. A labeled sample of the best work we can show, not the
+                  ₱15k five-pager.
+                </p>
+                <a
+                  href={cafeHref}
+                  className="mt-6 inline-flex text-sm font-semibold text-amber transition hover:brightness-110"
+                >
+                  Open Concordia’s demo →
+                </a>
+              </div>
+              <div className="relative min-h-40">
+                <Image
+                  src="/demos/concordias-cafe/interior.png"
+                  alt="Concordia’s Cafe labeled demo"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                />
+              </div>
+            </article>
+
+            <ul className="mt-6 grid gap-6 md:grid-cols-3">
               {demos.map((demo) => {
                 const href = site.demos[demo.key];
                 const live = Boolean(href);

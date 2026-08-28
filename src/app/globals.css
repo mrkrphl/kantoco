@@ -18,6 +18,13 @@
   --color-bone: var(--bone);
   --color-steel: var(--steel);
   --color-concrete: var(--concrete);
+  --color-cream: #f4ebe0;
+  --color-espresso: #2a1c14;
+  --color-terracotta: #c45c3a;
+  --color-clay: #8c4a32;
+  --color-brass: #c4a574;
+  --color-olive: #5e5c45;
+  --color-milk: #faf6f0;
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
@@ -82,6 +89,18 @@ body {
 .animate-line {
   transform-origin: left;
   animation: line-grow 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+.cafe-root {
+  min-height: 100%;
+  background: #f4ebe0;
+  color: #2a1c14;
+  font-family: var(--font-cafe-sans), system-ui, sans-serif;
+}
+
+.cafe-root ::selection {
+  background: color-mix(in srgb, #c45c3a 55%, transparent);
+  color: #f4ebe0;
 }
 
 .site-grain::before {
