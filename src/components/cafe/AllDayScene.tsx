@@ -257,6 +257,22 @@ function formatClock(progress: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+/** Exclusive fade: outgoing hits 0 before incoming leaves 0, so captions never stack. */
+function chapterOpacity(index: number, progress: number, count = 4) {
+  const start = index / count;
+  const end = (index + 1) / count;
+  const fade = 0.04;
+  if (progress < start || progress > end) return 0;
+  let opacity = 1;
+  if (index > 0 && progress < start + fade) {
+    opacity = (progress - start) / fade;
+  }
+  if (index < count - 1 && progress > end - fade) {
+    opacity = Math.min(opacity, (end - progress) / fade);
+  }
+  return Math.max(0, Math.min(1, opacity));
+}
+
 export default function AllDayScene() {
   const pinRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -361,9 +377,12 @@ export default function AllDayScene() {
       if (clockRef.current) clockRef.current.textContent = formatClock(p);
       chapterRefs.current.forEach((el, i) => {
         if (!el) return;
-        const local = 1 - Math.min(1, Math.abs(p - (i + 0.5) / 4) * 4.2);
-        el.style.opacity = String(0.12 + local * 0.88);
-        el.style.transform = `translateY(${(1 - local) * 18}px)`;
+        const opacity = chapterOpacity(i, p);
+        const visible = opacity > 0.02;
+        el.style.opacity = String(opacity);
+        el.style.visibility = visible ? "visible" : "hidden";
+        el.style.zIndex = visible ? "1" : "0";
+        el.setAttribute("aria-hidden", visible ? "false" : "true");
       });
     };
 
@@ -433,8 +452,8 @@ export default function AllDayScene() {
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(42,28,20,0.18)_100%)]" />
 
-      <div className="absolute left-5 top-8 z-10 md:left-10">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-clay">
+      <div className="pointer-events-none absolute left-5 top-8 z-10 md:left-10">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-espresso">
           Scroll the table
         </p>
         <p
@@ -443,27 +462,31 @@ export default function AllDayScene() {
         >
           07:00
         </p>
-        <p className="mt-1 text-sm text-olive">Aguirre Ave · all day</p>
+        <p className="mt-1 text-sm font-medium text-espresso/80">Aguirre Ave · all day</p>
       </div>
 
-      <div className="absolute bottom-8 left-5 right-5 z-10 md:bottom-12 md:left-auto md:right-10 md:w-[22rem]">
-        <div className="relative min-h-[8.5rem]">
+      <div className="pointer-events-none absolute bottom-8 left-5 right-5 z-10 md:bottom-12 md:left-auto md:right-10 md:w-[22rem]">
+        <div className="relative isolate min-h-[9.5rem] overflow-hidden border-l-[3px] border-clay bg-cream px-4 py-3 shadow-[0_10px_28px_rgba(42,28,20,0.14)]">
           {dayChapters.map((chapter, i) => (
             <div
               key={chapter.clock}
               ref={(el) => {
                 chapterRefs.current[i] = el;
               }}
-              className="absolute inset-x-0 top-0 border-l-2 border-terracotta/70 pl-4"
-              style={{ opacity: i === 0 ? 1 : 0.12 }}
+              className="absolute inset-x-4 top-3"
+              style={{
+                opacity: i === 0 ? 1 : 0,
+                visibility: i === 0 ? "visible" : "hidden",
+              }}
+              aria-hidden={i !== 0}
             >
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-terracotta">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-clay">
                 {chapter.clock}
               </p>
               <p className="mt-1 font-[family-name:var(--font-cafe-display)] text-2xl text-espresso">
                 {chapter.title}
               </p>
-              <p className="mt-1 text-sm leading-relaxed text-olive">{chapter.body}</p>
+              <p className="mt-1 text-sm leading-relaxed text-espresso/90">{chapter.body}</p>
             </div>
           ))}
         </div>
