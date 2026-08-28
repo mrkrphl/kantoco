@@ -258,7 +258,7 @@ export default function ConcordiaExperience() {
                       rel="noopener noreferrer"
                       className="underline decoration-cream/40 underline-offset-4 hover:decoration-cream"
                     >
-                      {cafe.instagramHandle}
+                      Instagram {cafe.instagramHandle}
                     </a>
                   </dd>
                 </div>
