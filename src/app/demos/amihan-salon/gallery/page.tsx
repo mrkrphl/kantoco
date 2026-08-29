@@ -5,7 +5,7 @@ import { AmihanShell } from "@/components/demos/amihan/AmihanShell";
 const tiles = [
   ["/demos/amihan-salon/mirrors.jpg", "Wash basin and long mirror", "tall"],
   ["/demos/amihan-salon/shears.jpg", "Shears on a wood rack", "wide"],
-  ["/demos/amihan-salon/tools.jpg", "Hair texture mid-set", "wide"],
+  ["/demos/amihan-salon/wet-cut.jpg", "Dark wet hair mid-cut", "wide"],
   ["/demos/amihan-salon/chair.jpg", "Shears seated in a wood block", "sq"],
   ["/demos/amihan-salon/combs.jpg", "Clipper and brushes on the bench", "sq"],
   ["/demos/amihan-salon/mirror-chair.jpg", "Empty station, brick and plate", "tall"],
@@ -23,11 +23,11 @@ export default function AmihanGallery() {
           </p>
         </FadeUp>
 
-        <ul className="mt-10 columns-1 gap-3 sm:columns-2">
+        <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {tiles.map(([src, alt, shape]) => (
-            <li key={src} className="mb-3 break-inside-avoid">
+            <li key={src} className="min-w-0">
               <div
-                className={`relative ${
+                className={`relative overflow-hidden ${
                   shape === "tall"
                     ? "aspect-[3/4]"
                     : shape === "wide"

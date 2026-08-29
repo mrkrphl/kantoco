@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ClipReveal } from "@/components/demos/ClipReveal";
 import { FadeUp } from "@/components/demos/FadeUp";
 import { HaligiPin } from "@/components/demos/haligi/HaligiPin";
 import { HaligiShell } from "@/components/demos/haligi/HaligiShell";
@@ -25,8 +24,8 @@ export default function HaligiHome() {
         </div>
       </HaligiPin>
 
-      <div className="grid md:grid-cols-[1.05fr_0.95fr]">
-        <div className="px-4 py-10 md:px-6 md:py-14">
+      <div className="grid md:grid-cols-[1.05fr_0.95fr] md:items-start">
+        <div className="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
           <FadeUp>
             <h1 className="haligi-cond text-5xl leading-[0.9] text-[var(--ha-yellow)] md:text-7xl">
               We take the car.
@@ -72,16 +71,16 @@ export default function HaligiHome() {
           </div>
         </div>
 
-        <ClipReveal className="relative min-h-[280px] md:min-h-full">
+        <div className="relative min-h-[280px] overflow-hidden md:h-[calc(100svh-11rem)] md:min-h-[22rem]">
           <Image
             src="/demos/haligi-auto/lift.jpg"
             alt="White wagon on a two-post lift in a working bay"
             fill
-            className="object-cover"
+            className="object-cover object-[center_72%]"
             sizes="(max-width: 768px) 100vw, 50vw"
             preload
           />
-        </ClipReveal>
+        </div>
       </div>
     </HaligiShell>
   );

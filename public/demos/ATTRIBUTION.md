@@ -25,7 +25,7 @@ Licenses:
 | `amihan-salon/chair.jpg` | https://www.pexels.com/photo/3992874/ | cottonbro studio | Pexels License |
 | `amihan-salon/combs.jpg` | https://www.pexels.com/photo/3992870/ | cottonbro studio | Pexels License |
 | `amihan-salon/shears.jpg` | https://www.pexels.com/photo/several-scissors-1319460/ | Nikolaos Dimou | Pexels License |
-| `amihan-salon/tools.jpg` | https://www.pexels.com/photo/3065209/ | cottonbro studio | Pexels License |
+| `amihan-salon/wet-cut.jpg` | https://www.pexels.com/photo/close-up-of-person-with-short-hair-getting-a-haircut-15659494/ | Jari Lobo | Pexels License |
 | `amihan-salon/mirrors.jpg` | https://www.pexels.com/photo/the-interior-of-a-barber-shop-7518728/ | Pavel Danilyuk | Pexels License |
 | `amihan-salon/mirror-chair.jpg` | https://www.pexels.com/photo/salon-chair-beside-oil-heater-in-front-of-mirror-inside-room-1895701/ | Lisa from Pexels | Pexels License |
 
