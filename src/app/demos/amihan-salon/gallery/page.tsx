@@ -23,11 +23,11 @@ export default function AmihanGallery() {
           </p>
         </FadeUp>
 
-        <ul className="mt-10 columns-1 gap-3 sm:columns-2">
+        <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {tiles.map(([src, alt, shape]) => (
-            <li key={src} className="mb-3 break-inside-avoid">
+            <li key={src} className="min-w-0">
               <div
-                className={`relative ${
+                className={`relative overflow-hidden ${
                   shape === "tall"
                     ? "aspect-[3/4]"
                     : shape === "wide"

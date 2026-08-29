@@ -19,9 +19,9 @@ export function HaligiPin({ children }: { children: React.ReactNode }) {
       ScrollTrigger.create({
         trigger: el,
         start: "top top",
-        end: "+=56",
+        end: "+=48",
         pin: true,
-        pinSpacing: true,
+        pinSpacing: false,
       });
     },
     { scope: ref },
