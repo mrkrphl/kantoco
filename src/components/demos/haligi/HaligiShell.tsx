@@ -23,7 +23,7 @@ export function HaligiShell({
         {DEMO_DISCLAIMER}
       </p>
 
-      <header className="bg-[var(--ha-black)] px-4 py-5 md:px-6">
+      <header className="bg-[var(--ha-black)] px-4 py-3 md:px-6 md:py-3.5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <Link href="/demos/haligi-auto" className="block">
             <p className="text-[10px] font-bold tracking-[0.24em] text-[var(--ha-yellow)]">

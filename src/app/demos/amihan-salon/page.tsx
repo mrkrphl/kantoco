@@ -19,8 +19,8 @@ export default function AmihanHome() {
           </p>
         </FadeUp>
 
-        <div className="relative mt-10 grid min-h-[28rem] grid-cols-12 gap-3 md:min-h-[36rem]">
-          <ClipReveal className="relative col-span-12 aspect-[4/5] md:col-span-7 md:aspect-auto md:h-[36rem]">
+        <div className="mt-10 grid grid-cols-12 gap-3">
+          <ClipReveal className="relative col-span-12 aspect-[4/5] md:col-span-7 md:row-span-2 md:aspect-auto md:min-h-[36rem]">
             <Image
               src="/demos/amihan-salon/mirrors.jpg"
               alt="Empty wash station, brick, and a long salon mirror"
@@ -30,22 +30,22 @@ export default function AmihanHome() {
               preload
             />
           </ClipReveal>
-          <div className="relative col-span-7 aspect-[3/4] md:col-span-5 md:mt-16 md:aspect-auto md:h-[22rem]">
+          <div className="relative col-span-7 aspect-[3/4] overflow-hidden md:col-span-5 md:aspect-[4/5]">
             <Image
-              src="/demos/amihan-salon/tools.jpg"
-              alt="Wet-styled hair texture, no face in frame"
+              src="/demos/amihan-salon/wet-cut.jpg"
+              alt="Dark wet hair in a shears-and-comb cut, no face in frame"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 60vw, 40vw"
             />
           </div>
-          <div className="relative col-span-5 aspect-square self-end md:absolute md:bottom-6 md:right-[18%] md:h-48 md:w-48">
+          <div className="relative col-span-5 aspect-square overflow-hidden md:col-span-5 md:aspect-[16/10]">
             <Image
               src="/demos/amihan-salon/shears.jpg"
               alt="Shears hung on a dark wood rack"
               fill
               className="object-cover"
-              sizes="200px"
+              sizes="(max-width: 768px) 40vw, 40vw"
             />
           </div>
         </div>
