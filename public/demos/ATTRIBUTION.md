@@ -29,6 +29,30 @@ Licenses:
 | `amihan-salon/mirrors.jpg` | https://www.pexels.com/photo/the-interior-of-a-barber-shop-7518728/ | Pavel Danilyuk | Pexels License |
 | `amihan-salon/mirror-chair.jpg` | https://www.pexels.com/photo/salon-chair-beside-oil-heater-in-front-of-mirror-inside-room-1895701/ | Lisa from Pexels | Pexels License |
 
+## Aninag Studio
+
+| File | Source | Author | License |
+| --- | --- | --- | --- |
+| `aninag-studio/studio-room.jpg` | https://unsplash.com/photos/ae15ff5dd4ea | Alexander Andrews | Unsplash License |
+| `aninag-studio/loft-lights.jpg` | https://www.pexels.com/photo/10910632/ | Max Ravier | Pexels License |
+| `aninag-studio/camera.jpg` | https://www.pexels.com/photo/274973/ | Pixabay | Pexels License |
+
+## Hinog Bakery
+
+| File | Source | Author | License |
+| --- | --- | --- | --- |
+| `hinog-bakery/counter.jpg` | https://www.pexels.com/photo/1070946/ | Life Of Pix | Pexels License |
+| `hinog-bakery/crust.jpg` | https://unsplash.com/photos/0249088772ff | Wesual Click | Unsplash License |
+| `hinog-bakery/bags.jpg` | https://www.pexels.com/photo/1666067/ | Pexels contributor | Pexels License |
+
+## Buhol Blooms
+
+| File | Source | Author | License |
+| --- | --- | --- | --- |
+| `buhol-blooms/buckets.jpg` | https://www.pexels.com/photo/28252162/ | Natalia S | Pexels License |
+| `buhol-blooms/market-table.jpg` | https://www.pexels.com/photo/26161064/ | Natalia S | Pexels License |
+| `buhol-blooms/wrap.jpg` | https://www.pexels.com/photo/931147/ | Secret Garden | Pexels License |
+
 ## Haligi Auto Care
 
 | File | Source | Author | License |

@@ -69,6 +69,9 @@ export default function Home() {
             <a href="#samples" className="hidden transition hover:text-bone sm:inline">
               Samples
             </a>
+            <a href="#craft" className="hidden transition hover:text-bone sm:inline">
+              Craft
+            </a>
             <a href="#package" className="hidden transition hover:text-bone sm:inline">
               Package
             </a>
@@ -175,6 +178,75 @@ export default function Home() {
                 );
               })}
             </ul>
+          </div>
+        </section>
+
+        {/* Craft samples. Extra row. Concordia stays unlisted. */}
+        <section
+          id="craft"
+          className="border-t border-white/10 px-5 py-20 md:px-8 md:py-28"
+        >
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber">
+              Craft samples
+            </p>
+            <h2 className="mt-3 max-w-xl font-[family-name:var(--font-display)] text-3xl leading-tight text-bone md:text-5xl">
+              One-scroll shops. Different type, motion, photo.
+            </h2>
+            <p className="mt-4 max-w-lg text-concrete">
+              Extra labeled samples. Not the clinic, salon, or auto row. Demo
+              site by KantoCo. Sample only. Not real client work.
+            </p>
+
+            <ol className="mt-12 divide-y divide-white/10 border-y border-white/10">
+              {[
+                {
+                  href: "/demos/aninag-studio",
+                  shop: "Aninag Studio",
+                  kind: "Photo studio",
+                  motion: "Aperture irises open into the room.",
+                  mark: "f/1.4",
+                },
+                {
+                  href: "/demos/hinog-bakery",
+                  shop: "Hinog Bakery",
+                  kind: "Bakery counter",
+                  motion: "A kraft box lifts its lid.",
+                  mark: "014",
+                },
+                {
+                  href: "/demos/buhol-blooms",
+                  shop: "Buhol Blooms",
+                  kind: "Flower stall",
+                  motion: "Petals unfurl, then the table.",
+                  mark: "wrap",
+                },
+              ].map((row) => (
+                <li
+                  key={row.href}
+                  className="grid gap-3 py-7 sm:grid-cols-[5.5rem_1fr_auto] sm:items-end"
+                >
+                  <p className="font-[family-name:var(--font-display)] text-amber">
+                    {row.mark}
+                  </p>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-steel">
+                      {row.kind}
+                    </p>
+                    <p className="mt-1 font-[family-name:var(--font-display)] text-2xl text-bone md:text-3xl">
+                      {row.shop}
+                    </p>
+                    <p className="mt-2 max-w-md text-sm text-concrete">{row.motion}</p>
+                  </div>
+                  <Link
+                    href={row.href}
+                    className="text-sm font-semibold text-amber transition hover:brightness-110"
+                  >
+                    Open demo
+                  </Link>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
