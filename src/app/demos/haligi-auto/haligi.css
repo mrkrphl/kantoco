@@ -1,0 +1,41 @@
+.haligi {
+  --ha-black: #111111;
+  --ha-yellow: #f0c400;
+  --ha-grease: #2e2e2c;
+  --ha-steel: #c4c2b8;
+  --ha-paper: #e8e4d8;
+  background: var(--ha-grease);
+  color: var(--ha-paper);
+  font-family: var(--font-haligi-body), "Source Sans 3", ui-sans-serif, sans-serif;
+  min-height: 100%;
+}
+
+.haligi a {
+  color: inherit;
+}
+
+.haligi ::selection {
+  background: var(--ha-yellow);
+  color: var(--ha-black);
+}
+
+.haligi-cond {
+  font-family: var(--font-haligi-display), "Barlow Condensed", sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.haligi-stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ha-yellow),
+    var(--ha-yellow) 10px,
+    var(--ha-black) 10px,
+    var(--ha-black) 20px
+  );
+}
+
+.haligi-stamp {
+  border: 3px solid var(--ha-yellow);
+  box-shadow: 4px 4px 0 var(--ha-black);
+}
