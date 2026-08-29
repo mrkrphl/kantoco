@@ -153,7 +153,7 @@ export default function Home() {
               </div>
               <div className="relative min-h-40">
                 <Image
-                  src="/demos/concordias-cafe/night-facade.webp"
+                  src="/demos/concordias-cafe/walk-in/facade.webp"
                   alt="Concordia's Cafe private sample"
                   fill
                   className="object-cover"

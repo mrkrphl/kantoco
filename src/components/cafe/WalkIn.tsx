@@ -3,157 +3,243 @@
 import Image from "next/image";
 import { useRef } from "react";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { cafe, walkIn } from "@/lib/cafe";
 import ArchMark from "./ArchMark";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-function chapterOpacity(index: number, progress: number, count: number) {
-  const start = index / count;
-  const end = (index + 1) / count;
-  const fade = 0.08;
-  if (progress < start || progress > end) return 0;
-  let opacity = 1;
-  if (index > 0 && progress < start + fade) {
-    opacity = (progress - start) / fade;
+declare global {
+  interface Window {
+    gsap: typeof gsap;
+    ScrollTrigger: typeof ScrollTrigger;
   }
-  if (index < count - 1 && progress > end - fade) {
-    opacity = Math.min(opacity, (end - progress) / fade);
-  }
-  return Math.max(0, Math.min(1, opacity));
+}
+
+if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+  throw new Error("WalkIn: GSAP failed to import. Do not ship a CSS fallback.");
+}
+
+function exposeGsap() {
+  window.gsap = gsap;
+  window.ScrollTrigger = ScrollTrigger;
 }
 
 export default function WalkIn() {
   const rootRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const pinRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      const pin = rootRef.current;
-      const stage = stageRef.current;
-      if (!pin || !stage) return;
+      const root = rootRef.current;
+      const pin = pinRef.current;
+      if (!root || !pin) return;
 
-      const apply = (p: number) => {
-        const count = walkIn.length;
-        layerRefs.current.forEach((el, i) => {
-          if (!el) return;
-          const opacity = chapterOpacity(i, p, count);
-          const visible = opacity > 0.02;
-          el.style.opacity = String(opacity);
-          el.style.visibility = visible ? "visible" : "hidden";
-          if (visible) {
-            const start = i / count;
-            const local = Math.min(1, Math.max(0, (p - start) / (1 / count)));
-            el.style.transform = `scale(${1.06 - local * 0.06})`;
-          }
-        });
-      };
+      if (typeof gsap === "undefined" || typeof ScrollTrigger.create !== "function") {
+        throw new Error("WalkIn: ScrollTrigger is missing after import.");
+      }
 
-      const mm = gsap.matchMedia();
+      exposeGsap();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        apply(0);
-        gsap.from(".walkin-intro", {
-          y: 24,
-          autoAlpha: 0,
-          duration: 0.85,
-          stagger: 0.08,
-          ease: "power3.out",
-        });
+      const layers = gsap.utils.toArray<HTMLElement>(".walkin-layer", pin);
+      const photos = gsap.utils.toArray<HTMLElement>(".walkin-photo", pin);
+      const types = gsap.utils.toArray<HTMLElement>(".walkin-type", pin);
+      const cupReveal = pin.querySelector<HTMLElement>(".walkin-cup-reveal");
+      const cupLayer = pin.querySelector<HTMLElement>('[data-key="cup"]');
 
-        ScrollTrigger.create({
-          trigger: pin,
-          start: "top top",
-          end: "+=360%",
-          pin: true,
-          scrub: 0.7,
-          anticipatePin: 1,
-          onUpdate: (self) => apply(self.progress),
-        });
-      });
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        stage.style.height = "auto";
-        layerRefs.current.forEach((el) => {
-          if (!el) return;
+      if (reduced) {
+        pin.dataset.walkin = "reduced";
+        pin.style.height = "auto";
+        layers.forEach((el) => {
+          el.style.position = "relative";
+          el.style.height = "100svh";
           el.style.opacity = "1";
           el.style.visibility = "visible";
           el.style.transform = "none";
-          el.style.position = "relative";
-          el.style.height = "100svh";
+          el.style.clipPath = "none";
         });
+        return;
+      }
+
+      pin.dataset.walkin = "pinned";
+
+      gsap.set(layers, { autoAlpha: 0 });
+      gsap.set(layers[0], { autoAlpha: 1 });
+      gsap.set(photos, { scale: 1.08, transformOrigin: "50% 50%" });
+      gsap.set(types, { y: 24, autoAlpha: 0 });
+      if (cupReveal) {
+        gsap.set(cupReveal, { clipPath: "circle(0% at 50% 52%)" });
+      }
+      if (cupLayer) {
+        gsap.set(cupLayer, { autoAlpha: 1 });
+      }
+
+      gsap.from(".walkin-intro", {
+        y: 24,
+        autoAlpha: 0,
+        duration: 0.85,
+        stagger: 0.08,
+        ease: "power3.out",
       });
 
-      return () => mm.revert();
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: pin,
+          start: "top top",
+          end: "+=480%",
+          pin: true,
+          pinSpacing: true,
+          scrub: 0.6,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          id: "walk-in",
+        },
+      });
+
+      tl.to(photos[0], { scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+      tl.to(types[0], { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out" }, 0.05);
+
+      const crossfade = (from: number, to: number, at: number) => {
+        tl.to(types[from], { autoAlpha: 0, y: -16, duration: 0.2, ease: "power3.out" }, at);
+        tl.to(layers[from], { autoAlpha: 0, duration: 0.16 }, at + 0.2);
+        tl.fromTo(
+          layers[to],
+          { autoAlpha: 0 },
+          { autoAlpha: 1, duration: 0.16, immediateRender: false },
+          at + 0.36,
+        );
+        tl.fromTo(
+          photos[to],
+          { scale: 1.08 },
+          { scale: 1, duration: 0.9, ease: "power3.out", immediateRender: false },
+          at + 0.36,
+        );
+        if (types[to]?.dataset.empty !== "true") {
+          tl.fromTo(
+            types[to],
+            { y: 24, autoAlpha: 0 },
+            { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out", immediateRender: false },
+            at + 0.42,
+          );
+        }
+      };
+
+      // facade → patio glass → inside at the doors → the hall
+      crossfade(0, 1, 1.0);
+      crossfade(1, 2, 2.15);
+      crossfade(2, 3, 3.3);
+
+      // cup opens over the room
+      const cupAt = 4.5;
+      tl.to(types[3], { autoAlpha: 0, y: -16, duration: 0.2, ease: "power3.out" }, cupAt);
+      if (cupReveal) {
+        tl.fromTo(
+          cupReveal,
+          { clipPath: "circle(0% at 50% 52%)" },
+          { clipPath: "circle(80% at 50% 52%)", duration: 1.2, ease: "power3.out" },
+          cupAt + 0.12,
+        );
+      }
+      tl.fromTo(
+        photos[4],
+        { scale: 1.08 },
+        { scale: 1, duration: 1.2, ease: "power3.out", immediateRender: false },
+        cupAt + 0.12,
+      );
+      tl.to(layers[3], { autoAlpha: 0, duration: 0.5 }, cupAt + 0.4);
+      tl.fromTo(
+        types[4],
+        { y: 24, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out", immediateRender: false },
+        cupAt + 0.55,
+      );
+
+      const refresh = () => ScrollTrigger.refresh();
+      pin.querySelectorAll("img").forEach((img) => {
+        if (img.complete) return;
+        img.addEventListener("load", refresh, { once: true });
+      });
+      requestAnimationFrame(refresh);
     },
     { scope: rootRef },
   );
 
   return (
-    <section ref={rootRef} className="walkin overflow-hidden bg-navy">
-      <div ref={stageRef} className="relative h-[100svh]">
-        {walkIn.map((chapter, i) => (
-          <div
-            key={chapter.key}
-            ref={(el) => {
-              layerRefs.current[i] = el;
-            }}
-            className="absolute inset-0 origin-center will-change-transform"
-            style={{
-              opacity: i === 0 ? 1 : 0,
-              visibility: i === 0 ? "visible" : "hidden",
-            }}
-          >
-            <Image
-              src={chapter.src}
-              alt={chapter.alt}
-              fill
-              priority={i === 0}
-              className="object-cover"
-              sizes="100vw"
-            />
+    <section ref={rootRef} className="walkin bg-navy">
+      <div
+        ref={pinRef}
+        id="walk-in"
+        className="walkin-pin relative h-[100svh] overflow-hidden"
+      >
+        {walkIn.map((chapter, i) => {
+          const emptyType = !chapter.title && !chapter.line;
+          const isCup = chapter.kind === "cup";
+          return (
             <div
-              className={
-                chapter.wash === "soft"
-                  ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/25 via-transparent to-navy/10"
-                  : "pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/25 to-transparent"
-              }
-              aria-hidden
-            />
-            {chapter.wash !== "soft" ? (
+              key={chapter.key}
+              data-key={chapter.key}
+              className="walkin-layer absolute inset-0"
+              style={{ zIndex: isCup ? 4 : i + 1 }}
+            >
               <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-navy/20"
-                aria-hidden
-              />
-            ) : null}
-            <div className="absolute inset-x-5 bottom-16 max-w-3xl md:inset-x-8 md:bottom-20">
-              {chapter.kicker ? (
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-cornflower-2">
-                  {chapter.kicker}
-                </p>
-              ) : null}
-              {chapter.title ? (
-                <p className="mt-2 font-[family-name:var(--font-cafe-display)] text-[clamp(3.4rem,14vw,8rem)] leading-[0.82] tracking-[-0.03em] text-cream">
-                  {chapter.title}
-                </p>
-              ) : null}
-              {chapter.line ? (
-                <p
-                  className={`mt-4 text-cream ${
-                    "italic" in chapter && chapter.italic
-                      ? "font-[family-name:var(--font-cafe-accent)] text-xl italic md:text-2xl"
-                      : "font-[family-name:var(--font-cafe-display)] text-2xl tracking-tight md:text-4xl"
-                  }`}
-                >
-                  {chapter.line}
-                </p>
-              ) : null}
+                className={
+                  isCup
+                    ? "walkin-cup-reveal absolute inset-0 overflow-hidden"
+                    : "absolute inset-0"
+                }
+              >
+                <div className="walkin-photo absolute inset-0 origin-center will-change-transform">
+                  <Image
+                    src={chapter.src}
+                    alt={chapter.alt}
+                    fill
+                    priority={i < 2}
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/65 via-navy/20 to-transparent"
+                    aria-hidden
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/55 via-transparent to-navy/15"
+                    aria-hidden
+                  />
+                </div>
+              </div>
+              <div
+                className="walkin-type absolute inset-x-5 bottom-16 max-w-3xl md:inset-x-8 md:bottom-20"
+                data-empty={emptyType ? "true" : "false"}
+              >
+                {chapter.kicker ? (
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-cornflower-2">
+                    {chapter.kicker}
+                  </p>
+                ) : null}
+                {chapter.title ? (
+                  <p className="mt-2 font-[family-name:var(--font-cafe-display)] text-[clamp(3.4rem,14vw,8rem)] leading-[0.82] tracking-[-0.03em] text-cream">
+                    {chapter.title}
+                  </p>
+                ) : null}
+                {chapter.line ? (
+                  <p
+                    className={`mt-4 text-cream ${
+                      "italic" in chapter && chapter.italic
+                        ? "font-[family-name:var(--font-cafe-accent)] text-xl italic md:text-2xl"
+                        : "font-[family-name:var(--font-cafe-display)] text-2xl tracking-tight md:text-4xl"
+                    }`}
+                  >
+                    {chapter.line}
+                  </p>
+                ) : null}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="pointer-events-none absolute inset-x-5 top-8 z-10 flex items-start gap-3 md:inset-x-8 md:top-10">
           <ArchMark className="walkin-intro h-12 w-12 shrink-0 md:h-14 md:w-14" />
