@@ -67,7 +67,7 @@ export default function WalkIn() {
         ScrollTrigger.create({
           trigger: pin,
           start: "top top",
-          end: "+=280%",
+          end: "+=360%",
           pin: true,
           scrub: 0.7,
           anticipatePin: 1,
@@ -116,29 +116,41 @@ export default function WalkIn() {
               sizes="100vw"
             />
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/25 to-transparent"
+              className={
+                chapter.wash === "soft"
+                  ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/25 via-transparent to-navy/10"
+                  : "pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/25 to-transparent"
+              }
               aria-hidden
             />
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-navy/20"
-              aria-hidden
-            />
+            {chapter.wash !== "soft" ? (
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-navy/20"
+                aria-hidden
+              />
+            ) : null}
             <div className="absolute inset-x-5 bottom-16 max-w-3xl md:inset-x-8 md:bottom-20">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-cornflower-2">
-                {chapter.kicker}
-              </p>
-              <p className="mt-2 font-[family-name:var(--font-cafe-display)] text-[clamp(3.4rem,14vw,8rem)] leading-[0.82] tracking-[-0.03em] text-cream">
-                {chapter.title}
-              </p>
-              <p
-                className={`mt-4 text-cream ${
-                  "italic" in chapter && chapter.italic
-                    ? "font-[family-name:var(--font-cafe-accent)] text-xl italic md:text-2xl"
-                    : "font-[family-name:var(--font-cafe-display)] text-2xl tracking-tight md:text-4xl"
-                }`}
-              >
-                {chapter.line}
-              </p>
+              {chapter.kicker ? (
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-cornflower-2">
+                  {chapter.kicker}
+                </p>
+              ) : null}
+              {chapter.title ? (
+                <p className="mt-2 font-[family-name:var(--font-cafe-display)] text-[clamp(3.4rem,14vw,8rem)] leading-[0.82] tracking-[-0.03em] text-cream">
+                  {chapter.title}
+                </p>
+              ) : null}
+              {chapter.line ? (
+                <p
+                  className={`mt-4 text-cream ${
+                    "italic" in chapter && chapter.italic
+                      ? "font-[family-name:var(--font-cafe-accent)] text-xl italic md:text-2xl"
+                      : "font-[family-name:var(--font-cafe-display)] text-2xl tracking-tight md:text-4xl"
+                  }`}
+                >
+                  {chapter.line}
+                </p>
+              ) : null}
             </div>
           </div>
         ))}

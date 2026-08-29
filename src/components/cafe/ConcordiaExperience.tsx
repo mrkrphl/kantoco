@@ -27,8 +27,8 @@ export default function ConcordiaExperience() {
             </p>
             <p className="mt-6 max-w-md text-base leading-relaxed text-navy/80">
               A private labeled sample of their room. Night facade, glass,
-              then the hall. Not a pitch. Facebook and Instagram are the live
-              pages.
+              the room, then the cup. Not a pitch. Facebook and Instagram are
+              the live pages.
             </p>
           </div>
           <dl className="space-y-5 text-sm">
