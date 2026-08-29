@@ -18,6 +18,12 @@
   --color-bone: var(--bone);
   --color-steel: var(--steel);
   --color-concrete: var(--concrete);
+  --color-navy: #00337f;
+  --color-cornflower: #4a7bbe;
+  --color-cornflower-2: #5d8fce;
+  --color-terracotta: #a3482d;
+  --color-ochre: #885409;
+  --color-cream: #efebe4;
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
@@ -82,6 +88,18 @@ body {
 .animate-line {
   transform-origin: left;
   animation: line-grow 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+.cafe-root {
+  min-height: 100%;
+  background: #efebe4;
+  color: #00337f;
+  font-family: var(--font-cafe-sans), system-ui, sans-serif;
+}
+
+.cafe-root ::selection {
+  background: color-mix(in srgb, #4a7bbe 55%, transparent);
+  color: #efebe4;
 }
 
 .site-grain::before {

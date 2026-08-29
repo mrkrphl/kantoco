@@ -2,7 +2,7 @@ import Image from "next/image";
 import { site, type Vertical } from "@/lib/config";
 
 const demos: {
-  key: Vertical;
+  key: Exclude<Vertical, "cafe">;
   label: string;
   blurb: string;
 }[] = [
@@ -44,7 +44,7 @@ function MessageLink({
 
 export default function Home() {
   return (
-    <div className="relative overflow-x-hidden bg-charcoal text-bone">
+    <div className="site-grain relative overflow-x-hidden bg-charcoal text-bone">
       <header className="absolute inset-x-0 top-0 z-20">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 md:px-8">
           <a href="#top" className="flex items-center gap-2.5">
