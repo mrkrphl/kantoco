@@ -141,9 +141,8 @@ export default function Home() {
                   Concordia’s Cafe
                 </p>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
-                  Neighborhood cafe on Aguirre Ave, BF Homes. Concrete, navy
-                  mark, photobooth, visitor plates. A labeled sample of the
-                  best work we can show, not the ₱15k five-pager.
+                  Private labeled sample. A walk-in through their space on
+                  Aguirre Ave, BF Homes. Not a pitch. Not the ₱15k five-pager.
                 </p>
                 <a
                   href={cafeHref}
@@ -154,8 +153,8 @@ export default function Home() {
               </div>
               <div className="relative min-h-40">
                 <Image
-                  src="/demos/concordias-cafe/day-interior.webp"
-                  alt="Concordia's Cafe labeled demo"
+                  src="/demos/concordias-cafe/night-facade.webp"
+                  alt="Concordia's Cafe private sample"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 40vw"
