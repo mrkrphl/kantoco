@@ -1,0 +1,30 @@
+.amihan {
+  --ami-ink: #0b1210;
+  --ami-teal: #1a5c58;
+  --ami-tungsten: #c9a36a;
+  --ami-paper: #efe4cf;
+  --ami-dim: #8d8576;
+  background: var(--ami-ink);
+  color: var(--ami-paper);
+  font-family: var(--font-amihan-body), Karla, ui-sans-serif, sans-serif;
+  min-height: 100%;
+}
+
+.amihan a {
+  color: inherit;
+}
+
+.amihan ::selection {
+  background: var(--ami-tungsten);
+  color: var(--ami-ink);
+}
+
+.amihan-display {
+  font-family: var(--font-amihan-display), Syne, sans-serif;
+  letter-spacing: -0.045em;
+}
+
+.amihan-neon {
+  color: var(--ami-tungsten);
+  text-shadow: 0 0 0 transparent;
+}

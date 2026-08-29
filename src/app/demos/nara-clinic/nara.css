@@ -1,0 +1,33 @@
+.nara {
+  --nara-paper: #efe6d6;
+  --nara-ink: #1c1914;
+  --nara-green: #2c4a3e;
+  --nara-rust: #8f3d2a;
+  --nara-rule: #c9bba4;
+  --nara-muted: #5c564c;
+  background: var(--nara-paper);
+  color: var(--nara-ink);
+  font-family: var(--font-nara), "IBM Plex Sans", ui-sans-serif, sans-serif;
+  min-height: 100%;
+}
+
+.nara a {
+  color: inherit;
+}
+
+.nara ::selection {
+  background: color-mix(in srgb, var(--nara-rust) 40%, transparent);
+  color: var(--nara-paper);
+}
+
+.nara-rule {
+  border-color: var(--nara-rule);
+}
+
+.nara-ledger {
+  border-top: 1px solid var(--nara-rule);
+}
+
+.nara-ledger + .nara-ledger {
+  border-top: 1px dashed var(--nara-rule);
+}

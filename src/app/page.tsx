@@ -1,24 +1,29 @@
 import Image from "next/image";
+import Link from "next/link";
 import { site, type Vertical } from "@/lib/config";
 
 const demos: {
   key: Exclude<Vertical, "cafe">;
   label: string;
+  shop: string;
   blurb: string;
 }[] = [
   {
     key: "clinic",
     label: "Clinic",
+    shop: "Nara Clinic",
     blurb: "Clear services, hours, and a Message button patients can find.",
   },
   {
     key: "salon",
     label: "Salon",
+    shop: "Amihan Salon",
     blurb: "Gallery-forward layout for beauty shops that live on walk-ins.",
   },
   {
     key: "auto",
     label: "Auto",
+    shop: "Haligi Auto Care",
     blurb: "Straight talk on services and contact for repair & parts shops.",
   },
 ];
@@ -139,18 +144,28 @@ export default function Home() {
                     <p className="font-[family-name:var(--font-display)] text-2xl text-bone">
                       {demo.label}
                     </p>
+                    <p className="mt-1 text-sm text-amber">{demo.shop}</p>
                     <p className="mt-3 text-sm leading-relaxed text-steel">
                       {demo.blurb}
                     </p>
                     {live ? (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex text-sm font-semibold text-amber transition hover:brightness-110"
-                      >
-                        Open demo →
-                      </a>
+                      href.startsWith("/") ? (
+                        <Link
+                          href={href}
+                          className="mt-6 inline-flex text-sm font-semibold text-amber transition hover:brightness-110"
+                        >
+                          Open demo →
+                        </Link>
+                      ) : (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex text-sm font-semibold text-amber transition hover:brightness-110"
+                        >
+                          Open demo →
+                        </a>
+                      )
                     ) : (
                       <p className="mt-6 text-sm text-steel/80">
                         Demo link coming soon
