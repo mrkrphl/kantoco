@@ -17,10 +17,14 @@
   color: #fff;
 }
 
+html:has(.hinog) {
+  scroll-behavior: auto;
+}
+
 .hinog-banner {
-  position: absolute;
+  position: fixed;
   inset: 0 0 auto;
-  z-index: 20;
+  z-index: 40;
   padding: 0.5rem 1rem;
   text-align: center;
   font-size: 11px;
@@ -57,20 +61,36 @@
   place-items: center;
   perspective: 1400px;
   perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.hinog-box-scale {
+  transform: scale(clamp(0.58, calc(72vw / 280px), 1));
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.hinog-box-move {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .hinog-box {
   position: relative;
-  width: min(72vw, 300px);
-  height: min(48vw, 210px);
+  width: 280px;
+  height: 196px;
   transform-style: preserve-3d;
-  transform: rotateX(16deg) rotateY(-24deg);
+  -webkit-transform-style: preserve-3d;
+  transform: rotateX(18deg) rotateY(-26deg);
 }
 
 .hinog-panel,
 .hinog-lid,
 .hinog-flap {
   position: absolute;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background:
     repeating-linear-gradient(
       90deg,
@@ -85,19 +105,20 @@
 .hinog-flap-anchor {
   position: absolute;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .hinog-lid-anchor {
   inset: 0;
   transform-origin: top center;
-  transform: rotateX(90deg) translateZ(96px);
+  transform: rotateX(90deg) translateZ(98px);
 }
 
 .hinog-flap-anchor {
   top: 0;
   width: 46%;
   height: 42%;
-  transform: translateZ(97px);
+  transform: translateZ(99px);
 }
 
 .hinog-flap-anchor.left {
@@ -119,33 +140,33 @@
 }
 
 .hinog-front {
-  transform: translateZ(96px);
+  transform: translateZ(98px);
   display: grid;
   place-items: center;
 }
 
 .hinog-back {
-  transform: rotateY(180deg) translateZ(96px);
+  transform: rotateY(180deg) translateZ(98px);
 }
 
 .hinog-bottom {
-  transform: rotateX(-90deg) translateZ(105px);
+  transform: rotateX(-90deg) translateZ(98px);
   background: #8d5a24;
 }
 
 .hinog-left,
 .hinog-right {
-  width: 192px;
+  width: 196px;
   height: 100%;
-  left: calc(50% - 96px);
+  left: 42px;
 }
 
 .hinog-left {
-  transform: rotateY(-90deg) translateZ(150px);
+  transform: rotateY(-90deg) translateZ(140px);
 }
 
 .hinog-right {
-  transform: rotateY(90deg) translateZ(150px);
+  transform: rotateY(90deg) translateZ(140px);
 }
 
 .hinog-lid {
@@ -219,7 +240,7 @@
 }
 
 .hinog-rest {
-  padding: 4.2rem 1.2rem 5rem;
+  padding: 5.2rem 1.2rem 5rem;
   background:
     repeating-linear-gradient(
       0deg,
@@ -231,6 +252,16 @@
 .hinog-rest-inner {
   max-width: 58rem;
   margin: 0 auto;
+}
+
+.hinog-live-mark {
+  display: inline-block;
+  margin: 0 0 0.7rem;
+  background: var(--hinog-enamel);
+  color: #fff;
+  padding: 0.2rem 0.45rem;
+  font-size: 10px;
+  letter-spacing: 0.16em;
 }
 
 .hinog-rest h2 {

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
-import { exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
+import { DEMO_PIN, exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
 
 const PETALS = [
   { deg: 0, kind: "sap" },
@@ -55,11 +55,7 @@ export function BuholExperience() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pin,
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.6,
-          start: "top top",
-          end: "+=220%",
+          ...DEMO_PIN,
         },
       });
 
@@ -124,6 +120,7 @@ export function BuholExperience() {
 
       <section className="buhol-rest">
         <div className="buhol-rest-inner">
+          <p className="buhol-live-mark">{DEMO_BADGE}</p>
           <h2>
             knot the wrap
             <span>then the table</span>

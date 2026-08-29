@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
-import { exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
+import { DEMO_PIN, exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
 
 const BLADES = 12;
 
@@ -49,11 +49,7 @@ export function AninagExperience() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pin,
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.6,
-          start: "top top",
-          end: "+=220%",
+          ...DEMO_PIN,
         },
       });
 
@@ -112,6 +108,7 @@ export function AninagExperience() {
 
       <section className="aninag-rest">
         <div className="aninag-rest-grid">
+          <p className="aninag-live-mark">{DEMO_BADGE}</p>
           <h2>Paper. Tungsten. One gel.</h2>
           <p style={{ maxWidth: "28rem", marginTop: "1rem", lineHeight: 1.55 }}>
             Sample loft off Sucat Road, San Antonio, Parañaque. Fictional block.

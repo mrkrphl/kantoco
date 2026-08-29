@@ -17,10 +17,14 @@
   color: #fff;
 }
 
+html:has(.buhol) {
+  scroll-behavior: auto;
+}
+
 .buhol-banner {
-  position: absolute;
+  position: fixed;
   inset: 0 0 auto;
-  z-index: 20;
+  z-index: 40;
   padding: 0.5rem 1rem;
   text-align: center;
   font-size: 11px;
@@ -64,6 +68,7 @@
   width: min(70vmin, 420px);
   height: min(70vmin, 420px);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .buhol-petal-slot {
@@ -71,6 +76,7 @@
   inset: 0;
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .buhol-petal {
@@ -156,7 +162,7 @@
 }
 
 .buhol-rest {
-  padding: 4.2rem 1.2rem 5rem;
+  padding: 5.2rem 1.2rem 5rem;
   background:
     repeating-linear-gradient(
       -12deg,
@@ -168,6 +174,16 @@
 .buhol-rest-inner {
   max-width: 60rem;
   margin: 0 auto;
+}
+
+.buhol-live-mark {
+  display: inline-block;
+  margin: 0 0 0.7rem;
+  border: 2px solid var(--buhol-band);
+  color: var(--buhol-band);
+  padding: 0.15rem 0.4rem;
+  font-size: 10px;
+  letter-spacing: 0.16em;
 }
 
 .buhol-rest h2 {

@@ -25,4 +25,15 @@ if (typeof window !== "undefined") {
   exposeGsap();
 }
 
+/** One pinned viewport. Animate children, never the pinned node. */
+export const DEMO_PIN = {
+  pin: true,
+  pinSpacing: true,
+  scrub: 0.6,
+  start: "top top",
+  end: "+=220%",
+  anticipatePin: 1,
+  invalidateOnRefresh: true,
+} as const;
+
 export { gsap, ScrollTrigger, useGSAP };

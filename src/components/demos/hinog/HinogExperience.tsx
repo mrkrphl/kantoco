@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
-import { exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
+import { DEMO_PIN, exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
 
 export function HinogExperience() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ export function HinogExperience() {
       }
 
       const photo = pin.querySelector<HTMLElement>(".hinog-photo");
-      const box = pin.querySelector<HTMLElement>(".hinog-box");
+      const boxMove = pin.querySelector<HTMLElement>(".hinog-box-move");
       const lid = pin.querySelector<HTMLElement>(".hinog-lid");
       const flapL = pin.querySelector<HTMLElement>(".hinog-flap-l");
       const flapR = pin.querySelector<HTMLElement>(".hinog-flap-r");
@@ -29,7 +29,7 @@ export function HinogExperience() {
 
       if (reduced) {
         gsap.set(photo, { scale: 1, filter: "brightness(1) saturate(1)" });
-        gsap.set(box, { autoAlpha: 0, scale: 0.4 });
+        gsap.set(boxMove, { autoAlpha: 0, scale: 0.4 });
         gsap.set(lid, { rotateX: -128 });
         gsap.set(flapL, { rotateY: -88 });
         gsap.set(flapR, { rotateY: 88 });
@@ -45,17 +45,13 @@ export function HinogExperience() {
       gsap.set(lid, { rotateX: 0, transformOrigin: "top center" });
       gsap.set(flapL, { rotateY: 0, transformOrigin: "left center" });
       gsap.set(flapR, { rotateY: 0, transformOrigin: "right center" });
-      gsap.set(box, { scale: 1, autoAlpha: 1 });
+      gsap.set(boxMove, { autoAlpha: 1 });
       gsap.set(type, { y: 32, autoAlpha: 0 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pin,
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.6,
-          start: "top top",
-          end: "+=220%",
+          ...DEMO_PIN,
         },
       });
 
@@ -68,8 +64,8 @@ export function HinogExperience() {
           0.1,
         )
         .to(
-          box,
-          { scale: 0.42, y: 90, autoAlpha: 0, duration: 0.55, ease: "none" },
+          boxMove,
+          { autoAlpha: 0, y: 80, duration: 0.55, ease: "none" },
           0.48,
         )
         .to(type, { y: 0, autoAlpha: 1, duration: 0.38, stagger: 0.05, ease: "none" }, 0.5);
@@ -95,23 +91,27 @@ export function HinogExperience() {
           </div>
 
           <div className="hinog-scene" aria-hidden>
-            <div className="hinog-box">
-              <div className="hinog-panel hinog-back" />
-              <div className="hinog-panel hinog-bottom" />
-              <div className="hinog-panel hinog-left" />
-              <div className="hinog-panel hinog-right" />
-              <div className="hinog-panel hinog-front">
-                <span className="hinog-stamp">HINOG</span>
+            <div className="hinog-box-scale">
+            <div className="hinog-box-move">
+              <div className="hinog-box">
+                <div className="hinog-panel hinog-back" />
+                <div className="hinog-panel hinog-bottom" />
+                <div className="hinog-panel hinog-left" />
+                <div className="hinog-panel hinog-right" />
+                <div className="hinog-panel hinog-front">
+                  <span className="hinog-stamp">HINOG</span>
+                </div>
+                <div className="hinog-lid-anchor">
+                  <div className="hinog-lid" />
+                </div>
+                <div className="hinog-flap-anchor left">
+                  <div className="hinog-flap hinog-flap-l" />
+                </div>
+                <div className="hinog-flap-anchor right">
+                  <div className="hinog-flap hinog-flap-r" />
+                </div>
               </div>
-              <div className="hinog-lid-anchor">
-                <div className="hinog-lid" />
-              </div>
-              <div className="hinog-flap-anchor left">
-                <div className="hinog-flap hinog-flap-l" />
-              </div>
-              <div className="hinog-flap-anchor right">
-                <div className="hinog-flap hinog-flap-r" />
-              </div>
+            </div>
             </div>
           </div>
 
@@ -126,6 +126,7 @@ export function HinogExperience() {
 
       <section className="hinog-rest">
         <div className="hinog-rest-inner">
+          <p className="hinog-live-mark">{DEMO_BADGE}</p>
           <h2>COUNTER, NOT A CAFE</h2>
           <p>
             Sample stall off Quirino Ave, Tambo, Parañaque. Fictional corner.
