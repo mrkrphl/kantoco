@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
+import { Teko, Work_Sans } from "next/font/google";
 import "./haligi.css";
 
-const display = Barlow_Condensed({
+const display = Teko({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["500", "600", "700"],
   variable: "--font-haligi-display",
 });
 
-const body = Source_Sans_3({
+const body = Work_Sans({
   subsets: ["latin"],
   variable: "--font-haligi-body",
 });
 
 export const metadata: Metadata = {
-  title: "Haligi Auto Care — sample by KantoCo",
+  title: "Haligi Auto Care, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a neighborhood auto bay. Sample only. Not real client work.",
+    "KantoCo sample of a neighborhood auto bay in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 

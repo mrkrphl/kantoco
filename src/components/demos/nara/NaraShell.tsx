@@ -18,33 +18,33 @@ export function NaraShell({
 }) {
   return (
     <div className="nara">
-      <p className="border-b border-[var(--nara-rule)] bg-[var(--nara-green)] px-4 py-2 text-center text-[11px] leading-snug text-[var(--nara-paper)] md:text-xs">
+      <p className="bg-[var(--nara-green)] px-4 py-2 text-center text-[11px] leading-snug text-[#f4faf7] md:text-xs">
         {DEMO_DISCLAIMER}
       </p>
 
-      <header className="border-b border-[var(--nara-rule)]">
+      <header className="border-b border-[var(--nara-rule)] bg-[var(--nara-card)]">
         <div className="mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-4 px-4 py-5 md:px-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--nara-rust)]">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-[var(--nara-maroon)]">
               {DEMO_BADGE}
             </p>
             <Link
               href="/demos/nara-clinic"
-              className="mt-1 block text-2xl font-semibold tracking-tight"
+              className="nara-serif mt-1 block text-3xl font-semibold tracking-tight"
             >
               Nara Clinic
             </Link>
             <p className="mt-1 text-xs text-[var(--nara-muted)]">
-              Neighborhood consults · Parañaque sample
+              Consults near Dr. A. Santos Avenue, BF Homes, Parañaque
             </p>
           </div>
           <p className="text-right text-xs text-[var(--nara-muted)]">
-            Mon-Sat 8:00-17:00
+            Monday to Saturday, 8:00-17:00
             <br />
-            Sunday closed
+            Closed on Sunday
           </p>
         </div>
-        <nav className="border-t border-[var(--nara-rule)]">
+        <nav className="border-t border-[var(--nara-rule)] bg-[var(--nara-wall)]">
           <ul className="mx-auto flex max-w-5xl flex-wrap gap-x-5 gap-y-2 px-4 py-3 text-sm md:px-6">
             {nav.map(([label, href]) => (
               <li key={href}>
@@ -52,7 +52,7 @@ export function NaraShell({
                   href={href}
                   className={
                     current === label
-                      ? "font-semibold text-[var(--nara-rust)] underline decoration-[var(--nara-rust)] underline-offset-4"
+                      ? "font-semibold text-[var(--nara-maroon)] underline decoration-[var(--nara-maroon)] underline-offset-4"
                       : "text-[var(--nara-muted)] hover:text-[var(--nara-ink)]"
                   }
                 >
@@ -66,22 +66,22 @@ export function NaraShell({
 
       <main>{children}</main>
 
-      <footer className="mt-16 border-t-2 border-[var(--nara-green)] px-4 py-10 md:px-6">
+      <footer className="mt-16 border-t-4 border-[var(--nara-green)] bg-[var(--nara-card)] px-4 py-10 md:px-6">
         <div className="mx-auto flex max-w-5xl flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold">Nara Clinic</p>
+            <p className="nara-serif text-lg font-semibold">Nara Clinic</p>
             <p className="mt-2 max-w-sm text-xs leading-relaxed text-[var(--nara-muted)]">
               {DEMO_DISCLAIMER} Fictional shop on a sample block off Dr. A.
-              Santos Ave., BF Homes fringe, Parañaque.
+              Santos Avenue, BF Homes, Parañaque.
             </p>
           </div>
           <a
             href={KANTOCO_MESSENGER}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold text-[var(--nara-rust)] underline underline-offset-4"
+            className="text-sm font-semibold text-[var(--nara-maroon)] underline underline-offset-4"
           >
-            Message KantoCo on Messenger
+            Message us on Facebook
           </a>
         </div>
       </footer>

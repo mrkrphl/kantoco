@@ -1,50 +1,43 @@
 import Image from "next/image";
-import { ClipReveal } from "@/components/demos/ClipReveal";
-import { FadeUp } from "@/components/demos/FadeUp";
 import { NaraShell } from "@/components/demos/nara/NaraShell";
 
 export default function NaraAbout() {
   return (
     <NaraShell current="About">
       <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--nara-green)]">
-            About
-          </p>
-          <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-tight md:text-5xl">
-            Built for the block, not a medical campus.
-          </h1>
-        </FadeUp>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--nara-green)]">
+          About
+        </p>
+        <h1 className="nara-serif mt-3 max-w-xl text-4xl font-semibold tracking-tight md:text-5xl">
+          Built for the block, not a medical campus.
+        </h1>
 
-        <div className="mt-10 grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-start">
-          <ClipReveal>
-            <div className="relative aspect-[4/5] overflow-hidden">
-              <Image
-                src="/demos/nara-clinic/day-hall.jpg"
-                alt="Daylit ward with empty beds and folded blankets"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 40vw"
-              />
-            </div>
-          </ClipReveal>
+        <div className="mt-10 grid gap-10 md:grid-cols-[0.85fr_1.15fr] md:items-start">
+          <div className="relative aspect-[4/5] overflow-hidden">
+            <Image
+              src="/demos/nara-clinic/day-hall.jpg"
+              alt="Daylit ward with empty beds and folded blankets"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 40vw"
+            />
+          </div>
           <div className="space-y-5 text-base leading-relaxed text-[var(--nara-muted)]">
             <p>
               Nara is a sample neighborhood clinic: one waiting row, one consult
-              room, a tray that gets wiped between patients. The name is
-              invented. The block is invented. The tone is the part we want
-              shops to steal.
+              room, and a tray that gets wiped between patients. The name is
+              invented. The block is invented.
             </p>
             <p>
-              We write hours in the header because patients look there first.
-              We keep the service list as a ledger, not three equal cards. We
-              do not stock smiling portraits. The photos here are empty rooms
-              and daylight halls.
+              Hours sit in the header because patients look there first. The
+              service list is a ledger. The photos are empty rooms and daylight
+              halls, not stock portraits of doctors.
             </p>
             <p>
-              Sample location: fictional lot off Dr. A. Santos Ave., BF Homes
-              fringe, Parañaque. Not a real street number. Not a real phone.
-              Message KantoCo if you want a site like this for an actual shop.
+              Sample location: a fictional lot off Dr. A. Santos Avenue, BF
+              Homes, Parañaque. There is no real street number and no real
+              phone. Message KantoCo on Facebook if you want a site like this
+              for an actual shop.
             </p>
           </div>
         </div>

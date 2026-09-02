@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FadeUp } from "@/components/demos/FadeUp";
-import { HaligiPin } from "@/components/demos/haligi/HaligiPin";
 import { HaligiShell } from "@/components/demos/haligi/HaligiShell";
 import { KANTOCO_MESSENGER } from "@/lib/demos";
 
@@ -16,70 +14,62 @@ const jobs = [
 export default function HaligiHome() {
   return (
     <HaligiShell current="Home">
-      <HaligiPin>
-        <div className="bg-[var(--ha-yellow)] px-4 py-3 text-[var(--ha-black)] md:px-6">
-          <p className="haligi-cond text-xl md:text-2xl">
-            Mon-Sat 8:00-18:00 · Sun 8:00-12:00 · Sample bay, Sucat corridor
-          </p>
-        </div>
-      </HaligiPin>
+      <div className="haligi-photo-strip relative h-[38vw] min-h-[180px] max-h-[280px] w-full">
+        <Image
+          src="/demos/haligi-auto/lift.jpg"
+          alt="White wagon on a two-post lift in a working bay"
+          fill
+          className="object-cover object-[center_72%]"
+          sizes="100vw"
+          preload
+        />
+      </div>
 
-      <div className="grid md:grid-cols-[1.05fr_0.95fr] md:items-start">
-        <div className="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
-          <FadeUp>
-            <h1 className="haligi-cond text-5xl leading-[0.9] text-[var(--ha-yellow)] md:text-7xl">
-              We take the car.
-              <br />
-              You get it back running.
-            </h1>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-[var(--ha-steel)] md:text-base">
-              Straight talk for a neighborhood bay. No lounge. No wait-and-see
-              quote. This is a labeled sample, not a live shop.
-            </p>
-          </FadeUp>
-          <ol className="mt-8">
-            {jobs.map(([n, title, body]) => (
-              <li
-                key={n}
-                className="grid grid-cols-[2.5rem_1fr] gap-3 border-t border-white/15 py-3"
-              >
-                <span className="haligi-cond text-xl text-[var(--ha-yellow)]">
-                  {n}
-                </span>
-                <div>
-                  <p className="haligi-cond text-2xl">{title}</p>
-                  <p className="text-sm text-[var(--ha-steel)]">{body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href={KANTOCO_MESSENGER}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="haligi-cond bg-[var(--ha-yellow)] px-5 py-3 text-xl text-[var(--ha-black)]"
-            >
-              Message on Messenger
-            </a>
-            <Link
-              href="/demos/haligi-auto/services"
-              className="haligi-cond border-2 border-[var(--ha-yellow)] px-5 py-3 text-xl text-[var(--ha-yellow)]"
-            >
-              Work order
-            </Link>
-          </div>
-        </div>
+      <div className="px-4 py-8 md:px-6 md:py-10">
+        <p className="text-sm text-[var(--ha-carbon)]">
+          Monday to Saturday 8:00-18:00. Sunday 8:00-12:00. Sample bay, Sucat
+          corridor.
+        </p>
+        <h1 className="haligi-cond mt-3 max-w-xl text-5xl leading-[0.92] text-[var(--ha-ink)] md:text-7xl">
+          We take the car. You get it back running.
+        </h1>
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--ha-steel)] md:text-base">
+          Straight talk for a neighborhood bay. There is no lounge and no
+          wait-and-see quote. This is a sample, not a live shop.
+        </p>
 
-        <div className="relative min-h-[280px] overflow-hidden md:h-[calc(100svh-11rem)] md:min-h-[22rem]">
-          <Image
-            src="/demos/haligi-auto/lift.jpg"
-            alt="White wagon on a two-post lift in a working bay"
-            fill
-            className="object-cover object-[center_72%]"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            preload
-          />
+        <ol className="haligi-form mt-8 max-w-2xl p-4 md:p-5">
+          {jobs.map(([n, title, body]) => (
+            <li
+              key={n}
+              className="grid grid-cols-[2.4rem_1fr] gap-3 border-b border-dashed border-[#c9c0aa] py-3 last:border-b-0"
+            >
+              <span className="haligi-cond text-2xl text-[var(--ha-oxide)]">
+                {n}
+              </span>
+              <div>
+                <p className="haligi-cond text-2xl">{title}</p>
+                <p className="text-sm text-[var(--ha-steel)]">{body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a
+            href={KANTOCO_MESSENGER}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="haligi-cond bg-[var(--ha-oxide)] px-5 py-3 text-2xl text-[#f4efe3]"
+          >
+            Message us on Facebook
+          </a>
+          <Link
+            href="/demos/haligi-auto/services"
+            className="haligi-cond border-2 border-[var(--ha-carbon)] px-5 py-3 text-2xl text-[var(--ha-carbon)]"
+          >
+            Work order
+          </Link>
         </div>
       </div>
     </HaligiShell>

@@ -1,15 +1,18 @@
 .buhol {
-  --buhol-wrap: #efe4c0;
+  --buhol-kraft: #e7d3a4;
   --buhol-sap: #2f5c28;
-  --buhol-band: #d0122d;
-  --buhol-ink: #161a12;
-  --buhol-stem: #6a8a3a;
-  --buhol-paper: #f7efd4;
+  --buhol-band: #c41b36;
+  --buhol-ink: #1b1a14;
+  --buhol-ice: #d9e3d4;
   min-height: 100%;
-  background: var(--buhol-wrap);
+  background:
+    repeating-linear-gradient(
+      -18deg,
+      var(--buhol-kraft) 0 28px,
+      color-mix(in srgb, #c9b27a 55%, var(--buhol-kraft)) 28px 29px
+    );
   color: var(--buhol-ink);
-  font-family: var(--font-buhol-sans), system-ui, sans-serif;
-  position: relative;
+  font-family: var(--font-buhol-sans), Cabin, ui-sans-serif, sans-serif;
 }
 
 .buhol ::selection {
@@ -17,261 +20,108 @@
   color: #fff;
 }
 
-html:has(.buhol) {
-  scroll-behavior: auto;
+.buhol a {
+  color: inherit;
 }
 
 .buhol-banner {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 40;
   padding: 0.5rem 1rem;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   background: var(--buhol-sap);
-  color: var(--buhol-paper);
+  color: #f4efd8;
 }
 
-.buhol-pin {
-  position: relative;
-  height: 100svh;
-  overflow: hidden;
-  background: #1c2618;
-}
-
-.buhol-stage {
-  position: absolute;
-  inset: 0;
-}
-
-.buhol-photo-wrap {
-  position: absolute;
-  inset: 0;
-  clip-path: circle(4% at 50% 48%);
-}
-
-.buhol-photo {
-  object-fit: cover;
-}
-
-.buhol-bloom {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  perspective: 1100px;
-  pointer-events: none;
-}
-
-.buhol-bloom-core {
-  position: relative;
-  width: min(70vmin, 420px);
-  height: min(70vmin, 420px);
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
-.buhol-petal-slot {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 50%;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
-.buhol-petal {
-  position: absolute;
-  left: 50%;
-  top: 6%;
-  width: 34%;
-  height: 48%;
-  margin-left: -17%;
-  transform-origin: 50% 100%;
-  border-radius: 55% 55% 40% 40%;
-  background:
-    radial-gradient(circle at 40% 30%, #8fb85a, var(--buhol-sap) 70%);
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, #0f1c0d 40%, transparent);
-}
-
-.buhol-petal.band {
-  background:
-    radial-gradient(circle at 45% 28%, #c44, var(--buhol-band) 72%);
-}
-
-.buhol-petal.kraft {
-  background:
-    radial-gradient(circle at 40% 25%, #f0d9a0, #c9a45a 75%);
-}
-
-.buhol-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 14%;
-  height: 14%;
-  margin: -7% 0 0 -7%;
-  border-radius: 50%;
-  background: #7a2a14;
-  box-shadow: 0 0 0 6px #3d1a10;
-}
-
-.buhol-type {
-  position: absolute;
-  left: 1.15rem;
-  right: 1.15rem;
-  bottom: 1.3rem;
-  z-index: 6;
+.buhol-mast {
+  padding: 1.3rem 1.1rem 0.4rem;
 }
 
 .buhol-hand {
   margin: 0;
-  font-family: var(--font-buhol-hand), cursive;
-  font-size: clamp(3.4rem, 14vw, 6.2rem);
-  line-height: 0.8;
+  font-family: var(--font-buhol-hand), Kalam, cursive;
+  font-size: clamp(3.2rem, 12vw, 5.6rem);
+  line-height: 0.85;
   color: var(--buhol-band);
 }
 
 .buhol-word {
-  margin: 0;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  margin: 0.2rem 0 0;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  font-size: clamp(1.6rem, 6vw, 2.6rem);
-  color: var(--buhol-paper);
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
 }
 
-.buhol-line {
-  margin: 0.45rem 0 0;
-  max-width: 18rem;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #dce8c8;
-}
-
-.buhol-badge {
-  position: absolute;
-  top: 2.75rem;
-  right: 1.1rem;
-  z-index: 6;
-  border: 2px solid var(--buhol-band);
-  color: var(--buhol-paper);
-  padding: 0.15rem 0.4rem;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-}
-
-.buhol-rest {
-  padding: 5.2rem 1.2rem 5rem;
-  background:
-    repeating-linear-gradient(
-      -12deg,
-      var(--buhol-wrap) 0 18px,
-      color-mix(in srgb, var(--buhol-sap) 8%, var(--buhol-wrap)) 18px 19px
-    );
-}
-
-.buhol-rest-inner {
-  max-width: 60rem;
-  margin: 0 auto;
-}
-
-.buhol-live-mark {
-  display: inline-block;
-  margin: 0 0 0.7rem;
-  border: 2px solid var(--buhol-band);
-  color: var(--buhol-band);
-  padding: 0.15rem 0.4rem;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-}
-
-.buhol-rest h2 {
-  margin: 0;
-  font-family: var(--font-buhol-hand), cursive;
-  font-size: clamp(2.6rem, 10vw, 4.4rem);
-  line-height: 0.9;
-  color: var(--buhol-sap);
-}
-
-.buhol-rest h2 span {
-  display: block;
-  font-family: var(--font-buhol-sans), sans-serif;
-  font-size: 0.42em;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--buhol-band);
-  margin-top: 0.35rem;
-}
-
-.buhol-rest-inner > p {
-  max-width: 28rem;
-  margin-top: 0.9rem;
-  line-height: 1.55;
-}
-
-.buhol-split {
-  margin-top: 2rem;
+.buhol-buckets {
   display: grid;
-  gap: 0.8rem;
+  grid-template-columns: 1.1fr 0.7fr;
+  gap: 0.7rem;
+  padding: 1rem 1.1rem 0;
 }
 
-@media (min-width: 800px) {
-  .buhol-split {
-    grid-template-columns: 1.15fr 0.85fr;
-  }
-}
-
-.buhol-still {
+.buhol-bucket {
   position: relative;
-  min-height: 260px;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 50% 50% 8px 8px / 18% 18% 8px 8px;
   background: #2f5c28;
+  animation: buhol-sway 5.5s ease-in-out infinite;
 }
 
-.buhol-still img {
+.buhol-bucket:nth-child(2) {
+  min-height: 180px;
+  margin-top: 2.4rem;
+  animation-delay: 0.8s;
+}
+
+.buhol-bucket img {
   object-fit: cover;
 }
 
+@keyframes buhol-sway {
+  0%,
+  100% {
+    transform: rotate(-0.6deg);
+  }
+  50% {
+    transform: rotate(0.8deg);
+  }
+}
+
+.buhol-rest {
+  padding: 2rem 1.1rem 4.4rem;
+}
+
+.buhol-rest-inner {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+
 .buhol-board {
-  background: #20331c;
+  background: #24331f;
   color: #e8f0d8;
   padding: 1.1rem 1rem;
+  transform: rotate(-1.1deg);
 }
 
 .buhol-board p {
   margin: 0 0 0.7rem;
   font-family: var(--font-buhol-hand), cursive;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   color: #f2e3a8;
 }
 
-.buhol-board dl {
-  margin: 0;
-}
-
-.buhol-board dt {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #9aaa88;
-}
-
-.buhol-board dd {
-  margin: 0.15rem 0 0.75rem;
-  font-weight: 700;
-}
-
 .buhol-stems {
-  margin: 1.8rem 0 0;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
 
 .buhol-stems li {
   display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: 0.8rem;
-  padding: 0.7rem 0;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.7rem;
+  padding: 0.65rem 0;
   border-bottom: 2px solid var(--buhol-sap);
 }
 
@@ -281,35 +131,41 @@ html:has(.buhol) {
   font-size: 1.15rem;
 }
 
-.buhol-cta {
-  display: inline-flex;
-  margin-top: 1.8rem;
-  background: var(--buhol-band);
-  color: #fff;
-  text-decoration: none;
-  padding: 0.8rem 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 13px;
-}
-
-.buhol-cta:hover {
+.buhol-still {
+  position: relative;
+  min-height: 220px;
+  margin-top: 1.2rem;
   background: var(--buhol-sap);
 }
 
+.buhol-still img {
+  object-fit: cover;
+}
+
+.buhol-cta {
+  display: inline-flex;
+  margin-top: 1.6rem;
+  background: var(--buhol-band);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.75rem 1.1rem;
+  font-weight: 700;
+}
+
 .buhol-foot {
-  margin-top: 2.5rem;
+  margin-top: 2.2rem;
   font-size: 12px;
   color: #4a553c;
 }
 
-.buhol-foot a {
-  color: var(--buhol-ink);
+.buhol-split {
+  margin-top: 1.4rem;
+  display: grid;
+  gap: 0.9rem;
 }
 
-.buhol-wrap-still {
-  position: relative;
-  min-height: 200px;
-  margin-top: 1.4rem;
+@media (min-width: 800px) {
+  .buhol-split {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
 }

@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import { Noto_Sans, Noto_Serif } from "next/font/google";
 import "./nara.css";
 
-const naraSans = IBM_Plex_Sans({
+const serif = Noto_Serif({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-nara-serif",
+});
+
+const sans = Noto_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-nara",
+  variable: "--font-nara-sans",
 });
 
 export const metadata: Metadata = {
-  title: "Nara Clinic — sample by KantoCo",
+  title: "Nara Clinic, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a neighborhood clinic. Sample only. Not real client work.",
+    "KantoCo sample of a neighborhood clinic in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 
@@ -20,5 +26,5 @@ export default function NaraLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={naraSans.variable}>{children}</div>;
+  return <div className={`${serif.variable} ${sans.variable}`}>{children}</div>;
 }

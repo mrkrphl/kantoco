@@ -1,0 +1,245 @@
+.home {
+  --paper: #f4efe4;
+  --ink: #1c1912;
+  --paint: #c24a22;
+  --mute: #5a5348;
+  --rule: #d8d0c2;
+  min-height: 100%;
+  background:
+    radial-gradient(1200px 480px at 8% -10%, #fff8ee 0%, transparent 55%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), Georgia, serif;
+}
+
+.home-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.home-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.home-mark-img {
+  border-radius: 2px;
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+
+.home-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-nav a:not(.home-btn):hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--paint);
+  color: #fff8f2;
+  text-decoration: none;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.home-btn:hover {
+  filter: brightness(1.06);
+}
+
+.home-btn-lg {
+  padding: 0.8rem 1.1rem;
+  font-size: 1.05rem;
+}
+
+.home-main {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3.2rem 1.25rem 4.5rem;
+}
+
+.home-p {
+  margin: 0 0 1.35rem;
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+
+.home-p-lead {
+  font-size: 1.7rem;
+  line-height: 1.35;
+  max-width: 22ch;
+}
+
+.home-peso {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--paint);
+}
+
+.home-samples {
+  margin: 2.4rem 0 2.6rem;
+}
+
+.home-shops {
+  list-style: none;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.home-shop a {
+  display: grid;
+  gap: 0.45rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-shop-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #d8d0c2;
+}
+
+.home-shop-frame img {
+  object-fit: cover;
+}
+
+.home-shop-tall .home-shop-frame {
+  width: min(100%, 16rem);
+  aspect-ratio: 3 / 4;
+}
+
+.home-shop-wide .home-shop-frame {
+  width: min(100%, 22rem);
+  aspect-ratio: 16 / 10;
+}
+
+.home-shop-sq .home-shop-frame {
+  width: min(100%, 14rem);
+  aspect-ratio: 1;
+}
+
+.home-shop:nth-child(even) {
+  align-self: flex-end;
+}
+
+.home-shop:nth-child(3) {
+  align-self: center;
+}
+
+.home-shop-name {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.home-shop a:hover .home-shop-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-cta-wrap {
+  margin: 1.5rem 0 0;
+}
+
+.home-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 1.25rem 2rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.home-foot a {
+  color: var(--paint);
+  text-decoration: none;
+}
+
+.home-foot a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .home-nav a:not(.home-btn) {
+    display: none;
+  }
+
+  .home-p-lead {
+    font-size: 1.45rem;
+    max-width: none;
+  }
+
+  .home-shop:nth-child(even),
+  .home-shop:nth-child(3) {
+    align-self: stretch;
+  }
+
+  .home-shop-frame {
+    width: 100% !important;
+  }
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-p,
+.home-shops,
+.home-cta-wrap {
+  animation: home-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-p:nth-of-type(2) {
+  animation-delay: 0.08s;
+}
+
+.home-samples {
+  animation: none;
+}
+
+.home-samples .home-p {
+  animation-delay: 0.16s;
+}
+
+.home-shops {
+  animation-delay: 0.22s;
+}
+
+.home-cta-wrap {
+  animation-delay: 0.28s;
+}

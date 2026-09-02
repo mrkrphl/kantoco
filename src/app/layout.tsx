@@ -1,26 +1,25 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Figtree } from "next/font/google";
+import { Bricolage_Grotesque, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const display = Archivo_Black({
-  weight: "400",
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display",
 });
 
-const body = Figtree({
+const body = Newsreader({
   subsets: ["latin"],
   variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-  title: "KantoCo — Sites for the corner.",
+  title: "KantoCo",
   description:
-    "Fixed websites for local shops in Parañaque & nearby — clinic, salon, auto. Message us on Facebook.",
+    "We’re KantoCo. We make websites for small businesses in Parañaque and nearby.",
   openGraph: {
-    title: "KantoCo — Sites for the corner.",
+    title: "KantoCo",
     description:
-      "Fixed websites for local shops in Parañaque & nearby — clinic, salon, auto.",
+      "We’re KantoCo. We make websites for small businesses in Parañaque and nearby.",
     type: "website",
   },
 };

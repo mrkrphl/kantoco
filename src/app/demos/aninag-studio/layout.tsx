@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, IBM_Plex_Mono } from "next/font/google";
+import { Archivo_Narrow, IBM_Plex_Mono } from "next/font/google";
 import "./aninag.css";
 
-const display = Barlow_Condensed({
+const display = Archivo_Narrow({
   subsets: ["latin"],
-  weight: ["700", "800"],
+  weight: ["500", "600", "700"],
   variable: "--font-aninag-display",
 });
 
@@ -15,9 +15,9 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aninag Studio — sample by KantoCo",
+  title: "Aninag Studio, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a photo studio. Sample only. Not real client work.",
+    "KantoCo sample of a photo studio in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 

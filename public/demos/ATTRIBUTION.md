@@ -1,12 +1,15 @@
 # Photo attribution
 
-All stills under `public/demos/` are downloaded from Unsplash or Pexels.
-No generated interiors. No scraped shop Instagram. No Concordia assets.
+All stills under `public/demos/` are downloaded from Unsplash, Pexels, or
+Wikimedia Commons. No generated interiors. No scraped shop Instagram. No
+Concordia assets on the public samples.
 
 Licenses:
 
 - Unsplash License: https://unsplash.com/license
 - Pexels License: https://www.pexels.com/license/
+- CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+- CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
 
 ## Nara Clinic
 
@@ -39,11 +42,13 @@ Licenses:
 
 ## Hinog Bakery
 
+Honest PH pan de sal stills. No £ prices, no UK bakery labels.
+
 | File | Source | Author | License |
 | --- | --- | --- | --- |
-| `hinog-bakery/counter.jpg` | https://www.pexels.com/photo/1070946/ | Life Of Pix | Pexels License |
-| `hinog-bakery/crust.jpg` | https://unsplash.com/photos/0249088772ff | Wesual Click | Unsplash License |
-| `hinog-bakery/bags.jpg` | https://www.pexels.com/photo/1666067/ | Pexels contributor | Pexels License |
+| `hinog-bakery/pandesal-bowl.jpg` | https://commons.wikimedia.org/wiki/File:Pinoy_Pandesal.jpg | Jessartcam (Jesse Alegre) | CC BY-SA 4.0 |
+| `hinog-bakery/pandesal-bag.jpg` | https://commons.wikimedia.org/wiki/File:Pan_de_sal_(Philippines)_01.jpg | Obsidian Soul | CC0 1.0 |
+| `hinog-bakery/kape.jpg` | https://commons.wikimedia.org/wiki/File:Kape_at_pandesal.jpg | Froirivera | CC BY-SA 4.0 |
 
 ## Buhol Blooms
 

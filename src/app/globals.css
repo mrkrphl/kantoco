@@ -6,10 +6,10 @@
   --bone: #f2f0e9;
   --steel: #6b7077;
   --concrete: #a6a9ae;
-  --bg: var(--charcoal);
-  --fg: var(--bone);
-  --muted: var(--steel);
-  --accent: var(--amber);
+  --bg: #f4efe4;
+  --fg: #1c1912;
+  --muted: #5c564c;
+  --accent: #c24a22;
 }
 
 @theme inline {
@@ -35,59 +35,12 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body), Georgia, serif;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--amber) 55%, transparent);
-  color: var(--charcoal);
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes line-grow {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes grain {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-1%, 1%);
-  }
-}
-
-.animate-rise {
-  animation: rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-rise-delay-1 {
-  animation: rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-}
-
-.animate-rise-delay-2 {
-  animation: rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
-}
-
-.animate-line {
-  transform-origin: left;
-  animation: line-grow 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--fg);
 }
 
 .cafe-root {
@@ -102,27 +55,15 @@ body {
   color: #efebe4;
 }
 
-.site-grain::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: -20%;
-  z-index: 50;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 8s steps(2) infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .animate-rise,
-  .animate-rise-delay-1,
-  .animate-rise-delay-2,
-  .animate-line,
-  .site-grain::before {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
+    transition: none !important;
   }
 }

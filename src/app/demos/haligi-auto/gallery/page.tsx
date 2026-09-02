@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { FadeUp } from "@/components/demos/FadeUp";
 import { HaligiShell } from "@/components/demos/haligi/HaligiShell";
 
 const shots = [
@@ -13,14 +12,15 @@ export default function HaligiGallery() {
   return (
     <HaligiShell current="Gallery">
       <div className="px-4 py-10 md:px-6">
-        <FadeUp>
-          <h1 className="haligi-cond text-5xl text-[var(--ha-yellow)] md:text-6xl">
-            Bay photos
-          </h1>
-        </FadeUp>
-        <ul className="mt-8 grid grid-cols-2 gap-1 md:grid-cols-3">
-          {shots.map(([src, alt]) => (
-            <li key={src} className="relative aspect-[4/3]">
+        <h1 className="haligi-cond text-5xl text-[var(--ha-ink)] md:text-6xl">
+          Bay photos
+        </h1>
+        <ul className="mt-8 grid grid-cols-2 gap-2 md:grid-cols-4">
+          {shots.map(([src, alt], i) => (
+            <li
+              key={src}
+              className={`relative ${i === 0 ? "col-span-2 aspect-[16/9] md:col-span-4" : "aspect-[4/3]"}`}
+            >
               <Image
                 src={src}
                 alt={alt}

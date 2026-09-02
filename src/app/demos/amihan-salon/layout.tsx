@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import { Karla, Syne } from "next/font/google";
+import { Bodoni_Moda, Figtree } from "next/font/google";
 import "./amihan.css";
 
-const display = Syne({
+const display = Bodoni_Moda({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
   variable: "--font-amihan-display",
 });
 
-const body = Karla({
+const body = Figtree({
   subsets: ["latin"],
   variable: "--font-amihan-body",
 });
 
 export const metadata: Metadata = {
-  title: "Amihan Salon — sample by KantoCo",
+  title: "Amihan Salon, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a monsoon-minded hair shop. Sample only. Not real client work.",
+    "KantoCo sample of a neighborhood salon in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 

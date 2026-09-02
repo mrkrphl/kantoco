@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { FadeUp } from "@/components/demos/FadeUp";
 import { AmihanShell } from "@/components/demos/amihan/AmihanShell";
 
 const tiles = [
@@ -15,17 +14,23 @@ export default function AmihanGallery() {
   return (
     <AmihanShell current="Gallery">
       <div className="px-4 pb-8 md:px-8">
-        <FadeUp>
-          <h1 className="amihan-display text-4xl md:text-6xl">The wall</h1>
-          <p className="mt-4 max-w-md text-sm text-[var(--ami-dim)]">
-            Gallery-forward on purpose. This is the page a walk-in actually
-            scrolls.
-          </p>
-        </FadeUp>
+        <h1 className="amihan-display text-4xl md:text-6xl">The wall</h1>
+        <p className="mt-4 max-w-md text-sm text-[var(--ami-dim)]">
+          This is the page someone scrolls before they sit in the chair.
+        </p>
 
-        <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ul className="mt-10 flex flex-wrap items-end gap-3">
           {tiles.map(([src, alt, shape]) => (
-            <li key={src} className="min-w-0">
+            <li
+              key={src}
+              className={
+                shape === "tall"
+                  ? "w-[46%] min-w-[10rem] sm:w-[30%]"
+                  : shape === "wide"
+                    ? "w-full sm:w-[48%]"
+                    : "w-[48%] sm:w-[22%]"
+              }
+            >
               <div
                 className={`relative overflow-hidden ${
                   shape === "tall"

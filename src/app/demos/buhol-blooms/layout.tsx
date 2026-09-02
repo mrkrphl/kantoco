@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Kalam } from "next/font/google";
+import { Cabin, Kalam } from "next/font/google";
 import "./buhol.css";
 
 const hand = Kalam({
@@ -8,16 +8,16 @@ const hand = Kalam({
   variable: "--font-buhol-hand",
 });
 
-const sans = Archivo({
+const sans = Cabin({
   subsets: ["latin"],
-  weight: ["400", "600", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-buhol-sans",
 });
 
 export const metadata: Metadata = {
-  title: "Buhol Blooms — sample by KantoCo",
+  title: "Buhol Blooms, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a flower stall. Sample only. Not real client work.",
+    "KantoCo sample of a flower stall in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 

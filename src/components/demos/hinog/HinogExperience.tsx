@@ -1,156 +1,67 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
-import { DEMO_PIN, exposeGsap, gsap, useGSAP } from "@/lib/gsap-window";
 
 export function HinogExperience() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      exposeGsap();
-      const pin = pinRef.current;
-      if (!pin) return;
-      if (typeof gsap === "undefined") {
-        throw new Error("Hinog: GSAP missing after import.");
-      }
-
-      const photo = pin.querySelector<HTMLElement>(".hinog-photo");
-      const boxMove = pin.querySelector<HTMLElement>(".hinog-box-move");
-      const lid = pin.querySelector<HTMLElement>(".hinog-lid");
-      const flapL = pin.querySelector<HTMLElement>(".hinog-flap-l");
-      const flapR = pin.querySelector<HTMLElement>(".hinog-flap-r");
-      const type = gsap.utils.toArray<HTMLElement>(".hinog-rise", pin);
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (reduced) {
-        gsap.set(photo, { scale: 1, filter: "brightness(1) saturate(1)" });
-        gsap.set(boxMove, { autoAlpha: 0, scale: 0.4 });
-        gsap.set(lid, { rotateX: -128 });
-        gsap.set(flapL, { rotateY: -88 });
-        gsap.set(flapR, { rotateY: 88 });
-        gsap.set(type, { y: 0, autoAlpha: 1 });
-        return;
-      }
-
-      gsap.set(photo, {
-        scale: 1.08,
-        filter: "brightness(0.32) saturate(0.65)",
-        transformOrigin: "50% 50%",
-      });
-      gsap.set(lid, { rotateX: 0, transformOrigin: "top center" });
-      gsap.set(flapL, { rotateY: 0, transformOrigin: "left center" });
-      gsap.set(flapR, { rotateY: 0, transformOrigin: "right center" });
-      gsap.set(boxMove, { autoAlpha: 1 });
-      gsap.set(type, { y: 32, autoAlpha: 0 });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: pin,
-          ...DEMO_PIN,
-        },
-      });
-
-      tl.to(lid, { rotateX: -128, duration: 0.7, ease: "none" }, 0)
-        .to(flapL, { rotateY: -92, duration: 0.55, ease: "none" }, 0.08)
-        .to(flapR, { rotateY: 92, duration: 0.55, ease: "none" }, 0.08)
-        .to(
-          photo,
-          { scale: 1, filter: "brightness(1) saturate(1)", duration: 0.95, ease: "none" },
-          0.1,
-        )
-        .to(
-          boxMove,
-          { autoAlpha: 0, y: 80, duration: 0.55, ease: "none" },
-          0.48,
-        )
-        .to(type, { y: 0, autoAlpha: 1, duration: 0.38, stagger: 0.05, ease: "none" }, 0.5);
-    },
-    { scope: containerRef },
-  );
-
   return (
-    <div ref={containerRef} className="hinog">
+    <div className="hinog">
       <p className="hinog-banner">{DEMO_DISCLAIMER}</p>
 
-      <div ref={pinRef} className="hinog-pin">
-        <div className="hinog-stage">
-          <div className="hinog-photo-wrap">
-            <Image
-              src="/demos/hinog-bakery/counter.jpg"
-              alt="Bakery counter with crusted loaves in baskets and handwritten ticket labels"
-              fill
-              className="hinog-photo"
-              sizes="100vw"
-              preload
-            />
-          </div>
-
-          <div className="hinog-scene" aria-hidden>
-            <div className="hinog-box-scale">
-            <div className="hinog-box-move">
-              <div className="hinog-box">
-                <div className="hinog-panel hinog-back" />
-                <div className="hinog-panel hinog-bottom" />
-                <div className="hinog-panel hinog-left" />
-                <div className="hinog-panel hinog-right" />
-                <div className="hinog-panel hinog-front">
-                  <span className="hinog-stamp">HINOG</span>
-                </div>
-                <div className="hinog-lid-anchor">
-                  <div className="hinog-lid" />
-                </div>
-                <div className="hinog-flap-anchor left">
-                  <div className="hinog-flap hinog-flap-l" />
-                </div>
-                <div className="hinog-flap-anchor right">
-                  <div className="hinog-flap hinog-flap-r" />
-                </div>
-              </div>
-            </div>
-            </div>
-          </div>
-
-          <p className="hinog-badge hinog-rise">{DEMO_BADGE}</p>
-          <div className="hinog-type">
-            <p className="hinog-ticket hinog-rise">Ticket 014 · Tambo sample</p>
-            <h1 className="hinog-word hinog-rise">HINOG</h1>
-            <p className="hinog-line hinog-rise">Pan de sal. Monay. Ensaymada.</p>
+      <div className="hinog-hero">
+        <div className="hinog-ticket">
+          <p className="hinog-leaf">{DEMO_BADGE}</p>
+          <h1 className="hinog-word">HINOG</h1>
+          <p style={{ marginTop: "0.8rem", maxWidth: "22rem", lineHeight: 1.5 }}>
+            Pan de sal in the morning pull, then monay and ensaymada until the
+            trays empty. Sample stall off Quirino Avenue, Tambo, Parañaque.
+            Fictional corner. Not a real bakery.
+          </p>
+          <p style={{ marginTop: "1rem" }}>
+            Open daily 6:00-16:00. Last pull around 15:30. No table service.
+          </p>
+        </div>
+        <div className="hinog-photo">
+          <Image
+            src="/demos/hinog-bakery/pandesal-bowl.jpg"
+            alt="Wooden bowl of fresh pan de sal beside a cup of coffee"
+            fill
+            sizes="(min-width: 820px) 55vw, 100vw"
+            preload
+          />
+          <div className="hinog-steam" aria-hidden>
+            <span />
+            <span />
+            <span />
           </div>
         </div>
       </div>
 
       <section className="hinog-rest">
         <div className="hinog-rest-inner">
-          <p className="hinog-live-mark">{DEMO_BADGE}</p>
-          <h2>COUNTER, NOT A CAFE</h2>
-          <p>
-            Sample stall off Quirino Ave, Tambo, Parañaque. Fictional corner.
-            Not a real bakery. Hours on the stub only.
+          <h2>Counter, not a cafe</h2>
+          <p style={{ maxWidth: "32rem", marginTop: "0.8rem", lineHeight: 1.55 }}>
+            Take the bag. Hours sit on the stub. Prices here are a guide for
+            this sample only.
           </p>
-
-          <div className="hinog-ledger">
+          <div className="hinog-split">
             <div className="hinog-still">
               <Image
-                src="/demos/hinog-bakery/crust.jpg"
-                alt="Dark crusted loaves and wheat on a flour-dusted board"
+                src="/demos/hinog-bakery/pandesal-bag.jpg"
+                alt="Pan de sal packed in a plain brown paper bag"
                 fill
-                sizes="(min-width: 820px) 70vw, 100vw"
+                sizes="(min-width: 820px) 60vw, 100vw"
               />
             </div>
             <div className="hinog-stub">
               <p>
-                Open <strong>Daily 6:00-16:00</strong>
+                Open <strong>daily 6:00-16:00</strong>
               </p>
-              <p>Last pull around 15:30</p>
-              <p>No table service. Take the bag.</p>
+              <p style={{ marginTop: "0.6rem" }}>Last pull around 15:30</p>
+              <p style={{ marginTop: "0.6rem" }}>
+                Sample stall off Quirino Avenue, Tambo, Parañaque
+              </p>
             </div>
           </div>
-
           <ul className="hinog-menu">
             <li>
               <span>Pan de sal</span>
@@ -162,31 +73,31 @@ export function HinogExperience() {
             </li>
             <li>
               <span>Ensaymada</span>
-              <span>cheese, not cream</span>
+              <span>cheese on top</span>
             </li>
           </ul>
-
-          <div className="hinog-still hinog-bags">
+          <div className="hinog-still" style={{ minHeight: 240, marginTop: "1.2rem" }}>
             <Image
-              src="/demos/hinog-bakery/bags.jpg"
-              alt="Two kraft paper bags on enamel red"
+              src="/demos/hinog-bakery/kape.jpg"
+              alt="Hand dipping pan de sal into a mug of coffee"
               fill
               sizes="100vw"
             />
           </div>
-
           <a
             href={KANTOCO_MESSENGER}
             target="_blank"
             rel="noopener noreferrer"
             className="hinog-cta"
           >
-            MESSAGE KANTOCO
+            Message us on Facebook
           </a>
-
           <p className="hinog-foot">
             {DEMO_DISCLAIMER} No shop phone. No live orders.{" "}
             <Link href="/">Back to KantoCo</Link>
+            <br />
+            Pan de sal photos: Jessartcam, Obsidian Soul, and Froirivera, via
+            Wikimedia Commons.
           </p>
         </div>
       </section>

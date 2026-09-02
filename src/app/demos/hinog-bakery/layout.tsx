@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Bungee, Roboto_Mono } from "next/font/google";
+import { Atkinson_Hyperlegible, Lilita_One } from "next/font/google";
 import "./hinog.css";
 
-const enamel = Bungee({
+const enamel = Lilita_One({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-hinog-enamel",
 });
 
-const ticket = Roboto_Mono({
+const body = Atkinson_Hyperlegible({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-hinog-ticket",
+  weight: ["400", "700"],
+  variable: "--font-hinog-body",
 });
 
 export const metadata: Metadata = {
-  title: "Hinog Bakery — sample by KantoCo",
+  title: "Hinog Bakery, sample by KantoCo",
   description:
-    "Labeled KantoCo demo of a bakery counter. Sample only. Not real client work.",
+    "KantoCo sample of a bakery counter in Parañaque. This is a sample site, not real client work.",
   robots: { index: false, follow: false },
 };
 
@@ -26,5 +26,5 @@ export default function HinogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={`${enamel.variable} ${ticket.variable}`}>{children}</div>;
+  return <div className={`${enamel.variable} ${body.variable}`}>{children}</div>;
 }

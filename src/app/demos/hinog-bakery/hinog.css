@@ -1,15 +1,13 @@
 .hinog {
-  --hinog-news: #e7d8b4;
-  --hinog-kraft: #c48a42;
-  --hinog-crust: #3f2412;
-  --hinog-enamel: #e31c23;
-  --hinog-ticket: #1c140e;
-  --hinog-flour: #f4ead2;
+  --hinog-flour: #f6ead2;
+  --hinog-crust: #6b3a18;
+  --hinog-enamel: #d31218;
+  --hinog-leaf: #3c6b3a;
+  --hinog-ink: #2a1a10;
   min-height: 100%;
-  background: var(--hinog-news);
-  color: var(--hinog-ticket);
-  font-family: var(--font-hinog-ticket), ui-monospace, monospace;
-  position: relative;
+  background: var(--hinog-flour);
+  color: var(--hinog-ink);
+  font-family: var(--font-hinog-body), "Atkinson Hyperlegible", ui-sans-serif, sans-serif;
 }
 
 .hinog ::selection {
@@ -17,283 +15,133 @@
   color: #fff;
 }
 
-html:has(.hinog) {
-  scroll-behavior: auto;
+.hinog a {
+  color: inherit;
 }
 
 .hinog-banner {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 40;
   padding: 0.5rem 1rem;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   background: var(--hinog-enamel);
   color: #fff8ee;
 }
 
-.hinog-pin {
-  position: relative;
-  height: 100svh;
-  overflow: hidden;
-  background: #2a1a10;
-}
-
-.hinog-stage {
-  position: absolute;
-  inset: 0;
-}
-
-.hinog-photo-wrap {
-  position: absolute;
-  inset: 0;
-}
-
-.hinog-photo {
-  object-fit: cover;
-  filter: brightness(0.35) saturate(0.7);
-}
-
-.hinog-scene {
-  position: absolute;
-  inset: 0;
+.hinog-hero {
   display: grid;
-  place-items: center;
-  perspective: 1400px;
-  perspective-origin: 50% 42%;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
+  gap: 0;
 }
 
-.hinog-box-scale {
-  transform: scale(clamp(0.58, calc(72vw / 280px), 1));
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
-.hinog-box-move {
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
-.hinog-box {
-  position: relative;
-  width: 280px;
-  height: 196px;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  transform: rotateX(18deg) rotateY(-26deg);
-}
-
-.hinog-panel,
-.hinog-lid,
-.hinog-flap {
-  position: absolute;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #c9964e 0 12px,
-      #bb8840 12px 13px,
-      #c9964e 13px 24px
-    );
-  box-shadow: inset 0 0 0 2px #8a5a22;
-}
-
-.hinog-lid-anchor,
-.hinog-flap-anchor {
-  position: absolute;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
-.hinog-lid-anchor {
-  inset: 0;
-  transform-origin: top center;
-  transform: rotateX(90deg) translateZ(98px);
-}
-
-.hinog-flap-anchor {
-  top: 0;
-  width: 46%;
-  height: 42%;
-  transform: translateZ(99px);
-}
-
-.hinog-flap-anchor.left {
-  left: 0;
-  transform-origin: left center;
-}
-
-.hinog-flap-anchor.right {
-  right: 0;
-  transform-origin: right center;
-}
-
-.hinog-front,
-.hinog-back,
-.hinog-lid,
-.hinog-bottom {
-  width: 100%;
-  height: 100%;
-}
-
-.hinog-front {
-  transform: translateZ(98px);
-  display: grid;
-  place-items: center;
-}
-
-.hinog-back {
-  transform: rotateY(180deg) translateZ(98px);
-}
-
-.hinog-bottom {
-  transform: rotateX(-90deg) translateZ(98px);
-  background: #8d5a24;
-}
-
-.hinog-left,
-.hinog-right {
-  width: 196px;
-  height: 100%;
-  left: 42px;
-}
-
-.hinog-left {
-  transform: rotateY(-90deg) translateZ(140px);
-}
-
-.hinog-right {
-  transform: rotateY(90deg) translateZ(140px);
-}
-
-.hinog-lid {
-  inset: 0;
-  transform-origin: top center;
-  background:
-    linear-gradient(180deg, #d4a85a, #b78138);
-}
-
-.hinog-flap {
-  inset: 0;
-  background: #d2a052;
-}
-
-.hinog-stamp {
-  font-family: var(--font-hinog-enamel), sans-serif;
-  font-size: clamp(2.2rem, 8vw, 3.4rem);
-  color: var(--hinog-enamel);
-  letter-spacing: 0.04em;
-  transform: rotate(-6deg);
-  border: 4px solid var(--hinog-enamel);
-  padding: 0.15rem 0.45rem 0;
-  line-height: 1;
-}
-
-.hinog-type {
-  position: absolute;
-  left: 1.1rem;
-  right: 1.1rem;
-  bottom: 1.3rem;
-  z-index: 6;
+@media (min-width: 820px) {
+  .hinog-hero {
+    grid-template-columns: 0.85fr 1.15fr;
+    min-height: 72svh;
+  }
 }
 
 .hinog-ticket {
-  display: inline-block;
-  background: var(--hinog-flour);
-  color: var(--hinog-ticket);
-  padding: 0.2rem 0.5rem;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.hinog-word {
-  margin: 0.45rem 0 0;
-  font-family: var(--font-hinog-enamel), sans-serif;
-  font-size: clamp(3.2rem, 14vw, 6.4rem);
-  line-height: 0.9;
-  color: var(--hinog-flour);
-  text-shadow: 3px 3px 0 var(--hinog-enamel);
-}
-
-.hinog-line {
-  margin: 0.4rem 0 0;
-  color: #f0d9a6;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 12px;
-}
-
-.hinog-badge {
-  position: absolute;
-  top: 2.75rem;
-  left: 1.1rem;
-  z-index: 6;
-  background: var(--hinog-enamel);
-  color: #fff;
-  padding: 0.2rem 0.45rem;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-}
-
-.hinog-rest {
-  padding: 5.2rem 1.2rem 5rem;
+  padding: 1.4rem 1.2rem 1.8rem;
   background:
     repeating-linear-gradient(
-      0deg,
-      var(--hinog-news) 0 27px,
-      color-mix(in srgb, var(--hinog-kraft) 16%, var(--hinog-news)) 27px 28px
+      90deg,
+      var(--hinog-flour) 0 14px,
+      color-mix(in srgb, var(--hinog-crust) 8%, var(--hinog-flour)) 14px 15px
     );
 }
 
-.hinog-rest-inner {
-  max-width: 58rem;
-  margin: 0 auto;
+.hinog-word {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-hinog-enamel), "Lilita One", sans-serif;
+  font-size: clamp(3rem, 12vw, 5.4rem);
+  line-height: 0.9;
+  color: var(--hinog-enamel);
 }
 
-.hinog-live-mark {
-  display: inline-block;
-  margin: 0 0 0.7rem;
-  background: var(--hinog-enamel);
-  color: #fff;
-  padding: 0.2rem 0.45rem;
-  font-size: 10px;
-  letter-spacing: 0.16em;
+.hinog-photo {
+  position: relative;
+  min-height: 260px;
+  background: var(--hinog-crust);
+}
+
+.hinog-photo img {
+  object-fit: cover;
+}
+
+.hinog-steam {
+  pointer-events: none;
+  position: absolute;
+  left: 18%;
+  bottom: 28%;
+  width: 42%;
+  height: 38%;
+}
+
+.hinog-steam span {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 248, 238, 0.35);
+  animation: hinog-steam 3.2s ease-in infinite;
+}
+
+.hinog-steam span:nth-child(2) {
+  left: 28%;
+  animation-delay: 0.6s;
+}
+
+.hinog-steam span:nth-child(3) {
+  left: 54%;
+  animation-delay: 1.2s;
+}
+
+@keyframes hinog-steam {
+  0% {
+    transform: translateY(8px) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-70px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+.hinog-rest {
+  padding: 2.4rem 1.2rem 4.2rem;
+}
+
+.hinog-rest-inner {
+  max-width: 56rem;
+  margin: 0 auto;
 }
 
 .hinog-rest h2 {
   margin: 0;
   font-family: var(--font-hinog-enamel), sans-serif;
-  font-size: clamp(2.2rem, 10vw, 4rem);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
   color: var(--hinog-enamel);
-  line-height: 0.95;
 }
 
-.hinog-rest > .hinog-rest-inner > p {
-  max-width: 28rem;
-  margin-top: 0.9rem;
-  line-height: 1.55;
-}
-
-.hinog-ledger {
-  margin-top: 2rem;
+.hinog-split {
+  margin-top: 1.4rem;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 @media (min-width: 820px) {
-  .hinog-ledger {
-    grid-template-columns: 1fr 220px;
+  .hinog-split {
+    grid-template-columns: 1.2fr 0.8fr;
   }
 }
 
 .hinog-still {
   position: relative;
-  min-height: 240px;
-  background: #3f2412;
+  min-height: 220px;
+  background: var(--hinog-crust);
 }
 
 .hinog-still img {
@@ -301,28 +149,13 @@ html:has(.hinog) {
 }
 
 .hinog-stub {
-  background: var(--hinog-flour);
+  background: #fff8ee;
   border: 2px dashed var(--hinog-enamel);
   padding: 1rem;
 }
 
-.hinog-stub p {
-  margin: 0 0 0.55rem;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.hinog-stub strong {
-  font-family: var(--font-hinog-enamel), sans-serif;
-  font-size: 1.3rem;
-  color: var(--hinog-enamel);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
 .hinog-menu {
-  margin: 2rem 0 0;
+  margin: 1.6rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -333,36 +166,27 @@ html:has(.hinog) {
   gap: 1rem;
   padding: 0.55rem 0;
   border-bottom: 1px dashed var(--hinog-crust);
-  font-size: 0.95rem;
 }
 
 .hinog-cta {
   display: inline-flex;
-  margin-top: 1.8rem;
+  margin-top: 1.6rem;
   background: var(--hinog-enamel);
   color: #fff;
   text-decoration: none;
-  padding: 0.8rem 1.1rem;
+  padding: 0.75rem 1.05rem;
   font-family: var(--font-hinog-enamel), sans-serif;
-  letter-spacing: 0.04em;
-}
-
-.hinog-cta:hover {
-  filter: brightness(1.08);
 }
 
 .hinog-foot {
-  margin-top: 2.6rem;
+  margin-top: 2.2rem;
   font-size: 12px;
   color: #5a4030;
 }
 
-.hinog-foot a {
-  color: var(--hinog-crust);
-}
-
-.hinog-bags {
-  position: relative;
-  min-height: 160px;
-  margin-top: 1.4rem;
+.hinog-leaf {
+  color: var(--hinog-leaf);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

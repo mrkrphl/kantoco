@@ -21,7 +21,7 @@ const accent = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Concordia's Cafe — labeled KantoCo demo",
+  title: "Concordia's Cafe, sample by KantoCo",
   description:
     "Demo site by KantoCo — sample only. Not real client work. Neighborhood cafe on Aguirre Ave, BF Homes, Paranaque.",
   robots: { index: false, follow: false },

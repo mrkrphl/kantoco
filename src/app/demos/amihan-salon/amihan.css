@@ -1,12 +1,14 @@
 .amihan {
-  --ami-ink: #0b1210;
-  --ami-teal: #1a5c58;
-  --ami-tungsten: #c9a36a;
-  --ami-paper: #efe4cf;
-  --ami-dim: #8d8576;
-  background: var(--ami-ink);
-  color: var(--ami-paper);
-  font-family: var(--font-amihan-body), Karla, ui-sans-serif, sans-serif;
+  --ami-wall: #f6e4d8;
+  --ami-ink: #3a2420;
+  --ami-rose: #c46b6f;
+  --ami-chrome: #8a8f96;
+  --ami-paper: #fff6ee;
+  --ami-dim: #7a5e56;
+  background:
+    linear-gradient(180deg, #fbeee4 0%, var(--ami-wall) 18%, #f3d9cc 100%);
+  color: var(--ami-ink);
+  font-family: var(--font-amihan-body), Figtree, ui-sans-serif, sans-serif;
   min-height: 100%;
 }
 
@@ -15,16 +17,46 @@
 }
 
 .amihan ::selection {
-  background: var(--ami-tungsten);
-  color: var(--ami-ink);
+  background: color-mix(in srgb, var(--ami-rose) 40%, transparent);
 }
 
 .amihan-display {
-  font-family: var(--font-amihan-display), Syne, sans-serif;
-  letter-spacing: -0.045em;
+  font-family: var(--font-amihan-display), "Bodoni Moda", serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
-.amihan-neon {
-  color: var(--ami-tungsten);
-  text-shadow: 0 0 0 transparent;
+.amihan-sheen {
+  position: relative;
+}
+
+.amihan-sheen::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.28) 48%,
+    transparent 62%
+  );
+  transform: translateX(-40%);
+  animation: amihan-sheen 4.8s ease-in-out infinite;
+}
+
+@keyframes amihan-sheen {
+  0%,
+  35% {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
 }

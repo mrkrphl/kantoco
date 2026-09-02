@@ -1,13 +1,14 @@
 .nara {
-  --nara-paper: #efe6d6;
-  --nara-ink: #1c1914;
-  --nara-green: #2c4a3e;
-  --nara-rust: #8f3d2a;
-  --nara-rule: #c9bba4;
-  --nara-muted: #5c564c;
-  background: var(--nara-paper);
+  --nara-wall: #e7f0ea;
+  --nara-ink: #24312c;
+  --nara-green: #1f5a46;
+  --nara-maroon: #7a2e32;
+  --nara-card: #f7fbf8;
+  --nara-muted: #4e5d57;
+  --nara-rule: #c5d4cc;
+  background: var(--nara-wall);
   color: var(--nara-ink);
-  font-family: var(--font-nara), "IBM Plex Sans", ui-sans-serif, sans-serif;
+  font-family: var(--font-nara-sans), "Noto Sans", ui-sans-serif, sans-serif;
   min-height: 100%;
 }
 
@@ -16,18 +17,45 @@
 }
 
 .nara ::selection {
-  background: color-mix(in srgb, var(--nara-rust) 40%, transparent);
-  color: var(--nara-paper);
+  background: color-mix(in srgb, var(--nara-green) 30%, transparent);
 }
 
-.nara-rule {
-  border-color: var(--nara-rule);
+.nara-serif {
+  font-family: var(--font-nara-serif), "Noto Serif", Georgia, serif;
 }
 
-.nara-ledger {
-  border-top: 1px solid var(--nara-rule);
+.nara-hours {
+  animation: nara-stamp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.nara-ledger + .nara-ledger {
-  border-top: 1px dashed var(--nara-rule);
+@keyframes nara-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-2deg) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1.2deg) translateY(0);
+  }
+}
+
+.nara-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--nara-card);
+}
+
+.nara-table th,
+.nara-table td {
+  border-bottom: 1px solid var(--nara-rule);
+  padding: 0.7rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.nara-table th {
+  background: var(--nara-green);
+  color: #f4faf7;
+  font-weight: 600;
+  font-size: 0.82rem;
 }

@@ -1,4 +1,3 @@
-import { FadeUp } from "@/components/demos/FadeUp";
 import { NaraShell } from "@/components/demos/nara/NaraShell";
 import { KANTOCO_MESSENGER } from "@/lib/demos";
 
@@ -6,18 +5,16 @@ export default function NaraContact() {
   return (
     <NaraShell current="Contact">
       <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--nara-green)]">
-            Contact
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
-            Message first. No fake hotline.
-          </h1>
-        </FadeUp>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--nara-green)]">
+          Contact
+        </p>
+        <h1 className="nara-serif mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+          Message first. This sample has no fake hotline.
+        </h1>
 
-        <div className="mt-10 grid gap-8 md:grid-cols-2">
-          <section className="border border-[var(--nara-rule)] p-6">
-            <h2 className="text-lg font-semibold">Hours</h2>
+        <div className="mt-10 grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
+          <section className="bg-[var(--nara-card)] p-6 ring-1 ring-[var(--nara-rule)]">
+            <h2 className="nara-serif text-lg font-semibold">Hours</h2>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt>Monday to Saturday</dt>
@@ -29,12 +26,12 @@ export default function NaraContact() {
               </div>
             </dl>
           </section>
-          <section className="border border-[var(--nara-rule)] p-6">
-            <h2 className="text-lg font-semibold">Area</h2>
+          <section className="bg-[var(--nara-card)] p-6 ring-1 ring-[var(--nara-rule)]">
+            <h2 className="nara-serif text-lg font-semibold">Area</h2>
             <p className="mt-4 text-sm leading-relaxed text-[var(--nara-muted)]">
-              Sample lot on a fictional block off Dr. A. Santos Ave., near the
-              BF Homes fringe, Parañaque. This is not a real street address
-              and not a real clinic. Map pin is not live.
+              Sample lot on a fictional block off Dr. A. Santos Avenue, near BF
+              Homes, Parañaque. This is not a real street address and not a real
+              clinic. The map pin is not live.
             </p>
           </section>
         </div>
@@ -43,9 +40,9 @@ export default function NaraContact() {
           href={KANTOCO_MESSENGER}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-10 inline-flex bg-[var(--nara-rust)] px-5 py-3.5 text-sm font-semibold text-[var(--nara-paper)]"
+          className="mt-10 inline-flex bg-[var(--nara-maroon)] px-5 py-3.5 text-sm font-semibold text-[#f7fbf8]"
         >
-          Message on Messenger
+          Message us on Facebook
         </a>
       </div>
     </NaraShell>
