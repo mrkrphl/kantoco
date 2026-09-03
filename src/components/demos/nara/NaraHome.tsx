@@ -22,16 +22,6 @@ export function NaraHome() {
       const root = rootRef.current;
       if (!root || !ready || reduced) return;
 
-      const frame = root.querySelector<HTMLElement>(".nara-opener-frame");
-      if (frame) {
-        gsap.set(frame, { clipPath: "inset(0 0 0 100%)" });
-        gsap.to(frame, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          duration: 1.25,
-          ease: "power4.inOut",
-        });
-      }
-
       revealOnScroll(
         gsap,
         gsap.utils.toArray<HTMLElement>("[data-reveal]", root),

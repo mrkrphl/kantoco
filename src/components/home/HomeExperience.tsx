@@ -80,33 +80,31 @@ export function HomeExperience() {
       if (!root || !ready || reduced) return;
 
       const pin = root.querySelector<HTMLElement>(".home-opener");
-      const frame = root.querySelector<HTMLElement>(".home-opener-frame");
       const img = root.querySelector<HTMLElement>(".home-opener-img");
-      const copy = root.querySelector<HTMLElement>(".home-opener-copy");
-      if (!pin || !frame) return;
+      if (!pin) return;
 
-      gsap.set(frame, { clipPath: "inset(0 34% 0 34%)" });
-      if (img) gsap.set(img, { scale: 1.18, transformOrigin: "55% 40%" });
-      if (copy) gsap.set(copy, { autoAlpha: 0, y: 28 });
-
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: {
-          trigger: pin,
-          start: "top top",
-          end: "+=175%",
-          pin: true,
-          scrub: 0.7,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 720px)", () => {
+        if (!img) return;
+        gsap.fromTo(
+          img,
+          { scale: 1.08, transformOrigin: "55% 40%" },
+          {
+            scale: 1,
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: pin,
+              start: "top top",
+              end: "+=80%",
+              pin: true,
+              scrub: 0.55,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
       });
-
-      tl.to(frame, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.15 }, 0);
-      if (img) tl.to(img, { scale: 1, duration: 1.15 }, 0);
-      if (copy) {
-        tl.to(copy, { autoAlpha: 1, y: 0, duration: 0.32 }, 0.62);
-      }
 
       revealOnScroll(
         gsap,
@@ -150,6 +148,8 @@ export function HomeExperience() {
           );
         }
       });
+
+      return () => mm.revert();
     },
     { scope: rootRef, dependencies: [ready, reduced] },
   );
@@ -190,8 +190,8 @@ export function HomeExperience() {
           </div>
           <div className="home-opener-copy">
             <p className="home-p-lead">
-              We’re KantoCo. We make websites for small businesses in Parañaque
-              and nearby.
+              <span className="home-p-name">We’re KantoCo.</span> We make
+              websites for small businesses in Parañaque and nearby.
             </p>
           </div>
         </section>

@@ -50,6 +50,19 @@
   color: var(--mute);
 }
 
+.nara-overlay {
+  position: relative;
+}
+
+.nara-overlay .nara-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  background: rgba(18, 24, 22, 0.72);
+}
+
 .nara-overlay .nara-head {
   position: absolute;
   top: 2.15rem;
@@ -59,14 +72,22 @@
   max-width: none;
   margin: 0;
   padding: 1.15rem var(--pad) 0;
+  color: var(--ink);
+}
+
+.nara-overlay .nara-name {
+  font-size: clamp(2.6rem, 6.2vw, 5.4rem);
+  letter-spacing: -0.045em;
 }
 
 .nara-overlay .nara-nav {
   margin-top: 1rem;
   padding-bottom: 0;
+  border-bottom-color: color-mix(in srgb, var(--ink) 28%, transparent);
 }
 
 .nara-overlay .nara-opener {
+  height: 100svh;
   min-height: 100svh;
 }
 
@@ -121,14 +142,23 @@
   inset: 0;
   clip-path: inset(0 0 0 100%);
   transform-origin: left center;
+  animation: nara-door 1.2s cubic-bezier(0.76, 0, 0.18, 1) 0.06s forwards;
+}
+
+@keyframes nara-door {
+  to {
+    clip-path: inset(0% 0% 0% 0%);
+  }
 }
 
 [data-motion="static"] .nara-opener-frame {
+  animation: none;
   clip-path: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .nara-opener-frame {
+    animation: none;
     clip-path: none;
   }
 }
