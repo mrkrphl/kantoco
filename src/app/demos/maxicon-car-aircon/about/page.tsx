@@ -6,7 +6,6 @@ export default function MaxiconAbout() {
   return (
     <MaxiconShell current="About">
       <div className="maxicon-page">
-        <p className="maxicon-kicker">About</p>
         <h1 className="maxicon-display maxicon-title">
           A specialist bay, not a general shop with an aircon hose.
         </h1>
@@ -15,7 +14,7 @@ export default function MaxiconAbout() {
           <div className="maxicon-shot">
             <Image
               src="/demos/maxicon-car-aircon/maxicon-bay.jpg"
-              alt="A technician in a Maxicon shirt working under the open hood of a Toyota, from a photo they published."
+              alt="A technician in a Maxicon shirt working under the open hood of a Toyota."
               fill
               className="object-cover"
               sizes="(max-width: 880px) 100vw, 50vw"
@@ -28,14 +27,13 @@ export default function MaxiconAbout() {
               open the system and fix it.
             </p>
             <p>
-              Their public Facebook page has {maxicon.facebookFollowers}. Their
-              current website is a thin Wix page. This sample is a KantoCo
-              pitch of how that shop could read on the web. They did not hire
-              us. Do not treat this as their live site.
+              Their public Facebook page has {maxicon.facebookFollowers}. This
+              sample is a KantoCo pitch of how that shop could read on the web.
+              They did not hire us. Do not treat this as their live site.
             </p>
             <p>
               {maxicon.cards} Hours come from their Facebook intro:{" "}
-              {maxicon.hours}. We did not invent a Sunday line.
+              {maxicon.hours}.
             </p>
           </div>
         </div>
@@ -48,16 +46,11 @@ export default function MaxiconAbout() {
               board. That is the kind of shelf they keep.
             </p>
             <p>{maxicon.recentPost}</p>
-            <p>
-              If you own the shop and want a site that is actually yours, that
-              conversation is with KantoCo, not a claim that this page is
-              already live work.
-            </p>
           </div>
           <div className="maxicon-shot">
             <Image
               src="/demos/maxicon-car-aircon/compressor.jpg"
-              alt="A car aircon compressor on a parts board, photographed by the shop and published on their Wix page."
+              alt="A car aircon compressor on a parts board, photographed by the shop."
               fill
               className="object-cover"
               sizes="(max-width: 880px) 100vw, 50vw"

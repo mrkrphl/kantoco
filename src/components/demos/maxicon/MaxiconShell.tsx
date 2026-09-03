@@ -27,7 +27,6 @@ export function MaxiconShell({
       <header className="maxicon-head">
         <div className="maxicon-head-row">
           <Link href="/demos/maxicon-car-aircon" className="block">
-            <p className="maxicon-kicker">{DEMO_BADGE}</p>
             <p className="maxicon-display maxicon-name">{maxicon.name}</p>
             <p className="mt-2 text-sm text-[var(--mute)]">
               {maxicon.addressShort}
@@ -55,7 +54,7 @@ export function MaxiconShell({
       <footer className="maxicon-foot">
         <div className="maxicon-foot-inner">
           <p className="max-w-md text-sm leading-relaxed text-[var(--mute)]">
-            {maxicon.sampleNote} {DEMO_DISCLAIMER}
+            {maxicon.sampleNote}
           </p>
           <div className="flex flex-col gap-2 text-sm sm:items-end">
             <a
@@ -72,7 +71,7 @@ export function MaxiconShell({
               rel="noopener noreferrer"
               className="underline underline-offset-4"
             >
-              Sample note: message KantoCo
+              Message KantoCo
             </a>
             <Link href="/" className="text-[var(--mute)]">
               Back to the agency

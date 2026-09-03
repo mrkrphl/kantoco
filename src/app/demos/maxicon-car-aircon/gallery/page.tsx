@@ -4,27 +4,19 @@ import { MaxiconShell } from "@/components/demos/maxicon/MaxiconShell";
 const shots = [
   [
     "/demos/maxicon-car-aircon/shop-front.jpg",
-    "Maxicon’s open bay and sign, from a photo they published on their public Wix page.",
+    "Maxicon’s open bay and sign on President’s Avenue.",
   ],
   [
     "/demos/maxicon-car-aircon/maxicon-bay.jpg",
-    "A technician in a Maxicon shirt at an open hood. Their photo, not a generated person.",
+    "A technician in a Maxicon shirt at an open hood.",
   ],
   [
     "/demos/maxicon-car-aircon/dash-work.jpg",
-    "Dashboard pulled for evaporator work on a Toyota. Published by the shop.",
+    "Dashboard pulled for evaporator work on a Toyota.",
   ],
   [
     "/demos/maxicon-car-aircon/compressor.jpg",
-    "Compressor on the parts board, labeled Panasonic / Mazda 3. Their 2014 shop photo.",
-  ],
-  [
-    "/demos/maxicon-car-aircon/workshop-haze.jpg",
-    "Generic workshop photograph. Dark bay, not Maxicon’s storefront.",
-  ],
-  [
-    "/demos/maxicon-car-aircon/belt-drive.jpg",
-    "Generic engine-bay still of a belt and compressor clutch. Not their car.",
+    "Compressor on the parts board, labeled Panasonic / Mazda 3.",
   ],
 ] as const;
 
@@ -32,14 +24,12 @@ export default function MaxiconGallery() {
   return (
     <MaxiconShell current="Bay">
       <div className="maxicon-page">
-        <p className="maxicon-kicker">Bay</p>
         <h1 className="maxicon-display maxicon-title">
-          Their shop first. Generic stills labeled as generic.
+          Their bay and their parts.
         </h1>
         <p className="maxicon-lede">
-          The shop stills here are photos Maxicon already published on their
-          public Wix site. Two license-clean workshop photos fill the dark-bay
-          feeling and say so in the caption.
+          These stills were published by the shop. No generated people, and no
+          borrowed testimonials.
         </p>
 
         <ul className="maxicon-gallery">

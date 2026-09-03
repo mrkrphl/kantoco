@@ -11,14 +11,12 @@ export const maxicon = {
   phoneLandlineDisplay: "8820 5426",
   phoneLandlineHref: "tel:+63288205426",
   phoneLandlineAlt: "820 5426",
-  phoneWix: "2191370",
+  phoneOther: "2191370",
   email: "info_maxicon@yahoo.com",
   emailHref: "mailto:info_maxicon@yahoo.com",
   hours: "Monday to Saturday, 8:00am to 5:00pm",
-  hoursSource: "Facebook intro",
   facebook: "https://www.facebook.com/MaxiconCarAircon",
   facebookFollowers: "about 95,000 followers",
-  wix: "https://kulyo51.wixsite.com/maxiconcaraircon",
   mapsQuery:
     "https://www.google.com/maps/search/?api=1&query=45+President%27s+Avenue+BF+Homes+Paranaque",
   mapsEmbed:
@@ -35,7 +33,7 @@ export const maxicon = {
 export const maxiconWork = [
   [
     "Diagnostics",
-    "Read the system first. They list computerized scanning on their public Wix page.",
+    "Read the system first. They publish computerized scanning as part of the job.",
   ],
   [
     "Leak test",
@@ -55,6 +53,6 @@ export const maxiconWork = [
   ],
   [
     "Full-service repair",
-    "Japanese, American, and European cars. Classic cars are listed on their public page too.",
+    "Japanese, American, and European cars come through the same door.",
   ],
 ] as const;

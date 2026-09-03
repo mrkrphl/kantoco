@@ -23,8 +23,7 @@
 .maxicon-display {
   font-family: var(--font-maxicon-display), "Big Shoulders", sans-serif;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 .maxicon-banner {
@@ -81,7 +80,7 @@
 
 .maxicon-opener {
   position: relative;
-  min-height: calc(100svh - 6.5rem);
+  min-height: calc(100svh - 7.2rem);
   overflow: hidden;
   background: #05090b;
 }
@@ -117,24 +116,7 @@
 
 .maxicon-opener img {
   object-fit: cover;
-  object-position: 62% 40%;
-}
-
-.maxicon-loud-wrap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  padding: 2rem var(--pad) 2.4rem;
-  max-width: 46rem;
-}
-
-.maxicon-loud {
-  margin: 0;
-  font-size: clamp(2.6rem, 8.4vw, 5.8rem);
-  line-height: 0.88;
-  max-width: 14ch;
+  object-position: center 62%;
 }
 
 .maxicon-section,
@@ -159,9 +141,9 @@
 
 .maxicon-title {
   margin: 0.7rem 0 0;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  line-height: 0.92;
-  max-width: 16ch;
+  font-size: clamp(1.85rem, 4.4vw, 3.1rem);
+  line-height: 1.12;
+  max-width: 22ch;
 }
 
 .maxicon-lede {
@@ -200,7 +182,8 @@
   color: var(--bg);
   text-decoration: none;
   padding: 0.72rem 1.1rem;
-  font-size: 1.55rem;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .maxicon-cta-ghost {
@@ -210,7 +193,8 @@
   color: var(--ink);
   text-decoration: none;
   padding: 0.68rem 1.1rem;
-  font-size: 1.55rem;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .maxicon-note {

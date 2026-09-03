@@ -5,13 +5,12 @@ export default function MaxiconContact() {
   return (
     <MaxiconShell current="Visit">
       <div className="maxicon-page">
-        <p className="maxicon-kicker">Visit</p>
         <h1 className="maxicon-display maxicon-title">
           Call the mobile. Facebook is the live page.
         </h1>
         <p className="maxicon-lede">
-          {maxicon.sampleNote} The numbers and the street below are public. We
-          did not invent a second address.
+          The numbers and the street below are public. We did not invent a
+          second address.
         </p>
 
         <div className="maxicon-visit-grid mt-12">
@@ -50,8 +49,8 @@ export default function MaxiconContact() {
                 {maxicon.phoneLandlineDisplay}
               </a>
               {" / "}
-              {maxicon.phoneLandlineAlt}. Their old Wix page also lists{" "}
-              {maxicon.phoneWix}.
+              {maxicon.phoneLandlineAlt}. Another number they publish is{" "}
+              {maxicon.phoneOther}.
             </p>
           </section>
           <section className="maxicon-card">
@@ -89,16 +88,15 @@ export default function MaxiconContact() {
           </a>
         </div>
         <p className="maxicon-note">
-          KantoCo sample only.{" "}
+          {maxicon.sampleNote}{" "}
           <a
             href={maxicon.kantocoMessenger}
             target="_blank"
             rel="noopener noreferrer"
           >
             Message KantoCo
-          </a>{" "}
-          if you want a site like this. Never treat this URL as Maxicon’s live
-          site.
+          </a>
+          .
         </p>
       </div>
     </MaxiconShell>

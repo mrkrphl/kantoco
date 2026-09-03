@@ -25,22 +25,18 @@ export default function MaxiconServices() {
   return (
     <MaxiconShell current="Work">
       <div className="maxicon-page">
-        <p className="maxicon-kicker">Work</p>
         <h1 className="maxicon-display maxicon-title">
-          What the public page already says they do.
+          Parts on the shelf, repair in the bay.
         </h1>
         <p className="maxicon-lede">
-          No sample rates here. A live shop writes its own board. This list
-          follows their public Wix page and Facebook intro: parts, repair,
-          diagnostics, leak test, flush, and recharge.
+          There are no sample rates here. A live shop writes its own board. The
+          list is the work they already publish: parts, repair, diagnostics,
+          leak test, flush, and recharge.
         </p>
 
         <div className="maxicon-split mt-12">
           <section>
-            <p className="maxicon-kicker">Parts</p>
-            <h2 className="maxicon-display mt-3 text-4xl">
-              OEM and replacement
-            </h2>
+            <h2 className="maxicon-display text-3xl">OEM and replacement</h2>
             <ul className="maxicon-jobs">
               {parts.map((item) => (
                 <li key={item}>
@@ -50,10 +46,7 @@ export default function MaxiconServices() {
             </ul>
           </section>
           <section>
-            <p className="maxicon-kicker">Repair</p>
-            <h2 className="maxicon-display mt-3 text-4xl">
-              Full-service aircon
-            </h2>
+            <h2 className="maxicon-display text-3xl">Full-service aircon</h2>
             <ul className="maxicon-jobs">
               {repair.map((item) => (
                 <li key={item}>
@@ -66,7 +59,6 @@ export default function MaxiconServices() {
 
         <p className="maxicon-lede">
           {maxicon.recentPost} Their Facebook page is the live record of jobs.
-          This sample does not invent a diagnosis.
         </p>
 
         <div className="maxicon-cta-row">
