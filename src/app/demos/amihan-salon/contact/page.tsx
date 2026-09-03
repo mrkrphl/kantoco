@@ -4,14 +4,14 @@ import { KANTOCO_MESSENGER } from "@/lib/demos";
 export default function AmihanContact() {
   return (
     <AmihanShell current="Contact">
-      <div className="px-4 pb-16 md:px-8">
+      <div className="amihan-page">
         <h1 className="amihan-display text-4xl md:text-6xl">
           Look for the rose sign, then message.
         </h1>
 
-        <dl className="mt-12 max-w-lg space-y-8 text-sm">
+        <dl className="mt-14 max-w-lg space-y-10 text-base">
           <div>
-            <dt className="uppercase tracking-[0.18em] text-[var(--ami-rose)]">
+            <dt className="uppercase tracking-[0.18em] text-[var(--accent)]">
               Hours
             </dt>
             <dd className="mt-2">
@@ -21,10 +21,10 @@ export default function AmihanContact() {
             </dd>
           </div>
           <div>
-            <dt className="uppercase tracking-[0.18em] text-[var(--ami-rose)]">
+            <dt className="uppercase tracking-[0.18em] text-[var(--accent)]">
               Area
             </dt>
-            <dd className="mt-2 leading-relaxed text-[var(--ami-dim)]">
+            <dd className="mt-2 leading-relaxed text-[var(--mute)]">
               Sample walk-up on a fictional strip near BF Homes and Moonwalk,
               Parañaque. Not a real unit. No real phone.
             </dd>
@@ -35,7 +35,7 @@ export default function AmihanContact() {
           href={KANTOCO_MESSENGER}
           target="_blank"
           rel="noopener noreferrer"
-          className="amihan-display mt-12 inline-block bg-[var(--ami-rose)] px-6 py-4 text-2xl text-[#fff6ee]"
+          className="amihan-display amihan-cta text-2xl"
         >
           Message us on Facebook
         </a>

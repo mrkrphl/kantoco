@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Atkinson_Hyperlegible, Lilita_One } from "next/font/google";
+import { Atkinson_Hyperlegible, Fraunces } from "next/font/google";
 import "./hinog.css";
 
-const enamel = Lilita_One({
+const display = Fraunces({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-hinog-enamel",
+  weight: ["600", "700"],
+  variable: "--font-hinog-display",
 });
 
 const body = Atkinson_Hyperlegible({
@@ -26,5 +26,7 @@ export default function HinogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={`${enamel.variable} ${body.variable}`}>{children}</div>;
+  return (
+    <div className={`${display.variable} ${body.variable}`}>{children}</div>
+  );
 }

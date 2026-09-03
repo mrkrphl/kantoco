@@ -18,32 +18,28 @@ export function AmihanShell({
 }) {
   return (
     <div className="amihan">
-      <div className="flex items-center justify-between gap-3 bg-[var(--ami-rose)] px-4 py-2 text-[11px] text-[#fff6ee] md:px-6">
+      <div className="amihan-banner">
         <p className="font-semibold tracking-[0.14em]">{DEMO_BADGE}</p>
-        <p className="max-w-[16rem] text-right sm:max-w-none">{DEMO_DISCLAIMER}</p>
+        <p className="max-w-[18rem] text-right sm:max-w-none">{DEMO_DISCLAIMER}</p>
       </div>
 
-      <header className="border-b border-[color-mix(in_srgb,var(--ami-rose)_35%,transparent)] px-4 py-7 md:px-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <header className="amihan-head">
+        <div className="amihan-head-row">
           <Link href="/demos/amihan-salon" className="block">
             <p className="amihan-display text-5xl leading-none md:text-6xl">
               Amihan
             </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.28em] text-[var(--ami-dim)]">
+            <p className="mt-3 text-xs uppercase tracking-[0.28em] text-[var(--mute)]">
               Salon, Moonwalk / BF Homes
             </p>
           </Link>
           <nav>
-            <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-[var(--ami-dim)]">
+            <ul className="amihan-nav">
               {nav.map(([label, href]) => (
                 <li key={href}>
                   <Link
                     href={href}
-                    className={
-                      current === label
-                        ? "text-[var(--ami-ink)] underline decoration-[var(--ami-rose)] underline-offset-4"
-                        : "hover:text-[var(--ami-ink)]"
-                    }
+                    aria-current={current === label ? "page" : undefined}
                   >
                     {label}
                   </Link>
@@ -56,9 +52,9 @@ export function AmihanShell({
 
       <main>{children}</main>
 
-      <footer className="mt-16 border-t border-[color-mix(in_srgb,var(--ami-rose)_40%,transparent)] px-4 py-10 md:px-8">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <p className="max-w-md text-xs leading-relaxed text-[var(--ami-dim)]">
+      <footer className="amihan-foot">
+        <div className="mx-auto flex max-w-[76rem] flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <p className="max-w-md text-sm leading-relaxed text-[var(--mute)]">
             {DEMO_DISCLAIMER} Sample parlor on a fictional strip near BF Homes
             and Moonwalk, Parañaque.
           </p>
@@ -66,7 +62,7 @@ export function AmihanShell({
             href={KANTOCO_MESSENGER}
             target="_blank"
             rel="noopener noreferrer"
-            className="amihan-display text-2xl text-[var(--ami-rose)]"
+            className="amihan-display text-2xl text-[var(--accent)]"
           >
             Message us on Facebook
           </a>

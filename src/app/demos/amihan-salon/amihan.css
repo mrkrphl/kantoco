@@ -1,13 +1,18 @@
 .amihan {
-  --ami-wall: #f6e4d8;
-  --ami-ink: #3a2420;
-  --ami-rose: #c46b6f;
-  --ami-chrome: #8a8f96;
-  --ami-paper: #fff6ee;
-  --ami-dim: #7a5e56;
-  background:
-    linear-gradient(180deg, #fbeee4 0%, var(--ami-wall) 18%, #f3d9cc 100%);
-  color: var(--ami-ink);
+  --bg: #f3e4d6;
+  --ink: #2c1c18;
+  --accent: #9e3d42;
+  --mute: color-mix(in srgb, var(--ink) 58%, var(--bg));
+  --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
+  --paper: #fff6ee;
+  --ami-wall: var(--bg);
+  --ami-ink: var(--ink);
+  --ami-rose: var(--accent);
+  --ami-paper: var(--paper);
+  --ami-dim: var(--mute);
+  --pad: clamp(1.2rem, 4.2vw, 3.25rem);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-amihan-body), Figtree, ui-sans-serif, sans-serif;
   min-height: 100%;
 }
@@ -17,7 +22,7 @@
 }
 
 .amihan ::selection {
-  background: color-mix(in srgb, var(--ami-rose) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 36%, transparent);
 }
 
 .amihan-display {
@@ -26,37 +31,169 @@
   letter-spacing: -0.03em;
 }
 
-.amihan-sheen {
-  position: relative;
+.amihan-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  background: var(--accent);
+  color: var(--paper);
+  padding: 0.5rem var(--pad);
+  font-size: 0.72rem;
 }
 
-.amihan-sheen::after {
-  content: "";
-  pointer-events: none;
+.amihan-head {
+  padding: 2rem var(--pad) 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.amihan-head-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 800px) {
+  .amihan-head-row {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+  }
+}
+
+.amihan-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: 0.95rem;
+  color: var(--mute);
+}
+
+.amihan-nav a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 5px;
+}
+
+.amihan-hero {
+  padding: 4.5rem var(--pad) 0;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.amihan-hero h1 {
+  max-width: 16em;
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  line-height: 1.04;
+}
+
+.amihan-hero .lede {
+  margin-top: 1.4rem;
+  max-width: 32rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--mute);
+}
+
+.amihan-opener {
+  position: relative;
+  margin: 3.5rem auto 0;
+  max-width: 76rem;
+  min-height: min(78svh, 46rem);
+  overflow: hidden;
+  background: #3a2420;
+}
+
+.amihan-opener-frame {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    115deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.28) 48%,
-    transparent 62%
-  );
-  transform: translateX(-40%);
-  animation: amihan-sheen 4.8s ease-in-out infinite;
+  clip-path: inset(0 100% 0 0);
 }
 
-@keyframes amihan-sheen {
-  0%,
-  35% {
-    transform: translateX(-50%);
-    opacity: 0;
+[data-motion="static"] .amihan-opener-frame {
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amihan-opener-frame {
+    clip-path: none;
   }
-  50% {
-    opacity: 1;
+}
+
+.amihan-opener img {
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+
+.amihan-page {
+  padding: 4rem var(--pad) 5rem;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.amihan-still {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.amihan-still img,
+.amihan-shot img {
+  object-fit: cover;
+}
+
+.amihan-shot {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.amihan-gallery {
+  display: grid;
+  gap: 2.2rem;
+  margin-top: 3rem;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .amihan-gallery {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.8rem;
   }
-  70%,
-  100% {
-    transform: translateX(50%);
-    opacity: 0;
-  }
+}
+
+.amihan-cta {
+  display: inline-flex;
+  margin-top: 2.2rem;
+  background: var(--accent);
+  color: var(--paper);
+  text-decoration: none;
+  padding: 0.9rem 1.2rem;
+}
+
+.amihan-foot {
+  margin-top: 4rem;
+  border-top: 1px solid var(--rule);
+  padding: 2.4rem var(--pad) 3rem;
+}
+
+.amihan-menu {
+  margin-top: 3rem;
+  background: var(--paper);
+  padding: 0.5rem 1.4rem;
+}
+
+.amihan-menu li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.amihan-menu li:last-child {
+  border-bottom: 0;
 }

@@ -1,12 +1,19 @@
 .haligi {
-  --ha-paper: #e6dfd0;
-  --ha-ink: #1e1c16;
-  --ha-oxide: #c45a1a;
-  --ha-carbon: #2f5d4a;
-  --ha-steel: #5c5a52;
-  --ha-form: #f4efe3;
-  background: var(--ha-paper);
-  color: var(--ha-ink);
+  --bg: #e4ddd0;
+  --ink: #161410;
+  --accent: #c45a1a;
+  --mute: color-mix(in srgb, var(--ink) 56%, var(--bg));
+  --rule: color-mix(in srgb, var(--ink) 16%, var(--bg));
+  --form: #f4efe3;
+  --ha-paper: var(--bg);
+  --ha-ink: var(--ink);
+  --ha-oxide: var(--accent);
+  --ha-carbon: var(--ink);
+  --ha-steel: var(--mute);
+  --ha-form: var(--form);
+  --pad: clamp(1.2rem, 4vw, 3rem);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-haligi-body), "Work Sans", ui-sans-serif, sans-serif;
   min-height: 100%;
 }
@@ -16,7 +23,7 @@
 }
 
 .haligi ::selection {
-  background: color-mix(in srgb, var(--ha-oxide) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 38%, transparent);
 }
 
 .haligi-cond {
@@ -25,12 +32,145 @@
   text-transform: uppercase;
 }
 
-.haligi-form {
-  background: var(--ha-form);
-  box-shadow: inset 0 0 0 1px #c9c0aa, 6px 8px 0 rgba(47, 93, 74, 0.18);
+.haligi-banner {
+  background: var(--ink);
+  color: var(--form);
+  padding: 0.5rem var(--pad);
+  text-align: center;
+  font-size: 0.75rem;
 }
 
-.haligi-photo-strip img {
+.haligi-head {
+  padding: 1.5rem var(--pad) 1.2rem;
+  border-bottom: 3px solid var(--accent);
+}
+
+.haligi-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  font-size: 0.95rem;
+  color: var(--mute);
+}
+
+.haligi-nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--form);
+  padding: 0.15rem 0.45rem;
+}
+
+.haligi-opener {
+  position: relative;
+  min-height: min(78svh, 44rem);
+  overflow: hidden;
+  background: #1e1c16;
+}
+
+.haligi-opener-frame {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(100% 0 0 0);
+}
+
+[data-motion="static"] .haligi-opener-frame {
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .haligi-opener-frame {
+    clip-path: none;
+  }
+}
+
+.haligi-opener img {
   object-fit: cover;
-  object-position: center 70%;
+  object-position: center 62%;
+}
+
+.haligi-intro,
+.haligi-page {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 4.2rem var(--pad) 2rem;
+}
+
+.haligi-page {
+  max-width: 72rem;
+}
+
+.haligi-title {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.8rem, 8vw, 5.6rem);
+  line-height: 0.92;
+}
+
+.haligi-form {
+  background: var(--form);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.haligi-jobs {
+  margin: 2.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.haligi-jobs li {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 1rem;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.haligi-cta {
+  display: inline-flex;
+  margin-top: 2rem;
+  background: var(--accent);
+  color: var(--form);
+  text-decoration: none;
+  padding: 0.7rem 1.15rem;
+  font-size: 1.7rem;
+}
+
+.haligi-cta-ghost {
+  display: inline-flex;
+  margin-top: 2rem;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  padding: 0.62rem 1.15rem;
+  font-size: 1.7rem;
+}
+
+.haligi-foot {
+  margin-top: 3.5rem;
+  border-top: 3px solid var(--ink);
+  padding: 2rem var(--pad) 2.8rem;
+}
+
+.haligi-gallery {
+  display: grid;
+  gap: 1.6rem;
+  margin-top: 2.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .haligi-gallery {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+.haligi-shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.haligi-shot img {
+  object-fit: cover;
 }

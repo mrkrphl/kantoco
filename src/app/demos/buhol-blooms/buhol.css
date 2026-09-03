@@ -1,22 +1,18 @@
 .buhol {
-  --buhol-kraft: #e7d3a4;
-  --buhol-sap: #2f5c28;
-  --buhol-band: #c41b36;
-  --buhol-ink: #1b1a14;
-  --buhol-ice: #d9e3d4;
+  --bg: #e6d7b8;
+  --ink: #1b1a14;
+  --accent: #2f5c28;
+  --mute: color-mix(in srgb, var(--ink) 56%, var(--bg));
+  --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
+  --pad: clamp(1.2rem, 4.2vw, 3.25rem);
   min-height: 100%;
-  background:
-    repeating-linear-gradient(
-      -18deg,
-      var(--buhol-kraft) 0 28px,
-      color-mix(in srgb, #c9b27a 55%, var(--buhol-kraft)) 28px 29px
-    );
-  color: var(--buhol-ink);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-buhol-sans), Cabin, ui-sans-serif, sans-serif;
 }
 
 .buhol ::selection {
-  background: var(--buhol-band);
+  background: var(--accent);
   color: #fff;
 }
 
@@ -25,94 +21,94 @@
 }
 
 .buhol-banner {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem var(--pad);
   text-align: center;
-  font-size: 12px;
-  background: var(--buhol-sap);
+  font-size: 0.78rem;
+  background: var(--accent);
   color: #f4efd8;
 }
 
 .buhol-mast {
-  padding: 1.3rem 1.1rem 0.4rem;
+  padding: 2.6rem var(--pad) 0;
+  max-width: 42rem;
+  margin: 0 auto;
 }
 
 .buhol-hand {
   margin: 0;
-  font-family: var(--font-buhol-hand), Kalam, cursive;
-  font-size: clamp(3.2rem, 12vw, 5.6rem);
-  line-height: 0.85;
-  color: var(--buhol-band);
+  font-family: var(--font-buhol-display), "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: clamp(3.4rem, 11vw, 6rem);
+  line-height: 0.9;
+  font-weight: 600;
 }
 
 .buhol-word {
-  margin: 0.2rem 0 0;
+  margin: 0.15rem 0 0;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-size: clamp(0.95rem, 2.4vw, 1.15rem);
 }
 
-.buhol-buckets {
-  display: grid;
-  grid-template-columns: 1.1fr 0.7fr;
-  gap: 0.7rem;
-  padding: 1rem 1.1rem 0;
-}
-
-.buhol-bucket {
+.buhol-opener {
   position: relative;
-  min-height: 240px;
-  overflow: hidden;
-  border-radius: 50% 50% 8px 8px / 18% 18% 8px 8px;
-  background: #2f5c28;
-  animation: buhol-sway 5.5s ease-in-out infinite;
-}
-
-.buhol-bucket:nth-child(2) {
-  min-height: 180px;
   margin-top: 2.4rem;
-  animation-delay: 0.8s;
+  min-height: min(80svh, 46rem);
+  overflow: hidden;
+  background: var(--accent);
 }
 
-.buhol-bucket img {
+.buhol-opener-frame {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+}
+
+[data-motion="static"] .buhol-opener-frame {
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buhol-opener-frame {
+    clip-path: none;
+  }
+}
+
+.buhol-opener img,
+.buhol-still img {
   object-fit: cover;
 }
 
-@keyframes buhol-sway {
-  0%,
-  100% {
-    transform: rotate(-0.6deg);
-  }
-  50% {
-    transform: rotate(0.8deg);
-  }
-}
-
 .buhol-rest {
-  padding: 2rem 1.1rem 4.4rem;
-}
-
-.buhol-rest-inner {
-  max-width: 58rem;
+  padding: 4.5rem var(--pad) 5rem;
+  max-width: 42rem;
   margin: 0 auto;
 }
 
+.buhol-still {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--accent);
+  margin: 2.2rem 0;
+}
+
 .buhol-board {
-  background: #24331f;
+  background: var(--accent);
   color: #e8f0d8;
-  padding: 1.1rem 1rem;
-  transform: rotate(-1.1deg);
+  padding: 1.6rem 1.4rem;
 }
 
 .buhol-board p {
-  margin: 0 0 0.7rem;
-  font-family: var(--font-buhol-hand), cursive;
-  font-size: 1.7rem;
-  color: #f2e3a8;
+  margin: 0 0 0.8rem;
+  font-family: var(--font-buhol-display), serif;
+  font-style: italic;
+  font-size: 1.85rem;
 }
 
 .buhol-stems {
-  margin: 1.5rem 0 0;
+  margin: 2rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -120,52 +116,30 @@
 .buhol-stems li {
   display: grid;
   grid-template-columns: 6.5rem 1fr;
-  gap: 0.7rem;
-  padding: 0.65rem 0;
-  border-bottom: 2px solid var(--buhol-sap);
+  gap: 0.8rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--rule);
 }
 
 .buhol-stems span {
-  font-family: var(--font-buhol-hand), cursive;
-  color: var(--buhol-band);
-  font-size: 1.15rem;
-}
-
-.buhol-still {
-  position: relative;
-  min-height: 220px;
-  margin-top: 1.2rem;
-  background: var(--buhol-sap);
-}
-
-.buhol-still img {
-  object-fit: cover;
+  font-family: var(--font-buhol-display), serif;
+  font-style: italic;
+  color: var(--accent);
+  font-size: 1.25rem;
 }
 
 .buhol-cta {
   display: inline-flex;
-  margin-top: 1.6rem;
-  background: var(--buhol-band);
+  margin-top: 2rem;
+  background: var(--accent);
   color: #fff;
   text-decoration: none;
-  padding: 0.75rem 1.1rem;
+  padding: 0.85rem 1.15rem;
   font-weight: 700;
 }
 
 .buhol-foot {
-  margin-top: 2.2rem;
-  font-size: 12px;
-  color: #4a553c;
-}
-
-.buhol-split {
-  margin-top: 1.4rem;
-  display: grid;
-  gap: 0.9rem;
-}
-
-@media (min-width: 800px) {
-  .buhol-split {
-    grid-template-columns: 1.1fr 0.9fr;
-  }
+  margin-top: 2.6rem;
+  font-size: 0.8rem;
+  color: var(--mute);
 }

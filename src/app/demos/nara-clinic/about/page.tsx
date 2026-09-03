@@ -4,16 +4,14 @@ import { NaraShell } from "@/components/demos/nara/NaraShell";
 export default function NaraAbout() {
   return (
     <NaraShell current="About">
-      <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--nara-green)]">
-          About
-        </p>
-        <h1 className="nara-serif mt-3 max-w-xl text-4xl font-semibold tracking-tight md:text-5xl">
+      <div className="nara-page pb-16">
+        <p className="nara-kicker">About</p>
+        <h1 className="nara-serif nara-title">
           Built for the block, not a medical campus.
         </h1>
 
-        <div className="mt-10 grid gap-10 md:grid-cols-[0.85fr_1.15fr] md:items-start">
-          <div className="relative aspect-[4/5] overflow-hidden">
+        <div className="mt-12 grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+          <div className="nara-shot">
             <Image
               src="/demos/nara-clinic/day-hall.jpg"
               alt="Daylit ward with empty beds and folded blankets"
@@ -22,7 +20,7 @@ export default function NaraAbout() {
               sizes="(max-width: 768px) 100vw, 40vw"
             />
           </div>
-          <div className="space-y-5 text-base leading-relaxed text-[var(--nara-muted)]">
+          <div className="space-y-5 text-base leading-relaxed text-[var(--mute)]">
             <p>
               Nara is a sample neighborhood clinic: one waiting row, one consult
               room, and a tray that gets wiped between patients. The name is

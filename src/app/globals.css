@@ -55,6 +55,10 @@ body {
   color: #efebe4;
 }
 
+[data-motion="pending"] [data-reveal] {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -65,5 +69,10 @@ body {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  [data-motion] [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

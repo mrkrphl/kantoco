@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Cabin, Kalam } from "next/font/google";
+import { Cabin, Cormorant_Garamond } from "next/font/google";
 import "./buhol.css";
 
-const hand = Kalam({
+const display = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-buhol-hand",
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-buhol-display",
 });
 
 const sans = Cabin({
@@ -26,5 +27,7 @@ export default function BuholLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={`${hand.variable} ${sans.variable}`}>{children}</div>;
+  return (
+    <div className={`${display.variable} ${sans.variable}`}>{children}</div>
+  );
 }

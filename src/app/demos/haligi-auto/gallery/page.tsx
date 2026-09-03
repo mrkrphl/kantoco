@@ -11,23 +11,21 @@ const shots = [
 export default function HaligiGallery() {
   return (
     <HaligiShell current="Gallery">
-      <div className="px-4 py-10 md:px-6">
-        <h1 className="haligi-cond text-5xl text-[var(--ha-ink)] md:text-6xl">
-          Bay photos
-        </h1>
-        <ul className="mt-8 grid grid-cols-2 gap-2 md:grid-cols-4">
-          {shots.map(([src, alt], i) => (
-            <li
-              key={src}
-              className={`relative ${i === 0 ? "col-span-2 aspect-[16/9] md:col-span-4" : "aspect-[4/3]"}`}
-            >
-              <Image
-                src={src}
-                alt={alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 33vw"
-              />
+      <div className="haligi-page pb-16">
+        <h1 className="haligi-cond haligi-title">Bay photos</h1>
+        <ul className="haligi-gallery">
+          {shots.map(([src, alt]) => (
+            <li key={src}>
+              <div className="haligi-shot">
+                <Image
+                  src={src}
+                  alt={alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+              <p className="mt-3 text-sm text-[var(--mute)]">{alt}</p>
             </li>
           ))}
         </ul>
