@@ -12,12 +12,14 @@ const nav = [
 export function NaraShell({
   children,
   current,
+  overlay = false,
 }: {
   children: React.ReactNode;
   current: (typeof nav)[number][0];
+  overlay?: boolean;
 }) {
   return (
-    <div className="nara">
+    <div className={overlay ? "nara nara-overlay" : "nara"}>
       <p className="nara-banner">{DEMO_DISCLAIMER}</p>
 
       <header className="nara-head">
@@ -27,11 +29,11 @@ export function NaraShell({
             <Link href="/demos/nara-clinic" className="nara-serif nara-name block">
               Nara Clinic
             </Link>
-            <p className="mt-2 text-sm text-[var(--mute)]">
+            <p className="nara-meta mt-2 text-sm">
               Consults near Dr. A. Santos Avenue, BF Homes, Parañaque
             </p>
           </div>
-          <p className="text-sm text-[var(--mute)] md:text-right">
+          <p className="nara-meta text-sm md:text-right">
             Monday to Saturday, 8:00-17:00
             <br />
             Closed on Sunday

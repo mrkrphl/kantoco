@@ -79,29 +79,33 @@ export function HomeExperience() {
       const root = rootRef.current;
       if (!root || !ready || reduced) return;
 
+      const pin = root.querySelector<HTMLElement>(".home-opener");
       const frame = root.querySelector<HTMLElement>(".home-opener-frame");
+      const img = root.querySelector<HTMLElement>(".home-opener-img");
       const copy = root.querySelector<HTMLElement>(".home-opener-copy");
-      if (frame) {
-        gsap.set(frame, { clipPath: "inset(0 48% 0 48%)", scale: 1.08 });
-      }
-      if (copy) {
-        gsap.set(copy, { autoAlpha: 0, y: 24 });
-      }
+      if (!pin || !frame) return;
 
-      const opener = gsap.timeline({ defaults: { ease: "power3.inOut" } });
-      if (frame) {
-        opener.to(frame, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          scale: 1,
-          duration: 1.4,
-        });
-      }
+      gsap.set(frame, { clipPath: "inset(0 34% 0 34%)" });
+      if (img) gsap.set(img, { scale: 1.18, transformOrigin: "55% 40%" });
+      if (copy) gsap.set(copy, { autoAlpha: 0, y: 28 });
+
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: pin,
+          start: "top top",
+          end: "+=175%",
+          pin: true,
+          scrub: 0.7,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      tl.to(frame, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.15 }, 0);
+      if (img) tl.to(img, { scale: 1, duration: 1.15 }, 0);
       if (copy) {
-        opener.to(
-          copy,
-          { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" },
-          "-=0.4",
-        );
+        tl.to(copy, { autoAlpha: 1, y: 0, duration: 0.32 }, 0.62);
       }
 
       revealOnScroll(
@@ -110,22 +114,41 @@ export function HomeExperience() {
       );
 
       gsap.utils.toArray<HTMLElement>(".home-shop-frame", root).forEach((el) => {
-        const img = el.querySelector("img");
-        if (!img) return;
-        gsap.fromTo(
-          img,
-          { scale: 1.06 },
-          {
-            scale: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 0.4,
+        const photo = el.querySelector("img");
+        const name = el.parentElement?.querySelector(".home-shop-name");
+        if (photo) {
+          gsap.fromTo(
+            photo,
+            { scale: 1.1 },
+            {
+              scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.45,
+              },
             },
-          },
-        );
+          );
+        }
+        if (name) {
+          gsap.fromTo(
+            name,
+            { autoAlpha: 0, y: 18 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.7,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 72%",
+                toggleActions: "play none none reverse",
+              },
+            },
+          );
+        }
       });
     },
     { scope: rootRef, dependencies: [ready, reduced] },
@@ -154,7 +177,7 @@ export function HomeExperience() {
       </header>
 
       <main id="top" className="home-main">
-        <section className="home-opener" aria-label="Studio photograph">
+        <section className="home-opener" aria-label="Night corner in Parañaque">
           <div className="home-opener-frame">
             <Image
               src="/kanto-street.jpg"
@@ -166,7 +189,7 @@ export function HomeExperience() {
             />
           </div>
           <div className="home-opener-copy">
-            <p className="home-p home-p-lead">
+            <p className="home-p-lead">
               We’re KantoCo. We make websites for small businesses in Parañaque
               and nearby.
             </p>
@@ -181,23 +204,25 @@ export function HomeExperience() {
         </section>
 
         <section id="samples" className="home-samples">
-          <p className="home-p" data-reveal>
-            These are samples, not real client work. A clinic, a salon, an auto
-            shop, and a few more playful ones so you can see the range.
-          </p>
+          <div className="home-samples-intro" data-reveal>
+            <p className="home-p">
+              These are samples, not real client work. A clinic, a salon, an
+              auto shop, and a few more playful ones so you can see the range.
+            </p>
+          </div>
           <ol className="home-shops">
             {shops.map((shop) => (
-              <li key={shop.href} className="home-shop" data-reveal>
+              <li key={shop.href} className="home-shop">
                 <Link href={shop.href}>
                   <span className="home-shop-frame">
                     <Image
                       src={shop.src}
                       alt={shop.alt}
                       fill
-                      sizes="(max-width: 720px) 100vw, 72rem"
+                      sizes="100vw"
                     />
+                    <span className="home-shop-name">{shop.name}</span>
                   </span>
-                  <span className="home-shop-name">{shop.name}</span>
                 </Link>
               </li>
             ))}

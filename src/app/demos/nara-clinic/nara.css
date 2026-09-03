@@ -46,6 +46,30 @@
   margin: 0 auto;
 }
 
+.nara-meta {
+  color: var(--mute);
+}
+
+.nara-overlay .nara-head {
+  position: absolute;
+  top: 2.15rem;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  max-width: none;
+  margin: 0;
+  padding: 1.15rem var(--pad) 0;
+}
+
+.nara-overlay .nara-nav {
+  margin-top: 1rem;
+  padding-bottom: 0;
+}
+
+.nara-overlay .nara-opener {
+  min-height: 100svh;
+}
+
 .nara-head-row {
   display: flex;
   flex-wrap: wrap;

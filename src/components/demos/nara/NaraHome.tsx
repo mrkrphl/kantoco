@@ -44,7 +44,7 @@ export function NaraHome() {
 
   return (
     <div ref={rootRef} data-motion={motion}>
-      <NaraShell current="Home">
+      <NaraShell current="Home" overlay>
         <section className="nara-opener" aria-label="Clinic hallway">
           <div className="nara-opener-frame">
             <Image
