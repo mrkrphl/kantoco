@@ -157,7 +157,7 @@ export function HomeExperience() {
         <section className="home-opener" aria-label="Studio photograph">
           <div className="home-opener-frame">
             <Image
-              src="/hero-cover.png"
+              src="/hero-street.jpg"
               alt="Night corner shops on a Parañaque street"
               fill
               sizes="100vw"

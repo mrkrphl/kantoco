@@ -97,8 +97,7 @@
 
 .amihan-opener {
   position: relative;
-  margin: 3.5rem auto 0;
-  max-width: 76rem;
+  margin: 3.5rem 0 0;
   min-height: min(78svh, 46rem);
   overflow: hidden;
   background: #3a2420;
