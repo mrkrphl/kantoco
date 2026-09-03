@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Noto_Sans, Noto_Serif } from "next/font/google";
+import { Outfit, Source_Serif_4 } from "next/font/google";
 import "./nara.css";
 
-const serif = Noto_Serif({
+const serif = Source_Serif_4({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-nara-serif",
 });
 
-const sans = Noto_Sans({
+const sans = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   variable: "--font-nara-sans",
 });
 

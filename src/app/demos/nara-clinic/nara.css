@@ -1,14 +1,21 @@
 .nara {
-  --nara-wall: #e7f0ea;
-  --nara-ink: #24312c;
-  --nara-green: #1f5a46;
-  --nara-maroon: #7a2e32;
-  --nara-card: #f7fbf8;
-  --nara-muted: #4e5d57;
-  --nara-rule: #c5d4cc;
-  background: var(--nara-wall);
-  color: var(--nara-ink);
-  font-family: var(--font-nara-sans), "Noto Sans", ui-sans-serif, sans-serif;
+  --bg: #e7efe9;
+  --ink: #1c2723;
+  --accent: #8a3336;
+  --mute: color-mix(in srgb, var(--ink) 58%, var(--bg));
+  --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
+  --card: #f4faf6;
+  --nara-wall: var(--bg);
+  --nara-ink: var(--ink);
+  --nara-green: var(--ink);
+  --nara-maroon: var(--accent);
+  --nara-card: var(--card);
+  --nara-muted: var(--mute);
+  --nara-rule: var(--rule);
+  --pad: clamp(1.2rem, 4vw, 3rem);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-nara-sans), "Outfit", ui-sans-serif, sans-serif;
   min-height: 100%;
 }
 
@@ -17,45 +24,297 @@
 }
 
 .nara ::selection {
-  background: color-mix(in srgb, var(--nara-green) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
 .nara-serif {
-  font-family: var(--font-nara-serif), "Noto Serif", Georgia, serif;
+  font-family: var(--font-nara-serif), "Source Serif 4", Georgia, serif;
+}
+
+.nara-banner {
+  background: var(--ink);
+  color: var(--card);
+  padding: 0.55rem var(--pad);
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.nara-head {
+  padding: 1.6rem var(--pad) 0;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.nara-meta {
+  color: var(--mute);
+}
+
+.nara-overlay {
+  position: relative;
+}
+
+.nara-overlay .nara-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  background: rgba(18, 24, 22, 0.72);
+}
+
+.nara-overlay .nara-head {
+  position: absolute;
+  top: 2.15rem;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  max-width: none;
+  margin: 0;
+  padding: 1.15rem var(--pad) 0;
+  color: var(--ink);
+}
+
+.nara-overlay .nara-name {
+  font-size: clamp(2.6rem, 6.2vw, 5.4rem);
+  letter-spacing: -0.045em;
+}
+
+.nara-overlay .nara-nav {
+  margin-top: 1rem;
+  padding-bottom: 0;
+  border-bottom-color: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.nara-overlay .nara-opener {
+  height: 100svh;
+  min-height: 100svh;
+}
+
+.nara-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  align-items: end;
+}
+
+.nara-badge {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+
+.nara-name {
+  margin: 0.35rem 0 0;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.nara-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.4rem;
+  margin: 1.5rem auto 0;
+  padding: 1rem 0 1.25rem;
+  max-width: 76rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.95rem;
+}
+
+.nara-nav a[aria-current="page"] {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.nara-opener {
+  position: relative;
+  min-height: min(86svh, 52rem);
+  overflow: hidden;
+  background: #14201b;
+}
+
+.nara-opener-frame {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 100%);
+  transform-origin: left center;
+  animation: nara-door 1.2s cubic-bezier(0.76, 0, 0.18, 1) 0.06s forwards;
+}
+
+@keyframes nara-door {
+  to {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+}
+
+[data-motion="static"] .nara-opener-frame {
+  animation: none;
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nara-opener-frame {
+    animation: none;
+    clip-path: none;
+  }
+}
+
+.nara-opener img {
+  object-fit: cover;
+  object-position: 40% 50%;
+}
+
+.nara-intro,
+.nara-rest,
+.nara-page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 4.5rem var(--pad) 0;
+}
+
+.nara-rest {
+  max-width: 76rem;
+  display: grid;
+  gap: 4rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 880px) {
+  .nara-rest {
+    grid-template-columns: 1.15fr 0.75fr;
+    align-items: start;
+    padding-top: 5.5rem;
+  }
+}
+
+.nara-kicker {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.nara-title {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  max-width: 18ch;
+}
+
+.nara-lede {
+  margin: 1.4rem 0 0;
+  max-width: 34rem;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--mute);
+}
+
+.nara-cta {
+  display: inline-flex;
+  margin-top: 2rem;
+  background: var(--accent);
+  color: #f7fbf8;
+  text-decoration: none;
+  padding: 0.85rem 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.nara-list {
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.nara-list li {
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--rule);
 }
 
 .nara-hours {
-  animation: nara-stamp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  background: var(--card);
+  padding: 1.6rem 1.4rem;
+  border-top: 3px solid var(--accent);
 }
 
-@keyframes nara-stamp {
-  from {
-    opacity: 0;
-    transform: rotate(-2deg) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-1.2deg) translateY(0);
-  }
+.nara-hours dl {
+  margin: 1.1rem 0 0;
+}
+
+.nara-hours div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.95rem;
+  padding: 0.35rem 0;
+}
+
+.nara-foot {
+  margin-top: 5rem;
+  border-top: 1px solid var(--rule);
+  padding: 2.4rem var(--pad) 3rem;
+}
+
+.nara-foot-inner {
+  max-width: 76rem;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.4rem;
 }
 
 .nara-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--nara-card);
+  background: var(--card);
 }
 
 .nara-table th,
 .nara-table td {
-  border-bottom: 1px solid var(--nara-rule);
-  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.85rem 0.9rem;
   text-align: left;
   vertical-align: top;
 }
 
 .nara-table th {
-  background: var(--nara-green);
-  color: #f4faf7;
+  background: var(--ink);
+  color: var(--card);
   font-weight: 600;
   font-size: 0.82rem;
+}
+
+.nara-gallery {
+  display: grid;
+  gap: 2.4rem;
+  margin: 2.5rem 0 0;
+}
+
+@media (min-width: 720px) {
+  .nara-gallery {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.nara-gallery li {
+  list-style: none;
+}
+
+.nara-shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.nara-shot img {
+  object-fit: cover;
 }

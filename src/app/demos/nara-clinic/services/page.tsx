@@ -15,14 +15,12 @@ const rows = [
 export default function NaraServices() {
   return (
     <NaraShell current="Services">
-      <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--nara-green)]">
-          Services
-        </p>
-        <h1 className="nara-serif mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+      <div className="nara-page pb-16">
+        <p className="nara-kicker">Services</p>
+        <h1 className="nara-serif nara-title">
           Posted rates for this sample clinic.
         </h1>
-        <p className="mt-4 max-w-lg text-[var(--nara-muted)]">
+        <p className="nara-lede">
           A live clinic would lock these numbers to their own chart. The list is
           here so a shop owner can see a clear ledger instead of a fog of
           packages.
@@ -41,7 +39,7 @@ export default function NaraServices() {
               {rows.map(([visit, note, price]) => (
                 <tr key={visit}>
                   <td className="font-semibold">{visit}</td>
-                  <td className="text-[var(--nara-muted)]">{note}</td>
+                  <td className="text-[var(--mute)]">{note}</td>
                   <td>{price}</td>
                 </tr>
               ))}
@@ -53,7 +51,7 @@ export default function NaraServices() {
           href={KANTOCO_MESSENGER}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-10 inline-flex bg-[var(--nara-maroon)] px-4 py-3 text-sm font-semibold text-[#f7fbf8]"
+          className="nara-cta"
         >
           Message us on Facebook
         </a>

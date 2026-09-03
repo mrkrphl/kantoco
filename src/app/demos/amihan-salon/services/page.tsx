@@ -13,26 +13,23 @@ const menu = [
 export default function AmihanServices() {
   return (
     <AmihanShell current="Services">
-      <div className="px-4 pb-8 md:px-8">
+      <div className="amihan-page">
         <h1 className="amihan-display text-4xl md:text-6xl">The laminated board</h1>
-        <p className="mt-4 max-w-md text-sm text-[var(--ami-dim)]">
+        <p className="mt-4 max-w-md text-[var(--mute)]">
           Sample prices for this demo only. A live parlor would write their own
           numbers on the same kind of menu.
         </p>
 
-        <ol className="mt-10 bg-[var(--ami-paper)] px-4 py-2 shadow-[0_12px_28px_rgba(58,36,32,0.08)]">
+        <ol className="amihan-menu">
           {menu.map(([name, note, price], i) => (
-            <li
-              key={name}
-              className="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-dashed border-[color-mix(in_srgb,var(--ami-rose)_40%,transparent)] py-4 last:border-b-0"
-            >
+            <li key={name}>
               <div>
                 <p className="amihan-display text-2xl md:text-3xl">
                   {i + 1}. {name}
                 </p>
-                <p className="mt-1 text-sm text-[var(--ami-dim)]">{note}</p>
+                <p className="mt-1 text-sm text-[var(--mute)]">{note}</p>
               </div>
-              <p className="text-sm text-[var(--ami-rose)]">{price}</p>
+              <p className="text-[var(--accent)]">{price}</p>
             </li>
           ))}
         </ol>
@@ -41,7 +38,7 @@ export default function AmihanServices() {
           href={KANTOCO_MESSENGER}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-10 inline-block text-sm text-[var(--ami-rose)] underline underline-offset-4"
+          className="amihan-cta"
         >
           Message us on Facebook
         </a>

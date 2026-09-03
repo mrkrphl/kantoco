@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Narrow, IBM_Plex_Mono } from "next/font/google";
+import { Archivo_Narrow, IBM_Plex_Sans } from "next/font/google";
 import "./aninag.css";
 
 const display = Archivo_Narrow({
@@ -8,10 +8,10 @@ const display = Archivo_Narrow({
   variable: "--font-aninag-display",
 });
 
-const mono = IBM_Plex_Mono({
+const body = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-aninag-mono",
+  variable: "--font-aninag-body",
 });
 
 export const metadata: Metadata = {
@@ -26,5 +26,7 @@ export default function AninagLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={`${display.variable} ${mono.variable}`}>{children}</div>;
+  return (
+    <div className={`${display.variable} ${body.variable}`}>{children}</div>
+  );
 }
