@@ -66,3 +66,18 @@ Honest PH pan de sal stills. No £ prices, no UK bakery labels.
 | `haligi-auto/bay.jpg` | https://www.pexels.com/photo/a-white-car-in-an-auto-repair-shop-8985970/ | Artem Podrez | Pexels License |
 | `haligi-auto/oil-tools.jpg` | https://www.pexels.com/photo/set-of-tool-wrench-162553/ | Pixabay | Pexels License |
 | `haligi-auto/engine.jpg` | https://www.pexels.com/photo/190574/ | Pixabay | Pexels License |
+
+## Maxicon Car Aircon Specialist (unlisted)
+
+Pitch sample only. Not on the homepage list. Shop stills are photos they
+already published on their public Wix page. Generic workshop stills are
+labeled as generic. See `maxicon-car-aircon/ATTRIBUTION.md`.
+
+| File | Source | Author | License |
+| --- | --- | --- | --- |
+| `maxicon-car-aircon/shop-front.jpg` | https://kulyo51.wixsite.com/maxiconcaraircon | Maxicon (public Wix) | Shop-published public still |
+| `maxicon-car-aircon/maxicon-bay.jpg` | Same Wix page | Maxicon (public Wix) | Shop-published public still |
+| `maxicon-car-aircon/dash-work.jpg` | Same Wix page | Maxicon (public Wix) | Shop-published public still |
+| `maxicon-car-aircon/compressor.jpg` | Same Wix page | Maxicon (public Wix) | Shop-published public still |
+| `maxicon-car-aircon/workshop-haze.jpg` | https://www.pexels.com/photo/4489708/ | cottonbro studio | Pexels License |
+| `maxicon-car-aircon/belt-drive.jpg` | https://unsplash.com/photos/xe-e69j6-Ds | Chad Kirchoff | Unsplash License |
