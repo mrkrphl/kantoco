@@ -25,7 +25,7 @@ export function MaxiconHome() {
       if (frame) {
         gsap.set(frame, { clipPath: "circle(0% at 78% 22%)" });
         gsap.to(frame, {
-          clipPath: "circle(160% at 78% 22%)",
+          clipPath: "circle(200% at 78% 22%)",
           duration: 1.4,
           ease: "power3.inOut",
         });
@@ -50,7 +50,7 @@ export function MaxiconHome() {
               src="/demos/maxicon-car-aircon/shop-front.jpg"
               alt="Maxicon’s open bay and sign on President’s Avenue, BF Homes."
               fill
-              className="object-cover object-[center_62%]"
+              className="object-cover object-[center_28%]"
               sizes="100vw"
               preload
             />

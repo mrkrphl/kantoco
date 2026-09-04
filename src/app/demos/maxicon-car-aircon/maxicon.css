@@ -46,7 +46,7 @@
 }
 
 .maxicon-head {
-  padding: 1.15rem var(--pad) 1rem;
+  padding: 0.7rem var(--pad) 0.65rem;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -59,9 +59,9 @@
 }
 
 .maxicon-name {
-  margin: 0.2rem 0 0;
-  font-size: clamp(2.1rem, 5vw, 3.2rem);
-  line-height: 0.88;
+  margin: 0.1rem 0 0;
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  line-height: 0.95;
 }
 
 .maxicon-nav {
@@ -80,7 +80,7 @@
 
 .maxicon-opener {
   position: relative;
-  min-height: calc(100svh - 7.2rem);
+  min-height: calc(100svh - 5.6rem);
   overflow: hidden;
   background: #05090b;
 }
@@ -97,8 +97,8 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 18%, transparent) 0%,
-    color-mix(in srgb, var(--bg) 72%, transparent) 100%
+    color-mix(in srgb, var(--bg) 6%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 22%, transparent) 100%
   );
   pointer-events: none;
 }
@@ -116,7 +116,7 @@
 
 .maxicon-opener img {
   object-fit: cover;
-  object-position: center 62%;
+  object-position: center 28%;
 }
 
 .maxicon-section,
