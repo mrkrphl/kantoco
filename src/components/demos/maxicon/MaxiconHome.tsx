@@ -25,9 +25,12 @@ export function MaxiconHome() {
       if (frame) {
         gsap.set(frame, { clipPath: "circle(0% at 78% 22%)" });
         gsap.to(frame, {
-          clipPath: "circle(200% at 78% 22%)",
+          clipPath: "circle(220% at 78% 22%)",
           duration: 1.4,
           ease: "power3.inOut",
+          onComplete: () => {
+            gsap.set(frame, { clipPath: "none" });
+          },
         });
       }
 
