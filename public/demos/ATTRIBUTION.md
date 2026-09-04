@@ -66,3 +66,15 @@ Honest PH pan de sal stills. No £ prices, no UK bakery labels.
 | `haligi-auto/bay.jpg` | https://www.pexels.com/photo/a-white-car-in-an-auto-repair-shop-8985970/ | Artem Podrez | Pexels License |
 | `haligi-auto/oil-tools.jpg` | https://www.pexels.com/photo/set-of-tool-wrench-162553/ | Pixabay | Pexels License |
 | `haligi-auto/engine.jpg` | https://www.pexels.com/photo/190574/ | Pixabay | Pexels License |
+
+## Maxicon Car Aircon Specialist (unlisted)
+
+Pitch sample only. Not on the homepage list. Shop stills only. See
+`maxicon-car-aircon/ATTRIBUTION.md`.
+
+| File | Source | Author | License |
+| --- | --- | --- | --- |
+| `maxicon-car-aircon/shop-front.jpg` | Public shop page they published | Maxicon | Shop-published public still |
+| `maxicon-car-aircon/maxicon-bay.jpg` | Same public page | Maxicon | Shop-published public still |
+| `maxicon-car-aircon/dash-work.jpg` | Same public page | Maxicon | Shop-published public still |
+| `maxicon-car-aircon/compressor.jpg` | Same public page | Maxicon | Shop-published public still |
