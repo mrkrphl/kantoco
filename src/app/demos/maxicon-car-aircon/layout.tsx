@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Mono, Schibsted_Grotesk } from "next/font/google";
 import "./maxicon.css";
 
-const display = Big_Shoulders({
-  subsets: ["latin"],
-  weight: "variable",
-  variable: "--font-maxicon-display",
-  adjustFontFallback: false,
-});
-
-const body = IBM_Plex_Sans({
+const display = Schibsted_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-maxicon-body",
+  variable: "--font-maxicon-display",
+});
+
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-maxicon-mono",
 });
 
 export const metadata: Metadata = {
@@ -28,6 +27,6 @@ export default function MaxiconLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${display.variable} ${body.variable}`}>{children}</div>
+    <div className={`${display.variable} ${mono.variable}`}>{children}</div>
   );
 }

@@ -29,30 +29,3 @@ export const maxicon = {
     "This page is a KantoCo sample of how Maxicon’s shop could look on the web. They did not hire us.",
   kantocoMessenger: KANTOCO_MESSENGER,
 } as const;
-
-export const maxiconWork = [
-  [
-    "Diagnostics",
-    "Read the system first. They publish computerized scanning as part of the job.",
-  ],
-  [
-    "Leak test",
-    "Find where the cold is escaping before anyone talks about a recharge.",
-  ],
-  [
-    "Flush",
-    "Pull the system down and clean it when the job needs a full wash, not a top-up.",
-  ],
-  [
-    "Freon recharge",
-    "Charge the system once the leak is handled and the parts are ready.",
-  ],
-  [
-    "Parts",
-    "Compressors, condensers, evaporators, expansion valves, driers, auxiliary fans. OEM and replacement.",
-  ],
-  [
-    "Full-service repair",
-    "Japanese, American, and European cars come through the same door.",
-  ],
-] as const;
