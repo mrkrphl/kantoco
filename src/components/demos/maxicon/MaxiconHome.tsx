@@ -6,10 +6,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import {
-  MaxiconChrome,
-  MaxiconShell,
-} from "@/components/demos/maxicon/MaxiconShell";
+import { MaxiconShell } from "@/components/demos/maxicon/MaxiconShell";
 import { MaxiconVisit } from "@/components/demos/maxicon/MaxiconVisit";
 import { maxicon } from "@/lib/maxicon";
 import { useMotionReady } from "@/components/motion/useMotionReady";
@@ -29,7 +26,6 @@ export function MaxiconHome() {
 
       const stage = root.querySelector<HTMLElement>(".maxicon-stage");
       const inner = root.querySelector<HTMLElement>(".maxicon-stage-inner");
-      const heat = root.querySelector<HTMLElement>(".maxicon-heat-copy");
       const bayImg = root.querySelector<HTMLElement>(".maxicon-bay img");
       if (!stage || !inner) return;
 
@@ -61,10 +57,6 @@ export function MaxiconHome() {
         },
         0,
       );
-
-      if (heat) {
-        tl.to(heat, { opacity: 0, y: -28, duration: 0.2 }, 0.06);
-      }
 
       if (bayImg) {
         tl.fromTo(
@@ -131,7 +123,6 @@ export function MaxiconHome() {
           aria-label="A vent iris opens onto Maxicon’s bay"
         >
           <div className="maxicon-stage-inner maxicon-iris-css">
-            <MaxiconChrome current="Home" />
             <div className="maxicon-bay">
               <Image
                 src="/demos/maxicon-car-aircon/shop-front.jpg"
@@ -147,15 +138,13 @@ export function MaxiconHome() {
                 <span className="maxicon-fin" key={i} />
               ))}
             </div>
-            <p className="maxicon-heat-copy">
-              You come in off President&apos;s Avenue.
-            </p>
           </div>
         </section>
 
         <section className="maxicon-room">
           <p className="maxicon-line">
-            The heat stays on the sidewalk. Inside the bay the work is cold air.
+            You come in off President&apos;s Avenue. The heat stays on the
+            sidewalk. Inside the bay the work is cold air.
           </p>
         </section>
 

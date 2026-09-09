@@ -173,37 +173,10 @@ html:has(.maxicon) body {
   animation-range: 0 140vh;
 }
 
-.maxicon-iris-css .maxicon-heat-copy {
-  animation: maxicon-heat-out linear both;
-  animation-timeline: scroll(root);
-  animation-range: 10vh 58vh;
-}
-
 @keyframes maxicon-iris-open {
   to {
     --iris: 160%;
   }
-}
-
-@keyframes maxicon-heat-out {
-  to {
-    opacity: 0;
-    transform: translateY(-1.25rem);
-  }
-}
-
-.maxicon-heat-copy {
-  position: absolute;
-  left: var(--pad);
-  right: var(--pad);
-  bottom: clamp(1.4rem, 6vh, 3.2rem);
-  z-index: 3;
-  margin: 0;
-  max-width: 13ch;
-  font-size: clamp(1.7rem, 4.8vw, 3.2rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
 }
 
 .maxicon-room {
@@ -216,7 +189,7 @@ html:has(.maxicon) body {
 
 .maxicon-line {
   margin: 0;
-  max-width: 15ch;
+  max-width: 18ch;
   font-size: clamp(1.85rem, 5.4vw, 3.7rem);
   font-weight: 500;
   line-height: 1.12;
@@ -371,12 +344,6 @@ html:has(.maxicon) body {
   display: none;
 }
 
-[data-motion="static"] .maxicon-heat-copy {
-  animation: none;
-  color: var(--ink);
-  text-shadow: 0 1px 12px var(--bg);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .maxicon-stage {
     height: auto;
@@ -394,9 +361,5 @@ html:has(.maxicon) body {
 
   .maxicon-fins {
     display: none;
-  }
-
-  .maxicon-heat-copy {
-    animation: none;
   }
 }
