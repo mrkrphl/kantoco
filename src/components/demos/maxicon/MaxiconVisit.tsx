@@ -12,6 +12,9 @@ export function MaxiconVisit({
       <a href={maxicon.phoneMobileHref} className="maxicon-dial">
         {maxicon.phoneMobileDisplay}
       </a>
+      <a href={maxicon.emailHref} className="maxicon-email">
+        {maxicon.email}
+      </a>
       <a
         href={maxicon.facebook}
         target="_blank"

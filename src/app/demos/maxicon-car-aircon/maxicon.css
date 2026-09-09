@@ -1,21 +1,36 @@
-html:has(.maxicon) {
+html:has(.maxicon),
+html:has(.maxicon) body {
+  background: #071114;
   scroll-behavior: auto;
+}
+
+@property --iris {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 7%;
 }
 
 .maxicon {
   --bg: #071114;
   --ink: #cfe3e6;
   --accent: #8fd4ce;
-  position: relative;
   --mute: color-mix(in srgb, var(--ink) 58%, var(--bg));
   --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
   --pad: clamp(1.1rem, 4vw, 3.2rem);
   --banner: 2.15rem;
+  --iris: 8.5%;
+  --iris-at: 50% 34%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
   min-height: 100%;
-  overflow-x: hidden;
+}
+
+@media (min-width: 900px) {
+  .maxicon {
+    --iris: 5.2%;
+    --iris-at: 50% 32%;
+  }
 }
 
 .maxicon a {
@@ -98,47 +113,93 @@ html:has(.maxicon) {
 
 .maxicon-stage {
   position: relative;
+  z-index: 2;
+  height: 330svh;
 }
 
 .maxicon-stage-inner {
-  position: relative;
+  position: sticky;
+  top: var(--banner);
   height: calc(100svh - var(--banner));
   overflow: hidden;
   background: var(--bg);
 }
 
 .maxicon-bay,
-.maxicon-frost,
 .maxicon-fins {
   position: absolute;
   inset: 0;
 }
 
+.maxicon-bay {
+  z-index: 1;
+  clip-path: circle(var(--iris) at var(--iris-at));
+  will-change: clip-path;
+}
+
 .maxicon-bay img {
   object-fit: cover;
   object-position: center 28%;
-}
-
-.maxicon-frost {
-  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
-  opacity: 0;
-  mix-blend-mode: multiply;
-  pointer-events: none;
+  will-change: transform;
 }
 
 .maxicon-fins {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   pointer-events: none;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--iris-at),
+    transparent var(--iris),
+    #000 calc(var(--iris) + 1.2px)
+  );
+  mask-image: radial-gradient(
+    circle at var(--iris-at),
+    transparent var(--iris),
+    #000 calc(var(--iris) + 1.2px)
+  );
 }
 
 .maxicon-fin {
   flex: 1 1 0;
-  background: var(--bg);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent) 28%, transparent);
-  transform: translateY(0);
+  min-height: 0;
+  background: linear-gradient(
+    180deg,
+    #101c1f 0%,
+    #182628 18%,
+    #0a1214 46%,
+    #1c2f32 51%,
+    #071114 100%
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 34%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.maxicon-iris-css {
+  animation: maxicon-iris-open linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 140vh;
+}
+
+.maxicon-iris-css .maxicon-heat-copy {
+  animation: maxicon-heat-out linear both;
+  animation-timeline: scroll(root);
+  animation-range: 10vh 58vh;
+}
+
+@keyframes maxicon-iris-open {
+  to {
+    --iris: 160%;
+  }
+}
+
+@keyframes maxicon-heat-out {
+  to {
+    opacity: 0;
+    transform: translateY(-1.25rem);
+  }
 }
 
 .maxicon-heat-copy {
@@ -148,10 +209,10 @@ html:has(.maxicon) {
   bottom: clamp(1.4rem, 6vh, 3.2rem);
   z-index: 3;
   margin: 0;
-  max-width: 14ch;
-  font-size: clamp(1.65rem, 4.6vw, 3.15rem);
+  max-width: 13ch;
+  font-size: clamp(1.7rem, 4.8vw, 3.2rem);
   font-weight: 500;
-  line-height: 1.12;
+  line-height: 1.1;
   letter-spacing: -0.03em;
 }
 
@@ -165,11 +226,11 @@ html:has(.maxicon) {
 
 .maxicon-line {
   margin: 0;
-  max-width: 16ch;
-  font-size: clamp(1.7rem, 5vw, 3.4rem);
+  max-width: 15ch;
+  font-size: clamp(1.85rem, 5.4vw, 3.7rem);
   font-weight: 500;
-  line-height: 1.14;
-  letter-spacing: -0.03em;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
 }
 
 .maxicon-still {
@@ -193,7 +254,7 @@ html:has(.maxicon) {
 
 .maxicon-caption {
   margin: 0;
-  padding: 1rem var(--pad) 0;
+  padding: 1.15rem var(--pad) 0;
   max-width: 36rem;
   font-size: 1rem;
   line-height: 1.6;
@@ -216,9 +277,16 @@ html:has(.maxicon) {
   color: var(--accent);
 }
 
-.maxicon-hours {
+.maxicon-hours,
+.maxicon-email {
   margin: 0;
   font-size: 0.95rem;
+}
+
+.maxicon-email {
+  color: var(--mute);
+  width: fit-content;
+  text-underline-offset: 3px;
 }
 
 .maxicon-dial {
@@ -295,25 +363,50 @@ html:has(.maxicon) {
   text-underline-offset: 3px;
 }
 
+[data-motion="static"] .maxicon-stage {
+  height: auto;
+}
+
+[data-motion="static"] .maxicon-stage-inner {
+  position: relative;
+  top: 0;
+  animation: none;
+}
+
+[data-motion="static"] .maxicon-bay {
+  clip-path: none;
+}
+
 [data-motion="static"] .maxicon-fins {
   display: none;
 }
 
-[data-motion="static"] .maxicon-frost {
-  opacity: 0.12;
-}
-
 [data-motion="static"] .maxicon-heat-copy {
+  animation: none;
   color: var(--ink);
   text-shadow: 0 1px 12px var(--bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .maxicon-stage {
+    height: auto;
+  }
+
+  .maxicon-stage-inner {
+    position: relative;
+    top: 0;
+    animation: none;
+  }
+
+  .maxicon-bay {
+    clip-path: none;
+  }
+
   .maxicon-fins {
     display: none;
   }
 
-  .maxicon-frost {
-    opacity: 0.12;
+  .maxicon-heat-copy {
+    animation: none;
   }
 }

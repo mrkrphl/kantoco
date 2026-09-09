@@ -16,7 +16,7 @@ import { useMotionReady } from "@/components/motion/useMotionReady";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const FINS = 13;
+const FINS = 28;
 
 export function MaxiconHome() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -27,50 +27,95 @@ export function MaxiconHome() {
       const root = rootRef.current;
       if (!root || !ready || reduced) return;
 
-      const pin = root.querySelector<HTMLElement>(".maxicon-stage-inner");
-      const fins = gsap.utils.toArray<HTMLElement>(".maxicon-fin", root);
-      const frost = root.querySelector<HTMLElement>(".maxicon-frost");
+      const stage = root.querySelector<HTMLElement>(".maxicon-stage");
+      const inner = root.querySelector<HTMLElement>(".maxicon-stage-inner");
       const heat = root.querySelector<HTMLElement>(".maxicon-heat-copy");
-      const bay = root.querySelector<HTMLElement>(".maxicon-bay img");
-      if (!pin || !fins.length) return;
+      const bayImg = root.querySelector<HTMLElement>(".maxicon-bay img");
+      if (!stage || !inner) return;
+
+      const startIris = parseFloat(
+        getComputedStyle(inner).getPropertyValue("--iris"),
+      );
+      const iris = { r: Number.isFinite(startIris) ? startIris : 7 };
 
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: pin,
-          start: "top 2.2rem",
-          end: "+=165%",
-          pin: true,
-          scrub: 0.65,
-          anticipatePin: 1,
+          trigger: stage,
+          start: "top top",
+          end: "+=220%",
+          scrub: 0.45,
           invalidateOnRefresh: true,
         },
       });
 
-      fins.forEach((fin, i) => {
-        tl.to(
-          fin,
-          {
-            yPercent: i % 2 === 0 ? -130 : 130,
-            opacity: 0,
+      inner.style.setProperty("--iris", `${iris.r}%`);
+      tl.to(
+        iris,
+        {
+          r: 160,
+          duration: 0.6,
+          onUpdate: () => {
+            inner.style.setProperty("--iris", `${iris.r}%`);
           },
-          0,
-        );
-      });
+        },
+        0,
+      );
 
       if (heat) {
-        tl.to(heat, { autoAlpha: 0, y: -28 }, 0);
+        tl.to(heat, { opacity: 0, y: -28, duration: 0.2 }, 0.06);
       }
-      if (frost) {
-        tl.fromTo(frost, { opacity: 0 }, { opacity: 0.2 }, 0.15);
-      }
-      if (bay) {
+
+      if (bayImg) {
         tl.fromTo(
-          bay,
-          { scale: 1.08, transformOrigin: "50% 28%" },
-          { scale: 1 },
+          bayImg,
+          { scale: 1.12, transformOrigin: "50% 28%" },
+          { scale: 1, duration: 0.6 },
           0,
         );
+      }
+
+      tl.to({}, { duration: 0.4 });
+
+      inner.classList.remove("maxicon-iris-css");
+
+      gsap.fromTo(
+        ".maxicon-room p",
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.95,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".maxicon-room",
+            start: "top 78%",
+            toggleActions: "play none none reverse",
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".maxicon-caption",
+        { y: 22, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".maxicon-caption",
+            start: "top 88%",
+            toggleActions: "play none none reverse",
+          },
+        },
+      );
+
+      const bayImage = inner.querySelector("img");
+      if (bayImage) {
+        const refresh = () => ScrollTrigger.refresh();
+        if (bayImage.complete) refresh();
+        else bayImage.addEventListener("load", refresh, { once: true });
       }
     },
     { scope: rootRef, dependencies: [ready, reduced] },
@@ -83,9 +128,9 @@ export function MaxiconHome() {
       <MaxiconShell current="Home" overlay>
         <section
           className="maxicon-stage"
-          aria-label="Condenser fins open onto Maxicon’s bay"
+          aria-label="A vent iris opens onto Maxicon’s bay"
         >
-          <div className="maxicon-stage-inner">
+          <div className="maxicon-stage-inner maxicon-iris-css">
             <MaxiconChrome current="Home" />
             <div className="maxicon-bay">
               <Image
@@ -97,7 +142,6 @@ export function MaxiconHome() {
                 preload
               />
             </div>
-            <div className="maxicon-frost" aria-hidden />
             <div className="maxicon-fins" aria-hidden>
               {Array.from({ length: FINS }, (_, i) => (
                 <span className="maxicon-fin" key={i} />
