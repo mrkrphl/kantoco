@@ -6,7 +6,10 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { MaxiconShell } from "@/components/demos/maxicon/MaxiconShell";
+import {
+  MaxiconBanner,
+  MaxiconShell,
+} from "@/components/demos/maxicon/MaxiconShell";
 import { MaxiconVisit } from "@/components/demos/maxicon/MaxiconVisit";
 import { maxicon } from "@/lib/maxicon";
 import { useMotionReady } from "@/components/motion/useMotionReady";
@@ -123,6 +126,7 @@ export function MaxiconHome() {
           aria-label="A vent iris opens onto Maxicon’s bay"
         >
           <div className="maxicon-stage-inner maxicon-iris-css">
+            <MaxiconBanner over />
             <div className="maxicon-bay">
               <Image
                 src="/demos/maxicon-car-aircon/shop-front.jpg"

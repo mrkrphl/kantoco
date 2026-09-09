@@ -7,6 +7,15 @@ const nav = [
   ["Visit", "/demos/maxicon-car-aircon/contact"],
 ] as const;
 
+export function MaxiconBanner({ over = false }: { over?: boolean }) {
+  return (
+    <p className={over ? "maxicon-banner maxicon-banner--over" : "maxicon-banner"}>
+      <strong>{DEMO_BADGE}</strong>
+      <span>{DEMO_DISCLAIMER}</span>
+    </p>
+  );
+}
+
 export function MaxiconChrome({
   current,
 }: {
@@ -46,11 +55,12 @@ export function MaxiconShell({
 }) {
   return (
     <div className={overlay ? "maxicon" : "maxicon maxicon--page"}>
-      <p className="maxicon-banner">
-        <strong>{DEMO_BADGE}</strong>
-        <span>{DEMO_DISCLAIMER}</span>
-      </p>
-      {overlay ? null : <MaxiconChrome current={current} />}
+      {overlay ? null : (
+        <>
+          <MaxiconBanner />
+          <MaxiconChrome current={current} />
+        </>
+      )}
       <main>{children}</main>
     </div>
   );

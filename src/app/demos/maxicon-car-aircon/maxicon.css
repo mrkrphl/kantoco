@@ -67,6 +67,20 @@ html:has(.maxicon) body {
   letter-spacing: 0.12em;
 }
 
+.maxicon-banner--over {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 72%, transparent),
+    transparent
+  );
+  color: var(--ink);
+}
+
 .maxicon-chrome {
   position: absolute;
   top: 0;
@@ -119,8 +133,8 @@ html:has(.maxicon) body {
 
 .maxicon-stage-inner {
   position: sticky;
-  top: var(--banner);
-  height: calc(100svh - var(--banner));
+  top: 0;
+  height: 100svh;
   overflow: hidden;
   background: var(--bg);
 }
@@ -180,7 +194,7 @@ html:has(.maxicon) body {
 }
 
 .maxicon-room {
-  min-height: calc(100svh - var(--banner));
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -198,7 +212,7 @@ html:has(.maxicon) body {
 
 .maxicon-still {
   position: relative;
-  min-height: calc(100svh - var(--banner));
+  min-height: 100svh;
   overflow: hidden;
   background: #05090b;
 }
@@ -225,12 +239,18 @@ html:has(.maxicon) body {
 }
 
 .maxicon-visit {
-  min-height: calc(100svh - var(--banner));
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1.15rem;
   padding: 4.5rem var(--pad) 5rem;
+}
+
+.maxicon--page .maxicon-room,
+.maxicon--page .maxicon-still,
+.maxicon--page .maxicon-visit {
+  min-height: calc(100svh - var(--banner));
 }
 
 .maxicon-visit-kicker {
