@@ -18,8 +18,8 @@ html:has(.maxicon) body {
   --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
   --pad: clamp(1.1rem, 4vw, 3.2rem);
   --banner: 2.15rem;
-  --iris: 8.5%;
-  --iris-at: 50% 34%;
+  --iris: 9.5%;
+  --iris-at: 50% 28%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
@@ -28,8 +28,8 @@ html:has(.maxicon) body {
 
 @media (min-width: 900px) {
   .maxicon {
-    --iris: 5.2%;
-    --iris-at: 50% 32%;
+    --iris: 6.2%;
+    --iris-at: 50% 22%;
   }
 }
 
@@ -132,7 +132,7 @@ html:has(.maxicon) body {
 }
 
 .maxicon-bay {
-  z-index: 1;
+  z-index: 2;
   clip-path: circle(var(--iris) at var(--iris-at));
   will-change: clip-path;
 }
@@ -144,21 +144,11 @@ html:has(.maxicon) body {
 }
 
 .maxicon-fins {
-  z-index: 2;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(
-    circle at var(--iris-at),
-    transparent var(--iris),
-    #000 calc(var(--iris) + 1.2px)
-  );
-  mask-image: radial-gradient(
-    circle at var(--iris-at),
-    transparent var(--iris),
-    #000 calc(var(--iris) + 1.2px)
-  );
 }
 
 .maxicon-fin {
