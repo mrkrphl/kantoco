@@ -20,42 +20,40 @@ const FINS = 28;
 
 export function MaxiconHome() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { ready, reduced } = useMotionReady();
+  const { reduced } = useMotionReady();
 
   useGSAP(
     () => {
       const root = rootRef.current;
-      if (!root || !ready || reduced) return;
+      if (!root || reduced) return;
 
-      const stage = root.querySelector<HTMLElement>(".maxicon-stage");
       const inner = root.querySelector<HTMLElement>(".maxicon-stage-inner");
+      const bay = root.querySelector<HTMLElement>(".maxicon-bay");
       const bayImg = root.querySelector<HTMLElement>(".maxicon-bay img");
-      if (!stage || !inner) return;
+      if (!inner || !bay) return;
 
       const startIris = parseFloat(
         getComputedStyle(inner).getPropertyValue("--iris"),
       );
-      const iris = { r: Number.isFinite(startIris) ? startIris : 7 };
-
-      const tl = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: {
-          trigger: stage,
-          start: "top top",
-          end: "+=220%",
-          scrub: 0.45,
-          invalidateOnRefresh: true,
-        },
-      });
+      const iris = { r: Number.isFinite(startIris) ? startIris : 8 };
 
       inner.style.setProperty("--iris", `${iris.r}%`);
+      inner.classList.remove("maxicon-iris-css");
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power2.inOut" },
+      });
+
       tl.to(
         iris,
         {
           r: 160,
-          duration: 0.6,
+          duration: 0.85,
           onUpdate: () => {
             inner.style.setProperty("--iris", `${iris.r}%`);
+          },
+          onComplete: () => {
+            bay.style.clipPath = "none";
           },
         },
         0,
@@ -64,15 +62,18 @@ export function MaxiconHome() {
       if (bayImg) {
         tl.fromTo(
           bayImg,
-          { scale: 1.12, transformOrigin: "50% 28%" },
-          { scale: 1, duration: 0.6 },
+          { scale: 1.08, transformOrigin: "50% 28%" },
+          { scale: 1, duration: 0.85 },
           0,
         );
       }
 
-      tl.to({}, { duration: 0.4 });
-
-      inner.classList.remove("maxicon-iris-css");
+      tl.fromTo(
+        ".maxicon-hero-copy",
+        { y: 12 },
+        { y: 0, duration: 0.45, ease: "power2.out" },
+        0.4,
+      );
 
       gsap.fromTo(
         ".maxicon-room p",
@@ -105,25 +106,18 @@ export function MaxiconHome() {
           },
         },
       );
-
-      const bayImage = inner.querySelector("img");
-      if (bayImage) {
-        const refresh = () => ScrollTrigger.refresh();
-        if (bayImage.complete) refresh();
-        else bayImage.addEventListener("load", refresh, { once: true });
-      }
     },
-    { scope: rootRef, dependencies: [ready, reduced] },
+    { scope: rootRef, dependencies: [reduced] },
   );
 
-  const motion = reduced ? "static" : ready ? "ready" : "pending";
+  const motion = reduced ? "static" : "ready";
 
   return (
     <div ref={rootRef} data-motion={motion}>
       <MaxiconShell current="Home" overlay>
         <section
           className="maxicon-stage"
-          aria-label="A vent iris opens onto Maxicon’s bay"
+          aria-label="Maxicon’s bay on President’s Avenue"
         >
           <div className="maxicon-stage-inner maxicon-iris-css">
             <MaxiconBanner over />
@@ -141,6 +135,29 @@ export function MaxiconHome() {
               {Array.from({ length: FINS }, (_, i) => (
                 <span className="maxicon-fin" key={i} />
               ))}
+            </div>
+            <div className="maxicon-hero">
+              <div className="maxicon-hero-copy">
+                <h1 className="maxicon-hero-name">{maxicon.name}</h1>
+                <p className="maxicon-hero-addr">{maxicon.addressShort}</p>
+                <p className="maxicon-hero-line">{maxicon.heroLine}</p>
+                <div className="maxicon-hero-actions">
+                  <a href={maxicon.phoneMobileHref} className="maxicon-hero-call">
+                    Call {maxicon.phoneMobileDisplay}
+                  </a>
+                  <a
+                    href={maxicon.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="maxicon-hero-fb"
+                  >
+                    Facebook
+                  </a>
+                </div>
+                <a href="#visit" className="maxicon-scroll-cue">
+                  Hours and the map
+                </a>
+              </div>
             </div>
           </div>
         </section>

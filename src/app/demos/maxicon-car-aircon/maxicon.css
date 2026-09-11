@@ -128,12 +128,11 @@ html:has(.maxicon) body {
 .maxicon-stage {
   position: relative;
   z-index: 2;
-  height: 330svh;
+  height: 100svh;
 }
 
 .maxicon-stage-inner {
-  position: sticky;
-  top: 0;
+  position: relative;
   height: 100svh;
   overflow: hidden;
   background: var(--bg);
@@ -182,15 +181,111 @@ html:has(.maxicon) body {
 }
 
 .maxicon-iris-css {
-  animation: maxicon-iris-open linear both;
-  animation-timeline: scroll(root);
-  animation-range: 0 140vh;
+  animation: maxicon-iris-open 0.9s cubic-bezier(0.55, 0, 0.2, 1) forwards;
 }
 
 @keyframes maxicon-iris-open {
   to {
     --iris: 160%;
   }
+}
+
+.maxicon-hero {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4.6rem var(--pad) 1.35rem;
+  pointer-events: none;
+}
+
+.maxicon-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 32%,
+    color-mix(in srgb, var(--bg) 82%, transparent) 100%
+  );
+}
+
+.maxicon-hero-copy {
+  max-width: 36rem;
+}
+
+.maxicon-hero a {
+  pointer-events: auto;
+}
+
+.maxicon-hero-name {
+  margin: 0;
+  max-width: 14ch;
+  font-size: clamp(1.65rem, 5.2vw, 3.15rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-shadow: 0 1px 18px var(--bg);
+}
+
+.maxicon-hero-addr {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-maxicon-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.maxicon-hero-line {
+  margin: 0.8rem 0 0;
+  max-width: 28rem;
+  font-size: clamp(0.98rem, 2.1vw, 1.18rem);
+  line-height: 1.45;
+}
+
+.maxicon-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.15rem;
+  margin: 1.1rem 0 0;
+}
+
+.maxicon-hero-call {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent);
+  color: var(--bg);
+  text-decoration: none;
+  padding: 0.72rem 1.05rem;
+  font-family: var(--font-maxicon-mono), ui-monospace, monospace;
+  font-size: 0.92rem;
+}
+
+.maxicon-hero-call:hover {
+  filter: brightness(1.06);
+}
+
+.maxicon-hero-fb {
+  color: var(--ink);
+  font-size: 0.95rem;
+  text-underline-offset: 4px;
+}
+
+.maxicon-scroll-cue {
+  display: inline-block;
+  margin: 1rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--mute);
+  text-decoration: none;
+}
+
+.maxicon-scroll-cue::after {
+  content: " ↓";
 }
 
 .maxicon-room {
@@ -346,8 +441,9 @@ html:has(.maxicon) body {
   text-underline-offset: 3px;
 }
 
-[data-motion="static"] .maxicon-stage {
-  height: auto;
+[data-motion="static"] .maxicon-stage,
+[data-motion="static"] .maxicon-stage-inner {
+  height: 100svh;
 }
 
 [data-motion="static"] .maxicon-stage-inner {
@@ -364,9 +460,30 @@ html:has(.maxicon) body {
   display: none;
 }
 
+[data-motion="static"] .maxicon-hero-copy {
+  transform: none;
+}
+
+@media (max-height: 560px) {
+  .maxicon-hero {
+    padding-top: 3.4rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .maxicon-hero-line {
+    margin-top: 0.5rem;
+  }
+
+  .maxicon-hero-actions,
+  .maxicon-scroll-cue {
+    margin-top: 0.65rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .maxicon-stage {
-    height: auto;
+  .maxicon-stage,
+  .maxicon-stage-inner {
+    height: 100svh;
   }
 
   .maxicon-stage-inner {
@@ -381,5 +498,9 @@ html:has(.maxicon) body {
 
   .maxicon-fins {
     display: none;
+  }
+
+  .maxicon-hero-copy {
+    transform: none;
   }
 }

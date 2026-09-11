@@ -6,6 +6,8 @@ export const maxicon = {
   alsoKnownAs: "Maxicon Car Aircon Parts & Services",
   address: "45 President's Avenue, BF Homes, Parañaque",
   addressShort: "45 President's Avenue, BF Homes",
+  heroLine:
+    "The heat stays on the sidewalk; inside the bay the work is cold air.",
   phoneMobileDisplay: "0917 501 0872",
   phoneMobileHref: "tel:+639175010872",
   phoneLandlineDisplay: "8820 5426",
