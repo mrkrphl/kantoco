@@ -78,3 +78,10 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/maxicon-bay.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/dash-work.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/compressor.jpg` | Same public page | Maxicon | Shop-published public still |
+| `maxicon-car-aircon/iris-closed.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
+| `maxicon-car-aircon/iris-opening.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
+| `maxicon-car-aircon/frosted-condenser.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
+| `maxicon-car-aircon/vent-mist.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
+| `maxicon-car-aircon/vent-cold-burst.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
+| `maxicon-car-aircon/cold-poster.jpg` | Scaled from iris-closed | KantoCo | Video poster |
+| `maxicon-car-aircon/cold-sequence.mp4` | ffmpeg xfade of the five stills | KantoCo | Muted 1080p H.264, ~8s |
