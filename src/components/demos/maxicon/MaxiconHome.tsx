@@ -162,6 +162,7 @@ export function MaxiconHome() {
               </div>
               <p className="maxicon-hero-meta">
                 <span>{maxicon.hours}</span>
+                <span aria-hidden>·</span>
                 <a
                   href={maxicon.mapsQuery}
                   target="_blank"

@@ -254,7 +254,7 @@ html:has(.maxicon) body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 4.6rem var(--pad) 1.35rem;
+  padding: 4.6rem var(--pad) 2.35rem;
   pointer-events: none;
 }
 
@@ -283,7 +283,7 @@ html:has(.maxicon) body {
 .maxicon-hero-name {
   margin: 0;
   max-width: 14ch;
-  font-size: clamp(1.65rem, 5.2vw, 3.15rem);
+  font-size: clamp(1.5rem, 4.4vw, 2.7rem);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.035em;
