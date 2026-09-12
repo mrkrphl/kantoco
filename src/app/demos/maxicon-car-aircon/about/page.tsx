@@ -4,7 +4,7 @@ import { maxicon } from "@/lib/maxicon";
 
 export default function MaxiconAbout() {
   return (
-    <MaxiconShell current="Home">
+    <MaxiconShell>
       <div className="maxicon-page">
         <p className="maxicon-line">
           {maxicon.name} sits at {maxicon.address}.

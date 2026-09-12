@@ -1,8 +1,9 @@
 # Maxicon Car Aircon Specialist — photo notes
 
 Shop stills only on the sample. No generated people. No private albums.
-No testimonial portraits. Cold sequence is five stills crossfaded in
-ffmpeg on the build machine — not a Higgsfield clip, not live footage.
+No testimonial portraits. No fake logos. Cold sequence is five stills
+crossfaded in ffmpeg on the build machine — not a Higgsfield clip, not
+live footage.
 
 | File | Source | Notes |
 | --- | --- | --- |
@@ -17,6 +18,9 @@ ffmpeg on the build machine — not a Higgsfield clip, not live footage.
 | `vent-cold-burst.jpg` | KantoCo still for this sample | Frame 5, vent cold burst |
 | `cold-poster.jpg` | Scaled from `iris-closed.jpg` | First-frame poster |
 | `cold-sequence.mp4` | ffmpeg from the five stills | Muted 1920×1080 H.264, ~8s, 0.7s xfade |
+| `plate-iris-fin.png` | Generated cinematic still | Unused leftover plate |
+| `plate-vent-mist.png` | Generated cinematic still | Unused leftover plate |
+| `plate-condenser-frost.png` | Generated cinematic still | Unused leftover plate |
 
 Dropped from the live sample: generic Hollywood garage stills and fake
 testimonial portraits.

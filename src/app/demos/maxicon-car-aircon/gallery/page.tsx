@@ -3,7 +3,7 @@ import { MaxiconShell } from "@/components/demos/maxicon/MaxiconShell";
 
 export default function MaxiconGallery() {
   return (
-    <MaxiconShell current="Home">
+    <MaxiconShell>
       <div className="maxicon-page">
         <p className="maxicon-line">Their bay. Their parts.</p>
         <p className="maxicon-lede">

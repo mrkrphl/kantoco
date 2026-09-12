@@ -4,7 +4,7 @@ import { maxicon } from "@/lib/maxicon";
 
 export default function MaxiconServices() {
   return (
-    <MaxiconShell current="Home">
+    <MaxiconShell>
       <div className="maxicon-page">
         <p className="maxicon-line">
           They sell the part. They open the system. The recharge waits.

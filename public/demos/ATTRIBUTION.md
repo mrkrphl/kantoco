@@ -85,3 +85,6 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/vent-cold-burst.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
 | `maxicon-car-aircon/cold-poster.jpg` | Scaled from iris-closed | KantoCo | Video poster |
 | `maxicon-car-aircon/cold-sequence.mp4` | ffmpeg xfade of the five stills | KantoCo | Muted 1080p H.264, ~8s |
+| `maxicon-car-aircon/plate-iris-fin.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
+| `maxicon-car-aircon/plate-vent-mist.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
+| `maxicon-car-aircon/plate-condenser-frost.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
