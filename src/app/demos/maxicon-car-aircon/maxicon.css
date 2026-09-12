@@ -291,7 +291,8 @@ html:has(.maxicon) body {
 }
 
 .maxicon-hero-addr,
-.maxicon-hero-hours {
+.maxicon-hero-hours,
+.maxicon-hero-meta {
   margin: 0.55rem 0 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.78rem;
@@ -300,6 +301,19 @@ html:has(.maxicon) body {
 
 .maxicon-hero-hours {
   margin-top: 1rem;
+}
+
+.maxicon-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.85rem;
+  margin-top: 0.85rem;
+}
+
+.maxicon-hero-map {
+  color: var(--ink);
+  text-underline-offset: 3px;
 }
 
 .maxicon-hero-line {
@@ -537,6 +551,23 @@ html:has(.maxicon) body {
   transform: none;
 }
 
+@media (max-height: 700px) {
+  .maxicon-hero {
+    padding-top: 3.6rem;
+    padding-bottom: 1rem;
+  }
+
+  .maxicon-hero-line {
+    margin-top: 0.55rem;
+  }
+
+  .maxicon-hero-actions,
+  .maxicon-hero-meta,
+  .maxicon-scroll-cue {
+    margin-top: 0.7rem;
+  }
+}
+
 @media (max-height: 560px) {
   .maxicon-hero {
     padding-top: 3.4rem;
@@ -548,6 +579,7 @@ html:has(.maxicon) body {
   }
 
   .maxicon-hero-actions,
+  .maxicon-hero-meta,
   .maxicon-scroll-cue {
     margin-top: 0.65rem;
   }

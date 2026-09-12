@@ -60,10 +60,15 @@ export function MaxiconHome() {
       video.pause();
       video.muted = true;
 
+      const cue = pin.querySelector<HTMLElement>(".maxicon-reel-cue");
+
       const apply = (progress: number) => {
         const duration = video.duration;
         if (!Number.isFinite(duration) || duration <= 0) return;
         seekVideo(video, progress * duration);
+        if (cue) {
+          gsap.set(cue, { autoAlpha: 1 - Math.min(progress / 0.08, 1) });
+        }
       };
 
       const st = ScrollTrigger.create({
@@ -78,20 +83,6 @@ export function MaxiconHome() {
         onUpdate: (self) => apply(self.progress),
         onRefresh: (self) => apply(self.progress),
       });
-
-      const cue = pin.querySelector<HTMLElement>(".maxicon-reel-cue");
-      if (cue) {
-        gsap.to(cue, {
-          autoAlpha: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: pin,
-            start: "top top",
-            end: "+=18%",
-            scrub: true,
-          },
-        });
-      }
 
       apply(st.progress);
       if (reelReady) ScrollTrigger.refresh();
@@ -169,15 +160,17 @@ export function MaxiconHome() {
                   Facebook
                 </a>
               </div>
-              <p className="maxicon-hero-hours">{maxicon.hours}</p>
-              <a
-                href={maxicon.mapsQuery}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="maxicon-scroll-cue"
-              >
-                Map · {maxicon.addressShort}
-              </a>
+              <p className="maxicon-hero-meta">
+                <span>{maxicon.hours}</span>
+                <a
+                  href={maxicon.mapsQuery}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="maxicon-hero-map"
+                >
+                  Map
+                </a>
+              </p>
             </div>
           </div>
         </section>
