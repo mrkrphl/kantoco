@@ -14,7 +14,6 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const REEL_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4";
 const REEL_POSTER = "/demos/maxicon-car-aircon/cold-vent-poster.jpg";
-const PIN_VIEWS = 3.2;
 
 const BEATS = [
   { start: 0, end: 0.2 },
@@ -101,11 +100,8 @@ export function MaxiconHome() {
       const st = ScrollTrigger.create({
         trigger: pin,
         start: "top top",
-        end: () => `+=${Math.round(window.innerHeight * PIN_VIEWS)}`,
-        pin: true,
-        pinSpacing: true,
+        end: "bottom bottom",
         scrub: 0.5,
-        anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => apply(self.progress),
         onRefresh: (self) => apply(self.progress),
@@ -138,6 +134,7 @@ export function MaxiconHome() {
           className="maxicon-reel-pin"
           aria-label="Cold air from a dashboard vent. Scroll to play the film."
         >
+          <div className="maxicon-reel-sticky">
           {reelFailed ? (
             <Image
               src="/demos/maxicon-car-aircon/shop-front.jpg"
@@ -248,6 +245,7 @@ export function MaxiconHome() {
               </div>
             </>
           )}
+          </div>
         </section>
 
         <section id="visit" className="maxicon-after" aria-label="Visit">

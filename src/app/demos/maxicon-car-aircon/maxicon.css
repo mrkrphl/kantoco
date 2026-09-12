@@ -134,8 +134,21 @@ html:has(.maxicon) body {
   position: relative;
   z-index: 2;
   height: 100svh;
-  overflow: hidden;
   background: #05080a;
+}
+
+.maxicon[data-motion="ready"] .maxicon-reel-pin,
+.maxicon[data-motion="pending"] .maxicon-reel-pin {
+  height: 420vh;
+}
+
+.maxicon-reel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #05080a url("/demos/maxicon-car-aircon/cold-vent-poster.jpg")
+    center / cover no-repeat;
 }
 
 .maxicon-reel,
@@ -600,6 +613,10 @@ html:has(.maxicon) body {
   height: 100svh;
 }
 
+[data-motion="static"] .maxicon-reel-sticky {
+  position: relative;
+}
+
 [data-motion="static"] .maxicon-stage,
 [data-motion="static"] .maxicon-stage-inner {
   height: 100svh;
@@ -660,6 +677,10 @@ html:has(.maxicon) body {
 @media (prefers-reduced-motion: reduce) {
   .maxicon-reel-pin {
     height: 100svh;
+  }
+
+  .maxicon-reel-sticky {
+    position: relative;
   }
 
   .maxicon-stage,
