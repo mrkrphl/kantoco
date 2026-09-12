@@ -78,3 +78,6 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/maxicon-bay.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/dash-work.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/compressor.jpg` | Same public page | Maxicon | Shop-published public still |
+| `maxicon-car-aircon/plate-iris-fin.png` | Generated still for motion | KantoCo sample | Shutter layer. No people |
+| `maxicon-car-aircon/plate-vent-mist.png` | Generated still for motion | KantoCo sample | Vent layer. No people |
+| `maxicon-car-aircon/plate-condenser-frost.png` | Generated still for motion | KantoCo sample | Frost layer. No people |

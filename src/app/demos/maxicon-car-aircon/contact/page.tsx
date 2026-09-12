@@ -4,7 +4,7 @@ import { maxicon } from "@/lib/maxicon";
 
 export default function MaxiconContact() {
   return (
-    <MaxiconShell current="Visit">
+    <MaxiconShell>
       <MaxiconVisit id="contact" />
       <iframe
         title="Map of 45 President's Avenue, BF Homes, Parañaque"

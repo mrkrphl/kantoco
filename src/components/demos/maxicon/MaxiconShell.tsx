@@ -1,11 +1,4 @@
-import Link from "next/link";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
-import { maxicon } from "@/lib/maxicon";
-
-const nav = [
-  ["Home", "/demos/maxicon-car-aircon"],
-  ["Visit", "/demos/maxicon-car-aircon/contact"],
-] as const;
 
 export function MaxiconBanner({ over = false }: { over?: boolean }) {
   return (
@@ -16,51 +9,16 @@ export function MaxiconBanner({ over = false }: { over?: boolean }) {
   );
 }
 
-export function MaxiconChrome({
-  current,
-}: {
-  current: (typeof nav)[number][0];
-}) {
-  return (
-    <header className="maxicon-chrome">
-      <Link href="/demos/maxicon-car-aircon" className="maxicon-chrome-name">
-        {maxicon.name}
-      </Link>
-      <nav>
-        <ul className="maxicon-chrome-nav">
-          {nav.map(([label, href]) => (
-            <li key={href}>
-              <Link
-                href={href}
-                aria-current={current === label ? "page" : undefined}
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </header>
-  );
-}
-
 export function MaxiconShell({
   children,
-  current,
   overlay = false,
 }: {
   children: React.ReactNode;
-  current: (typeof nav)[number][0];
   overlay?: boolean;
 }) {
   return (
     <div className={overlay ? "maxicon" : "maxicon maxicon--page"}>
-      {overlay ? null : (
-        <>
-          <MaxiconBanner />
-          <MaxiconChrome current={current} />
-        </>
-      )}
+      {overlay ? null : <MaxiconBanner />}
       <main>{children}</main>
     </div>
   );

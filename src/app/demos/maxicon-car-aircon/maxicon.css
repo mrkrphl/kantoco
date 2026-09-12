@@ -7,7 +7,7 @@ html:has(.maxicon) body {
 @property --iris {
   syntax: "<length-percentage>";
   inherits: true;
-  initial-value: 7%;
+  initial-value: 9%;
 }
 
 .maxicon {
@@ -15,22 +15,12 @@ html:has(.maxicon) body {
   --ink: #cfe3e6;
   --accent: #8fd4ce;
   --mute: color-mix(in srgb, var(--ink) 58%, var(--bg));
-  --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
   --pad: clamp(1.1rem, 4vw, 3.2rem);
-  --banner: 2.15rem;
-  --iris: 9.5%;
-  --iris-at: 50% 28%;
+  --iris: 9%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
   min-height: 100%;
-}
-
-@media (min-width: 900px) {
-  .maxicon {
-    --iris: 6.2%;
-    --iris-at: 50% 22%;
-  }
 }
 
 .maxicon a {
@@ -81,50 +71,6 @@ html:has(.maxicon) body {
   color: var(--ink);
 }
 
-.maxicon-chrome {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 8;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.85rem var(--pad);
-  pointer-events: none;
-}
-
-.maxicon-chrome a {
-  pointer-events: auto;
-  text-decoration: none;
-}
-
-.maxicon-chrome-name {
-  font-size: 0.92rem;
-  font-weight: 500;
-  text-shadow: 0 1px 12px var(--bg);
-}
-
-.maxicon-chrome-nav {
-  display: flex;
-  gap: 1.1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.88rem;
-  color: var(--mute);
-}
-
-.maxicon-chrome-nav a[aria-current="page"] {
-  color: var(--accent);
-}
-
-.maxicon--page .maxicon-chrome {
-  position: relative;
-  background: var(--bg);
-}
-
 .maxicon-stage {
   position: relative;
   z-index: 2;
@@ -138,55 +84,98 @@ html:has(.maxicon) body {
   background: var(--bg);
 }
 
+.maxicon-shutter,
 .maxicon-bay,
-.maxicon-fins {
+.maxicon-vent,
+.maxicon-frost {
   position: absolute;
   inset: 0;
 }
 
+.maxicon-shutter {
+  z-index: 1;
+  pointer-events: none;
+}
+
 .maxicon-bay {
   z-index: 2;
-  clip-path: circle(var(--iris) at var(--iris-at));
-  will-change: clip-path;
+  clip-path: circle(var(--iris) at 50% 50%);
 }
 
 .maxicon-bay img {
   object-fit: cover;
   object-position: center 28%;
-  will-change: transform;
 }
 
-.maxicon-fins {
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.maxicon-vent,
+.maxicon-frost {
+  z-index: 3;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 
-.maxicon-fin {
-  flex: 1 1 0;
-  min-height: 0;
-  background: linear-gradient(
-    180deg,
-    #101c1f 0%,
-    #182628 18%,
-    #0a1214 46%,
-    #1c2f32 51%,
-    #071114 100%
-  );
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--accent) 34%, transparent),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.7);
+.maxicon-frost {
+  z-index: 4;
+}
+
+.maxicon-vent-photo {
+  position: absolute;
+  inset: -5%;
 }
 
 .maxicon-iris-css {
   animation: maxicon-iris-open 0.9s cubic-bezier(0.55, 0, 0.2, 1) forwards;
 }
 
+.maxicon-iris-css .maxicon-hero-copy {
+  animation: maxicon-type-in 0.42s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @keyframes maxicon-iris-open {
   to {
     --iris: 160%;
+  }
+}
+
+@keyframes maxicon-type-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes maxicon-vent-drift {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1.4%, 0.8%, 0);
+  }
+}
+
+@keyframes maxicon-mist-pulse {
+  0%,
+  100% {
+    opacity: 0.84;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .maxicon-vent-photo {
+    animation: maxicon-vent-drift 14s ease-in-out infinite alternate;
+  }
+
+  .maxicon-vent-photo img {
+    animation: maxicon-mist-pulse 5.6s ease-in-out infinite;
   }
 }
 
@@ -217,6 +206,7 @@ html:has(.maxicon) body {
 
 .maxicon-hero-copy {
   max-width: 36rem;
+  opacity: 0;
 }
 
 .maxicon-hero a {
@@ -231,13 +221,6 @@ html:has(.maxicon) body {
   line-height: 1.08;
   letter-spacing: -0.035em;
   text-shadow: 0 1px 18px var(--bg);
-}
-
-.maxicon-hero-addr {
-  margin: 0.55rem 0 0;
-  font-family: var(--font-maxicon-mono), ui-monospace, monospace;
-  font-size: 0.78rem;
-  color: var(--accent);
 }
 
 .maxicon-hero-line {
@@ -290,14 +273,6 @@ html:has(.maxicon) body {
   content: " ↓";
 }
 
-.maxicon-room {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 4rem var(--pad);
-}
-
 .maxicon-line {
   margin: 0;
   max-width: 18ch;
@@ -307,28 +282,8 @@ html:has(.maxicon) body {
   letter-spacing: -0.035em;
 }
 
-.maxicon-still {
-  position: relative;
-  min-height: 100svh;
-  overflow: hidden;
-  background: #05090b;
-}
-
-.maxicon-still img {
-  object-fit: cover;
-}
-
 .maxicon-lede {
   margin: 0;
-  max-width: 36rem;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--mute);
-}
-
-.maxicon-caption {
-  margin: 0;
-  padding: 1.15rem var(--pad) 0;
   max-width: 36rem;
   font-size: 1rem;
   line-height: 1.6;
@@ -344,10 +299,8 @@ html:has(.maxicon) body {
   padding: 4.5rem var(--pad) 5rem;
 }
 
-.maxicon--page .maxicon-room,
-.maxicon--page .maxicon-still,
 .maxicon--page .maxicon-visit {
-  min-height: calc(100svh - var(--banner));
+  min-height: calc(100svh - 2.15rem);
 }
 
 .maxicon-visit-kicker {
@@ -443,27 +396,25 @@ html:has(.maxicon) body {
   text-underline-offset: 3px;
 }
 
-[data-motion="static"] .maxicon-stage,
-[data-motion="static"] .maxicon-stage-inner {
-  height: 100svh;
-}
-
-[data-motion="static"] .maxicon-stage-inner {
-  position: relative;
-  top: 0;
-  animation: none;
-}
-
-[data-motion="static"] .maxicon-bay {
+[data-motion="static"] .maxicon-bay,
+[data-motion="static"] .maxicon-stage-inner.maxicon-iris-css .maxicon-bay {
   clip-path: none;
 }
 
-[data-motion="static"] .maxicon-fins {
+[data-motion="static"] .maxicon-shutter,
+[data-motion="static"] .maxicon-vent,
+[data-motion="static"] .maxicon-frost {
   display: none;
 }
 
+[data-motion="static"] .maxicon-stage-inner {
+  animation: none;
+}
+
 [data-motion="static"] .maxicon-hero-copy {
+  opacity: 1;
   transform: none;
+  animation: none;
 }
 
 @media (max-height: 560px) {
@@ -483,14 +434,7 @@ html:has(.maxicon) body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .maxicon-stage,
   .maxicon-stage-inner {
-    height: 100svh;
-  }
-
-  .maxicon-stage-inner {
-    position: relative;
-    top: 0;
     animation: none;
   }
 
@@ -498,11 +442,15 @@ html:has(.maxicon) body {
     clip-path: none;
   }
 
-  .maxicon-fins {
+  .maxicon-shutter,
+  .maxicon-vent,
+  .maxicon-frost {
     display: none;
   }
 
   .maxicon-hero-copy {
+    opacity: 1;
     transform: none;
+    animation: none;
   }
 }
