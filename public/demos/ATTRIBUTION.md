@@ -78,13 +78,5 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/maxicon-bay.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/dash-work.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/compressor.jpg` | Same public page | Maxicon | Shop-published public still |
-| `maxicon-car-aircon/iris-closed.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
-| `maxicon-car-aircon/iris-opening.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
-| `maxicon-car-aircon/frosted-condenser.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
-| `maxicon-car-aircon/vent-mist.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
-| `maxicon-car-aircon/vent-cold-burst.jpg` | KantoCo still for this sample | KantoCo | Sample still, not shop footage |
-| `maxicon-car-aircon/cold-poster.jpg` | Scaled from iris-closed | KantoCo | Video poster |
-| `maxicon-car-aircon/cold-sequence.mp4` | ffmpeg xfade of the five stills | KantoCo | Muted 1080p H.264, ~8s |
-| `maxicon-car-aircon/plate-iris-fin.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
-| `maxicon-car-aircon/plate-vent-mist.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
-| `maxicon-car-aircon/plate-condenser-frost.png` | Generated still for motion | KantoCo sample | Unused leftover plate |
+| `maxicon-car-aircon/cold-vent.mp4` | Generated KantoCo sample clip | KantoCo | Muted 1280×720 H.264, ~5.04s |
+| `maxicon-car-aircon/cold-vent-poster.jpg` | First frame of `cold-vent.mp4` | KantoCo | Poster / reduced-motion still |

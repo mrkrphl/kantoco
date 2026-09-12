@@ -12,13 +12,32 @@ import { useMotionReady } from "@/components/motion/useMotionReady";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const REEL_SRC = "/demos/maxicon-car-aircon/cold-sequence.mp4";
-const REEL_POSTER = "/demos/maxicon-car-aircon/cold-poster.jpg";
+const REEL_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4";
+const REEL_POSTER = "/demos/maxicon-car-aircon/cold-vent-poster.jpg";
+const PIN_VIEWS = 3.2;
+
+const BEATS = [
+  { start: 0, end: 0.2 },
+  { start: 0.2, end: 0.45 },
+  { start: 0.45, end: 0.7 },
+  { start: 0.7, end: 1 },
+] as const;
 
 function seekVideo(video: HTMLVideoElement, time: number) {
-  const next = Math.min(Math.max(time, 0), Math.max(video.duration - 0.001, 0));
-  if (Math.abs(video.currentTime - next) < 0.01) return;
+  const duration = video.duration;
+  if (!Number.isFinite(duration) || duration <= 0) return;
+  const next = Math.min(Math.max(time, 0), duration);
+  if (Math.abs(video.currentTime - next) < 0.008) return;
   video.currentTime = next;
+}
+
+function beatAlpha(progress: number, start: number, end: number, fade = 0.055) {
+  const holdLast = end >= 0.999;
+  if (progress < start) return 0;
+  if (!holdLast && progress > end) return 0;
+  const fadeIn = start === 0 ? 1 : Math.min(1, (progress - start) / fade);
+  const fadeOut = holdLast ? 1 : Math.min(1, (end - progress) / fade);
+  return Math.max(0, Math.min(fadeIn, fadeOut));
 }
 
 export function MaxiconHome() {
@@ -31,12 +50,13 @@ export function MaxiconHome() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || reduced) return;
+    if (!video) return;
 
     const markReady = () => {
       if (Number.isFinite(video.duration) && video.duration > 0) {
         video.pause();
         video.muted = true;
+        if (reduced) seekVideo(video, 0);
         setReelReady(true);
       }
     };
@@ -61,11 +81,18 @@ export function MaxiconHome() {
       video.muted = true;
 
       const cue = pin.querySelector<HTMLElement>(".maxicon-reel-cue");
+      const beats = pin.querySelectorAll<HTMLElement>("[data-beat]");
 
       const apply = (progress: number) => {
         const duration = video.duration;
-        if (!Number.isFinite(duration) || duration <= 0) return;
-        seekVideo(video, progress * duration);
+        if (Number.isFinite(duration) && duration > 0) {
+          seekVideo(video, progress * duration);
+        }
+        beats.forEach((el, i) => {
+          const range = BEATS[i];
+          if (!range) return;
+          gsap.set(el, { autoAlpha: beatAlpha(progress, range.start, range.end) });
+        });
         if (cue) {
           gsap.set(cue, { autoAlpha: 1 - Math.min(progress / 0.08, 1) });
         }
@@ -74,10 +101,10 @@ export function MaxiconHome() {
       const st = ScrollTrigger.create({
         trigger: pin,
         start: "top top",
-        end: () => `+=${Math.round(window.innerHeight * 2.6)}`,
+        end: () => `+=${Math.round(window.innerHeight * PIN_VIEWS)}`,
         pin: true,
         pinSpacing: true,
-        scrub: 0.35,
+        scrub: 0.5,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => apply(self.progress),
@@ -99,19 +126,28 @@ export function MaxiconHome() {
     { scope: rootRef, dependencies: [reduced, reelReady, reelFailed] },
   );
 
-  const staticLanding = reduced || reelFailed;
-  const motion = staticLanding ? "static" : reelReady ? "ready" : "pending";
+  const staticCopy = reduced || reelFailed;
+  const motion = staticCopy ? "static" : reelReady ? "ready" : "pending";
 
   return (
     <div ref={rootRef} className="maxicon" data-motion={motion}>
       <MaxiconBanner over fixed />
       <main>
-        {staticLanding ? null : (
-          <section
-            ref={pinRef}
-            className="maxicon-reel-pin"
-            aria-label="Cold-air sequence. Scroll to move through the film."
-          >
+        <section
+          ref={pinRef}
+          className="maxicon-reel-pin"
+          aria-label="Cold air from a dashboard vent. Scroll to play the film."
+        >
+          {reelFailed ? (
+            <Image
+              src="/demos/maxicon-car-aircon/shop-front.jpg"
+              alt=""
+              fill
+              className="maxicon-reel-fallback"
+              sizes="100vw"
+              preload
+            />
+          ) : (
             <video
               ref={videoRef}
               className="maxicon-reel"
@@ -126,27 +162,14 @@ export function MaxiconHome() {
             >
               <source src={REEL_SRC} type="video/mp4" />
             </video>
-            <p className="maxicon-reel-cue">Scroll</p>
-          </section>
-        )}
+          )}
 
-        <section
-          id="visit"
-          className="maxicon-bay-land"
-          aria-label="Maxicon’s bay on President’s Avenue"
-        >
-          <Image
-            src="/demos/maxicon-car-aircon/shop-front.jpg"
-            alt="Maxicon’s open bay and sign on President’s Avenue, BF Homes."
-            fill
-            className="object-cover object-[center_28%]"
-            sizes="100vw"
-            preload
-          />
-          <div className="maxicon-hero">
-            <div className="maxicon-hero-copy">
-              <h1 className="maxicon-hero-name">{maxicon.name}</h1>
-              <p className="maxicon-hero-line">{maxicon.heroLine}</p>
+          <div className="maxicon-reel-veil" aria-hidden />
+
+          {staticCopy ? (
+            <div className="maxicon-reel-copy maxicon-reel-copy--static">
+              <h1 className="maxicon-reel-name">{maxicon.name}</h1>
+              <p className="maxicon-reel-line">The product is cold.</p>
               <div className="maxicon-hero-actions">
                 <a href={maxicon.phoneMobileHref} className="maxicon-hero-call">
                   Call {maxicon.phoneMobileDisplay}
@@ -173,7 +196,63 @@ export function MaxiconHome() {
                 </a>
               </p>
             </div>
-          </div>
+          ) : (
+            <>
+              <p className="maxicon-reel-cue">Scroll</p>
+              <div className="maxicon-reel-copy">
+                <div className="maxicon-reel-beat" data-beat="open">
+                  <h1 className="maxicon-reel-name">{maxicon.name}</h1>
+                  <p className="maxicon-reel-line">The product is cold.</p>
+                </div>
+                <div className="maxicon-reel-beat" data-beat="heat">
+                  <p className="maxicon-reel-name">Hina na sa traffic?</p>
+                  <p className="maxicon-reel-line">They bring the cold back.</p>
+                </div>
+                <div className="maxicon-reel-beat" data-beat="bayan">
+                  <p className="maxicon-reel-name">
+                    President’s Avenue, BF Homes.
+                  </p>
+                  <p className="maxicon-reel-line">Parañaque. Bayan work.</p>
+                </div>
+                <div className="maxicon-reel-beat" data-beat="cta">
+                  <p className="maxicon-reel-name">Bring it in.</p>
+                  <div className="maxicon-hero-actions">
+                    <a
+                      href={maxicon.phoneMobileHref}
+                      className="maxicon-hero-call"
+                    >
+                      Call {maxicon.phoneMobileDisplay}
+                    </a>
+                    <a
+                      href={maxicon.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="maxicon-hero-fb"
+                    >
+                      Facebook
+                    </a>
+                  </div>
+                  <p className="maxicon-hero-meta">
+                    <span>{maxicon.hours}</span>
+                    <span aria-hidden>·</span>
+                    <a
+                      href={maxicon.mapsQuery}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="maxicon-hero-map"
+                    >
+                      Map
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
+
+        <section id="visit" className="maxicon-after" aria-label="Visit">
+          <p className="maxicon-visit-kicker">{maxicon.address}</p>
+          <p className="maxicon-mono maxicon-hours">{maxicon.hours}</p>
         </section>
 
         <p className="maxicon-note maxicon-foot">

@@ -138,7 +138,8 @@ html:has(.maxicon) body {
   background: #05080a;
 }
 
-.maxicon-reel {
+.maxicon-reel,
+.maxicon-reel-fallback {
   position: absolute;
   inset: 0;
   display: block;
@@ -148,6 +149,70 @@ html:has(.maxicon) body {
   object-position: center;
   background: #05080a;
   pointer-events: none;
+}
+
+.maxicon-reel-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 42%, transparent) 0%,
+    transparent 26%,
+    transparent 48%,
+    color-mix(in srgb, var(--bg) 78%, transparent) 100%
+  );
+}
+
+.maxicon-reel-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.maxicon-reel-copy--static {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4.6rem var(--pad) 2.35rem;
+}
+
+.maxicon-reel-beat {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: 2.35rem;
+  max-width: 28rem;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.maxicon-reel-beat[data-beat="open"] {
+  visibility: visible;
+  opacity: 1;
+}
+
+.maxicon-reel-name {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(1.55rem, 4.6vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-shadow: 0 1px 18px var(--bg);
+}
+
+.maxicon-reel-line {
+  margin: 0.75rem 0 0;
+  max-width: 24rem;
+  font-size: clamp(1rem, 2.1vw, 1.2rem);
+  line-height: 1.4;
+}
+
+.maxicon-reel-copy a {
+  pointer-events: auto;
 }
 
 .maxicon-reel-cue {
@@ -166,6 +231,13 @@ html:has(.maxicon) body {
 
 .maxicon-reel-cue::after {
   content: " ↓";
+}
+
+.maxicon-after {
+  position: relative;
+  z-index: 2;
+  padding: 2.4rem var(--pad) 0.4rem;
+  background: var(--bg);
 }
 
 .maxicon-bay-land {
@@ -525,7 +597,7 @@ html:has(.maxicon) body {
 }
 
 [data-motion="static"] .maxicon-reel-pin {
-  display: none;
+  height: 100svh;
 }
 
 [data-motion="static"] .maxicon-stage,
@@ -587,7 +659,7 @@ html:has(.maxicon) body {
 
 @media (prefers-reduced-motion: reduce) {
   .maxicon-reel-pin {
-    display: none;
+    height: 100svh;
   }
 
   .maxicon-stage,
