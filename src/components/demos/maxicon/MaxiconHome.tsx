@@ -30,6 +30,32 @@ function seekVideo(video: HTMLVideoElement, time: number) {
   video.currentTime = next;
 }
 
+function armInlinePlayback(video: HTMLVideoElement) {
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "true");
+  video.setAttribute("webkit-playsinline", "true");
+}
+
+async function unlockSeek(video: HTMLVideoElement, time: number) {
+  armInlinePlayback(video);
+  try {
+    await video.play();
+  } catch {
+    /* iOS may still block until a later gesture */
+  }
+  video.pause();
+  seekVideo(video, time);
+}
+
+function pinProgress(pin: HTMLElement) {
+  const travel = pin.offsetHeight - window.innerHeight;
+  if (travel <= 0) return 0;
+  return Math.min(1, Math.max(0, window.scrollY / travel));
+}
+
 function beatAlpha(progress: number, start: number, end: number, fade = 0.055) {
   const holdLast = end >= 0.999;
   if (progress < start) return 0;
@@ -51,13 +77,17 @@ export function MaxiconHome() {
     const video = videoRef.current;
     if (!video) return;
 
+    let cancelled = false;
+    let started = false;
+
     const markReady = () => {
-      if (Number.isFinite(video.duration) && video.duration > 0) {
-        video.pause();
-        video.muted = true;
-        if (reduced) seekVideo(video, 0);
-        setReelReady(true);
-      }
+      if (started) return;
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      started = true;
+      void (async () => {
+        await unlockSeek(video, 0);
+        if (!cancelled) setReelReady(true);
+      })();
     };
 
     if (video.readyState >= 1) markReady();
@@ -65,9 +95,49 @@ export function MaxiconHome() {
     video.addEventListener("error", () => setReelFailed(true));
 
     return () => {
+      cancelled = true;
       video.removeEventListener("loadedmetadata", markReady);
     };
-  }, [reduced]);
+  }, []);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    const video = videoRef.current;
+    if (!pin || !video || reduced || reelFailed || !reelReady) return;
+
+    let used = false;
+    let confirmed = false;
+
+    const retryIfStuck = () => {
+      if (used || confirmed) return;
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      const expected = pinProgress(pin) * video.duration;
+      if (expected <= 0.12) return;
+      if (Math.abs(video.currentTime - expected) <= 0.25) {
+        confirmed = true;
+        return;
+      }
+      used = true;
+      armInlinePlayback(video);
+      const playAttempt = video.play();
+      void Promise.resolve(playAttempt)
+        .catch(() => {})
+        .then(() => {
+          video.pause();
+          seekVideo(video, pinProgress(pin) * video.duration);
+        });
+    };
+
+    pin.addEventListener("pointerdown", retryIfStuck, { passive: true });
+    pin.addEventListener("touchstart", retryIfStuck, { passive: true });
+    window.addEventListener("scroll", retryIfStuck, { passive: true });
+
+    return () => {
+      pin.removeEventListener("pointerdown", retryIfStuck);
+      pin.removeEventListener("touchstart", retryIfStuck);
+      window.removeEventListener("scroll", retryIfStuck);
+    };
+  }, [reduced, reelReady, reelFailed]);
 
   useGSAP(
     () => {
@@ -156,6 +226,7 @@ export function MaxiconHome() {
               controls={false}
               tabIndex={-1}
               aria-hidden
+              {...{ "webkit-playsinline": "true" }}
             >
               <source src={REEL_SRC} type="video/mp4" />
             </video>

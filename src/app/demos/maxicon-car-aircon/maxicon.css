@@ -2,6 +2,7 @@ html:has(.maxicon),
 html:has(.maxicon) body {
   background: #071114;
   scroll-behavior: auto;
+  overflow-x: clip;
 }
 
 @property --iris {
@@ -139,7 +140,7 @@ html:has(.maxicon) body {
 
 .maxicon[data-motion="ready"] .maxicon-reel-pin,
 .maxicon[data-motion="pending"] .maxicon-reel-pin {
-  height: 420vh;
+  height: 420svh;
 }
 
 .maxicon-reel-sticky {
@@ -147,8 +148,9 @@ html:has(.maxicon) body {
   top: 0;
   height: 100svh;
   overflow: hidden;
+  touch-action: pan-y;
   background: #05080a url("/demos/maxicon-car-aircon/cold-vent-poster.jpg")
-    center / cover no-repeat;
+    center 32% / cover no-repeat;
 }
 
 .maxicon-reel,
@@ -159,7 +161,7 @@ html:has(.maxicon) body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 32%;
   background: #05080a;
   pointer-events: none;
 }
@@ -226,6 +228,50 @@ html:has(.maxicon) body {
 
 .maxicon-reel-copy a {
   pointer-events: auto;
+}
+
+@media (max-width: 480px) {
+  .maxicon-reel-name {
+    max-width: 13ch;
+    font-size: clamp(1.32rem, 7.4vw, 1.85rem);
+  }
+
+  .maxicon-reel-line {
+    margin-top: 0.55rem;
+    font-size: 0.98rem;
+  }
+
+  .maxicon-reel-beat {
+    bottom: max(1.35rem, env(safe-area-inset-bottom, 0px));
+    max-width: min(22rem, calc(100% - 0.2rem));
+  }
+
+  .maxicon-reel-copy--static {
+    padding: 4.1rem var(--pad) max(1.5rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .maxicon-reel-cue {
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .maxicon-hero-actions {
+    gap: 0.65rem 0.9rem;
+    margin-top: 0.85rem;
+  }
+
+  .maxicon-hero-call {
+    padding: 0.66rem 0.92rem;
+    font-size: 0.86rem;
+  }
+
+  .maxicon-hero-meta {
+    font-size: 0.72rem;
+  }
+
+  .maxicon-banner--over {
+    font-size: 0.62rem;
+    padding-right: 3.2rem;
+  }
 }
 
 .maxicon-reel-cue {
