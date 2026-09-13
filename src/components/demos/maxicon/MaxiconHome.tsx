@@ -180,10 +180,8 @@ export function MaxiconHome() {
       ScrollTrigger.create({
         trigger: pin,
         start: "top top",
-        end: "+=320%",
-        pin: true,
+        end: "bottom bottom",
         scrub: 0.35,
-        anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           const next = Math.min(

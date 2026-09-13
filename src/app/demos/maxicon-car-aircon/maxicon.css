@@ -1,7 +1,6 @@
 html:has(.maxicon),
 html:has(.maxicon) body {
   background: #0b1012;
-  overflow-x: clip;
   scroll-behavior: auto;
 }
 
@@ -18,6 +17,7 @@ html:has(.maxicon) body {
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
   min-height: 100%;
+  overflow-x: clip;
 }
 
 .maxicon a {
@@ -200,6 +200,8 @@ html:has(.maxicon) body {
 }
 
 .maxicon-break {
+  position: relative;
+  z-index: 1;
   min-height: 100svh;
   display: flex;
   align-items: center;
@@ -224,7 +226,10 @@ html:has(.maxicon) body {
 }
 
 .maxicon-rows {
+  position: relative;
+  z-index: 1;
   padding: 0;
+  background: var(--bg);
 }
 
 .maxicon-row {
@@ -292,7 +297,14 @@ html:has(.maxicon) body {
 }
 
 .maxicon-process {
+  position: relative;
+  z-index: 2;
   background: var(--bg);
+}
+
+.maxicon[data-motion="ready"] .maxicon-process,
+.maxicon[data-motion="pending"] .maxicon-process {
+  height: 420svh;
 }
 
 .maxicon-process-frame {
@@ -300,8 +312,15 @@ html:has(.maxicon) body {
   grid-template-columns: minmax(6rem, 0.28fr) minmax(0, 0.5fr) minmax(7rem, 0.22fr);
   align-items: center;
   gap: 1.2rem;
-  height: 100svh;
+  height: calc(100svh - var(--banner));
   padding: 1.4rem var(--pad);
+  background: var(--bg);
+}
+
+.maxicon[data-motion="ready"] .maxicon-process-frame,
+.maxicon[data-motion="pending"] .maxicon-process-frame {
+  position: sticky;
+  top: var(--banner);
 }
 
 .maxicon-process-num,
