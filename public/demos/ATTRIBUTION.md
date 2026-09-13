@@ -78,7 +78,7 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/maxicon-bay.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/dash-work.jpg` | Same public page | Maxicon | Shop-published public still |
 | `maxicon-car-aircon/compressor.jpg` | Same public page | Maxicon | Shop-published public still |
-| `maxicon-car-aircon/bay-work.mp4` | Generated KantoCo sample clip | KantoCo | Mechanic bay work, muted 1280×720 H.264 |
+| `maxicon-car-aircon/bay-work.mp4` | Generated KantoCo sample clip | KantoCo | Mechanic bay work, muted 1280×720 H.264, GOP 12 |
 | `maxicon-car-aircon/bay-work-poster.jpg` | First frame of `bay-work.mp4` | KantoCo | Poster / reduced-motion still |
-| `maxicon-car-aircon/cold-vent.mp4` | Generated KantoCo sample clip | KantoCo | Muted 1280×720 H.264, ~5.04s |
+| `maxicon-car-aircon/cold-vent.mp4` | Generated KantoCo sample clip | KantoCo | Muted 1280×720 H.264, ~5.04s, GOP 12 |
 | `maxicon-car-aircon/cold-vent-poster.jpg` | First frame of `cold-vent.mp4` | KantoCo | Poster / reduced-motion still |
