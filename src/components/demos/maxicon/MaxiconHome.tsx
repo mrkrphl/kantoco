@@ -14,12 +14,13 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const REEL_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4";
 const REEL_POSTER = "/demos/maxicon-car-aircon/cold-vent-poster.jpg";
+const IRIS_END = 0.12;
 
 const BEATS = [
-  { start: 0, end: 0.2 },
-  { start: 0.2, end: 0.45 },
-  { start: 0.45, end: 0.7 },
-  { start: 0.7, end: 1 },
+  { id: "open", start: 0.03, end: 0.22, hold: false, motion: "wipe" },
+  { id: "heat", start: 0.27, end: 0.46, hold: false, motion: "blur" },
+  { id: "bayan", start: 0.51, end: 0.7, hold: false, motion: "rise" },
+  { id: "cta", start: 0.75, end: 1, hold: true, motion: "draw" },
 ] as const;
 
 function seekVideo(video: HTMLVideoElement, time: number) {
@@ -56,13 +57,94 @@ function pinProgress(pin: HTMLElement) {
   return Math.min(1, Math.max(0, window.scrollY / travel));
 }
 
-function beatAlpha(progress: number, start: number, end: number, fade = 0.055) {
-  const holdLast = end >= 0.999;
-  if (progress < start) return 0;
-  if (!holdLast && progress > end) return 0;
-  const fadeIn = start === 0 ? 1 : Math.min(1, (progress - start) / fade);
-  const fadeOut = holdLast ? 1 : Math.min(1, (end - progress) / fade);
-  return Math.max(0, Math.min(fadeIn, fadeOut));
+function beatLocal(progress: number, start: number, end: number) {
+  if (progress < start) return -1;
+  if (progress > end) return 2;
+  return (progress - start) / (end - start);
+}
+
+function applyBeat(
+  el: HTMLElement,
+  t: number,
+  motion: (typeof BEATS)[number]["motion"],
+  hold: boolean,
+) {
+  const name = el.querySelector<HTMLElement>(".maxicon-reel-name");
+  const line = el.querySelector<HTMLElement>(".maxicon-reel-line");
+  const rule = el.querySelector<HTMLElement>(".maxicon-reel-rule");
+  const extra = el.querySelector<HTMLElement>(".maxicon-reel-extra");
+  const active = t >= 0 && (t <= 1 || hold);
+  if (!active) {
+    gsap.set(el, {
+      autoAlpha: 0,
+      visibility: "hidden",
+      clipPath: "none",
+      filter: "none",
+      y: 0,
+    });
+    return;
+  }
+
+  const enter = gsap.utils.clamp(0, 1, t <= 1 ? t / 0.3 : 1);
+  const exit = hold || t > 1 ? 0 : gsap.utils.clamp(0, 1, (t - 0.74) / 0.26);
+  const shown = enter * (1 - exit);
+
+  gsap.set(el, { visibility: "visible", autoAlpha: shown > 0.02 ? 1 : 0 });
+
+  if (rule) gsap.set(rule, { scaleX: shown, transformOrigin: "left center" });
+
+  if (motion === "wipe") {
+    const edge = (1 - enter) * 100 + exit * 100;
+    gsap.set(el, {
+      clipPath: `inset(0 ${Math.min(edge, 100)}% 0 0)`,
+      filter: "none",
+      y: 0,
+    });
+    if (name) {
+      gsap.set(name, {
+        letterSpacing: `${(0.14 * (1 - enter) - 0.035).toFixed(3)}em`,
+        y: 0,
+        filter: "none",
+      });
+    }
+    if (line) gsap.set(line, { y: 18 * (1 - enter) + exit * -16, autoAlpha: shown });
+    return;
+  }
+
+  if (motion === "blur") {
+    const blur = (1 - enter) * 12 + exit * 10;
+    const y = (1 - enter) * 36 + exit * -28;
+    gsap.set(el, { clipPath: "none", filter: `blur(${blur.toFixed(1)}px)`, y });
+    if (name) gsap.set(name, { letterSpacing: "-0.03em", y: 0, filter: "none" });
+    if (line) {
+      const lineEnter = gsap.utils.clamp(0, 1, (enter - 0.18) / 0.82);
+      gsap.set(line, { y: 14 * (1 - lineEnter), autoAlpha: lineEnter * (1 - exit) });
+    }
+    return;
+  }
+
+  if (motion === "rise") {
+    const fromBottom = (1 - enter) * 100;
+    gsap.set(el, {
+      clipPath: `inset(${fromBottom}% 0 ${exit * 100}% 0)`,
+      filter: "none",
+      y: 0,
+    });
+    if (name) gsap.set(name, { letterSpacing: "-0.035em", y: 10 * (1 - enter), filter: "none" });
+    if (line) gsap.set(line, { y: 16 * (1 - enter), autoAlpha: shown });
+    return;
+  }
+
+  gsap.set(el, { clipPath: "none", filter: "none", y: 12 * (1 - enter) });
+  if (name) {
+    gsap.set(name, {
+      letterSpacing: `${(0.08 * (1 - enter) - 0.03).toFixed(3)}em`,
+      y: 0,
+      filter: "none",
+    });
+  }
+  if (line) gsap.set(line, { y: 10 * (1 - enter), autoAlpha: shown });
+  if (extra) gsap.set(extra, { y: 16 * (1 - enter), autoAlpha: shown });
 }
 
 export function MaxiconHome() {
@@ -149,6 +231,7 @@ export function MaxiconHome() {
       video.pause();
       video.muted = true;
 
+      const iris = pin.querySelector<HTMLElement>(".maxicon-reel-iris");
       const cue = pin.querySelector<HTMLElement>(".maxicon-reel-cue");
       const beats = pin.querySelectorAll<HTMLElement>("[data-beat]");
 
@@ -157,13 +240,38 @@ export function MaxiconHome() {
         if (Number.isFinite(duration) && duration > 0) {
           seekVideo(video, progress * duration);
         }
-        beats.forEach((el, i) => {
-          const range = BEATS[i];
-          if (!range) return;
-          gsap.set(el, { autoAlpha: beatAlpha(progress, range.start, range.end) });
+
+        const irisT = gsap.utils.clamp(0, 1, progress / IRIS_END);
+        const irisEase = irisT ** 1.65;
+        const radius = gsap.utils.interpolate(6.5, 158, irisEase);
+        const irisX = gsap.utils.interpolate(56, 50, irisEase);
+        const irisY = gsap.utils.interpolate(36, 42, irisEase);
+        if (iris) {
+          gsap.set(iris, {
+            clipPath: `circle(${radius.toFixed(2)}% at ${irisX.toFixed(1)}% ${irisY.toFixed(1)}%)`,
+          });
+        }
+
+        const scale = 1.08 - 0.08 * progress;
+        const posX = 46 + 12 * progress;
+        const posY = 40 - 10 * progress;
+        gsap.set(video, {
+          scale,
+          transformOrigin: "56% 36%",
+          force3D: true,
         });
+        video.style.objectPosition = `${posX.toFixed(1)}% ${posY.toFixed(1)}%`;
+
+        beats.forEach((el) => {
+          const spec = BEATS.find((b) => b.id === el.dataset.beat);
+          if (!spec) return;
+          applyBeat(el, beatLocal(progress, spec.start, spec.end), spec.motion, spec.hold);
+        });
+
         if (cue) {
-          gsap.set(cue, { autoAlpha: 1 - Math.min(progress / 0.08, 1) });
+          const cueIn = gsap.utils.clamp(0, 1, progress / 0.02);
+          const cueOut = gsap.utils.clamp(0, 1, (progress - 0.02) / 0.07);
+          gsap.set(cue, { autoAlpha: cueIn * (1 - cueOut) });
         }
       };
 
@@ -205,117 +313,126 @@ export function MaxiconHome() {
           aria-label="Cold air from a dashboard vent. Scroll to play the film."
         >
           <div className="maxicon-reel-sticky">
-          {reelFailed ? (
-            <Image
-              src="/demos/maxicon-car-aircon/shop-front.jpg"
-              alt=""
-              fill
-              className="maxicon-reel-fallback"
-              sizes="100vw"
-              preload
-            />
-          ) : (
-            <video
-              ref={videoRef}
-              className="maxicon-reel"
-              muted
-              playsInline
-              preload="auto"
-              poster={REEL_POSTER}
-              disablePictureInPicture
-              controls={false}
-              tabIndex={-1}
-              aria-hidden
-              {...{ "webkit-playsinline": "true" }}
-            >
-              <source src={REEL_SRC} type="video/mp4" />
-            </video>
-          )}
-
-          <div className="maxicon-reel-veil" aria-hidden />
-
-          {staticCopy ? (
-            <div className="maxicon-reel-copy maxicon-reel-copy--static">
-              <h1 className="maxicon-reel-name">{maxicon.name}</h1>
-              <p className="maxicon-reel-line">The product is cold.</p>
-              <div className="maxicon-hero-actions">
-                <a href={maxicon.phoneMobileHref} className="maxicon-hero-call">
-                  Call {maxicon.phoneMobileDisplay}
-                </a>
-                <a
-                  href={maxicon.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="maxicon-hero-fb"
+            {reelFailed ? (
+              <Image
+                src="/demos/maxicon-car-aircon/shop-front.jpg"
+                alt=""
+                fill
+                className="maxicon-reel-fallback"
+                sizes="100vw"
+                preload
+              />
+            ) : (
+              <div className="maxicon-reel-iris">
+                <video
+                  ref={videoRef}
+                  className="maxicon-reel"
+                  muted
+                  playsInline
+                  preload="auto"
+                  poster={REEL_POSTER}
+                  disablePictureInPicture
+                  controls={false}
+                  tabIndex={-1}
+                  aria-hidden
+                  {...{ "webkit-playsinline": "true" }}
                 >
-                  Facebook
-                </a>
+                  <source src={REEL_SRC} type="video/mp4" />
+                </video>
               </div>
-              <p className="maxicon-hero-meta">
-                <span>{maxicon.hours}</span>
-                <span aria-hidden>·</span>
-                <a
-                  href={maxicon.mapsQuery}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="maxicon-hero-map"
-                >
-                  Map
-                </a>
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="maxicon-reel-cue">Scroll</p>
-              <div className="maxicon-reel-copy">
-                <div className="maxicon-reel-beat" data-beat="open">
-                  <h1 className="maxicon-reel-name">{maxicon.name}</h1>
-                  <p className="maxicon-reel-line">The product is cold.</p>
+            )}
+
+            <div className="maxicon-reel-veil" aria-hidden />
+
+            {staticCopy ? (
+              <div className="maxicon-reel-copy maxicon-reel-copy--static">
+                <span className="maxicon-reel-rule" aria-hidden />
+                <h1 className="maxicon-reel-name">{maxicon.name}</h1>
+                <p className="maxicon-reel-line">The product is cold.</p>
+                <div className="maxicon-hero-actions">
+                  <a href={maxicon.phoneMobileHref} className="maxicon-hero-call">
+                    Call {maxicon.phoneMobileDisplay}
+                  </a>
+                  <a
+                    href={maxicon.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="maxicon-hero-fb"
+                  >
+                    Facebook
+                  </a>
                 </div>
-                <div className="maxicon-reel-beat" data-beat="heat">
-                  <p className="maxicon-reel-name">Hina na sa traffic?</p>
-                  <p className="maxicon-reel-line">They bring the cold back.</p>
-                </div>
-                <div className="maxicon-reel-beat" data-beat="bayan">
-                  <p className="maxicon-reel-name">
-                    President’s Avenue, BF Homes.
-                  </p>
-                  <p className="maxicon-reel-line">Parañaque. Bayan work.</p>
-                </div>
-                <div className="maxicon-reel-beat" data-beat="cta">
-                  <p className="maxicon-reel-name">Bring it in.</p>
-                  <div className="maxicon-hero-actions">
-                    <a
-                      href={maxicon.phoneMobileHref}
-                      className="maxicon-hero-call"
-                    >
-                      Call {maxicon.phoneMobileDisplay}
-                    </a>
-                    <a
-                      href={maxicon.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="maxicon-hero-fb"
-                    >
-                      Facebook
-                    </a>
+                <p className="maxicon-hero-meta">
+                  <span>{maxicon.hours}</span>
+                  <span aria-hidden>·</span>
+                  <a
+                    href={maxicon.mapsQuery}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="maxicon-hero-map"
+                  >
+                    Map
+                  </a>
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="maxicon-reel-cue">Scroll</p>
+                <div className="maxicon-reel-copy">
+                  <div className="maxicon-reel-beat" data-beat="open">
+                    <span className="maxicon-reel-rule" aria-hidden />
+                    <h1 className="maxicon-reel-name">{maxicon.name}</h1>
+                    <p className="maxicon-reel-line">The product is cold.</p>
                   </div>
-                  <p className="maxicon-hero-meta">
-                    <span>{maxicon.hours}</span>
-                    <span aria-hidden>·</span>
-                    <a
-                      href={maxicon.mapsQuery}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="maxicon-hero-map"
-                    >
-                      Map
-                    </a>
-                  </p>
+                  <div className="maxicon-reel-beat" data-beat="heat">
+                    <span className="maxicon-reel-rule" aria-hidden />
+                    <p className="maxicon-reel-name">Hina na sa traffic?</p>
+                    <p className="maxicon-reel-line">Weak A/C. They fix that.</p>
+                  </div>
+                  <div className="maxicon-reel-beat" data-beat="bayan">
+                    <span className="maxicon-reel-rule" aria-hidden />
+                    <p className="maxicon-reel-name">President’s Avenue.</p>
+                    <p className="maxicon-reel-line">
+                      BF Homes, Parañaque. Bayan work.
+                    </p>
+                  </div>
+                  <div className="maxicon-reel-beat" data-beat="cta">
+                    <span className="maxicon-reel-rule" aria-hidden />
+                    <p className="maxicon-reel-name">Bring it in.</p>
+                    <div className="maxicon-reel-extra">
+                      <div className="maxicon-hero-actions">
+                        <a
+                          href={maxicon.phoneMobileHref}
+                          className="maxicon-hero-call"
+                        >
+                          Call {maxicon.phoneMobileDisplay}
+                        </a>
+                        <a
+                          href={maxicon.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="maxicon-hero-fb"
+                        >
+                          Facebook
+                        </a>
+                      </div>
+                      <p className="maxicon-hero-meta">
+                        <span>{maxicon.hours}</span>
+                        <span aria-hidden>·</span>
+                        <a
+                          href={maxicon.mapsQuery}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="maxicon-hero-map"
+                        >
+                          Map
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
           </div>
         </section>
 

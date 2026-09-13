@@ -140,7 +140,7 @@ html:has(.maxicon) body {
 
 .maxicon[data-motion="ready"] .maxicon-reel-pin,
 .maxicon[data-motion="pending"] .maxicon-reel-pin {
-  height: 420svh;
+  height: 440svh;
 }
 
 .maxicon-reel-sticky {
@@ -149,8 +149,17 @@ html:has(.maxicon) body {
   height: 100svh;
   overflow: hidden;
   touch-action: pan-y;
-  background: #05080a url("/demos/maxicon-car-aircon/cold-vent-poster.jpg")
-    center 32% / cover no-repeat;
+  background: #05080a;
+}
+
+.maxicon-reel-iris {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  clip-path: circle(6.5% at 56% 36%);
+  will-change: clip-path;
+  background: #05080a;
 }
 
 .maxicon-reel,
@@ -161,9 +170,11 @@ html:has(.maxicon) body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 32%;
+  object-position: 46% 40%;
   background: #05080a;
   pointer-events: none;
+  will-change: transform;
+  transform-origin: 56% 36%;
 }
 
 .maxicon-reel-veil {
@@ -202,28 +213,43 @@ html:has(.maxicon) body {
   max-width: 28rem;
   visibility: hidden;
   opacity: 0;
+  will-change: clip-path, transform, filter, opacity;
 }
 
-.maxicon-reel-beat[data-beat="open"] {
-  visibility: visible;
-  opacity: 1;
+.maxicon-reel-rule {
+  display: block;
+  width: 2.6rem;
+  height: 2px;
+  margin: 0 0 0.85rem;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.maxicon-reel-copy--static .maxicon-reel-rule {
+  transform: none;
 }
 
 .maxicon-reel-name {
   margin: 0;
-  max-width: 16ch;
-  font-size: clamp(1.55rem, 4.6vw, 2.75rem);
+  max-width: 14ch;
+  font-size: clamp(1.6rem, 4.8vw, 2.85rem);
   font-weight: 500;
-  line-height: 1.08;
+  line-height: 1.04;
   letter-spacing: -0.035em;
   text-shadow: 0 1px 18px var(--bg);
 }
 
 .maxicon-reel-line {
-  margin: 0.75rem 0 0;
-  max-width: 24rem;
-  font-size: clamp(1rem, 2.1vw, 1.2rem);
-  line-height: 1.4;
+  margin: 0.7rem 0 0;
+  max-width: 22rem;
+  font-size: clamp(1rem, 2.1vw, 1.22rem);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--ink) 88%, var(--accent));
+}
+
+.maxicon-reel-extra {
+  margin-top: 0.15rem;
 }
 
 .maxicon-reel-copy a {
@@ -663,6 +689,15 @@ html:has(.maxicon) body {
   position: relative;
 }
 
+[data-motion="static"] .maxicon-reel-iris {
+  clip-path: none;
+}
+
+[data-motion="static"] .maxicon-reel {
+  transform: none;
+  object-position: center 32%;
+}
+
 [data-motion="static"] .maxicon-stage,
 [data-motion="static"] .maxicon-stage-inner {
   height: 100svh;
@@ -727,6 +762,14 @@ html:has(.maxicon) body {
 
   .maxicon-reel-sticky {
     position: relative;
+  }
+
+  .maxicon-reel-iris {
+    clip-path: none;
+  }
+
+  .maxicon-reel {
+    transform: none;
   }
 
   .maxicon-stage,
