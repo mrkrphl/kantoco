@@ -2,12 +2,7 @@ html:has(.maxicon),
 html:has(.maxicon) body {
   background: #071114;
   scroll-behavior: auto;
-}
-
-@property --iris {
-  syntax: "<length-percentage>";
-  inherits: true;
-  initial-value: 7%;
+  overflow-x: clip;
 }
 
 .maxicon {
@@ -18,19 +13,10 @@ html:has(.maxicon) body {
   --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
   --pad: clamp(1.1rem, 4vw, 3.2rem);
   --banner: 2.15rem;
-  --iris: 9.5%;
-  --iris-at: 50% 28%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
   min-height: 100%;
-}
-
-@media (min-width: 900px) {
-  .maxicon {
-    --iris: 6.2%;
-    --iris-at: 50% 22%;
-  }
 }
 
 .maxicon a {
@@ -58,13 +44,13 @@ html:has(.maxicon) body {
   color: var(--bg);
   padding: 0.45rem var(--pad);
   font-size: 0.7rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .maxicon-banner strong {
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
 }
 
 .maxicon-banner--over {
@@ -134,20 +120,340 @@ html:has(.maxicon) body {
   position: relative;
   z-index: 2;
   height: 100svh;
+  background: #05080a;
+}
+
+.maxicon[data-motion="ready"] .maxicon-reel-pin,
+.maxicon[data-motion="pending"] .maxicon-reel-pin {
+  height: 560svh;
+}
+
+.maxicon-reel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  touch-action: pan-y;
+  background: #05080a;
+}
+
+.maxicon-reel-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   overflow: hidden;
   background: #05080a;
 }
 
-.maxicon-reel {
+.maxicon-reel,
+.maxicon-reel-fallback {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   background: #05080a;
   pointer-events: none;
+}
+
+.maxicon-reel--bay {
+  z-index: 1;
+  object-position: 38% 48%;
+  transform-origin: 40% 50%;
+  will-change: transform;
+}
+
+.maxicon-reel--vent {
+  z-index: 2;
+  object-position: 58% 42%;
+  clip-path: inset(0 100% 0 0);
+  transform: scale(1.04);
+  transform-origin: 70% 35%;
+  will-change: clip-path, transform;
+}
+
+.maxicon-reel-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 42%, transparent) 0%,
+    transparent 26%,
+    transparent 48%,
+    color-mix(in srgb, var(--bg) 78%, transparent) 100%
+  );
+}
+
+.maxicon-reel-mark {
+  position: absolute;
+  z-index: 5;
+  width: min(28vw, 11rem);
+  height: 0;
+  pointer-events: none;
+  transform: translate(-0.35rem, -0.35rem);
+}
+
+.maxicon-reel-mark-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.maxicon-reel-mark-arm {
+  position: absolute;
+  left: 0.7rem;
+  top: 0.28rem;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.maxicon-reel-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.maxicon-reel-copy--static {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4.6rem var(--pad) 2.35rem;
+}
+
+.maxicon-reel-kicker {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-maxicon-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.maxicon-reel-beat {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  will-change: clip-path, transform, opacity;
+}
+
+.maxicon-reel-beat[data-layout="hero"] {
+  top: 16%;
+  left: var(--pad);
+  right: auto;
+  bottom: auto;
+  max-width: min(40rem, 84vw);
+}
+
+.maxicon-reel-beat[data-layout="hero"] .maxicon-reel-name {
+  max-width: 11ch;
+  font-size: clamp(2.5rem, 7.4vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+}
+
+.maxicon-reel-beat[data-layout="hero"] .maxicon-reel-line {
+  max-width: 22rem;
+  margin-top: 0.9rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+}
+
+.maxicon-reel-beat[data-layout="callout"] {
+  left: var(--pad);
+  right: auto;
+  bottom: 12%;
+  max-width: min(22rem, 74vw);
+  padding: 0.85rem 1rem 0.95rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, #061018 62%, transparent);
+}
+
+.maxicon-reel-beat[data-layout="callout"] .maxicon-reel-name {
+  max-width: 16ch;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.maxicon-reel-beat[data-layout="callout"] .maxicon-reel-line {
+  margin-top: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.maxicon-reel-beat[data-layout="result"] {
+  left: auto;
+  right: var(--pad);
+  bottom: 16%;
+  max-width: min(26rem, 78vw);
+  text-align: right;
+}
+
+.maxicon-reel-beat[data-layout="result"] .maxicon-reel-name {
+  max-width: none;
+  font-size: clamp(1.85rem, 4.8vw, 3.5rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.maxicon-reel-beat[data-layout="result"] .maxicon-reel-line {
+  margin: 0.55rem 0 0 auto;
+  max-width: 20rem;
+}
+
+.maxicon-reel-beat[data-layout="bar"] {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  max-width: none;
+  padding: 1.2rem var(--pad) 1.3rem;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, #041018 88%, transparent)
+  );
+  pointer-events: auto;
+}
+
+.maxicon-reel-beat[data-layout="bar"] .maxicon-reel-name {
+  max-width: none;
+  font-size: clamp(1.25rem, 2.6vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.maxicon-reel-beat[data-layout="bar"] .maxicon-reel-line {
+  margin-top: 0.3rem;
+  font-size: 0.88rem;
+}
+
+.maxicon-reel-name {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-shadow: 0 1px 18px var(--bg);
+}
+
+.maxicon-reel-copy--static .maxicon-reel-name {
+  max-width: 14ch;
+  font-size: clamp(1.6rem, 4.8vw, 2.85rem);
+}
+
+.maxicon-reel-line {
+  margin: 0.7rem 0 0;
+  max-width: 22rem;
+  font-size: clamp(1rem, 2.1vw, 1.22rem);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--ink) 88%, var(--accent));
+}
+
+.maxicon-reel-bar-copy {
+  min-width: 0;
+}
+
+.maxicon-reel-extra {
+  margin-top: 0.15rem;
+  flex: 0 0 auto;
+}
+
+.maxicon-reel-copy a {
+  pointer-events: auto;
+}
+
+@media (max-width: 720px) {
+  .maxicon-reel-beat[data-layout="hero"] {
+    top: 12%;
+    right: var(--pad);
+    max-width: none;
+  }
+
+  .maxicon-reel-beat[data-layout="hero"] .maxicon-reel-name {
+    font-size: clamp(2.05rem, 13vw, 3.15rem);
+  }
+
+  .maxicon-reel-beat[data-layout="callout"] {
+    right: var(--pad);
+    bottom: max(10%, env(safe-area-inset-bottom, 0px));
+    max-width: none;
+  }
+
+  .maxicon-reel-beat[data-layout="result"] {
+    left: var(--pad);
+    right: var(--pad);
+    bottom: 14%;
+    max-width: none;
+    text-align: left;
+  }
+
+  .maxicon-reel-beat[data-layout="result"] .maxicon-reel-line {
+    margin-left: 0;
+  }
+
+  .maxicon-reel-beat[data-layout="bar"] {
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: max(1.1rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 480px) {
+  .maxicon-reel-copy--static .maxicon-reel-name {
+    max-width: 13ch;
+    font-size: clamp(1.32rem, 7.4vw, 1.85rem);
+  }
+
+  .maxicon-reel-line {
+    margin-top: 0.55rem;
+    font-size: 0.98rem;
+  }
+
+  .maxicon-reel-copy--static {
+    padding: 4.1rem var(--pad) max(1.5rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .maxicon-reel-cue {
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .maxicon-hero-actions {
+    gap: 0.65rem 0.9rem;
+    margin-top: 0.85rem;
+  }
+
+  .maxicon-hero-call {
+    padding: 0.66rem 0.92rem;
+    font-size: 0.86rem;
+  }
+
+  .maxicon-hero-meta {
+    font-size: 0.72rem;
+  }
+
+  .maxicon-banner--over,
+  .maxicon-banner--fixed {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    font-size: 0.62rem;
+    padding-right: 3.2rem;
+  }
 }
 
 .maxicon-reel-cue {
@@ -158,7 +464,7 @@ html:has(.maxicon) body {
   margin: 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--ink) 70%, transparent);
   pointer-events: none;
@@ -166,6 +472,13 @@ html:has(.maxicon) body {
 
 .maxicon-reel-cue::after {
   content: " ↓";
+}
+
+.maxicon-after {
+  position: relative;
+  z-index: 2;
+  padding: 2.4rem var(--pad) 0.4rem;
+  background: var(--bg);
 }
 
 .maxicon-bay-land {
@@ -203,8 +516,6 @@ html:has(.maxicon) body {
 
 .maxicon-bay {
   z-index: 2;
-  clip-path: circle(var(--iris) at var(--iris-at));
-  will-change: clip-path;
 }
 
 .maxicon-bay img {
@@ -235,16 +546,6 @@ html:has(.maxicon) body {
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--accent) 34%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.7);
-}
-
-.maxicon-iris-css {
-  animation: maxicon-iris-open 0.9s cubic-bezier(0.55, 0, 0.2, 1) forwards;
-}
-
-@keyframes maxicon-iris-open {
-  to {
-    --iris: 160%;
-  }
 }
 
 .maxicon-hero {
@@ -296,6 +597,7 @@ html:has(.maxicon) body {
   margin: 0.55rem 0 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.78rem;
+  letter-spacing: 0.06em;
   color: var(--accent);
 }
 
@@ -340,6 +642,7 @@ html:has(.maxicon) body {
   padding: 0.72rem 1.05rem;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.92rem;
+  letter-spacing: 0.02em;
   box-shadow: 0 10px 28px color-mix(in srgb, var(--bg) 55%, transparent);
 }
 
@@ -430,6 +733,7 @@ html:has(.maxicon) body {
   margin: 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.78rem;
+  letter-spacing: 0.06em;
   color: var(--accent);
 }
 
@@ -437,6 +741,10 @@ html:has(.maxicon) body {
 .maxicon-email {
   margin: 0;
   font-size: 0.95rem;
+}
+
+.maxicon-hours {
+  letter-spacing: 0.04em;
 }
 
 .maxicon-email {
@@ -451,7 +759,7 @@ html:has(.maxicon) body {
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: clamp(2rem, 7.4vw, 4.6rem);
   line-height: 0.95;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.01em;
   text-decoration: none;
   color: var(--ink);
 }
@@ -525,6 +833,21 @@ html:has(.maxicon) body {
 }
 
 [data-motion="static"] .maxicon-reel-pin {
+  height: 100svh;
+}
+
+[data-motion="static"] .maxicon-reel-sticky {
+  position: relative;
+}
+
+[data-motion="static"] .maxicon-reel,
+[data-motion="static"] .maxicon-reel--vent {
+  transform: none;
+  clip-path: none;
+  object-position: center 32%;
+}
+
+[data-motion="static"] .maxicon-reel-mark {
   display: none;
 }
 
@@ -537,10 +860,6 @@ html:has(.maxicon) body {
   position: relative;
   top: 0;
   animation: none;
-}
-
-[data-motion="static"] .maxicon-bay {
-  clip-path: none;
 }
 
 [data-motion="static"] .maxicon-fins {
@@ -587,6 +906,20 @@ html:has(.maxicon) body {
 
 @media (prefers-reduced-motion: reduce) {
   .maxicon-reel-pin {
+    height: 100svh;
+  }
+
+  .maxicon-reel-sticky {
+    position: relative;
+  }
+
+  .maxicon-reel,
+  .maxicon-reel--vent {
+    transform: none;
+    clip-path: none;
+  }
+
+  .maxicon-reel-mark {
     display: none;
   }
 
@@ -599,10 +932,6 @@ html:has(.maxicon) body {
     position: relative;
     top: 0;
     animation: none;
-  }
-
-  .maxicon-bay {
-    clip-path: none;
   }
 
   .maxicon-fins {
