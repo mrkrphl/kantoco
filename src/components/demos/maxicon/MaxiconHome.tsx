@@ -118,8 +118,7 @@ function ChapterWipe({
 
 export function MaxiconHome() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLElement>(null);
   const ventRef = useRef<HTMLVideoElement>(null);
   const bayRef = useRef<HTMLVideoElement>(null);
   const { ready, reduced } = useMotionReady();
@@ -162,7 +161,6 @@ export function MaxiconHome() {
   useGSAP(
     () => {
       const root = rootRef.current;
-      const track = trackRef.current;
       const pin = pinRef.current;
       const motionOn = ready || booted;
       if (!root || !motionOn || reduced) return;
@@ -185,7 +183,7 @@ export function MaxiconHome() {
         );
       });
 
-      if (!track || !pin) return;
+      if (!pin) return;
 
       const photos = gsap.utils.toArray<HTMLElement>(
         ".maxicon-process-photo",
@@ -219,16 +217,23 @@ export function MaxiconHome() {
         last = index;
       };
 
+      const stick = (active: boolean) => {
+        pin.classList.toggle("is-pinned", active);
+        if (active) gsap.set(pin, { x: 0, y: 0 });
+      };
+
       ScrollTrigger.create({
         trigger: pin,
         start: "top top",
-        endTrigger: track,
-        end: "bottom bottom",
+        end: "+=300%",
         pin: true,
-        pinSpacing: false,
-        anticipatePin: 1,
+        pinSpacing: true,
+        pinType: "fixed",
+        pinReparent: true,
         invalidateOnRefresh: true,
+        onToggle: (self) => stick(self.isActive),
         onUpdate: (self) => {
+          stick(self.isActive);
           const next = Math.min(
             photos.length - 1,
             Math.floor(self.progress * 0.999 * photos.length),
@@ -354,13 +359,13 @@ export function MaxiconHome() {
         <ChapterWipe tone="bone" word="Process" />
 
         <section
-          ref={trackRef}
+          ref={pinRef}
           className="maxicon-process"
           aria-label="How a job moves"
+          data-active-step="01"
         >
-          <div ref={pinRef} className="maxicon-process-pin" data-active-step="01">
-            <div className="maxicon-process-frame">
-              <p className="maxicon-process-num" aria-hidden={!reduced}>
+          <div className="maxicon-process-frame">
+            <p className="maxicon-process-num" aria-hidden={!reduced}>
                 {STEPS.map((step, i) => (
                   <span
                     key={step.n}
@@ -396,7 +401,6 @@ export function MaxiconHome() {
                 ))}
               </p>
             </div>
-          </div>
         </section>
 
         <ChapterWipe tone="ice" word="Cold" />

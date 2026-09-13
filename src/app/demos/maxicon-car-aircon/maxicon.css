@@ -2,6 +2,8 @@ html:has(.maxicon),
 html:has(.maxicon) body {
   background: #0b1012;
   scroll-behavior: auto;
+  height: auto;
+  min-height: 100%;
 }
 
 .maxicon {
@@ -334,12 +336,15 @@ html:has(.maxicon) body {
 .maxicon-process {
   position: relative;
   z-index: 1;
-  height: 400vh;
+  height: 100svh;
   background: var(--bg);
 }
 
-.maxicon-process-pin {
-  height: 100svh;
+.maxicon-process.is-pinned {
+  transform: none !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
 }
 
 .maxicon-process-frame {
@@ -619,10 +624,6 @@ html:has(.maxicon) body {
 }
 
 .maxicon[data-motion="static"] .maxicon-process {
-  height: auto;
-}
-
-.maxicon[data-motion="static"] .maxicon-process-pin {
   height: auto;
 }
 
