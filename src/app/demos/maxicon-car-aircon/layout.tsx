@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Schibsted_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Syne } from "next/font/google";
 import "./maxicon.css";
 
-const display = Schibsted_Grotesk({
+const display = Syne({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-maxicon-display",
 });
 
-const mono = IBM_Plex_Mono({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-maxicon-mono",

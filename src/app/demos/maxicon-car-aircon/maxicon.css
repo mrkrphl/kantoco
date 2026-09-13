@@ -44,13 +44,13 @@ html:has(.maxicon) body {
   color: var(--bg);
   padding: 0.45rem var(--pad);
   font-size: 0.7rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .maxicon-banner strong {
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
 }
 
 .maxicon-banner--over {
@@ -234,8 +234,8 @@ html:has(.maxicon) body {
   margin: 0 0 0.4rem;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--accent);
 }
@@ -258,9 +258,9 @@ html:has(.maxicon) body {
 .maxicon-reel-beat[data-layout="hero"] .maxicon-reel-name {
   max-width: 11ch;
   font-size: clamp(2.5rem, 7.4vw, 5.5rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 0.86;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.045em;
 }
 
 .maxicon-reel-beat[data-layout="hero"] .maxicon-reel-line {
@@ -282,7 +282,7 @@ html:has(.maxicon) body {
 .maxicon-reel-beat[data-layout="callout"] .maxicon-reel-name {
   max-width: 16ch;
   font-size: clamp(1.15rem, 2.6vw, 1.6rem);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.03em;
 }
@@ -303,9 +303,9 @@ html:has(.maxicon) body {
 .maxicon-reel-beat[data-layout="result"] .maxicon-reel-name {
   max-width: none;
   font-size: clamp(1.85rem, 4.8vw, 3.5rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 0.9;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
 }
 
 .maxicon-reel-beat[data-layout="result"] .maxicon-reel-line {
@@ -334,7 +334,8 @@ html:has(.maxicon) body {
 .maxicon-reel-beat[data-layout="bar"] .maxicon-reel-name {
   max-width: none;
   font-size: clamp(1.25rem, 2.6vw, 1.85rem);
-  font-weight: 650;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .maxicon-reel-beat[data-layout="bar"] .maxicon-reel-line {
@@ -344,7 +345,7 @@ html:has(.maxicon) body {
 
 .maxicon-reel-name {
   margin: 0;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.04;
   letter-spacing: -0.035em;
   text-shadow: 0 1px 18px var(--bg);
@@ -463,7 +464,7 @@ html:has(.maxicon) body {
   margin: 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--ink) 70%, transparent);
   pointer-events: none;
@@ -596,6 +597,7 @@ html:has(.maxicon) body {
   margin: 0.55rem 0 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.78rem;
+  letter-spacing: 0.06em;
   color: var(--accent);
 }
 
@@ -640,6 +642,7 @@ html:has(.maxicon) body {
   padding: 0.72rem 1.05rem;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.92rem;
+  letter-spacing: 0.02em;
   box-shadow: 0 10px 28px color-mix(in srgb, var(--bg) 55%, transparent);
 }
 
@@ -730,6 +733,7 @@ html:has(.maxicon) body {
   margin: 0;
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: 0.78rem;
+  letter-spacing: 0.06em;
   color: var(--accent);
 }
 
@@ -737,6 +741,10 @@ html:has(.maxicon) body {
 .maxicon-email {
   margin: 0;
   font-size: 0.95rem;
+}
+
+.maxicon-hours {
+  letter-spacing: 0.04em;
 }
 
 .maxicon-email {
@@ -751,7 +759,7 @@ html:has(.maxicon) body {
   font-family: var(--font-maxicon-mono), ui-monospace, monospace;
   font-size: clamp(2rem, 7.4vw, 4.6rem);
   line-height: 0.95;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.01em;
   text-decoration: none;
   color: var(--ink);
 }
