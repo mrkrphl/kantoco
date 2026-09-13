@@ -12,9 +12,9 @@ import { useMotionReady } from "@/components/motion/useMotionReady";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const BAY_SRC = "/demos/maxicon-car-aircon/bay-work.mp4";
+const BAY_SRC = "/demos/maxicon-car-aircon/bay-work.mp4?g=12";
 const BAY_POSTER = "/demos/maxicon-car-aircon/bay-work-poster.jpg";
-const VENT_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4";
+const VENT_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4?g=12";
 const VENT_POSTER = "/demos/maxicon-car-aircon/cold-vent-poster.jpg";
 
 const WIPE_START = 0.4;
@@ -40,12 +40,53 @@ const MARK = [
   { at: 0.86, x: 12, y: 86 },
 ] as const;
 
+/** Half a frame at 24fps — skip micro-seeks that thrash the decoder. */
+const SEEK_EPS = 0.02;
+
+type FastSeekVideo = HTMLVideoElement & {
+  fastSeek?: (time: number) => void;
+};
+
+const pendingSeek = new WeakMap<HTMLVideoElement, number>();
+const seekFlushArmed = new WeakSet<HTMLVideoElement>();
+
+function armSeekFlush(video: HTMLVideoElement) {
+  if (seekFlushArmed.has(video)) return;
+  seekFlushArmed.add(video);
+  video.addEventListener("seeked", () => {
+    const queued = pendingSeek.get(video);
+    if (queued == null) return;
+    pendingSeek.delete(video);
+    seekVideo(video, queued);
+  });
+}
+
+function commitSeek(video: HTMLVideoElement, time: number) {
+  const seekable = video as FastSeekVideo;
+  if (typeof seekable.fastSeek === "function") {
+    try {
+      seekable.fastSeek(time);
+      return;
+    } catch {
+      /* media not seekable yet */
+    }
+  }
+  video.currentTime = time;
+}
+
 function seekVideo(video: HTMLVideoElement, time: number) {
   const duration = video.duration;
   if (!Number.isFinite(duration) || duration <= 0) return;
   const next = Math.min(Math.max(time, 0), duration);
-  if (Math.abs(video.currentTime - next) < 0.008) return;
-  video.currentTime = next;
+  if (Math.abs(video.currentTime - next) < SEEK_EPS) return;
+  armSeekFlush(video);
+  // One in-flight seek at a time — pile-ups keep painting the stale GOP.
+  if (video.seeking) {
+    pendingSeek.set(video, next);
+    return;
+  }
+  pendingSeek.delete(video);
+  commitSeek(video, next);
 }
 
 function armInlinePlayback(video: HTMLVideoElement) {
@@ -357,6 +398,8 @@ export function MaxiconHome() {
           force3D: true,
         });
         gsap.set(bay, {
+          // After the wipe, drop the bay so a parked last frame cannot flash.
+          autoAlpha: wipe >= 0.995 ? 0 : 1,
           scale: 1 + 0.04 * wipe,
           transformOrigin: "40% 50%",
           force3D: true,
