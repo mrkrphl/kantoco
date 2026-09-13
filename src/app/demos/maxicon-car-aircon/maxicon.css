@@ -5,12 +5,6 @@ html:has(.maxicon) body {
   overflow-x: clip;
 }
 
-@property --iris {
-  syntax: "<length-percentage>";
-  inherits: true;
-  initial-value: 7%;
-}
-
 .maxicon {
   --bg: #071114;
   --ink: #cfe3e6;
@@ -19,19 +13,10 @@ html:has(.maxicon) body {
   --rule: color-mix(in srgb, var(--ink) 14%, var(--bg));
   --pad: clamp(1.1rem, 4vw, 3.2rem);
   --banner: 2.15rem;
-  --iris: 9.5%;
-  --iris-at: 50% 28%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-maxicon-display), ui-sans-serif, sans-serif;
   min-height: 100%;
-}
-
-@media (min-width: 900px) {
-  .maxicon {
-    --iris: 6.2%;
-    --iris-at: 50% 22%;
-  }
 }
 
 .maxicon a {
@@ -140,7 +125,7 @@ html:has(.maxicon) body {
 
 .maxicon[data-motion="ready"] .maxicon-reel-pin,
 .maxicon[data-motion="pending"] .maxicon-reel-pin {
-  height: 440svh;
+  height: 560svh;
 }
 
 .maxicon-reel-sticky {
@@ -152,13 +137,11 @@ html:has(.maxicon) body {
   background: #05080a;
 }
 
-.maxicon-reel-iris {
+.maxicon-reel-stage {
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  clip-path: circle(6.5% at 56% 36%);
-  will-change: clip-path;
   background: #05080a;
 }
 
@@ -170,11 +153,24 @@ html:has(.maxicon) body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 46% 40%;
   background: #05080a;
   pointer-events: none;
+}
+
+.maxicon-reel--bay {
+  z-index: 1;
+  object-position: 38% 48%;
+  transform-origin: 40% 50%;
   will-change: transform;
-  transform-origin: 56% 36%;
+}
+
+.maxicon-reel--vent {
+  z-index: 2;
+  object-position: 58% 42%;
+  clip-path: inset(0 100% 0 0);
+  transform: scale(1.04);
+  transform-origin: 70% 35%;
+  will-change: clip-path, transform;
 }
 
 .maxicon-reel-veil {
@@ -191,6 +187,35 @@ html:has(.maxicon) body {
   );
 }
 
+.maxicon-reel-mark {
+  position: absolute;
+  z-index: 5;
+  width: min(28vw, 11rem);
+  height: 0;
+  pointer-events: none;
+  transform: translate(-0.35rem, -0.35rem);
+}
+
+.maxicon-reel-mark-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.maxicon-reel-mark-arm {
+  position: absolute;
+  left: 0.7rem;
+  top: 0.28rem;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
 .maxicon-reel-copy {
   position: absolute;
   inset: 0;
@@ -205,39 +230,129 @@ html:has(.maxicon) body {
   padding: 4.6rem var(--pad) 2.35rem;
 }
 
+.maxicon-reel-kicker {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-maxicon-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 .maxicon-reel-beat {
   position: absolute;
-  left: var(--pad);
-  right: var(--pad);
-  bottom: 2.35rem;
-  max-width: 28rem;
   visibility: hidden;
   opacity: 0;
-  will-change: clip-path, transform, filter, opacity;
+  will-change: clip-path, transform, opacity;
 }
 
-.maxicon-reel-rule {
-  display: block;
-  width: 2.6rem;
-  height: 2px;
-  margin: 0 0 0.85rem;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left center;
+.maxicon-reel-beat[data-layout="hero"] {
+  top: 16%;
+  left: var(--pad);
+  right: auto;
+  bottom: auto;
+  max-width: min(40rem, 84vw);
 }
 
-.maxicon-reel-copy--static .maxicon-reel-rule {
-  transform: none;
+.maxicon-reel-beat[data-layout="hero"] .maxicon-reel-name {
+  max-width: 11ch;
+  font-size: clamp(2.5rem, 7.4vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.065em;
+}
+
+.maxicon-reel-beat[data-layout="hero"] .maxicon-reel-line {
+  max-width: 22rem;
+  margin-top: 0.9rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+}
+
+.maxicon-reel-beat[data-layout="callout"] {
+  left: var(--pad);
+  right: auto;
+  bottom: 12%;
+  max-width: min(22rem, 74vw);
+  padding: 0.85rem 1rem 0.95rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, #061018 62%, transparent);
+}
+
+.maxicon-reel-beat[data-layout="callout"] .maxicon-reel-name {
+  max-width: 16ch;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.maxicon-reel-beat[data-layout="callout"] .maxicon-reel-line {
+  margin-top: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.maxicon-reel-beat[data-layout="result"] {
+  left: auto;
+  right: var(--pad);
+  bottom: 16%;
+  max-width: min(26rem, 78vw);
+  text-align: right;
+}
+
+.maxicon-reel-beat[data-layout="result"] .maxicon-reel-name {
+  max-width: none;
+  font-size: clamp(1.85rem, 4.8vw, 3.5rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+
+.maxicon-reel-beat[data-layout="result"] .maxicon-reel-line {
+  margin: 0.55rem 0 0 auto;
+  max-width: 20rem;
+}
+
+.maxicon-reel-beat[data-layout="bar"] {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  max-width: none;
+  padding: 1.2rem var(--pad) 1.3rem;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, #041018 88%, transparent)
+  );
+  pointer-events: auto;
+}
+
+.maxicon-reel-beat[data-layout="bar"] .maxicon-reel-name {
+  max-width: none;
+  font-size: clamp(1.25rem, 2.6vw, 1.85rem);
+  font-weight: 650;
+}
+
+.maxicon-reel-beat[data-layout="bar"] .maxicon-reel-line {
+  margin-top: 0.3rem;
+  font-size: 0.88rem;
 }
 
 .maxicon-reel-name {
   margin: 0;
-  max-width: 14ch;
-  font-size: clamp(1.6rem, 4.8vw, 2.85rem);
   font-weight: 500;
   line-height: 1.04;
   letter-spacing: -0.035em;
   text-shadow: 0 1px 18px var(--bg);
+}
+
+.maxicon-reel-copy--static .maxicon-reel-name {
+  max-width: 14ch;
+  font-size: clamp(1.6rem, 4.8vw, 2.85rem);
 }
 
 .maxicon-reel-line {
@@ -248,16 +363,57 @@ html:has(.maxicon) body {
   color: color-mix(in srgb, var(--ink) 88%, var(--accent));
 }
 
+.maxicon-reel-bar-copy {
+  min-width: 0;
+}
+
 .maxicon-reel-extra {
   margin-top: 0.15rem;
+  flex: 0 0 auto;
 }
 
 .maxicon-reel-copy a {
   pointer-events: auto;
 }
 
+@media (max-width: 720px) {
+  .maxicon-reel-beat[data-layout="hero"] {
+    top: 12%;
+    right: var(--pad);
+    max-width: none;
+  }
+
+  .maxicon-reel-beat[data-layout="hero"] .maxicon-reel-name {
+    font-size: clamp(2.05rem, 13vw, 3.15rem);
+  }
+
+  .maxicon-reel-beat[data-layout="callout"] {
+    right: var(--pad);
+    bottom: max(10%, env(safe-area-inset-bottom, 0px));
+    max-width: none;
+  }
+
+  .maxicon-reel-beat[data-layout="result"] {
+    left: var(--pad);
+    right: var(--pad);
+    bottom: 14%;
+    max-width: none;
+    text-align: left;
+  }
+
+  .maxicon-reel-beat[data-layout="result"] .maxicon-reel-line {
+    margin-left: 0;
+  }
+
+  .maxicon-reel-beat[data-layout="bar"] {
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: max(1.1rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
 @media (max-width: 480px) {
-  .maxicon-reel-name {
+  .maxicon-reel-copy--static .maxicon-reel-name {
     max-width: 13ch;
     font-size: clamp(1.32rem, 7.4vw, 1.85rem);
   }
@@ -265,11 +421,6 @@ html:has(.maxicon) body {
   .maxicon-reel-line {
     margin-top: 0.55rem;
     font-size: 0.98rem;
-  }
-
-  .maxicon-reel-beat {
-    bottom: max(1.35rem, env(safe-area-inset-bottom, 0px));
-    max-width: min(22rem, calc(100% - 0.2rem));
   }
 
   .maxicon-reel-copy--static {
@@ -360,8 +511,6 @@ html:has(.maxicon) body {
 
 .maxicon-bay {
   z-index: 2;
-  clip-path: circle(var(--iris) at var(--iris-at));
-  will-change: clip-path;
 }
 
 .maxicon-bay img {
@@ -392,16 +541,6 @@ html:has(.maxicon) body {
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--accent) 34%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.7);
-}
-
-.maxicon-iris-css {
-  animation: maxicon-iris-open 0.9s cubic-bezier(0.55, 0, 0.2, 1) forwards;
-}
-
-@keyframes maxicon-iris-open {
-  to {
-    --iris: 160%;
-  }
 }
 
 .maxicon-hero {
@@ -689,13 +828,15 @@ html:has(.maxicon) body {
   position: relative;
 }
 
-[data-motion="static"] .maxicon-reel-iris {
+[data-motion="static"] .maxicon-reel,
+[data-motion="static"] .maxicon-reel--vent {
+  transform: none;
   clip-path: none;
+  object-position: center 32%;
 }
 
-[data-motion="static"] .maxicon-reel {
-  transform: none;
-  object-position: center 32%;
+[data-motion="static"] .maxicon-reel-mark {
+  display: none;
 }
 
 [data-motion="static"] .maxicon-stage,
@@ -707,10 +848,6 @@ html:has(.maxicon) body {
   position: relative;
   top: 0;
   animation: none;
-}
-
-[data-motion="static"] .maxicon-bay {
-  clip-path: none;
 }
 
 [data-motion="static"] .maxicon-fins {
@@ -764,12 +901,14 @@ html:has(.maxicon) body {
     position: relative;
   }
 
-  .maxicon-reel-iris {
+  .maxicon-reel,
+  .maxicon-reel--vent {
+    transform: none;
     clip-path: none;
   }
 
-  .maxicon-reel {
-    transform: none;
+  .maxicon-reel-mark {
+    display: none;
   }
 
   .maxicon-stage,
@@ -781,10 +920,6 @@ html:has(.maxicon) body {
     position: relative;
     top: 0;
     animation: none;
-  }
-
-  .maxicon-bay {
-    clip-path: none;
   }
 
   .maxicon-fins {

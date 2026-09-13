@@ -24,6 +24,11 @@ export const maxicon = {
   mapsEmbed:
     "https://maps.google.com/maps?q=45%20President%27s%20Avenue%2C%20BF%20Homes%2C%20Para%C3%B1aque&z=16&output=embed",
   cards: "They accept major credit cards.",
+  offerKicker: "Car repair · Store · HVAC service",
+  parts:
+    "Compressors, condensers, fans, evaporators, expansion valves, driers — OEM and replacement.",
+  services:
+    "Full-service automotive A/C repair and service: system evaluation, cleaning, and maintenance.",
   recentPost:
     "On 26 August their public Facebook page posted a GAC GS8 that was not blowing cold.",
   disclaimer: DEMO_DISCLAIMER,

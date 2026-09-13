@@ -1,9 +1,9 @@
 # Maxicon Car Aircon Specialist — photo notes
 
 Shop stills only on the inner pages. No generated people. No private albums.
-No testimonial portraits. No fake logos. The home film is a generated
-ventilation clip scrubbed by scroll — not shop footage, not a still-plate
-crossfade.
+No testimonial portraits. No fake logos. The home film is two generated
+clips scrubbed by scroll — bay work, then the cold vent. Not shop footage,
+not a still-plate crossfade, not a circular wipe.
 
 | File | Source | Notes |
 | --- | --- | --- |
@@ -11,6 +11,8 @@ crossfade.
 | `maxicon-bay.jpg` | Same public page (`28058704_…_n.jpg`) | Technician in a Maxicon shirt |
 | `dash-work.jpg` | Same public page (`28059161_…_n.jpg`) | Dashboard pulled for evaporator work |
 | `compressor.jpg` | Same public page (`2014-04-04 06_03_34.jpg`) | Panasonic / Mazda 3 compressor |
+| `bay-work.mp4` | Generated KantoCo sample clip | Mechanic bay work, muted 1280×720 H.264 |
+| `bay-work-poster.jpg` | First frame of `bay-work.mp4` | Poster / reduced-motion still |
 | `cold-vent.mp4` | Generated KantoCo sample clip | Muted 1280×720 H.264, ~5.04s, 24fps |
 | `cold-vent-poster.jpg` | First frame of `cold-vent.mp4` | Poster / reduced-motion still |
 
