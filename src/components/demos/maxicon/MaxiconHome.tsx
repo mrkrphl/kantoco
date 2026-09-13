@@ -17,15 +17,18 @@ const BAY_POSTER = "/demos/maxicon-car-aircon/bay-work-poster.jpg";
 const VENT_SRC = "/demos/maxicon-car-aircon/cold-vent.mp4";
 const VENT_POSTER = "/demos/maxicon-car-aircon/cold-vent-poster.jpg";
 
-const BAY_END = 0.46;
 const WIPE_START = 0.4;
 const WIPE_END = 0.54;
+/** Bay keeps moving through the wipe instead of parking on its last frame. */
+const BAY_SCRUB_END = 0.58;
+/** Vent starts before the wipe so it is already off frame 0 when it appears. */
+const VENT_SCRUB_START = 0.32;
 
 const BEATS = [
-  { id: "heat", start: 0, end: 0.17, hold: false },
-  { id: "bay", start: 0.19, end: 0.4, hold: false },
-  { id: "cold", start: 0.55, end: 0.76, hold: false },
-  { id: "cta", start: 0.78, end: 1, hold: true },
+  { id: "heat", start: 0, end: 0.22, hold: false },
+  { id: "bay", start: 0.14, end: 0.48, hold: false },
+  { id: "cold", start: 0.38, end: 0.8, hold: false },
+  { id: "cta", start: 0.7, end: 1, hold: true },
 ] as const;
 
 const MARK = [
@@ -73,6 +76,14 @@ function pinProgress(pin: HTMLElement) {
 
 function remap(progress: number, start: number, end: number) {
   return gsap.utils.clamp(0, 1, (progress - start) / (end - start));
+}
+
+function bayPlayhead(progress: number, duration: number) {
+  return remap(progress, 0, BAY_SCRUB_END) * duration;
+}
+
+function ventPlayhead(progress: number, duration: number) {
+  return remap(progress, VENT_SCRUB_START, 1) * duration;
 }
 
 function beatLocal(progress: number, start: number, end: number) {
@@ -227,6 +238,22 @@ export function MaxiconHome() {
       started = true;
       void (async () => {
         await Promise.all(videos.map((v) => unlockSeek(v, 0)));
+        const pin = pinRef.current;
+        const bay = bayRef.current;
+        const vent = ventRef.current;
+        const progress = pin ? pinProgress(pin) : 0;
+        if (bay && Number.isFinite(bay.duration) && bay.duration > 0) {
+          seekVideo(bay, bayPlayhead(progress, bay.duration));
+        }
+        if (vent && Number.isFinite(vent.duration) && vent.duration > 0) {
+          const mapped = ventPlayhead(progress, vent.duration);
+          // Vent is still clipped away at the head — decode the wipe-in
+          // frame so the second clip is not cold when the cut starts.
+          seekVideo(
+            vent,
+            mapped > 0.04 ? mapped : ventPlayhead(WIPE_START, vent.duration),
+          );
+        }
         if (!cancelled) setReelReady(true);
       })();
     };
@@ -268,11 +295,10 @@ export function MaxiconHome() {
       const progress = pinProgress(pin);
       const active = progress < WIPE_END ? bay : vent;
       if (!Number.isFinite(active.duration) || active.duration <= 0) return;
-      const local =
-        progress < BAY_END
-          ? remap(progress, 0, BAY_END)
-          : remap(progress, BAY_END, 1);
-      const expected = local * active.duration;
+      const expected =
+        active === bay
+          ? bayPlayhead(progress, active.duration)
+          : ventPlayhead(progress, active.duration);
       if (expected <= 0.12) return;
       if (Math.abs(active.currentTime - expected) <= 0.25) {
         confirmed = true;
@@ -280,8 +306,9 @@ export function MaxiconHome() {
       }
       used = true;
       void (async () => {
-        await unlockSeek(bay, remap(pinProgress(pin), 0, BAY_END) * (bay.duration || 0));
-        await unlockSeek(vent, remap(pinProgress(pin), BAY_END, 1) * (vent.duration || 0));
+        const now = pinProgress(pin);
+        await unlockSeek(bay, bayPlayhead(now, bay.duration || 0));
+        await unlockSeek(vent, ventPlayhead(now, vent.duration || 0));
       })();
     };
 
@@ -315,10 +342,10 @@ export function MaxiconHome() {
 
       const apply = (progress: number) => {
         if (Number.isFinite(bay.duration) && bay.duration > 0) {
-          seekVideo(bay, remap(progress, 0, BAY_END) * bay.duration);
+          seekVideo(bay, bayPlayhead(progress, bay.duration));
         }
         if (Number.isFinite(vent.duration) && vent.duration > 0) {
-          seekVideo(vent, remap(progress, BAY_END, 1) * vent.duration);
+          seekVideo(vent, ventPlayhead(progress, vent.duration));
         }
 
         const wipe = remap(progress, WIPE_START, WIPE_END);
@@ -363,17 +390,23 @@ export function MaxiconHome() {
         }
       };
 
-      const st = ScrollTrigger.create({
-        trigger: pin,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 0.5,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => apply(self.progress),
-        onRefresh: (self) => apply(self.progress),
-      });
+      const bindPin = (scrub: boolean | number) => {
+        const st = ScrollTrigger.create({
+          trigger: pin,
+          start: "top top",
+          end: "bottom bottom",
+          scrub,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => apply(self.progress),
+          onRefresh: (self) => apply(self.progress),
+        });
+        apply(st.progress);
+      };
 
-      apply(st.progress);
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 900px)", () => bindPin(true));
+      mm.add("(max-width: 899px)", () => bindPin(0.2));
+
       if (reelReady) ScrollTrigger.refresh();
 
       const refresh = () => ScrollTrigger.refresh();
@@ -381,6 +414,7 @@ export function MaxiconHome() {
       window.visualViewport?.addEventListener("resize", refresh);
 
       return () => {
+        mm.revert();
         window.removeEventListener("resize", refresh);
         window.visualViewport?.removeEventListener("resize", refresh);
       };
