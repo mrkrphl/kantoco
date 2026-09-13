@@ -76,6 +76,7 @@ html:has(.maxicon) body {
   gap: 1.1rem;
   background: var(--bg);
   pointer-events: none;
+  animation: maxicon-preload-out 0.42s ease 0.95s forwards;
 }
 
 .maxicon[data-booted="true"] .maxicon-preloader {

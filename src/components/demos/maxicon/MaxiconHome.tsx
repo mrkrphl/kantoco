@@ -164,7 +164,8 @@ export function MaxiconHome() {
       const root = rootRef.current;
       const track = trackRef.current;
       const pin = pinRef.current;
-      if (!root || !ready || reduced) return;
+      const motionOn = ready || booted;
+      if (!root || !motionOn || reduced) return;
 
       gsap.utils.toArray<HTMLElement>("[data-wipe]", root).forEach((wipe) => {
         gsap.fromTo(
@@ -214,6 +215,7 @@ export function MaxiconHome() {
         labels[last]?.classList.remove("is-on");
         nums[index]?.classList.add("is-on");
         labels[index]?.classList.add("is-on");
+        pin.setAttribute("data-active-step", String(index + 1).padStart(2, "0"));
         last = index;
       };
 
@@ -356,7 +358,7 @@ export function MaxiconHome() {
           className="maxicon-process"
           aria-label="How a job moves"
         >
-          <div ref={pinRef} className="maxicon-process-pin">
+          <div ref={pinRef} className="maxicon-process-pin" data-active-step="01">
             <div className="maxicon-process-frame">
               <p className="maxicon-process-num" aria-hidden={!reduced}>
                 {STEPS.map((step, i) => (
