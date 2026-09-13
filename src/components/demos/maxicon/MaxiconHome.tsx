@@ -99,7 +99,7 @@ function markAt(progress: number) {
   };
 }
 
-function applyBeat(el: HTMLElement, t: number, hold: boolean) {
+function applyBeat(el: HTMLElement, t: number, hold: boolean, snapIn = false) {
   const name = el.querySelector<HTMLElement>(".maxicon-reel-name");
   const line = el.querySelector<HTMLElement>(".maxicon-reel-line");
   const extra = el.querySelector<HTMLElement>(".maxicon-reel-extra");
@@ -116,7 +116,7 @@ function applyBeat(el: HTMLElement, t: number, hold: boolean) {
     return;
   }
 
-  const enter = gsap.utils.clamp(0, 1, t <= 1 ? t / 0.28 : 1);
+  const enter = snapIn ? 1 : gsap.utils.clamp(0, 1, t <= 1 ? t / 0.28 : 1);
   const exit = hold || t > 1 ? 0 : gsap.utils.clamp(0, 1, (t - 0.76) / 0.24);
   const shown = enter * (1 - exit);
   const layout = el.dataset.layout;
@@ -340,7 +340,12 @@ export function MaxiconHome() {
         beats.forEach((el) => {
           const spec = BEATS.find((b) => b.id === el.dataset.beat);
           if (!spec) return;
-          applyBeat(el, beatLocal(progress, spec.start, spec.end), spec.hold);
+          applyBeat(
+            el,
+            beatLocal(progress, spec.start, spec.end),
+            spec.hold,
+            spec.start === 0,
+          );
         });
 
         if (mark) {
