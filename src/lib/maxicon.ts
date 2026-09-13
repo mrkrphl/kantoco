@@ -7,7 +7,7 @@ export const maxicon = {
   address: "45 President's Avenue, BF Homes, Parañaque",
   addressShort: "45 President's Avenue, BF Homes",
   heroLine:
-    "The heat stays on the sidewalk; inside the bay the work is cold air.",
+    "The vent should still bite in traffic. If yours doesn’t, this is the shop on President’s Avenue.",
   phoneMobileDisplay: "0917 501 0872",
   phoneMobileHref: "tel:+639175010872",
   phoneLandlineDisplay: "8820 5426",

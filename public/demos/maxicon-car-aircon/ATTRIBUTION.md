@@ -1,9 +1,9 @@
 # Maxicon Car Aircon Specialist — photo notes
 
 Shop stills only on the inner pages. No generated people. No private albums.
-No testimonial portraits. No fake logos. The home film is two generated
-clips scrubbed by scroll — bay work, then the cold vent. Not shop footage,
-not a still-plate crossfade, not a circular wipe.
+No testimonial portraits. No fake logos. The home is a CSS/JS scroll story:
+photo chapters, a pinned process that swaps stills, and a contained 16:9
+bay clip. Not a looping video hero, not MP4 currentTime scrub, not an iris.
 
 | File | Source | Notes |
 | --- | --- | --- |
