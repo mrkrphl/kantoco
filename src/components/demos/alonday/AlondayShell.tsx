@@ -6,8 +6,8 @@ const nav = [
   ["Home", "/demos/alonday-dental"],
   ["Services", "/demos/alonday-dental/services"],
   ["About", "/demos/alonday-dental/about"],
-  ["Gallery", "/demos/alonday-dental/gallery"],
-  ["Visit", "/demos/alonday-dental/contact"],
+  ["Hours", "/demos/alonday-dental/hours"],
+  ["Contact", "/demos/alonday-dental/contact"],
 ] as const;
 
 export function AlondayBanner() {
@@ -22,14 +22,12 @@ export function AlondayBanner() {
 export function AlondayShell({
   children,
   current,
-  overlay = false,
 }: {
   children: React.ReactNode;
   current: (typeof nav)[number][0];
-  overlay?: boolean;
 }) {
   return (
-    <div className={overlay ? "alonday alonday--overlay" : "alonday"}>
+    <div className="alonday">
       <AlondayBanner />
       <header className="alonday-head">
         <div className="alonday-head-row">
@@ -39,7 +37,11 @@ export function AlondayShell({
             </Link>
             <p className="alonday-meta">{alonday.addressShort}</p>
           </div>
-          <p className="alonday-meta alonday-head-hours">{alonday.hours}</p>
+          <p className="alonday-meta alonday-head-hours">
+            {alonday.hours}
+            <br />
+            Confirm on Facebook
+          </p>
         </div>
         <nav>
           <ul className="alonday-nav">

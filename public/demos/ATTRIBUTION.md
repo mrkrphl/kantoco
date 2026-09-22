@@ -85,12 +85,6 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 
 ## Alonday Dental Clinic (unlisted)
 
-Pitch sample only. Not on the homepage list. See
-`alonday-dental/ATTRIBUTION.md`.
-
-| File | Source | Author | License |
-| --- | --- | --- | --- |
-| `alonday-dental/facade.jpg` | Public Wheree listing of the clinic | Clinic / directory listing | Public storefront still |
-| `alonday-dental/chair.jpg` | https://www.pexels.com/photo/empty-dentist-office-6812461/ | Pavel Danilyuk | Pexels License |
-| `alonday-dental/chair-side.jpg` | https://www.pexels.com/photo/black-and-white-dentist-chair-4269361/ | Cedric Fauntleroy | Pexels License |
-| `alonday-dental/operatory.jpg` | https://www.pexels.com/photo/dental-clinic-and-equipment-4687337/ | Polina Zimmerman | Pexels License |
+Pitch sample only. Not on the homepage list. Facebook stills from Paige’s
+brief could not be downloaded here. See `alonday-dental/ATTRIBUTION.md`
+for the photo-01 through photo-12 slot list.

@@ -1,17 +1,27 @@
 # Alonday Dental Clinic — photo notes
 
 Unlisted KantoCo pitch sample. Not a live client site. Do not message the
-clinic. Hours stay on Facebook. No invented quote or package price.
+clinic. Paige brief is the source of truth.
 
-The bungalow still is a public listing photo of this clinic. Empty-chair
-stills are licensed references, not their rooms. Filenames stay ready if a
-Facebook still replaces them.
+Facebook stills could not be downloaded from this environment (login wall /
+403). Attached files `photo-01`, `02`, `04`, `11`, and `12` were not on
+disk at `/workspace/kantoco-clients/alonday-dental/photos/`. Named slots
+stay ready to drop in:
 
-| File | Source | Author | License / notes |
+| File | Facebook | Job | Status |
 | --- | --- | --- | --- |
-| `facade.jpg` | Public Wheree listing of Alonday Dental Clinic (`Alonday-Dental-Clinic_b966f0e463ab3b94b1f12ef014506d0c.jpg`) | Clinic / directory listing | Public still of the El Grande bungalow. Sign names Dr. Emma Aleli D. Alonday. Swap if a higher-resolution Facebook still is added. |
-| `chair.jpg` | https://www.pexels.com/photo/empty-dentist-office-6812461/ | Pavel Danilyuk | Pexels License. Reference operatory, not their room. |
-| `chair-side.jpg` | https://www.pexels.com/photo/black-and-white-dentist-chair-4269361/ | Cedric Fauntleroy | Pexels License. Reference operatory, not their room. |
-| `operatory.jpg` | https://www.pexels.com/photo/dental-clinic-and-equipment-4687337/ | Polina Zimmerman | Pexels License. Reference still with a panoramic film on a monitor. |
+| `photo-01.jpg` | fbid 1283963127080072 | Logo / contact card | Missing. Home uses an HTML recreation of that public card. |
+| `photo-02.jpg` | fbid 1395733745903009 | PFM crowns B/A | Missing. Services tile reserved. |
+| `photo-03.jpg` | fbid 1366073978868986 | Retainers | Missing. |
+| `photo-04.jpg` | fbid 1280149050794813 | Composite B/A | Missing. Services tile reserved. |
+| `photo-05.jpg` | fbid 1274652218011163 | Implants smile promo | Missing. |
+| `photo-06.jpg` | fbid 1253037483505970 | X-ray / surgery graphic | Missing. |
+| `photo-07.jpg` | fbid 1237921558350896 | Implant model | Missing. |
+| `photo-08.jpg` | fbid 1145568694252850 | Fillings B/A | Missing. |
+| `photo-09.jpg` | fbid 1137549768388076 | Denture B/A | Missing. |
+| `photo-10.jpg` | fbid 1130379019105151 | Whitening | Missing. |
+| `photo-11.jpg` | fbid 1126289316180788 | Hours graphic | Missing. Hours page copies Mon–Sat 9–6 and walk-ins from that graphic, with a confirm-on-Facebook caveat. |
+| `photo-12.jpg` | fbid 1111227657686954 | Reception team | Missing. About page marks a placeholder only. Do not invent names. |
 
-Dropped smiling-patient stock. No private albums. No testimonial portraits.
+Dropped earlier Pexels chair refs and the Wheree bungalow still so this
+folder only waits for Paige’s Facebook set.
