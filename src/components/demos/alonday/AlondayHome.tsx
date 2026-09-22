@@ -44,7 +44,8 @@ export function AlondayHome() {
             <p className="alonday-word">Alonday</p>
             <p className="alonday-clinic-line">Dental Clinic</p>
             <p className="alonday-byline">
-              by {alonday.dentistOnCard} and associates
+              As printed on their public contact card: {alonday.dentistOnCard}{" "}
+              and associates
             </p>
             <p className="alonday-card-meta">{alonday.address}</p>
             <p className="alonday-card-meta">{alonday.phoneDisplay}</p>
