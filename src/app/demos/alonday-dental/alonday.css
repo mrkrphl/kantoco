@@ -76,7 +76,7 @@ html:has(.alonday) body {
 }
 
 .alonday-opener-photo {
-  transform-origin: 48% 38%;
+  transform-origin: 50% 48%;
 }
 
 .alonday-opener-img,
@@ -85,15 +85,15 @@ html:has(.alonday) body {
 }
 
 .alonday-opener-img {
-  object-position: 50% 50%;
+  object-position: 50% 48%;
 }
 
 .alonday-beat-img--molar {
-  object-position: 50% 45%;
+  object-position: 50% 42%;
 }
 
 .alonday-beat-img--crowns {
-  object-position: 50% 8%;
+  object-position: 50% 42%;
 }
 
 .alonday-opener-shade {
