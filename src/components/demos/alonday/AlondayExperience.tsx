@@ -22,75 +22,64 @@ export function AlondayExperience() {
       if (!root || !ready) return;
 
       const pin = root.querySelector<HTMLElement>(".alonday-opener-pin");
-      const bay = root.querySelector<HTMLElement>(".alonday-opener-bay");
-      const field = root.querySelector<HTMLElement>(".alonday-opener-field");
-      const copy = root.querySelector<HTMLElement>(".alonday-opener-copy");
+      const name = root.querySelector<HTMLElement>(".alonday-name");
+      const line = root.querySelector<HTMLElement>(".alonday-hairline");
+      const rest = gsap.utils.toArray<HTMLElement>(
+        ".alonday-clinic, .alonday-promise, .alonday-place, .alonday-opener-ctas",
+        root,
+      );
+      const glow = root.querySelector<HTMLElement>(".alonday-opener-glow");
+      const tick = root.querySelector<HTMLElement>(".alonday-opener-tick");
 
       if (reduced) return;
-      if (!pin || !bay || !field || !copy) return;
+      if (!pin || !name || !line || !glow) return;
 
-      const bayStart = "inset(10% 100% 10% 0%)";
-      const bayEnd = "inset(10% 8% 10% 0%)";
-      const pinDistance = () => `+=${Math.round(window.innerHeight * 1.2)}`;
+      const buildOpener = (id: string, vh: number) => {
+        gsap.set(name, { opacity: 0.4 });
+        gsap.set(line, { scaleX: 0, transformOrigin: "left center" });
+        gsap.set(rest, { autoAlpha: 0, y: 16 });
+        gsap.set(glow, { opacity: 0 });
+        if (tick) gsap.set(tick, { opacity: 0, scaleY: 0.4 });
+
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: pin,
+            start: "top top",
+            end: () => `+=${Math.round(window.innerHeight * vh)}`,
+            pin: true,
+            pinSpacing: true,
+            scrub: 0.65,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            id,
+          },
+        });
+
+        tl.to(
+          line,
+          { scaleX: 1, duration: 0.35, ease: "power2.out" },
+          0,
+        );
+        tl.to(name, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.35);
+        tl.to(
+          rest,
+          { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" },
+          0.38,
+        );
+        tl.to(glow, { opacity: 1, duration: 0.55, ease: "power1.out" }, 0.45);
+        if (tick) {
+          tl.to(
+            tick,
+            { opacity: 1, scaleY: 1, duration: 0.4, ease: "power2.out" },
+            0.48,
+          );
+        }
+      };
+
       const mm = gsap.matchMedia();
-
-      mm.add("(min-width: 720px)", () => {
-        gsap.set(field, { scale: 1.04, transformOrigin: "62% 46%" });
-        gsap.set(bay, { clipPath: bayStart });
-        gsap.set(copy, { autoAlpha: 0, x: -28 });
-
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: pin,
-            start: "top top",
-            end: pinDistance,
-            pin: true,
-            pinSpacing: true,
-            scrub: 0.65,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            id: "alonday-light-bay",
-          },
-        });
-
-        tl.to(field, { scale: 1, duration: 1 }, 0);
-        tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
-        tl.to(
-          copy,
-          { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out" },
-          0.36,
-        );
-      });
-
-      mm.add("(max-width: 719px)", () => {
-        gsap.set(field, { scale: 1.04, transformOrigin: "50% 40%" });
-        gsap.set(bay, { clipPath: bayStart });
-        gsap.set(copy, { autoAlpha: 0, x: -18 });
-
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: pin,
-            start: "top top",
-            end: pinDistance,
-            pin: true,
-            pinSpacing: true,
-            scrub: 0.65,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            id: "alonday-light-bay-m",
-          },
-        });
-
-        tl.to(field, { scale: 1, duration: 1 }, 0);
-        tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
-        tl.to(
-          copy,
-          { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out" },
-          0.34,
-        );
-      });
+      mm.add("(min-width: 720px)", () => buildOpener("alonday-line", 1.4));
+      mm.add("(max-width: 719px)", () => buildOpener("alonday-line-m", 1.2));
 
       root.querySelectorAll<HTMLElement>("[data-beat]").forEach((beat) => {
         const frame = beat.querySelector<HTMLElement>("[data-beat-still]");
@@ -173,21 +162,19 @@ export function AlondayExperience() {
 
       <section className="alonday-opener" aria-label="Alonday Dental Clinic">
         <div className="alonday-opener-pin">
-          <div className="alonday-opener-still">
-            <div className="alonday-opener-field" aria-hidden />
-          </div>
-
-          <div className="alonday-opener-bay">
-            <div className="alonday-opener-light" aria-hidden />
-            <div className="alonday-opener-copy">
+          <div className="alonday-opener-copy">
+            <div className="alonday-opener-stack">
+              <div className="alonday-opener-glow" aria-hidden />
               <p className="alonday-kicker">{DEMO_BADGE}</p>
-              <h1 className="alonday-name">
-                {alonday.shortName}
-                <span>Dental Clinic</span>
-              </h1>
+              <div className="alonday-name-block">
+                <span className="alonday-opener-tick" aria-hidden />
+                <h1 className="alonday-name">{alonday.shortName}</h1>
+                <span className="alonday-hairline" aria-hidden />
+              </div>
+              <p className="alonday-clinic">Dental Clinic</p>
               <p className="alonday-promise">{alonday.promise}</p>
               <p className="alonday-place">{alonday.addressShort}</p>
-              <div className="alonday-ctas">
+              <div className="alonday-ctas alonday-opener-ctas">
                 <a href={alonday.phoneHref} className="alonday-btn alonday-btn--fill">
                   Call {alonday.phoneDisplay}
                 </a>

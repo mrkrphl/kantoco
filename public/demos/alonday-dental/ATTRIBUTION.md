@@ -6,10 +6,10 @@ clinic. Paige brief is the source of truth.
 Facebook stills from Paige’s set, dropped from the attached tar as
 `photo-01.jpg` … `photo-12.jpg`. All twelve slots are present.
 
-The opener is abstract paper + teal light — no Facebook still. The set
-has no usable clinic-room photograph (photo-12 is a reception/team card
-and is banned from the first viewport). Clinical crops below the opener
-are cut from the same JPEGs. They are not invented photographs.
+The opener is Appointment line: type, a 1px teal hairline, and a CSS
+radial glow behind the type block. Zero photos. The Facebook set has
+no usable clinic-room still. Clinical crops below the opener are cut
+from the same JPEGs. They are not invented photographs.
 
 | File | Facebook | Job | Status |
 | --- | --- | --- | --- |
