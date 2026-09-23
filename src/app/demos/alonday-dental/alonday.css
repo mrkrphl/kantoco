@@ -1,23 +1,27 @@
 html:has(.alonday),
 html:has(.alonday) body {
-  background: #f4f7f8;
+  background: #f7f4ef;
   height: auto;
   min-height: 100%;
 }
 
 .alonday {
-  --paper: #f4f7f8;
-  --porcelain: #ffffff;
-  --ink: #1c3a44;
-  --mute: color-mix(in srgb, var(--ink) 58%, var(--paper));
-  --rule: color-mix(in srgb, var(--ink) 12%, var(--paper));
-  --teal: #6fa0b3;
-  --teal-deep: #3d6d7e;
-  --pad: clamp(1.15rem, 4vw, 3rem);
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-alonday-sans), "Karla", ui-sans-serif, sans-serif;
+  --bg: #f7f4ef;
+  --type: #1a1f24;
+  --accent: #2f6f6a;
+  --muted: color-mix(in srgb, var(--type) 45%, transparent);
+  --rule: color-mix(in srgb, var(--type) 12%, transparent);
+  --pad: clamp(1.15rem, 4vw, 3.2rem);
+  --display: var(--font-alonday-display), "Fraunces", Georgia, serif;
+  --sans: var(--font-alonday-sans), "Instrument Sans", ui-sans-serif, sans-serif;
+  background: var(--bg);
+  color: var(--type);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.65;
   min-height: 100%;
+  overflow-x: clip;
 }
 
 .alonday a {
@@ -25,548 +29,432 @@ html:has(.alonday) body {
 }
 
 .alonday ::selection {
-  background: color-mix(in srgb, var(--teal) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 36%, transparent);
+  color: var(--type);
 }
 
 .alonday-banner {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.3rem 1rem;
-  background: var(--ink);
-  color: var(--paper);
+  gap: 0.25rem 1rem;
+  background: var(--type);
+  color: var(--bg);
   padding: 0.48rem var(--pad);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .alonday-banner strong {
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.alonday-head {
-  padding: 1.35rem var(--pad) 0;
-  max-width: 76rem;
-  margin: 0 auto;
-}
-
-.alonday-head-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.8rem 2rem;
-  align-items: end;
-}
-
-.alonday-name {
-  display: block;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: clamp(1.7rem, 3.4vw, 2.4rem);
-  font-weight: 600;
-  font-style: italic;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  text-decoration: none;
-}
-
-.alonday-meta {
-  margin: 0.35rem 0 0;
-  color: var(--mute);
-  font-size: 0.92rem;
-}
-
-.alonday-head-hours {
-  text-align: right;
-}
-
-.alonday-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.35rem;
-  margin: 1.25rem 0 0;
-  padding: 0.9rem 0 1.1rem;
-  border-bottom: 1px solid var(--rule);
-  list-style: none;
-  font-size: 0.92rem;
-}
-
-.alonday-nav a[aria-current="page"] {
-  color: var(--teal-deep);
-  text-decoration: underline;
-  text-underline-offset: 5px;
-}
-
-.alonday-hero-card,
-.alonday-page {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: 3.2rem var(--pad) 0;
-}
-
-.alonday-page {
-  max-width: 76rem;
 }
 
 .alonday-kicker {
   margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--teal-deep);
+  color: var(--accent);
 }
 
-.alonday-hero-still {
-  margin: 1.4rem 0 0;
-  padding: 0;
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
+.alonday-opener {
+  background: var(--bg);
 }
 
-.alonday-hero-still img {
-  display: block;
-  width: 100%;
-  height: auto;
+.alonday-opener-pin {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
 }
 
-.alonday-hero-still figcaption,
-.alonday-hours-still figcaption,
-.alonday-about-still figcaption {
-  margin: 0;
-  padding: 0.75rem 1rem 0.9rem;
-  color: var(--mute);
-  font-size: 0.9rem;
-  line-height: 1.5;
+.alonday-beat-img {
+  object-fit: cover;
 }
 
-.alonday-logo-card {
-  margin: 1.4rem 0 0;
-  padding: 2.4rem 1.6rem 2rem;
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
-  text-align: center;
+.alonday-beat-img--fillings {
+  object-position: 50% 46%;
 }
 
-.alonday-tooth {
-  width: 4.2rem;
-  height: auto;
-  color: var(--teal);
-  margin: 0 auto;
+.alonday-beat-img--crowns {
+  object-position: 50% 42%;
 }
 
-.alonday-word {
-  margin: 0.6rem 0 0;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: clamp(2.4rem, 8vw, 3.6rem);
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--teal);
-}
-
-.alonday-clinic-line {
-  margin: 0.35rem 0 0;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--teal-deep);
-}
-
-.alonday-byline {
-  margin: 0.7rem 0 0;
-  font-size: 0.88rem;
-  color: var(--mute);
-}
-
-.alonday-card-meta {
-  margin: 0.35rem 0 0;
-  font-size: 0.92rem;
-}
-
-.alonday-title {
-  margin: 1.2rem 0 0;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-  max-width: 18ch;
-}
-
-.alonday-title--wide {
-  max-width: 16ch;
-}
-
-.alonday-lede {
-  margin: 1.2rem 0 0;
+.alonday-opener-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
   max-width: 36rem;
-  font-size: 1.05rem;
-  line-height: 1.62;
-  color: var(--mute);
+  padding: clamp(4.4rem, 10vh, 6rem) var(--pad) 2rem;
 }
 
-.alonday-hero-ctas {
+.alonday-opener-stack {
+  position: relative;
+}
+
+.alonday-opener-glow {
+  position: absolute;
+  z-index: 0;
+  inset: -18% -22% -28% -16%;
+  background: radial-gradient(
+    56% 50% at 28% 42%,
+    color-mix(in srgb, var(--accent) 13%, var(--bg)),
+    color-mix(in srgb, var(--accent) 5%, var(--bg)) 52%,
+    transparent 74%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.alonday-name-block {
+  position: relative;
+  margin-top: 0.85rem;
+}
+
+.alonday-opener-tick {
+  position: absolute;
+  z-index: 1;
+  left: -0.7rem;
+  top: 0.18em;
+  width: 1px;
+  height: 1.2em;
+  background: var(--accent);
+  transform-origin: top center;
+  pointer-events: none;
+}
+
+.alonday-opener-stack > *:not(.alonday-opener-glow) {
+  position: relative;
+  z-index: 1;
+}
+
+.alonday-name {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 560;
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 144;
+  opacity: 0.4;
+}
+
+.alonday-hairline {
+  display: block;
+  width: 280px;
+  max-width: 280px;
+  height: 1px;
+  margin: 0.72rem 0 0;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.alonday-clinic {
+  margin: 0.85rem 0 0;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.alonday-clinic,
+.alonday-opener-copy .alonday-promise,
+.alonday-opener-copy .alonday-place,
+.alonday-opener-ctas,
+.alonday-opener-tick {
+  opacity: 0;
+}
+
+.alonday-promise {
+  margin: 1.15rem 0 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.3;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 80;
+}
+
+.alonday-place {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.alonday-ctas {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
-  margin-top: 1.5rem;
+  margin-top: 1.45rem;
 }
 
 .alonday-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.72rem 0.95rem;
+  justify-content: center;
+  padding: 0.72rem 1.05rem;
   text-decoration: none;
-  font-size: 0.92rem;
-  font-weight: 650;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.alonday-btn--teal {
-  background: var(--teal-deep);
-  color: #f7fbfc;
+.alonday-btn--fill {
+  background: var(--accent);
+  color: var(--bg);
 }
 
-.alonday-btn--ghost {
-  border: 1px solid color-mix(in srgb, var(--ink) 22%, var(--paper));
-  background: var(--porcelain);
+.alonday-btn--line {
+  border: 1px solid var(--type);
+  background: color-mix(in srgb, var(--bg) 18%, transparent);
+  color: var(--type);
+  text-shadow: none;
 }
 
-.alonday-highlights {
+.alonday-btn--fill {
+  text-shadow: none;
+}
+
+.alonday-beat {
+  position: relative;
+  min-height: 100svh;
+  background: var(--bg);
+}
+
+.alonday-beat--photo {
   display: grid;
-  gap: 0.55rem;
-  margin: 1.2rem 0 0;
-  padding: 0;
-  list-style: none;
 }
 
-.alonday-highlights li {
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: 1.25rem;
+.alonday-beat-still {
+  position: relative;
+  min-height: 46svh;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--type) 8%, var(--bg));
+}
+
+.alonday-beat-photo {
+  position: absolute;
+  inset: 0;
+}
+
+.alonday-beat-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.2rem var(--pad) 2.6rem;
+}
+
+.alonday-beat-copy--wide {
+  min-height: 100svh;
+  max-width: 46rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.alonday-loud {
+  margin: 0.7rem 0 0;
+  font-family: var(--display);
+  font-weight: 560;
+  font-size: clamp(32px, 2.8vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 96;
+}
+
+.alonday-loud--dial a {
+  text-decoration: none;
+}
+
+.alonday-loud--dial a:hover {
+  color: var(--accent);
+}
+
+.alonday-num {
+  color: var(--accent);
+}
+
+.alonday-time {
+  margin: 0.7rem 0 0;
+  font-family: var(--display);
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 80;
+}
+
+.alonday-sentence {
+  margin: 1.15rem 0 0;
+  max-width: 28rem;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--muted);
 }
 
 .alonday-text-link {
   display: inline-block;
   margin-top: 1.4rem;
-  color: var(--teal-deep);
-  font-size: 0.95rem;
-  font-weight: 650;
-  text-underline-offset: 4px;
-}
-
-.alonday-tiles {
-  display: grid;
-  gap: 1.4rem;
-  margin: 2rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 720px) {
-  .alonday-tiles {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.alonday-tile {
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
-  padding: 0 0 1.1rem;
-}
-
-.alonday-tile-photo,
-.alonday-tile-photos {
-  background: color-mix(in srgb, var(--teal) 10%, var(--paper));
-}
-
-.alonday-tile-photo--empty {
-  min-height: 10rem;
-  display: grid;
-  place-items: center;
-  padding: 1.2rem;
-  color: var(--mute);
-  font-size: 0.86rem;
-  line-height: 1.45;
-  text-align: center;
-}
-
-.alonday-tile-shot {
-  position: relative;
-  aspect-ratio: 4 / 5;
-}
-
-.alonday-tile-photos .alonday-tile-shot + .alonday-tile-shot {
-  border-top: 1px solid var(--rule);
-}
-
-.alonday-tile-shot img {
-  object-fit: cover;
-}
-
-.alonday-tile-name {
-  margin: 1rem 1.1rem 0;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: 1.3rem;
+  color: var(--accent);
   font-weight: 600;
-}
-
-.alonday-tile-line {
-  margin: 0.4rem 1.1rem 0;
-  color: var(--mute);
-  line-height: 1.5;
-}
-
-.alonday-hours-split {
-  display: grid;
-  gap: 1.4rem;
-  margin: 1.6rem 0 0;
-  max-width: 44rem;
-  align-items: start;
-}
-
-@media (min-width: 720px) {
-  .alonday-hours-split {
-    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-  }
-}
-
-.alonday-hours-still,
-.alonday-about-still {
-  margin: 0;
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
-  max-width: 22rem;
-}
-
-.alonday-about-still {
-  margin: 2rem 0 0;
-}
-
-.alonday-hours-still img,
-.alonday-about-still img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.alonday-placeholder {
-  margin: 2rem 0 0;
-  max-width: 36rem;
-}
-
-.alonday-placeholder-frame {
-  min-height: 16rem;
-  display: grid;
-  place-content: center;
-  gap: 0.4rem;
-  background: color-mix(in srgb, var(--teal) 12%, var(--paper));
-  border: 1px dashed var(--teal-deep);
-  text-align: center;
-  padding: 1.5rem;
-}
-
-.alonday-placeholder figcaption,
-.alonday-placeholder-frame p {
-  margin: 0;
-  color: var(--mute);
-  line-height: 1.5;
-}
-
-.alonday-placeholder figcaption {
-  margin-top: 0.8rem;
-  font-size: 0.9rem;
-}
-
-.alonday-hours-split {
-  display: grid;
-  gap: 1.4rem;
-  margin: 1.6rem 0 0;
-  max-width: 44rem;
-  align-items: start;
-}
-
-@media (min-width: 720px) {
-  .alonday-hours-split {
-    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-  }
-}
-
-.alonday-hours-still,
-.alonday-about-still {
-  margin: 0;
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
-  max-width: 22rem;
-}
-
-.alonday-about-still {
-  margin: 2rem 0 0;
-}
-
-.alonday-hours-still img,
-.alonday-about-still img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.alonday-hours-card {
-  margin: 0;
-  padding: 1.6rem 1.4rem;
-  background: var(--teal-deep);
-  color: #f4fbfc;
-  max-width: 28rem;
-}
-
-.alonday-hours-card-kicker {
-  margin: 0;
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.alonday-hours-card-line {
-  margin: 0.7rem 0 0;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: 1.55rem;
-  line-height: 1.25;
-}
-
-.alonday-hours-card-note {
-  margin: 0.7rem 0 0;
-  color: color-mix(in srgb, #f4fbfc 80%, transparent);
-}
-
-.alonday-map-ph {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.4rem;
-  min-height: 14rem;
-  margin: 1.8rem 0 0;
-  padding: 1.4rem;
-  background: color-mix(in srgb, var(--teal) 14%, var(--paper));
-  border: 1px dashed var(--teal-deep);
-  text-decoration: none;
-  max-width: 36rem;
-}
-
-.alonday-map-ph span:first-child {
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-.alonday-dial-wrap {
-  margin: 1.4rem 0 0;
-}
-
-.alonday-dial {
-  display: inline-block;
-  font-family: var(--font-alonday-display), "Lora", Georgia, serif;
-  font-size: clamp(2rem, 7vw, 3.6rem);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  text-decoration: none;
-}
-
-.alonday-dial:hover {
-  color: var(--teal-deep);
-}
-
-.alonday-visit-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.8rem 1.2rem;
-  margin-top: 1.2rem;
-}
-
-.alonday-visit-links a:not(.alonday-btn) {
-  color: var(--teal-deep);
+  font-size: 14px;
   text-underline-offset: 4px;
-}
-
-.alonday-mock {
-  display: grid;
-  gap: 0.85rem;
-  margin: 2.4rem 0 0;
-  padding: 1.4rem;
-  max-width: 28rem;
-  background: var(--porcelain);
-  border: 1px solid var(--rule);
-}
-
-.alonday-mock label {
-  display: grid;
-  gap: 0.3rem;
-  font-size: 0.88rem;
-  font-weight: 650;
-}
-
-.alonday-mock input,
-.alonday-mock textarea {
-  border: 1px solid var(--rule);
-  background: var(--paper);
-  padding: 0.55rem 0.65rem;
-  font: inherit;
-  color: var(--mute);
-}
-
-.alonday-mock button {
-  width: fit-content;
-  padding: 0.7rem 0.95rem;
-  border: 0;
-  background: color-mix(in srgb, var(--ink) 18%, var(--paper));
-  color: var(--mute);
-  font: inherit;
-  font-weight: 650;
-}
-
-.alonday-note {
-  margin: 1.5rem 0 0;
-  max-width: 32rem;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: var(--mute);
-}
-
-.alonday-note a,
-.alonday-foot a {
-  color: var(--teal-deep);
-  text-underline-offset: 3px;
 }
 
 .alonday-foot {
-  padding: 1.6rem 0 2.8rem;
+  padding: 2.2rem var(--pad) 3rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 40rem;
 }
 
-.alonday-page > .alonday-foot {
-  padding-left: 0;
+.alonday-foot a {
+  color: var(--accent);
+  text-underline-offset: 3px;
 }
 
-.alonday-foot-back {
-  display: block;
-  margin-top: 0.8rem;
+[data-motion="pending"] .alonday-name {
+  opacity: 0.4;
 }
 
-@media (max-width: 640px) {
-  .alonday-head-hours {
-    text-align: left;
+[data-motion="pending"] .alonday-hairline {
+  transform: scaleX(0);
+}
+
+[data-motion="pending"] .alonday-clinic,
+[data-motion="pending"] .alonday-promise,
+[data-motion="pending"] .alonday-place,
+[data-motion="pending"] .alonday-opener-ctas,
+[data-motion="pending"] .alonday-opener-glow,
+[data-motion="pending"] .alonday-opener-tick,
+[data-motion="pending"] [data-beat-word],
+[data-motion="pending"] [data-beat-line] {
+  opacity: 0;
+}
+
+[data-motion="static"] .alonday-name,
+[data-motion="static"] .alonday-clinic,
+[data-motion="static"] .alonday-promise,
+[data-motion="static"] .alonday-place,
+[data-motion="static"] .alonday-opener-ctas,
+[data-motion="static"] .alonday-opener-glow,
+[data-motion="static"] .alonday-opener-tick,
+[data-motion="static"] [data-beat-word],
+[data-motion="static"] [data-beat-line] {
+  opacity: 1;
+  transform: none;
+}
+
+[data-motion="static"] .alonday-hairline {
+  transform: scaleX(1);
+}
+
+@media (min-width: 720px) {
+  .alonday-beat--photo {
+    grid-template-columns: 1.15fr 0.85fr;
+    min-height: 100svh;
+  }
+
+  .alonday-beat--flip {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+
+  .alonday-beat--flip .alonday-beat-still {
+    order: 2;
+  }
+
+  .alonday-beat-still {
+    min-height: 100svh;
+  }
+
+  .alonday-beat-copy {
+    padding: 3rem clamp(1.6rem, 4vw, 3.4rem);
+  }
+}
+
+@media (max-width: 719px) {
+  .alonday {
+    font-size: 16px;
   }
 
   .alonday-banner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.15rem;
-    font-size: 0.64rem;
+  }
+
+  .alonday-opener-copy {
+    justify-content: flex-end;
+    padding: 1.4rem 1.15rem 1.8rem;
+    max-width: none;
+  }
+
+  .alonday-hairline {
+    width: 200px;
+  }
+
+  .alonday-name {
+    font-size: 36px;
+    font-variation-settings: "SOFT" 50, "opsz" 96;
+  }
+
+  .alonday-promise {
+    font-size: 18px;
+  }
+
+  .alonday-place,
+  .alonday-sentence {
+    font-size: 16px;
+  }
+
+  .alonday-loud {
+    font-size: 28px;
+    font-variation-settings: "SOFT" 50, "opsz" 80;
+  }
+
+  .alonday-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alonday-name,
+  .alonday-clinic,
+  .alonday-promise,
+  .alonday-place,
+  .alonday-opener-ctas,
+  .alonday-opener-glow,
+  .alonday-opener-tick,
+  [data-beat-word],
+  [data-beat-line] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .alonday-hairline {
+    transform: scaleX(1);
   }
 }
