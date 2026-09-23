@@ -28,8 +28,8 @@ export const alonday = {
   stills: {
     hero: still("opener-after.jpg"),
     heroSource: still("photo-08.jpg"),
-    composite: still("beat-composite.jpg"),
-    compositeSource: still("photo-04.jpg"),
+    composite: still("beat-fillings.jpg"),
+    compositeSource: still("photo-08.jpg"),
     crowns: still("beat-crowns.jpg"),
     crownsSource: still("photo-02.jpg"),
   },

@@ -23,27 +23,30 @@ export function AlondayExperience() {
 
       const pin = root.querySelector<HTMLElement>(".alonday-opener-pin");
       const bay = root.querySelector<HTMLElement>(".alonday-opener-bay");
-      const still = root.querySelector<HTMLElement>(".alonday-opener-photo");
+      const still = root.querySelector<HTMLElement>(
+        ".alonday-opener-still > .alonday-opener-photo",
+      );
       const copy = root.querySelector<HTMLElement>(".alonday-opener-copy");
 
       if (reduced) return;
       if (!pin || !bay || !still || !copy) return;
 
+      const bayStart = "inset(10% 100% 10% 0%)";
+      const bayEnd = "inset(10% 8% 10% 0%)";
+      const pinDistance = () => `+=${Math.round(window.innerHeight * 1.2)}`;
       const mm = gsap.matchMedia();
 
       mm.add("(min-width: 720px)", () => {
-        gsap.set(still, { scale: 1.02, transformOrigin: "50% 48%" });
-        gsap.set(bay, {
-          clipPath: "inset(0% 100% 0% 0%)",
-        });
-        gsap.set(copy, { autoAlpha: 0, x: -24 });
+        gsap.set(still, { scale: 1.03, transformOrigin: "50% 48%" });
+        gsap.set(bay, { clipPath: bayStart });
+        gsap.set(copy, { autoAlpha: 0, x: -28 });
 
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: pin,
             start: "top top",
-            end: "+=120%",
+            end: pinDistance,
             pin: true,
             pinSpacing: true,
             scrub: 0.65,
@@ -54,34 +57,25 @@ export function AlondayExperience() {
         });
 
         tl.to(still, { scale: 1, duration: 1 }, 0);
-        tl.to(
-          bay,
-            {
-              clipPath: "inset(0% 0% 0% 0%)",
-              duration: 0.78,
-            },
-          0,
-        );
+        tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
         tl.to(
           copy,
-          { autoAlpha: 1, x: 0, duration: 0.3, ease: "power2.out" },
-          0.44,
+          { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out" },
+          0.36,
         );
       });
 
       mm.add("(max-width: 719px)", () => {
-        gsap.set(still, { scale: 1.02, transformOrigin: "50% 48%" });
-        gsap.set(bay, {
-          clipPath: "inset(100% 0% 0% 0%)",
-        });
-        gsap.set(copy, { autoAlpha: 0, y: 20 });
+        gsap.set(still, { scale: 1.03, transformOrigin: "50% 48%" });
+        gsap.set(bay, { clipPath: bayStart });
+        gsap.set(copy, { autoAlpha: 0, x: -18 });
 
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: pin,
             start: "top top",
-            end: "+=120%",
+            end: pinDistance,
             pin: true,
             pinSpacing: true,
             scrub: 0.65,
@@ -92,18 +86,11 @@ export function AlondayExperience() {
         });
 
         tl.to(still, { scale: 1, duration: 1 }, 0);
-        tl.to(
-          bay,
-          {
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 0.78,
-          },
-          0,
-        );
+        tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
         tl.to(
           copy,
-          { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" },
-          0.42,
+          { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out" },
+          0.34,
         );
       });
 
@@ -204,7 +191,18 @@ export function AlondayExperience() {
           </div>
 
           <div className="alonday-opener-bay">
-            <div className="alonday-opener-wash" aria-hidden />
+            <div className="alonday-opener-light" aria-hidden>
+              <div className="alonday-opener-photo alonday-opener-photo--lit">
+                <Image
+                  src={alonday.stills.hero}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="alonday-opener-img"
+                />
+              </div>
+              <div className="alonday-opener-wash" />
+            </div>
             <div className="alonday-opener-copy">
               <p className="alonday-kicker">{DEMO_BADGE}</p>
               <h1 className="alonday-name">
@@ -240,10 +238,10 @@ export function AlondayExperience() {
           <div data-beat-still className="alonday-beat-photo">
             <Image
               src={alonday.stills.composite}
-              alt="Close crop of a finished composite on a molar, from a public Facebook still"
+              alt="Finished composite fillings smile, cropped from a public Facebook still"
               fill
               sizes="(min-width: 720px) 54vw, 100vw"
-              className="alonday-beat-img alonday-beat-img--molar"
+              className="alonday-beat-img alonday-beat-img--fillings"
             />
           </div>
         </div>
@@ -253,8 +251,8 @@ export function AlondayExperience() {
             Composite
           </h2>
           <p className="alonday-sentence" data-beat-line>
-            A molar they already posted, finished and quiet. This is chair work
-            from their own still, not a whitening ad.
+            A filling they already posted, finished and quiet. This is chair
+            work from their own still, not a whitening ad.
           </p>
         </div>
       </section>
