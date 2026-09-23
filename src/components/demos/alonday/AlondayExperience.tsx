@@ -189,6 +189,7 @@ export function AlondayExperience() {
       <section className="alonday-opener" aria-label="Alonday Dental Clinic">
         <div className="alonday-opener-pin">
           <div className="alonday-opener-still">
+            <div className="alonday-opener-bloom" aria-hidden />
             <div className="alonday-opener-photo">
               <Image
                 src={alonday.stills.hero}

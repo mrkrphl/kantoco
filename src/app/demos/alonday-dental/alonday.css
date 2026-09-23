@@ -77,9 +77,14 @@ html:has(.alonday) body {
 }
 
 .alonday-opener-still,
-.alonday-opener-photo {
+.alonday-opener-photo,
+.alonday-opener-bloom {
   position: absolute;
   inset: 0;
+}
+
+.alonday-opener-bloom {
+  display: none;
 }
 
 .alonday-opener-photo {
@@ -366,6 +371,20 @@ html:has(.alonday) body {
   .alonday-banner {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .alonday-opener-bloom {
+    display: block;
+    inset: -12%;
+    background: url("/demos/alonday-dental/opener-after.jpg") 50% 45% / cover
+      no-repeat;
+    filter: blur(36px) saturate(0.94);
+    transform: scale(1.08);
+  }
+
+  .alonday-opener-img {
+    object-fit: contain;
+    object-position: 50% 30%;
   }
 
   .alonday-opener-copy {
