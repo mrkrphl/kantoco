@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { AlondayShell } from "@/components/demos/alonday/AlondayShell";
 import { alonday } from "@/lib/alonday";
 
@@ -15,15 +16,16 @@ export default function AlondayAbout() {
           on that card. They do not publish a marketing site. This page is a
           KantoCo sample of how that clinic could look on the web.
         </p>
-        <figure className="alonday-placeholder">
-          <div className="alonday-placeholder-frame">
-            <p>photo-12.jpg</p>
-            <p>Reception team portrait — placeholder only.</p>
-          </div>
+        <figure className="alonday-about-still">
+          <Image
+            src={alonday.stills.reception}
+            alt="Reception desk at Alonday Dental Clinic, from a public Facebook still"
+            width={482}
+            height={600}
+          />
           <figcaption>
-            A public Facebook still of two people at the reception desk is
-            reserved as photo-12 (fbid 1111227657686954). Names are not
-            confirmed. Do not treat this as a staff bio.
+            A public Facebook still from the reception desk (photo-12). Names
+            are not confirmed. This is not a staff bio.
           </figcaption>
         </figure>
         <p className="alonday-note alonday-foot">{alonday.sampleNote}</p>

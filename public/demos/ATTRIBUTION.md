@@ -86,5 +86,5 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 ## Alonday Dental Clinic (unlisted)
 
 Pitch sample only. Not on the homepage list. Facebook stills from Paige’s
-brief could not be downloaded here. See `alonday-dental/ATTRIBUTION.md`
-for the photo-01 through photo-12 slot list.
+brief are present as `photo-01.jpg` … `photo-12.jpg`. See
+`alonday-dental/ATTRIBUTION.md` for the slot list.
