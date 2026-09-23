@@ -26,11 +26,11 @@ export const alonday = {
     "https://www.google.com/maps/search/?api=1&query=454+El+Grande+Ave.+BF+Homes+Paranaque+1718",
   dentistOnCard: "Dr. Emma Aleli Alonday",
   stills: {
-    hero: still("hero-smile.jpg"),
+    hero: still("opener-smile.jpg"),
     heroSource: still("photo-08.jpg"),
-    composite: still("composite-after.jpg"),
+    composite: still("beat-composite.jpg"),
     compositeSource: still("photo-04.jpg"),
-    crowns: still("crowns-after.jpg"),
+    crowns: still("beat-crowns.jpg"),
     crownsSource: still("photo-02.jpg"),
   },
   sampleNote:

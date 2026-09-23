@@ -32,7 +32,7 @@ export function AlondayExperience() {
       const mm = gsap.matchMedia();
 
       mm.add("(min-width: 720px)", () => {
-        gsap.set(still, { scale: 1.08, transformOrigin: "48% 38%" });
+        gsap.set(still, { scale: 1.03, transformOrigin: "50% 50%" });
         gsap.set(bay, {
           clipPath: "inset(16% 100% 16% 0% round 1.4rem)",
         });
@@ -70,7 +70,7 @@ export function AlondayExperience() {
       });
 
       mm.add("(max-width: 719px)", () => {
-        gsap.set(still, { scale: 1.1, transformOrigin: "50% 32%" });
+        gsap.set(still, { scale: 1.04, transformOrigin: "50% 50%" });
         gsap.set(bay, {
           clipPath: "inset(100% 5% 4% 5% round 1.15rem)",
         });

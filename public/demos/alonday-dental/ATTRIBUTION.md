@@ -23,6 +23,6 @@ They are not invented photographs.
 | `photo-10.jpg` | fbid 1130379019105151 | Whitening | Present. Held. |
 | `photo-11.jpg` | fbid 1126289316180788 | Hours graphic | Present. Hours are typeset, not the graphic. |
 | `photo-12.jpg` | fbid 1111227657686954 | Reception / team still | Present. De-emphasized until names are confirmed. |
-| `hero-smile.jpg` | crop of photo-08 after | Opener still | After smile only. No full face. No BEFORE panel. |
-| `composite-after.jpg` | crop of photo-04 after | Composite beat | After molar only. |
-| `crowns-after.jpg` | crop of photo-02 after | Crowns beat | After mouth crop. No full face. |
+| `opener-smile.jpg` | crop of photo-08 after | Opener still | After smile only. No full face. No BEFORE panel. |
+| `beat-composite.jpg` | crop of photo-04 after | Composite beat | After molar only. |
+| `beat-crowns.jpg` | crop of photo-02 after | Crowns beat | After mouth crop. No full face. |
