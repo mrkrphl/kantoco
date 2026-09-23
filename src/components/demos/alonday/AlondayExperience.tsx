@@ -192,7 +192,7 @@ export function AlondayExperience() {
             <div className="alonday-opener-photo">
               <Image
                 src={alonday.stills.hero}
-                alt="Close crop of a finished composite filling, from a public Alonday Facebook still"
+                alt="After crop of molars in a mouth mirror, from a public Alonday Facebook still"
                 fill
                 sizes="100vw"
                 preload

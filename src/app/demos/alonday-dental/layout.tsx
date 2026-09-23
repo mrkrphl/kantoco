@@ -4,7 +4,9 @@ import "./alonday.css";
 
 const display = Fraunces({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  axes: ["SOFT", "opsz"],
   variable: "--font-alonday-display",
 });
 

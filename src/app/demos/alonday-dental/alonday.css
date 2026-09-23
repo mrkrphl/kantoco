@@ -7,14 +7,19 @@ html:has(.alonday) body {
 
 .alonday {
   --bg: #f7f4ef;
-  --ink: #1a1f24;
+  --type: #1a1f24;
   --accent: #2f6f6a;
-  --mute: color-mix(in srgb, var(--ink) 58%, var(--bg));
-  --rule: color-mix(in srgb, var(--ink) 12%, var(--bg));
+  --muted: color-mix(in srgb, var(--type) 45%, transparent);
+  --rule: color-mix(in srgb, var(--type) 12%, transparent);
   --pad: clamp(1.15rem, 4vw, 3.2rem);
+  --display: var(--font-alonday-display), "Fraunces", Georgia, serif;
+  --sans: var(--font-alonday-sans), "Instrument Sans", ui-sans-serif, sans-serif;
   background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-alonday-sans), "Instrument Sans", ui-sans-serif, sans-serif;
+  color: var(--type);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.65;
   min-height: 100%;
   overflow-x: clip;
 }
@@ -25,7 +30,7 @@ html:has(.alonday) body {
 
 .alonday ::selection {
   background: color-mix(in srgb, var(--accent) 36%, transparent);
-  color: var(--ink);
+  color: var(--type);
 }
 
 .alonday-banner {
@@ -36,37 +41,39 @@ html:has(.alonday) body {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.25rem 1rem;
-  background: var(--ink);
+  background: var(--type);
   color: var(--bg);
   padding: 0.48rem var(--pad);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .alonday-banner strong {
-  font-weight: 650;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .alonday-kicker {
   margin: 0;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
 }
 
 .alonday-opener {
-  background: var(--ink);
+  background: var(--type);
 }
 
 .alonday-opener-pin {
   position: relative;
   height: 100svh;
   overflow: hidden;
-  background: var(--ink);
+  background: var(--type);
 }
 
 .alonday-opener-still,
@@ -99,7 +106,7 @@ html:has(.alonday) body {
 .alonday-opener-shade {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--ink) 16%, transparent);
+  background: color-mix(in srgb, var(--type) 16%, transparent);
 }
 
 .alonday-opener-bay {
@@ -138,35 +145,42 @@ html:has(.alonday) body {
 
 .alonday-name {
   margin: 0.85rem 0 0;
-  font-family: var(--font-alonday-display), "Fraunces", Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(3.1rem, 7.4vw, 6.2rem);
-  line-height: 0.88;
-  letter-spacing: -0.035em;
+  font-family: var(--display);
+  font-weight: 560;
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 144;
 }
 
 .alonday-name span {
   display: block;
-  margin-top: 0.18em;
-  font-size: 0.36em;
+  margin-top: 0.22em;
+  font-size: 0.34em;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--mute);
+  color: var(--muted);
+  font-variation-settings: "SOFT" 50, "opsz" 80;
 }
 
 .alonday-promise {
   margin: 1.15rem 0 0;
-  font-family: var(--font-alonday-display), "Fraunces", Georgia, serif;
-  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+  font-family: var(--display);
+  font-style: italic;
   font-weight: 500;
-  line-height: 1.25;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.3;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 80;
 }
 
 .alonday-place {
   margin: 0.55rem 0 0;
-  color: var(--mute);
-  font-size: 0.98rem;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.65;
 }
 
 .alonday-ctas {
@@ -180,9 +194,10 @@ html:has(.alonday) body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.78rem 1.05rem;
+  padding: 0.72rem 1.05rem;
   text-decoration: none;
-  font-size: 0.92rem;
+  font-family: var(--sans);
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -193,8 +208,9 @@ html:has(.alonday) body {
 }
 
 .alonday-btn--line {
-  border: 1px solid color-mix(in srgb, var(--ink) 22%, var(--bg));
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1px solid var(--type);
+  background: transparent;
+  color: var(--type);
 }
 
 .alonday-beat {
@@ -211,7 +227,7 @@ html:has(.alonday) body {
   position: relative;
   min-height: 46svh;
   overflow: hidden;
-  background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  background: color-mix(in srgb, var(--type) 8%, var(--bg));
 }
 
 .alonday-beat-photo {
@@ -235,11 +251,13 @@ html:has(.alonday) body {
 
 .alonday-loud {
   margin: 0.7rem 0 0;
-  font-family: var(--font-alonday-display), "Fraunces", Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(3rem, 12vw, 7rem);
-  line-height: 0.88;
-  letter-spacing: -0.04em;
+  font-family: var(--display);
+  font-weight: 560;
+  font-size: clamp(32px, 2.8vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 96;
 }
 
 .alonday-loud--dial a {
@@ -256,19 +274,21 @@ html:has(.alonday) body {
 
 .alonday-time {
   margin: 0.7rem 0 0;
-  font-family: var(--font-alonday-display), "Fraunces", Georgia, serif;
-  font-size: clamp(2rem, 7vw, 3.6rem);
+  font-family: var(--display);
+  font-size: clamp(22px, 2.2vw, 28px);
   font-weight: 500;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--accent);
+  font-optical-sizing: none;
+  font-variation-settings: "SOFT" 50, "opsz" 80;
 }
 
 .alonday-sentence {
   margin: 1.15rem 0 0;
   max-width: 28rem;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--mute);
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--muted);
 }
 
 .alonday-text-link {
@@ -276,15 +296,16 @@ html:has(.alonday) body {
   margin-top: 1.4rem;
   color: var(--accent);
   font-weight: 600;
+  font-size: 14px;
   text-underline-offset: 4px;
 }
 
 .alonday-foot {
   padding: 2.2rem var(--pad) 3rem;
   border-top: 1px solid var(--rule);
-  color: var(--mute);
-  font-size: 0.88rem;
-  line-height: 1.55;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
   max-width: 40rem;
 }
 
@@ -338,10 +359,13 @@ html:has(.alonday) body {
 }
 
 @media (max-width: 719px) {
+  .alonday {
+    font-size: 16px;
+  }
+
   .alonday-banner {
     flex-direction: column;
     align-items: flex-start;
-    font-size: 0.64rem;
   }
 
   .alonday-opener-copy {
@@ -351,7 +375,22 @@ html:has(.alonday) body {
   }
 
   .alonday-name {
-    font-size: clamp(2.6rem, 14vw, 3.6rem);
+    font-size: 36px;
+    font-variation-settings: "SOFT" 50, "opsz" 96;
+  }
+
+  .alonday-promise {
+    font-size: 18px;
+  }
+
+  .alonday-place,
+  .alonday-sentence {
+    font-size: 16px;
+  }
+
+  .alonday-loud {
+    font-size: 28px;
+    font-variation-settings: "SOFT" 50, "opsz" 80;
   }
 
   .alonday-ctas {
