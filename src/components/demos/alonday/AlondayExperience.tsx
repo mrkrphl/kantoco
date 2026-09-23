@@ -34,7 +34,7 @@ export function AlondayExperience() {
       mm.add("(min-width: 720px)", () => {
         gsap.set(still, { scale: 1.02, transformOrigin: "50% 48%" });
         gsap.set(bay, {
-          clipPath: "inset(16% 100% 16% 0% round 1.4rem)",
+          clipPath: "inset(0% 100% 0% 0%)",
         });
         gsap.set(copy, { autoAlpha: 0, x: -24 });
 
@@ -57,7 +57,7 @@ export function AlondayExperience() {
         tl.to(
           bay,
             {
-              clipPath: "inset(7% 48% 5% 3% round 1.25rem)",
+              clipPath: "inset(0% 0% 0% 0%)",
               duration: 0.78,
             },
           0,
@@ -72,7 +72,7 @@ export function AlondayExperience() {
       mm.add("(max-width: 719px)", () => {
         gsap.set(still, { scale: 1.02, transformOrigin: "50% 48%" });
         gsap.set(bay, {
-          clipPath: "inset(100% 5% 4% 5% round 1.15rem)",
+          clipPath: "inset(100% 0% 0% 0%)",
         });
         gsap.set(copy, { autoAlpha: 0, y: 20 });
 
@@ -95,7 +95,7 @@ export function AlondayExperience() {
         tl.to(
           bay,
           {
-            clipPath: "inset(46% 4% 3.5% 4% round 1.15rem)",
+            clipPath: "inset(0% 0% 0% 0%)",
             duration: 0.78,
           },
           0,
@@ -192,7 +192,7 @@ export function AlondayExperience() {
             <div className="alonday-opener-photo">
               <Image
                 src={alonday.stills.hero}
-                alt="After crop of molars in a mouth mirror, from a public Alonday Facebook still"
+                alt="Finished after-filling smile, cropped from a public Alonday Facebook still"
                 fill
                 sizes="100vw"
                 preload

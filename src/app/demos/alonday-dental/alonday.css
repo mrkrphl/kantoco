@@ -106,7 +106,7 @@ html:has(.alonday) body {
 .alonday-opener-shade {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--type) 16%, transparent);
+  background: color-mix(in srgb, var(--type) 8%, transparent);
 }
 
 .alonday-opener-bay {
@@ -118,18 +118,12 @@ html:has(.alonday) body {
 .alonday-opener-wash {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-}
-
-.alonday-opener-bay::after {
-  content: "";
-  position: absolute;
-  top: 14%;
-  bottom: 14%;
-  right: 0;
-  width: 2px;
-  background: var(--accent);
-  opacity: 0.75;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--bg) 20%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 7%, transparent) 28%,
+    transparent 56%
+  );
 }
 
 .alonday-opener-copy {
@@ -139,8 +133,9 @@ html:has(.alonday) body {
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  max-width: 34rem;
+  max-width: 32rem;
   padding: clamp(4.4rem, 10vh, 6rem) clamp(1.3rem, 3vw, 2.4rem) 2rem;
+  text-shadow: 0 1px 18px color-mix(in srgb, var(--bg) 78%, transparent);
 }
 
 .alonday-name {
@@ -209,8 +204,13 @@ html:has(.alonday) body {
 
 .alonday-btn--line {
   border: 1px solid var(--type);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg) 18%, transparent);
   color: var(--type);
+  text-shadow: none;
+}
+
+.alonday-btn--fill {
+  text-shadow: none;
 }
 
 .alonday-beat {
@@ -315,7 +315,7 @@ html:has(.alonday) body {
 }
 
 [data-motion="pending"] .alonday-opener-bay {
-  clip-path: inset(16% 100% 16% 0% round 1.4rem);
+  clip-path: inset(0% 100% 0% 0%);
 }
 
 [data-motion="pending"] .alonday-opener-copy,
@@ -325,7 +325,7 @@ html:has(.alonday) body {
 }
 
 [data-motion="static"] .alonday-opener-bay {
-  clip-path: inset(7% 48% 5% 3% round 1.25rem);
+  clip-path: inset(0% 0% 0% 0%);
 }
 
 [data-motion="static"] .alonday-opener-copy,
@@ -398,27 +398,27 @@ html:has(.alonday) body {
     align-items: stretch;
   }
 
-  .alonday-opener-bay::after {
-    top: 0;
-    bottom: auto;
-    right: 12%;
-    left: 12%;
-    width: auto;
-    height: 2px;
+  .alonday-opener-wash {
+    background: linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--bg) 24%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 6%, transparent) 36%,
+      transparent 66%
+    );
   }
 
   [data-motion="pending"] .alonday-opener-bay {
-    clip-path: inset(100% 5% 4% 5% round 1.15rem);
+    clip-path: inset(100% 0% 0% 0%);
   }
 
   [data-motion="static"] .alonday-opener-bay {
-    clip-path: inset(46% 4% 3.5% 4% round 1.15rem);
+    clip-path: inset(0% 0% 0% 0%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .alonday-opener-bay {
-    clip-path: inset(7% 48% 5% 3% round 1.25rem);
+    clip-path: inset(0% 0% 0% 0%);
   }
 
   .alonday-opener-copy,
@@ -431,6 +431,6 @@ html:has(.alonday) body {
 
 @media (prefers-reduced-motion: reduce) and (max-width: 719px) {
   .alonday-opener-bay {
-    clip-path: inset(46% 4% 3.5% 4% round 1.15rem);
+    clip-path: inset(0% 0% 0% 0%);
   }
 }
