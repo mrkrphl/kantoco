@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Karla, Lora } from "next/font/google";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import "./alonday.css";
 
-const display = Lora({
+const display = Fraunces({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
   variable: "--font-alonday-display",
 });
 
-const sans = Karla({
+const sans = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-alonday-sans",
 });
 
