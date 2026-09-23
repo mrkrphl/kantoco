@@ -121,6 +121,29 @@ html:has(.alonday) body {
   color: var(--teal-deep);
 }
 
+.alonday-hero-still {
+  margin: 1.4rem 0 0;
+  padding: 0;
+  background: var(--porcelain);
+  border: 1px solid var(--rule);
+}
+
+.alonday-hero-still img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.alonday-hero-still figcaption,
+.alonday-hours-still figcaption,
+.alonday-about-still figcaption {
+  margin: 0;
+  padding: 0.75rem 1rem 0.9rem;
+  color: var(--mute);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .alonday-logo-card {
   margin: 1.4rem 0 0;
   padding: 2.4rem 1.6rem 2rem;
@@ -258,16 +281,33 @@ html:has(.alonday) body {
   padding: 0 0 1.1rem;
 }
 
-.alonday-tile-photo {
+.alonday-tile-photo,
+.alonday-tile-photos {
+  background: color-mix(in srgb, var(--teal) 10%, var(--paper));
+}
+
+.alonday-tile-photo--empty {
   min-height: 10rem;
   display: grid;
   place-items: center;
   padding: 1.2rem;
-  background: color-mix(in srgb, var(--teal) 10%, var(--paper));
   color: var(--mute);
   font-size: 0.86rem;
   line-height: 1.45;
   text-align: center;
+}
+
+.alonday-tile-shot {
+  position: relative;
+  aspect-ratio: 4 / 5;
+}
+
+.alonday-tile-photos .alonday-tile-shot + .alonday-tile-shot {
+  border-top: 1px solid var(--rule);
+}
+
+.alonday-tile-shot img {
+  object-fit: cover;
 }
 
 .alonday-tile-name {
@@ -281,6 +321,39 @@ html:has(.alonday) body {
   margin: 0.4rem 1.1rem 0;
   color: var(--mute);
   line-height: 1.5;
+}
+
+.alonday-hours-split {
+  display: grid;
+  gap: 1.4rem;
+  margin: 1.6rem 0 0;
+  max-width: 44rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .alonday-hours-split {
+    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  }
+}
+
+.alonday-hours-still,
+.alonday-about-still {
+  margin: 0;
+  background: var(--porcelain);
+  border: 1px solid var(--rule);
+  max-width: 22rem;
+}
+
+.alonday-about-still {
+  margin: 2rem 0 0;
+}
+
+.alonday-hours-still img,
+.alonday-about-still img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .alonday-placeholder {
@@ -311,8 +384,41 @@ html:has(.alonday) body {
   font-size: 0.9rem;
 }
 
-.alonday-hours-card {
+.alonday-hours-split {
+  display: grid;
+  gap: 1.4rem;
   margin: 1.6rem 0 0;
+  max-width: 44rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .alonday-hours-split {
+    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  }
+}
+
+.alonday-hours-still,
+.alonday-about-still {
+  margin: 0;
+  background: var(--porcelain);
+  border: 1px solid var(--rule);
+  max-width: 22rem;
+}
+
+.alonday-about-still {
+  margin: 2rem 0 0;
+}
+
+.alonday-hours-still img,
+.alonday-about-still img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.alonday-hours-card {
+  margin: 0;
   padding: 1.6rem 1.4rem;
   background: var(--teal-deep);
   color: #f4fbfc;

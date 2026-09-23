@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { AlondayShell } from "@/components/demos/alonday/AlondayShell";
-import { AlondayMark } from "@/components/demos/alonday/AlondayMark";
 import { alonday } from "@/lib/alonday";
 import { DEMO_BADGE } from "@/lib/demos";
 import { revealOnScroll } from "@/lib/motion";
@@ -39,17 +39,19 @@ export function AlondayHome() {
           <p className="alonday-kicker">
             {DEMO_BADGE} · El Grande Avenue, BF Homes
           </p>
-          <div className="alonday-logo-card">
-            <AlondayMark className="alonday-tooth" />
-            <p className="alonday-word">Alonday</p>
-            <p className="alonday-clinic-line">Dental Clinic</p>
-            <p className="alonday-byline">
+          <figure className="alonday-hero-still">
+            <Image
+              src={alonday.stills.hero}
+              alt="Alonday Dental Clinic public logo and contact card"
+              width={852}
+              height={316}
+              priority
+            />
+            <figcaption>
               As printed on their public contact card: {alonday.dentistOnCard}{" "}
               and associates
-            </p>
-            <p className="alonday-card-meta">{alonday.address}</p>
-            <p className="alonday-card-meta">{alonday.phoneDisplay}</p>
-          </div>
+            </figcaption>
+          </figure>
           <h1 className="alonday-title alonday-title--wide">
             {alonday.promise}
           </h1>

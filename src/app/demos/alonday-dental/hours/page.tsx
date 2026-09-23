@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { AlondayShell } from "@/components/demos/alonday/AlondayShell";
 import { alonday } from "@/lib/alonday";
 
@@ -7,16 +8,29 @@ export default function AlondayHours() {
       <div className="alonday-page">
         <p className="alonday-kicker">Hours and location</p>
         <h1 className="alonday-title">{alonday.address}</h1>
-        <div className="alonday-hours-card">
-          <p className="alonday-hours-card-kicker">From their public graphic</p>
-          <p className="alonday-hours-card-line">{alonday.hours}</p>
-          <p className="alonday-hours-card-note">{alonday.hoursNote}</p>
+        <div className="alonday-hours-split">
+          <figure className="alonday-hours-still">
+            <Image
+              src={alonday.stills.hours}
+              alt="Public Facebook graphic: open Monday to Saturday, 9 am to 6 pm"
+              width={480}
+              height={600}
+            />
+            <figcaption>
+              Hours graphic they posted on Facebook (photo-11). Confirm before
+              you go.
+            </figcaption>
+          </figure>
+          <div className="alonday-hours-card">
+            <p className="alonday-hours-card-kicker">From their public graphic</p>
+            <p className="alonday-hours-card-line">{alonday.hours}</p>
+            <p className="alonday-hours-card-note">{alonday.hoursNote}</p>
+          </div>
         </div>
         <p className="alonday-lede">
-          The hours graphic they posted (photo-11, fbid 1126289316180788) says
-          Monday to Saturday, 9:00 AM to 6:00 PM, and that walk-ins are
-          accepted. Confirm the schedule on Facebook before you go. Sunday is
-          not listed on that graphic.
+          Monday to Saturday, 9:00 AM to 6:00 PM. Walk-ins are accepted.
+          Confirm the schedule on Facebook before you go. Sunday is not listed
+          on that graphic.
         </p>
         <p className="alonday-lede">
           Directions: El Grande Avenue in BF Homes, Parañaque, postal code
