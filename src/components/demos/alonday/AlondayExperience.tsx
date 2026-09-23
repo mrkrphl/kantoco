@@ -23,13 +23,11 @@ export function AlondayExperience() {
 
       const pin = root.querySelector<HTMLElement>(".alonday-opener-pin");
       const bay = root.querySelector<HTMLElement>(".alonday-opener-bay");
-      const still = root.querySelector<HTMLElement>(
-        ".alonday-opener-still > .alonday-opener-photo",
-      );
+      const field = root.querySelector<HTMLElement>(".alonday-opener-field");
       const copy = root.querySelector<HTMLElement>(".alonday-opener-copy");
 
       if (reduced) return;
-      if (!pin || !bay || !still || !copy) return;
+      if (!pin || !bay || !field || !copy) return;
 
       const bayStart = "inset(10% 100% 10% 0%)";
       const bayEnd = "inset(10% 8% 10% 0%)";
@@ -37,7 +35,7 @@ export function AlondayExperience() {
       const mm = gsap.matchMedia();
 
       mm.add("(min-width: 720px)", () => {
-        gsap.set(still, { scale: 1.03, transformOrigin: "50% 48%" });
+        gsap.set(field, { scale: 1.04, transformOrigin: "62% 46%" });
         gsap.set(bay, { clipPath: bayStart });
         gsap.set(copy, { autoAlpha: 0, x: -28 });
 
@@ -56,7 +54,7 @@ export function AlondayExperience() {
           },
         });
 
-        tl.to(still, { scale: 1, duration: 1 }, 0);
+        tl.to(field, { scale: 1, duration: 1 }, 0);
         tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
         tl.to(
           copy,
@@ -66,7 +64,7 @@ export function AlondayExperience() {
       });
 
       mm.add("(max-width: 719px)", () => {
-        gsap.set(still, { scale: 1.03, transformOrigin: "50% 48%" });
+        gsap.set(field, { scale: 1.04, transformOrigin: "50% 40%" });
         gsap.set(bay, { clipPath: bayStart });
         gsap.set(copy, { autoAlpha: 0, x: -18 });
 
@@ -85,7 +83,7 @@ export function AlondayExperience() {
           },
         });
 
-        tl.to(still, { scale: 1, duration: 1 }, 0);
+        tl.to(field, { scale: 1, duration: 1 }, 0);
         tl.to(bay, { clipPath: bayEnd, duration: 0.82 }, 0);
         tl.to(
           copy,
@@ -176,33 +174,11 @@ export function AlondayExperience() {
       <section className="alonday-opener" aria-label="Alonday Dental Clinic">
         <div className="alonday-opener-pin">
           <div className="alonday-opener-still">
-            <div className="alonday-opener-bloom" aria-hidden />
-            <div className="alonday-opener-photo">
-              <Image
-                src={alonday.stills.hero}
-                alt="Finished after-filling smile, cropped from a public Alonday Facebook still"
-                fill
-                sizes="100vw"
-                preload
-                className="alonday-opener-img"
-              />
-            </div>
-            <div className="alonday-opener-shade" aria-hidden />
+            <div className="alonday-opener-field" aria-hidden />
           </div>
 
           <div className="alonday-opener-bay">
-            <div className="alonday-opener-light" aria-hidden>
-              <div className="alonday-opener-photo alonday-opener-photo--lit">
-                <Image
-                  src={alonday.stills.hero}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  className="alonday-opener-img"
-                />
-              </div>
-              <div className="alonday-opener-wash" />
-            </div>
+            <div className="alonday-opener-light" aria-hidden />
             <div className="alonday-opener-copy">
               <p className="alonday-kicker">{DEMO_BADGE}</p>
               <h1 className="alonday-name">
