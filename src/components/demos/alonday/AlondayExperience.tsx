@@ -56,10 +56,10 @@ export function AlondayExperience() {
         tl.to(still, { scale: 1, duration: 1 }, 0);
         tl.to(
           bay,
-          {
-            clipPath: "inset(10% 50% 10% 3.5% round 1.4rem)",
-            duration: 0.78,
-          },
+            {
+              clipPath: "inset(7% 48% 5% 3% round 1.25rem)",
+              duration: 0.78,
+            },
           0,
         );
         tl.to(
@@ -196,7 +196,7 @@ export function AlondayExperience() {
                 fill
                 sizes="100vw"
                 preload
-                className="object-cover"
+                className="alonday-opener-img"
               />
             </div>
             <div className="alonday-opener-shade" aria-hidden />
@@ -242,7 +242,7 @@ export function AlondayExperience() {
               alt="Close crop of a finished composite on a molar, from a public Facebook still"
               fill
               sizes="(min-width: 720px) 54vw, 100vw"
-              className="object-cover"
+              className="alonday-beat-img alonday-beat-img--molar"
             />
           </div>
         </div>
@@ -270,7 +270,7 @@ export function AlondayExperience() {
               alt="Close crop of a finished porcelain-fused-to-metal smile, from a public Facebook still"
               fill
               sizes="(min-width: 720px) 54vw, 100vw"
-              className="object-cover"
+              className="alonday-beat-img alonday-beat-img--crowns"
             />
           </div>
         </div>

@@ -79,15 +79,27 @@ html:has(.alonday) body {
   transform-origin: 48% 38%;
 }
 
-.alonday-opener-still img,
-.alonday-beat-photo img {
+.alonday-opener-img,
+.alonday-beat-img {
   object-fit: cover;
+}
+
+.alonday-opener-img {
+  object-position: 50% 72%;
+}
+
+.alonday-beat-img--molar {
+  object-position: 50% 74%;
+}
+
+.alonday-beat-img--crowns {
+  object-position: 50% 78%;
 }
 
 .alonday-opener-shade {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--ink) 30%, transparent);
+  background: color-mix(in srgb, var(--ink) 16%, transparent);
 }
 
 .alonday-opener-bay {
@@ -118,10 +130,10 @@ html:has(.alonday) body {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   height: 100%;
   max-width: 34rem;
-  padding: clamp(5.2rem, 12vh, 7rem) clamp(1.3rem, 3vw, 2.4rem) 2.4rem;
+  padding: clamp(4.4rem, 10vh, 6rem) clamp(1.3rem, 3vw, 2.4rem) 2rem;
 }
 
 .alonday-name {
@@ -292,7 +304,7 @@ html:has(.alonday) body {
 }
 
 [data-motion="static"] .alonday-opener-bay {
-  clip-path: inset(10% 50% 10% 3.5% round 1.4rem);
+  clip-path: inset(7% 48% 5% 3% round 1.25rem);
 }
 
 [data-motion="static"] .alonday-opener-copy,
@@ -367,7 +379,7 @@ html:has(.alonday) body {
 
 @media (prefers-reduced-motion: reduce) {
   .alonday-opener-bay {
-    clip-path: inset(10% 50% 10% 3.5% round 1.4rem);
+    clip-path: inset(7% 48% 5% 3% round 1.25rem);
   }
 
   .alonday-opener-copy,
