@@ -18,11 +18,11 @@ They are not invented photographs.
 | `photo-05.jpg` | fbid 1274652218011163 | Implants smile promo | Present. Held. |
 | `photo-06.jpg` | fbid 1253037483505970 | X-ray / surgery graphic | Present. Held. |
 | `photo-07.jpg` | fbid 1237921558350896 | Implant model | Present. Held. |
-| `photo-08.jpg` | fbid 1145568694252850 | Fillings B/A | Present. Opener still, CSS-cropped to the after smile. |
+| `photo-08.jpg` | fbid 1145568694252850 | Fillings B/A | Present. Source for opener crop. |
 | `photo-09.jpg` | fbid 1137549768388076 | Denture B/A | Present. Held. |
 | `photo-10.jpg` | fbid 1130379019105151 | Whitening | Present. Held. |
 | `photo-11.jpg` | fbid 1126289316180788 | Hours graphic | Present. Hours are typeset, not the graphic. |
 | `photo-12.jpg` | fbid 1111227657686954 | Reception / team still | Present. De-emphasized until names are confirmed. |
-| `hero-smile.jpg` | crop of photo-08 after | Held tight crop | Kept. Opener uses `photo-08.jpg` so the still stays readable at 1440. |
-| `composite-after.jpg` | crop of photo-04 after | Held tight crop | Composite beat uses `photo-04.jpg`. |
-| `crowns-after.jpg` | crop of photo-02 after | Held tight crop | Crowns beat uses `photo-02.jpg`. |
+| `hero-smile.jpg` | crop of photo-08 after | Opener still | After smile only. No full face. No BEFORE panel. |
+| `composite-after.jpg` | crop of photo-04 after | Composite beat | After molar only. |
+| `crowns-after.jpg` | crop of photo-02 after | Crowns beat | After mouth crop. No full face. |

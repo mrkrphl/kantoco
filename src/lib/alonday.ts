@@ -26,12 +26,12 @@ export const alonday = {
     "https://www.google.com/maps/search/?api=1&query=454+El+Grande+Ave.+BF+Homes+Paranaque+1718",
   dentistOnCard: "Dr. Emma Aleli Alonday",
   stills: {
-    hero: still("photo-08.jpg"),
-    heroCrop: still("hero-smile.jpg"),
-    composite: still("photo-04.jpg"),
-    compositeCrop: still("composite-after.jpg"),
-    crowns: still("photo-02.jpg"),
-    crownsCrop: still("crowns-after.jpg"),
+    hero: still("hero-smile.jpg"),
+    heroSource: still("photo-08.jpg"),
+    composite: still("composite-after.jpg"),
+    compositeSource: still("photo-04.jpg"),
+    crowns: still("crowns-after.jpg"),
+    crownsSource: still("photo-02.jpg"),
   },
   sampleNote:
     "This page is a KantoCo sample of how Alonday Dental Clinic could look on the web. They did not hire us.",
