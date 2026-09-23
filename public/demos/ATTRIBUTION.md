@@ -82,3 +82,9 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 | `maxicon-car-aircon/bay-work-poster.jpg` | First frame of `bay-work.mp4` | KantoCo | Poster / reduced-motion still |
 | `maxicon-car-aircon/cold-vent.mp4` | Generated KantoCo sample clip | KantoCo | Muted 1280×720 H.264, ~5.04s, GOP 12 |
 | `maxicon-car-aircon/cold-vent-poster.jpg` | First frame of `cold-vent.mp4` | KantoCo | Poster / reduced-motion still |
+
+## Alonday Dental Clinic (unlisted)
+
+Pitch sample only. Not on the homepage list. Facebook stills from Paige’s
+brief could not be downloaded here. See `alonday-dental/ATTRIBUTION.md`
+for the photo-01 through photo-12 slot list.
