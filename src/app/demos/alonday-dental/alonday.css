@@ -110,46 +110,20 @@ html:has(.alonday) body {
 
 .alonday-opener {
   position: relative;
-  min-height: calc(100svh - var(--banner-h));
+  min-height: min(calc(100svh - var(--banner-h)), 880px);
   display: grid;
-  align-content: end;
-  padding-bottom: clamp(48px, 8vh, 96px);
+  align-content: center;
+  padding-block: clamp(48px, 8vh, 96px);
   background: var(--bg);
-  overflow: hidden;
 }
 
 .alonday-opener-copy {
   position: relative;
   z-index: 1;
-  overflow: hidden;
-  --glow-o: 1;
-  --glow-s: 1;
-}
-
-.alonday-opener-copy::before {
-  content: "";
-  position: absolute;
-  inset: -8% 0;
-  z-index: 0;
-  background: radial-gradient(
-    ellipse 55% 65% at 28% 50%,
-    color-mix(in srgb, var(--accent) 12%, var(--bg)) 0%,
-    color-mix(in srgb, var(--accent) 5%, var(--bg)) 45%,
-    var(--bg) 75%
-  );
-  opacity: var(--glow-o);
-  transform: scale(var(--glow-s));
-  transform-origin: 28% 50%;
-  pointer-events: none;
-}
-
-.alonday-opener-copy > * {
-  position: relative;
-  z-index: 1;
 }
 
 .alonday-name {
-  margin: 0.55rem 0 0;
+  margin: 0;
   padding-bottom: 40px;
   font-family: var(--display);
   font-weight: 560;
@@ -447,6 +421,21 @@ html:has(.alonday) body {
   font-variation-settings: "SOFT" 50, "opsz" 80;
 }
 
+p,
+li,
+dd,
+.note {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+.closing-line,
+.tagline {
+  text-wrap: balance;
+}
+
 .alonday-visit-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -488,13 +477,6 @@ html:has(.alonday) body {
 
 .alonday-visit-dial.alonday-line::after {
   bottom: 0.12em;
-}
-
-.alonday-visit-note {
-  margin: 1.15rem 0 0;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--muted);
 }
 
 .alonday-visit-block + .alonday-visit-block {
@@ -573,11 +555,6 @@ html.js-anim .alonday-name {
   --draw: 0;
 }
 
-html.js-anim .alonday-opener-copy {
-  --glow-o: 0;
-  --glow-s: 0.94;
-}
-
 html.js-anim .alonday-clinic,
 html.js-anim .alonday-promise,
 html.js-anim .alonday-place,
@@ -604,11 +581,6 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
   transform: none;
 }
 
-[data-motion="static"] .alonday-opener-copy {
-  --glow-o: 1;
-  --glow-s: 1;
-}
-
 [data-motion="static"] .alonday-line:not(.alonday-name)::after,
 [data-motion="static"] .alonday-foot-rule {
   transform: scaleX(1);
@@ -631,7 +603,6 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
   }
 
   .alonday-note-attr,
-  .alonday-visit-note,
   .alonday-foot-copy,
   .alonday-foot-links a {
     font-size: 15px;
@@ -640,10 +611,6 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
 }
 
 @media (max-width: 1023px) {
-  .alonday-opener {
-    padding-bottom: 48px;
-  }
-
   .alonday-section--treat {
     padding-top: 24px;
   }
@@ -773,11 +740,6 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
   .alonday-opener-ctas .alonday-btn {
     opacity: 1;
     transform: none;
-  }
-
-  .alonday-opener-copy {
-    --glow-o: 1;
-    --glow-s: 1;
   }
 
   .alonday-line:not(.alonday-name)::after,

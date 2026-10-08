@@ -17,7 +17,6 @@ function drawLine(el: Element | null) {
 }
 
 function playOpener(root: HTMLElement) {
-  const copy = root.querySelector<HTMLElement>(".alonday-opener-copy");
   const name = root.querySelector<HTMLElement>(".alonday-name");
   const rise = gsap.utils.toArray<HTMLElement>(
     ".alonday-clinic, .alonday-promise, .alonday-place",
@@ -27,13 +26,11 @@ function playOpener(root: HTMLElement) {
     ".alonday-opener-ctas .alonday-btn",
     root,
   );
-  if (!copy || !name) return;
+  if (!name) return;
 
-  const vars = { draw: 0, glowO: 0, glowS: 0.94 };
+  const vars = { draw: 0 };
   const applyVars = () => {
     name.style.setProperty("--draw", String(vars.draw));
-    copy.style.setProperty("--glow-o", String(vars.glowO));
-    copy.style.setProperty("--glow-s", String(vars.glowS));
   };
   applyVars();
   gsap.set(name, { opacity: 0.4 });
@@ -49,11 +46,6 @@ function playOpener(root: HTMLElement) {
 
   tl.to(vars, { draw: 1, duration: 0.8, onUpdate: applyVars }, 0);
   tl.to(name, { opacity: 1, duration: 0.75 }, 0.25);
-  tl.to(
-    vars,
-    { glowO: 1, glowS: 1, duration: 1.2, onUpdate: applyVars },
-    0,
-  );
   tl.to(rise, { opacity: 1, y: 0, duration: 0.3, stagger: 0.1 }, 0.8);
   tl.to(buttons, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 }, 1.2);
 }
@@ -137,15 +129,14 @@ export function AlondayExperience() {
 
       <section className="alonday-opener" aria-label="Alonday Dental Clinic">
         <div className="alonday-wrap alonday-opener-copy">
-          <p className="alonday-kicker alonday-kicker--tick">
-            <span className="alonday-section-tick" aria-hidden />
-            {DEMO_BADGE}
-          </p>
           <h1 className="alonday-name alonday-line">{alonday.shortName}</h1>
           <div className="alonday-opener-below">
             <div className="alonday-opener-left">
-              <p className="alonday-clinic">Dental Clinic</p>
-              <p className="alonday-promise">{alonday.promise}</p>
+              <p className="alonday-clinic alonday-kicker--tick">
+                <span className="alonday-section-tick" aria-hidden />
+                Dental Clinic
+              </p>
+              <p className="alonday-promise tagline">{alonday.promise}</p>
             </div>
             <div className="alonday-opener-right">
               <p className="alonday-place">{alonday.addressShort}</p>
@@ -217,7 +208,7 @@ export function AlondayExperience() {
             <span className="alonday-section-tick" aria-hidden />
             Visit
           </p>
-          <p className="alonday-visit-close">{alonday.promise}</p>
+          <p className="alonday-visit-close closing-line">{alonday.visitClose}</p>
           <div className="alonday-visit-grid">
             <div className="alonday-visit-main">
               <p className="alonday-kicker">Call or message</p>
@@ -243,7 +234,6 @@ export function AlondayExperience() {
                   {alonday.messageLabel}
                 </a>
               </div>
-              <p className="alonday-visit-note">{alonday.visitNote}</p>
             </div>
             <div className="alonday-visit-side">
               <div className="alonday-visit-block">
