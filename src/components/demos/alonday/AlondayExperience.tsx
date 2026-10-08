@@ -6,11 +6,29 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { alonday } from "@/lib/alonday";
+import { alondayImages } from "@/lib/alonday-images";
 import { waitForOpenerAutoplay } from "@/lib/motion";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
 import { useMotionReady } from "@/components/motion/useMotionReady";
+import { AlondayPicture } from "@/components/demos/alonday/AlondayPicture";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+function TreatRow({
+  row,
+}: {
+  row: (typeof alonday.treatments)[number];
+}) {
+  return (
+    <li className="alonday-treat-row">
+      <span className="alonday-treat-num">{row.n}</span>
+      <div className="alonday-treat-main">
+        <h2 className="alonday-treat-name alonday-line">{row.name}</h2>
+      </div>
+      <p className="alonday-treat-desc">{row.descriptor}</p>
+    </li>
+  );
+}
 
 function drawLine(el: Element | null) {
   el?.classList.add("is-drawn");
@@ -108,7 +126,76 @@ export function AlondayExperience() {
         }
       });
 
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const plateFrame = root.querySelector<HTMLElement>(
+          ".alonday-plate .alonday-frame",
+        );
+        const plateImg = plateFrame?.querySelector("img");
+        if (plateFrame && plateImg) {
+          gsap.fromTo(
+            plateImg,
+            { scale: 1.08 },
+            {
+              scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: plateFrame,
+                start: "top bottom",
+                end: "center center",
+                scrub: true,
+              },
+            },
+          );
+        }
+
+        root
+          .querySelectorAll<HTMLElement>("[data-parallax^='treat']")
+          .forEach((frame) => {
+            const img = frame.querySelector("img");
+            if (!img) return;
+            const pair = frame.dataset.parallax === "treat-2";
+            gsap.set(img, { scale: 1.08 });
+            gsap.fromTo(
+              img,
+              { yPercent: pair ? -2 : -4 },
+              {
+                yPercent: pair ? 2 : 4,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: frame,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: true,
+                },
+              },
+            );
+          });
+
+        const shopFrame = root.querySelector<HTMLElement>(
+          ".alonday-visit-storefront .alonday-frame",
+        );
+        const shopImg = shopFrame?.querySelector("img");
+        if (shopFrame && shopImg) {
+          gsap.fromTo(
+            shopImg,
+            { scale: 1.04 },
+            {
+              scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: shopFrame,
+                start: "top bottom",
+                end: "center center",
+                scrub: true,
+              },
+            },
+          );
+        }
+      });
+
       requestAnimationFrame(() => ScrollTrigger.refresh());
+      return () => mm.revert();
     },
     { scope: rootRef, dependencies: [ready, reduced] },
   );
@@ -159,6 +246,25 @@ export function AlondayExperience() {
       </section>
 
       <section
+        className={`alonday-plate alonday-plate--${alondayImages.plate.key}`}
+        aria-label="Clinic interior"
+      >
+        <div className="alonday-wrap">
+          <AlondayPicture
+            desktop={alondayImages.plate.desktop}
+            mobile={alondayImages.plate.mobile}
+            alt={alondayImages.plate.alt}
+            sizes={alondayImages.sizes.plate}
+            frameClass="alonday-frame--plate"
+            parallax="plate"
+          />
+          {alondayImages.plate.caption ? (
+            <p className="alonday-stock-cap note">{alondayImages.plate.caption}</p>
+          ) : null}
+        </div>
+      </section>
+
+      <section
         className="alonday-section alonday-section--treat"
         aria-label="What they treat"
       >
@@ -168,14 +274,51 @@ export function AlondayExperience() {
             What they treat
           </p>
           <ol className="alonday-treat">
-            {alonday.treatments.map((row) => (
-              <li key={row.n} className="alonday-treat-row">
-                <span className="alonday-treat-num">{row.n}</span>
-                <div className="alonday-treat-main">
-                  <h2 className="alonday-treat-name alonday-line">{row.name}</h2>
-                </div>
-                <p className="alonday-treat-desc">{row.descriptor}</p>
-              </li>
+            {alonday.treatments.slice(0, 3).map((row) => (
+              <TreatRow key={row.n} row={row} />
+            ))}
+            <li className="alonday-treat-break alonday-treat-break--pair">
+              <figure className="alonday-treat-fig alonday-treat-fig--1">
+                <AlondayPicture
+                  desktop={alondayImages.treat1.src}
+                  mobile={alondayImages.treat1.src}
+                  alt={alondayImages.treat1.alt}
+                  sizes={alondayImages.sizes.treat}
+                  frameClass="alonday-frame--treat alonday-frame--treat-1"
+                  parallax="treat"
+                />
+              </figure>
+              <figure className="alonday-treat-fig alonday-treat-fig--2">
+                <AlondayPicture
+                  desktop={alondayImages.treat2.src}
+                  mobile={alondayImages.treat2.src}
+                  alt={alondayImages.treat2.alt}
+                  sizes={alondayImages.sizes.treat2}
+                  frameClass="alonday-frame--treat alonday-frame--treat-2"
+                  parallax="treat-2"
+                />
+                <figcaption className="alonday-stock-cap note">
+                  {alondayImages.treat2.caption}
+                </figcaption>
+              </figure>
+            </li>
+            {alonday.treatments.slice(3, 6).map((row) => (
+              <TreatRow key={row.n} row={row} />
+            ))}
+            <li className="alonday-treat-break alonday-treat-break--solo">
+              <figure className="alonday-treat-fig alonday-treat-fig--3">
+                <AlondayPicture
+                  desktop={alondayImages.treat3.src}
+                  mobile={alondayImages.treat3.src}
+                  alt={alondayImages.treat3.alt}
+                  sizes={alondayImages.sizes.treat}
+                  frameClass="alonday-frame--treat alonday-frame--treat-3"
+                  parallax="treat"
+                />
+              </figure>
+            </li>
+            {alonday.treatments.slice(6).map((row) => (
+              <TreatRow key={row.n} row={row} />
             ))}
           </ol>
         </div>
@@ -235,30 +378,38 @@ export function AlondayExperience() {
                 </a>
               </div>
             </div>
-            <div className="alonday-visit-side">
-              <div className="alonday-visit-block">
-                <p className="alonday-kicker alonday-kicker--tick">
-                  <span className="alonday-section-tick" aria-hidden />
-                  Hours
-                </p>
-                <p className="alonday-visit-heading">{alonday.hoursHeading}</p>
-                <p className="alonday-visit-body">{alonday.hoursBody}</p>
-              </div>
-              <div className="alonday-visit-block">
-                <p className="alonday-kicker alonday-kicker--tick">
-                  <span className="alonday-section-tick" aria-hidden />
-                  Address
-                </p>
-                <p className="alonday-visit-heading">{alonday.address}</p>
-                <a
-                  href={alonday.mapsQuery}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="alonday-map-link"
-                >
-                  Open the map
-                </a>
-              </div>
+            <div className="alonday-visit-hours alonday-visit-block">
+              <p className="alonday-kicker alonday-kicker--tick">
+                <span className="alonday-section-tick" aria-hidden />
+                Hours
+              </p>
+              <p className="alonday-visit-heading">{alonday.hoursHeading}</p>
+              <p className="alonday-visit-body">{alonday.hoursBody}</p>
+            </div>
+            <div className="alonday-visit-storefront">
+              <AlondayPicture
+                desktop={alondayImages.storefront.desktop}
+                mobile={alondayImages.storefront.mobile}
+                alt={alondayImages.storefront.alt}
+                sizes={alondayImages.sizes.storefront}
+                frameClass="alonday-frame--storefront"
+                parallax="storefront"
+              />
+            </div>
+            <div className="alonday-visit-address alonday-visit-block">
+              <p className="alonday-kicker alonday-kicker--tick">
+                <span className="alonday-section-tick" aria-hidden />
+                Address
+              </p>
+              <p className="alonday-visit-heading">{alonday.address}</p>
+              <a
+                href={alonday.mapsQuery}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="alonday-map-link"
+              >
+                Open the map
+              </a>
             </div>
           </div>
         </div>
@@ -272,7 +423,10 @@ export function AlondayExperience() {
             aria-hidden
           />
           <div className="alonday-foot-grid">
-            <p className="alonday-foot-copy">{alonday.sampleNote}</p>
+            <div className="alonday-foot-copy">
+              <p>{alonday.sampleNote}</p>
+              <p className="alonday-foot-credit">{alondayImages.plate.credit}</p>
+            </div>
             <p className="alonday-foot-links">
               <a
                 href={alonday.kantocoMessenger}
