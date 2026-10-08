@@ -1,19 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { alonday } from "@/lib/alonday";
+import { waitForOpenerLine } from "@/lib/motion";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+const drawEase = "cubic-bezier(.22,1,.36,1)";
+
+function drawLine(el: Element | null) {
+  el?.classList.add("is-drawn");
+}
+
 export function AlondayExperience() {
   const rootRef = useRef<HTMLDivElement>(null);
   const { ready, reduced } = useMotionReady();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || reduced) return;
+    let live = true;
+    waitForOpenerLine().then(() => {
+      if (!live) return;
+      const name = root.querySelector<HTMLElement>(".alonday-name");
+      if (!name) return;
+      drawLine(name);
+      gsap.to(name, { opacity: 1, duration: 0.9, ease: drawEase });
+    });
+    return () => {
+      live = false;
+    };
+  }, [reduced]);
 
   useGSAP(
     () => {
@@ -21,8 +44,6 @@ export function AlondayExperience() {
       if (!root || !ready) return;
 
       const pin = root.querySelector<HTMLElement>(".alonday-opener-pin");
-      const name = root.querySelector<HTMLElement>(".alonday-name");
-      const line = root.querySelector<HTMLElement>(".alonday-hairline");
       const rest = gsap.utils.toArray<HTMLElement>(
         ".alonday-clinic, .alonday-promise, .alonday-place, .alonday-opener-ctas",
         root,
@@ -31,11 +52,9 @@ export function AlondayExperience() {
       const tick = root.querySelector<HTMLElement>(".alonday-opener-tick");
 
       if (reduced) return;
-      if (!pin || !name || !line || !glow) return;
+      if (!pin || !glow) return;
 
       const buildOpener = (id: string, vh: number) => {
-        gsap.set(name, { opacity: 0.4 });
-        gsap.set(line, { scaleX: 0, transformOrigin: "left center" });
         gsap.set(rest, { autoAlpha: 0, y: 16 });
         gsap.set(glow, { opacity: 0 });
         if (tick) gsap.set(tick, { opacity: 0, scaleY: 0.4 });
@@ -56,12 +75,6 @@ export function AlondayExperience() {
         });
 
         tl.to(
-          line,
-          { scaleX: 1, duration: 0.35, ease: "power2.out" },
-          0,
-        );
-        tl.to(name, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.35);
-        tl.to(
           rest,
           { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" },
           0.38,
@@ -76,36 +89,55 @@ export function AlondayExperience() {
         }
       };
 
+      const fitGap = () => {
+        const pinEl = root.querySelector<HTMLElement>(".alonday-opener-pin");
+        const ctas = root.querySelector<HTMLElement>(".alonday-opener-ctas");
+        const treat = root.querySelector<HTMLElement>(".alonday-section--treat");
+        if (!pinEl || !ctas || !treat) return;
+        treat.style.marginTop = "0px";
+        const spaceBelow =
+          pinEl.getBoundingClientRect().bottom - ctas.getBoundingClientRect().bottom;
+        const padTop = Number.parseFloat(getComputedStyle(treat).paddingTop) || 0;
+        const gap = spaceBelow + padTop;
+        const target = window.matchMedia("(max-width: 719px)").matches
+          ? 80
+          : 120;
+        if (gap > target) {
+          treat.style.marginTop = `${Math.round(target - gap)}px`;
+        }
+      };
+
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 720px)", () => buildOpener("alonday-line", 1.4));
-      mm.add("(max-width: 719px)", () => buildOpener("alonday-line-m", 1.2));
+      mm.add("(min-width: 720px)", () => buildOpener("alonday-line", 0.8));
+      mm.add("(max-width: 719px)", () => buildOpener("alonday-line-m", 0.65));
+      ScrollTrigger.addEventListener("refresh", fitGap);
 
-      root.querySelectorAll<HTMLElement>("[data-draw]").forEach((row) => {
-        const mark = row.querySelector<HTMLElement>(".alonday-draw");
-        const ink = gsap.utils.toArray<HTMLElement>(".alonday-ink", row);
-        if (!mark) return;
-
-        gsap.set(mark, { scaleX: 0, transformOrigin: "left center" });
-        if (ink.length) gsap.set(ink, { opacity: 0.45 });
-
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: row,
-            start: "top 75%",
-            end: () => `+=${Math.round(window.innerHeight * 0.25)}`,
-            scrub: 0.45,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        tl.to(mark, { scaleX: 1, ease: "power2.out" }, 0);
-        if (ink.length) tl.to(ink, { opacity: 1, ease: "power1.out" }, 0);
+      ScrollTrigger.batch(".alonday-treat-row .alonday-line", {
+        start: "top 85%",
+        once: true,
+        onEnter: (els) => {
+          els.forEach((el, i) => {
+            gsap.delayedCall(i * 0.08, () => drawLine(el));
+          });
+        },
       });
 
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      root.querySelectorAll<HTMLElement>("[data-draw]").forEach((el) => {
+        ScrollTrigger.create({
+          trigger: el,
+          start: "top 75%",
+          once: true,
+          onEnter: () => drawLine(el),
+        });
+      });
+
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+        fitGap();
+      });
 
       return () => {
+        ScrollTrigger.removeEventListener("refresh", fitGap);
         mm.revert();
       };
     },
@@ -123,14 +155,13 @@ export function AlondayExperience() {
 
       <section className="alonday-opener" aria-label="Alonday Dental Clinic">
         <div className="alonday-opener-pin">
-          <div className="alonday-opener-copy">
+          <div className="alonday-wrap alonday-opener-copy">
             <div className="alonday-opener-stack">
               <div className="alonday-opener-glow" aria-hidden />
               <p className="alonday-kicker">{DEMO_BADGE}</p>
               <div className="alonday-name-block">
                 <span className="alonday-opener-tick" aria-hidden />
-                <h1 className="alonday-name">{alonday.shortName}</h1>
-                <span className="alonday-hairline" aria-hidden />
+                <h1 className="alonday-name alonday-line">{alonday.shortName}</h1>
               </div>
               <p className="alonday-clinic">Dental Clinic</p>
               <p className="alonday-promise">{alonday.promise}</p>
@@ -153,19 +184,21 @@ export function AlondayExperience() {
         </div>
       </section>
 
-      <section className="alonday-section" aria-label="What they treat">
-        <div className="alonday-section-inner">
+      <section
+        className="alonday-section alonday-section--treat"
+        aria-label="What they treat"
+      >
+        <div className="alonday-wrap">
           <p className="alonday-kicker alonday-kicker--tick">
             <span className="alonday-section-tick" aria-hidden />
             What they treat
           </p>
           <ol className="alonday-treat">
             {alonday.treatments.map((row) => (
-              <li key={row.n} className="alonday-treat-row" data-draw>
+              <li key={row.n} className="alonday-treat-row">
                 <span className="alonday-treat-num">{row.n}</span>
                 <div className="alonday-treat-main">
-                  <h2 className="alonday-treat-name alonday-ink">{row.name}</h2>
-                  <span className="alonday-draw" aria-hidden />
+                  <h2 className="alonday-treat-name alonday-line">{row.name}</h2>
                 </div>
                 <p className="alonday-treat-desc">{row.descriptor}</p>
               </li>
@@ -175,7 +208,7 @@ export function AlondayExperience() {
       </section>
 
       <section className="alonday-section" aria-label="Case notes">
-        <div className="alonday-section-inner">
+        <div className="alonday-wrap">
           <p className="alonday-kicker alonday-kicker--tick">
             <span className="alonday-section-tick" aria-hidden />
             Case notes · from their Facebook
@@ -192,94 +225,90 @@ export function AlondayExperience() {
         </div>
       </section>
 
-      <section className="alonday-section" aria-label="Hours">
-        <div className="alonday-section-inner alonday-section-inner--narrow">
+      <section className="alonday-visit" aria-label="Visit">
+        <div className="alonday-wrap">
           <p className="alonday-kicker alonday-kicker--tick">
             <span className="alonday-section-tick" aria-hidden />
-            Hours
+            Visit
           </p>
-          <h2 className="alonday-loud">{alonday.hoursLoud}</h2>
-          <div className="alonday-mark" data-draw>
-            <p className="alonday-time">{alonday.hoursTime}</p>
-            <span className="alonday-draw alonday-draw--time" aria-hidden />
-          </div>
-          <p className="alonday-sentence">{alonday.hoursWalkins}</p>
-          <p className="alonday-sentence">{alonday.hoursConfirm}</p>
-        </div>
-      </section>
-
-      <section className="alonday-section" aria-label="Location">
-        <div className="alonday-section-inner alonday-section-inner--narrow">
-          <p className="alonday-kicker alonday-kicker--tick">
-            <span className="alonday-section-tick" aria-hidden />
-            Location
-          </p>
-          <h2 className="alonday-loud">
-            <span className="alonday-num">{alonday.streetNumber}</span>{" "}
-            <span className="alonday-street" data-draw>
-              {alonday.streetName}
-              <span className="alonday-draw alonday-draw--street" aria-hidden />
-            </span>
-          </h2>
-          <p className="alonday-sentence">{alonday.address}</p>
-          <p className="alonday-sentence">{alonday.locationNote}</p>
-          <a
-            href={alonday.mapsQuery}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="alonday-text-link"
-          >
-            Open the map
-          </a>
-        </div>
-      </section>
-
-      <section className="alonday-section" aria-label="Contact">
-        <div className="alonday-section-inner alonday-section-inner--narrow">
-          <p className="alonday-kicker alonday-kicker--tick">
-            <span className="alonday-section-tick" aria-hidden />
-            Contact
-          </p>
-          <div className="alonday-mark" data-draw>
-            <h2 className="alonday-loud alonday-loud--dial">
-              <a href={alonday.phoneHref}>{alonday.phoneDisplay}</a>
-            </h2>
-            <span className="alonday-draw alonday-draw--phone" aria-hidden />
-          </div>
-          <p className="alonday-sentence">
-            Call the number on their card, or write them on Facebook. This
-            sample does not take appointments.
-          </p>
-          <div className="alonday-ctas">
-            <a href={alonday.phoneHref} className="alonday-btn alonday-btn--fill">
-              Call {alonday.phoneDisplay}
-            </a>
-            <a
-              href={alonday.messenger}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="alonday-btn alonday-btn--line"
-            >
-              Message on Facebook
-            </a>
+          <div className="alonday-visit-grid">
+            <div className="alonday-visit-main">
+              <p className="alonday-kicker">Call or message</p>
+              <div className="alonday-visit-number">
+                <div className="alonday-visit-glow" aria-hidden />
+                <a
+                  href={alonday.phoneHref}
+                  className="alonday-visit-dial alonday-line"
+                  data-draw
+                >
+                  {alonday.phoneDisplay}
+                </a>
+              </div>
+              <div className="alonday-ctas alonday-visit-ctas">
+                <a href={alonday.phoneHref} className="alonday-btn alonday-btn--fill">
+                  Call {alonday.phoneDisplay}
+                </a>
+                <a
+                  href={alonday.messenger}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="alonday-btn alonday-btn--line"
+                >
+                  Message on Facebook
+                </a>
+              </div>
+              <p className="alonday-visit-note">{alonday.visitNote}</p>
+            </div>
+            <div className="alonday-visit-side">
+              <div className="alonday-visit-block">
+                <p className="alonday-kicker alonday-kicker--tick">
+                  <span className="alonday-section-tick" aria-hidden />
+                  Hours
+                </p>
+                <p className="alonday-visit-heading">{alonday.hoursHeading}</p>
+                <p className="alonday-visit-body">{alonday.hoursBody}</p>
+              </div>
+              <div className="alonday-visit-block">
+                <p className="alonday-kicker alonday-kicker--tick">
+                  <span className="alonday-section-tick" aria-hidden />
+                  Address
+                </p>
+                <p className="alonday-visit-heading">{alonday.address}</p>
+                <a
+                  href={alonday.mapsQuery}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="alonday-map-link"
+                >
+                  Open the map
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <footer className="alonday-foot">
-        <p>
-          {alonday.sampleNote}{" "}
-          <a
-            href={alonday.kantocoMessenger}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Message KantoCo
-          </a>
-        </p>
-        <p>
-          <Link href="/">Back to the agency</Link>
-        </p>
+        <div className="alonday-wrap">
+          <span
+            className="alonday-foot-rule alonday-line"
+            data-draw
+            aria-hidden
+          />
+          <div className="alonday-foot-grid">
+            <p className="alonday-foot-copy">{alonday.sampleNote}</p>
+            <p className="alonday-foot-links">
+              <a
+                href={alonday.kantocoMessenger}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Message KantoCo
+              </a>
+              <Link href="/">Back to the agency</Link>
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );

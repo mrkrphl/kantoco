@@ -12,12 +12,10 @@ export const alonday = {
   phoneDisplay: "0939 932 2060",
   phoneHref: "tel:+639399322060",
   hours: "Monday to Saturday, 9:00 AM to 6:00 PM",
-  hoursLoud: "Monday to Saturday",
-  hoursTime: "9 to 6",
-  hoursWalkins: "Walk-ins are accepted daily, including Thursdays.",
-  hoursConfirm: "Confirm the schedule on Facebook before you go.",
-  locationNote:
-    "A neighborhood clinic on El Grande Avenue in BF Homes, look for the number, then confirm on Facebook if you are walking in.",
+  hoursHeading: "Open Monday to Saturday, 9 am to 6 pm.",
+  hoursBody:
+    "Walk-ins are accepted. Sunday isn't in their posted hours, so message them on Facebook before you go.",
+  visitNote: "This sample does not take appointments.",
   facebook: "https://www.facebook.com/AlondayDentalClinic/",
   messenger: "https://www.facebook.com/AlondayDentalClinic/",
   instagram: "https://www.instagram.com/alondaydentalclinic",
