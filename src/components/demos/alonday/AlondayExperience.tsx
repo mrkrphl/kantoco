@@ -123,14 +123,18 @@ export function AlondayExperience() {
       });
 
       root.querySelectorAll<HTMLElement>("[data-draw]").forEach((el) => {
+        const start = el.classList.contains("alonday-foot-rule")
+          ? "top bottom"
+          : "top 75%";
         ScrollTrigger.create({
           trigger: el,
-          start: el.classList.contains("alonday-foot-rule")
-            ? "top 98%"
-            : "top 75%",
+          start,
           once: true,
           onEnter: () => drawLine(el),
         });
+        if (el.getBoundingClientRect().top < window.innerHeight) {
+          drawLine(el);
+        }
       });
 
       requestAnimationFrame(() => {
