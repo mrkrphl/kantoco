@@ -430,7 +430,7 @@ html:has(.alonday) body {
 .alonday-visit {
   position: relative;
   background: var(--bg);
-  padding: clamp(64px, 7vw, 96px) 0;
+  padding: clamp(64px, 7vw, 92px) 0;
 }
 
 .alonday-visit-close {
