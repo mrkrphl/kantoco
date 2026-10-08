@@ -455,7 +455,7 @@ html:has(.alonday) body {
   z-index: 1;
   display: inline-block;
   width: max-content;
-  max-width: 9.2ch;
+  max-width: 4.85em;
   padding-bottom: 0.5em;
   font-family: var(--display);
   font-weight: 560;

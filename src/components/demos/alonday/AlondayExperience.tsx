@@ -125,7 +125,9 @@ export function AlondayExperience() {
       root.querySelectorAll<HTMLElement>("[data-draw]").forEach((el) => {
         ScrollTrigger.create({
           trigger: el,
-          start: "top 75%",
+          start: el.classList.contains("alonday-foot-rule")
+            ? "top 98%"
+            : "top 75%",
           once: true,
           onEnter: () => drawLine(el),
         });
