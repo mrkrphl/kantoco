@@ -10,8 +10,8 @@ export function waitForFonts(ms = 1600) {
   return Promise.race([ready.then(() => undefined), timeout]);
 }
 
-/** Opener beat 1: fonts.ready + 250ms, or 1200ms after DOMContentLoaded. */
-export function waitForOpenerLine() {
+/** Opener autoplay: fonts.ready + 150ms, or 1000ms after DOMContentLoaded. */
+export function waitForOpenerAutoplay() {
   return new Promise<void>((resolve) => {
     let done = false;
     const finish = () => {
@@ -20,8 +20,8 @@ export function waitForOpenerLine() {
       resolve();
     };
     const fonts = document.fonts?.ready ?? Promise.resolve();
-    fonts.then(() => window.setTimeout(finish, 250));
-    const fallback = () => window.setTimeout(finish, 1200);
+    fonts.then(() => window.setTimeout(finish, 150));
+    const fallback = () => window.setTimeout(finish, 1000);
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fallback, { once: true });
     } else {
