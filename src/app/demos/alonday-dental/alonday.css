@@ -153,7 +153,7 @@ html:has(.alonday) body {
   padding-bottom: 16px;
   font-family: var(--display);
   font-weight: 560;
-  font-size: clamp(64px, var(--name-vw), 260px);
+  font-size: clamp(64px, var(--name-vw), 268px);
   line-height: 0.88;
   letter-spacing: -0.035em;
   white-space: nowrap;
@@ -232,7 +232,7 @@ html:has(.alonday) body {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: 32px;
   align-items: start;
-  margin-top: 0.35rem;
+  margin-top: 1.15rem;
 }
 
 .alonday-opener-left {
@@ -640,6 +640,10 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
 }
 
 @media (max-width: 1023px) {
+  .alonday-opener {
+    padding-bottom: 48px;
+  }
+
   .alonday-section--treat {
     padding-top: 24px;
   }
