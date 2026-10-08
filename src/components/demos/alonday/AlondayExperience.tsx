@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import gsap from "gsap";
@@ -81,68 +80,30 @@ export function AlondayExperience() {
       mm.add("(min-width: 720px)", () => buildOpener("alonday-line", 1.4));
       mm.add("(max-width: 719px)", () => buildOpener("alonday-line-m", 1.2));
 
-      root.querySelectorAll<HTMLElement>("[data-beat]").forEach((beat) => {
-        const frame = beat.querySelector<HTMLElement>("[data-beat-still]");
-        const words = gsap.utils.toArray<HTMLElement>(
-          "[data-beat-word], [data-beat-line]",
-          beat,
-        );
+      root.querySelectorAll<HTMLElement>("[data-draw]").forEach((row) => {
+        const mark = row.querySelector<HTMLElement>(".alonday-draw");
+        const ink = gsap.utils.toArray<HTMLElement>(".alonday-ink", row);
+        if (!mark) return;
 
-        ScrollTrigger.create({
-          trigger: beat,
-          start: "top top",
-          end: "+=90%",
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+        gsap.set(mark, { scaleX: 0, transformOrigin: "left center" });
+        if (ink.length) gsap.set(ink, { opacity: 0.45 });
+
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: row,
+            start: "top 75%",
+            end: () => `+=${Math.round(window.innerHeight * 0.25)}`,
+            scrub: 0.45,
+            invalidateOnRefresh: true,
+          },
         });
 
-        if (frame) {
-          gsap.fromTo(
-            frame,
-            { scale: 1.08 },
-            {
-              scale: 1,
-              ease: "none",
-              immediateRender: false,
-              scrollTrigger: {
-                trigger: beat,
-                start: "top top",
-                end: "+=90%",
-                scrub: 0.5,
-              },
-            },
-          );
-        }
-
-        words.forEach((el, i) => {
-          gsap.fromTo(
-            el,
-            { autoAlpha: 0, y: 22 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.7,
-              delay: i * 0.06,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: {
-                trigger: beat,
-                start: "top 72%",
-                toggleActions: "play none none reverse",
-              },
-            },
-          );
-        });
+        tl.to(mark, { scaleX: 1, ease: "power2.out" }, 0);
+        if (ink.length) tl.to(ink, { opacity: 1, ease: "power1.out" }, 0);
       });
 
-      const refresh = () => ScrollTrigger.refresh();
-      root.querySelectorAll("img").forEach((img) => {
-        if (img.complete) return;
-        img.addEventListener("load", refresh, { once: true });
-      });
-      requestAnimationFrame(refresh);
+      requestAnimationFrame(() => ScrollTrigger.refresh());
 
       return () => {
         mm.revert();
@@ -192,97 +153,76 @@ export function AlondayExperience() {
         </div>
       </section>
 
-      <section
-        className="alonday-beat alonday-beat--photo"
-        data-beat
-        aria-label="Composite"
-      >
-        <div className="alonday-beat-still">
-          <div data-beat-still className="alonday-beat-photo">
-            <Image
-              src={alonday.stills.composite}
-              alt="Finished composite fillings smile, cropped from a public Facebook still"
-              fill
-              sizes="(min-width: 720px) 54vw, 100vw"
-              className="alonday-beat-img alonday-beat-img--fillings"
-            />
+      <section className="alonday-section" aria-label="What they treat">
+        <div className="alonday-section-inner">
+          <p className="alonday-kicker alonday-kicker--tick">
+            <span className="alonday-section-tick" aria-hidden />
+            What they treat
+          </p>
+          <ol className="alonday-treat">
+            {alonday.treatments.map((row) => (
+              <li key={row.n} className="alonday-treat-row" data-draw>
+                <span className="alonday-treat-num">{row.n}</span>
+                <div className="alonday-treat-main">
+                  <h2 className="alonday-treat-name alonday-ink">{row.name}</h2>
+                  <span className="alonday-draw" aria-hidden />
+                </div>
+                <p className="alonday-treat-desc">{row.descriptor}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="alonday-section" aria-label="Case notes">
+        <div className="alonday-section-inner">
+          <p className="alonday-kicker alonday-kicker--tick">
+            <span className="alonday-section-tick" aria-hidden />
+            Case notes · from their Facebook
+          </p>
+          <div className="alonday-notes">
+            {alonday.notes.map((note) => (
+              <article key={note.title} className="alonday-note">
+                <h2 className="alonday-note-title">“{note.title}”</h2>
+                <p className="alonday-note-body">{note.body}</p>
+              </article>
+            ))}
           </div>
-        </div>
-        <div className="alonday-beat-copy">
-          <p className="alonday-kicker">The work</p>
-          <h2 className="alonday-loud" data-beat-word>
-            Composite
-          </h2>
-          <p className="alonday-sentence" data-beat-line>
-            A filling they already posted, finished and quiet. This is chair
-            work from their own still, not a whitening ad.
-          </p>
+          <p className="alonday-note-attr">{alonday.notesAttribution}</p>
         </div>
       </section>
 
-      <section
-        className="alonday-beat alonday-beat--photo alonday-beat--flip"
-        data-beat
-        aria-label="Crowns"
-      >
-        <div className="alonday-beat-still">
-          <div data-beat-still className="alonday-beat-photo">
-            <Image
-              src={alonday.stills.crowns}
-              alt="Close crop of a finished porcelain-fused-to-metal smile, from a public Facebook still"
-              fill
-              sizes="(min-width: 720px) 54vw, 100vw"
-              className="alonday-beat-img alonday-beat-img--crowns"
-            />
+      <section className="alonday-section" aria-label="Hours">
+        <div className="alonday-section-inner alonday-section-inner--narrow">
+          <p className="alonday-kicker alonday-kicker--tick">
+            <span className="alonday-section-tick" aria-hidden />
+            Hours
+          </p>
+          <h2 className="alonday-loud">{alonday.hoursLoud}</h2>
+          <div className="alonday-mark" data-draw>
+            <p className="alonday-time">{alonday.hoursTime}</p>
+            <span className="alonday-draw alonday-draw--time" aria-hidden />
           </div>
-        </div>
-        <div className="alonday-beat-copy">
-          <p className="alonday-kicker">The work</p>
-          <h2 className="alonday-loud" data-beat-word>
-            Crowns
-          </h2>
-          <p className="alonday-sentence" data-beat-line>
-            Porcelain fused to metal, from a case on their Facebook. The after
-            is the only thing printed large here.
-          </p>
+          <p className="alonday-sentence">{alonday.hoursWalkins}</p>
+          <p className="alonday-sentence">{alonday.hoursConfirm}</p>
         </div>
       </section>
 
-      <section
-        className="alonday-beat alonday-beat--type"
-        data-beat
-        aria-label="Hours"
-      >
-        <div className="alonday-beat-copy alonday-beat-copy--wide">
-          <p className="alonday-kicker">Hours</p>
-          <h2 className="alonday-loud" data-beat-word>
-            {alonday.hoursLoud}
-          </h2>
-          <p className="alonday-time" data-beat-word>
-            {alonday.hoursTime}
+      <section className="alonday-section" aria-label="Location">
+        <div className="alonday-section-inner alonday-section-inner--narrow">
+          <p className="alonday-kicker alonday-kicker--tick">
+            <span className="alonday-section-tick" aria-hidden />
+            Location
           </p>
-          <p className="alonday-sentence" data-beat-line>
-            {alonday.hoursNote}
-          </p>
-        </div>
-      </section>
-
-      <section
-        className="alonday-beat alonday-beat--type"
-        data-beat
-        aria-label="Location"
-      >
-        <div className="alonday-beat-copy alonday-beat-copy--wide">
-          <p className="alonday-kicker">Location</p>
-          <h2 className="alonday-loud" data-beat-word>
+          <h2 className="alonday-loud">
             <span className="alonday-num">{alonday.streetNumber}</span>{" "}
-            {alonday.streetName}
+            <span className="alonday-street" data-draw>
+              {alonday.streetName}
+              <span className="alonday-draw alonday-draw--street" aria-hidden />
+            </span>
           </h2>
-          <p className="alonday-sentence" data-beat-line>
-            {alonday.address}. A neighborhood clinic on El Grande Avenue in BF
-            Homes — look for the number, then confirm on Facebook if you are
-            walking in.
-          </p>
+          <p className="alonday-sentence">{alonday.address}</p>
+          <p className="alonday-sentence">{alonday.locationNote}</p>
           <a
             href={alonday.mapsQuery}
             target="_blank"
@@ -294,17 +234,19 @@ export function AlondayExperience() {
         </div>
       </section>
 
-      <section
-        className="alonday-beat alonday-beat--type"
-        data-beat
-        aria-label="Contact"
-      >
-        <div className="alonday-beat-copy alonday-beat-copy--wide">
-          <p className="alonday-kicker">Contact</p>
-          <h2 className="alonday-loud alonday-loud--dial" data-beat-word>
-            <a href={alonday.phoneHref}>{alonday.phoneDisplay}</a>
-          </h2>
-          <p className="alonday-sentence" data-beat-line>
+      <section className="alonday-section" aria-label="Contact">
+        <div className="alonday-section-inner alonday-section-inner--narrow">
+          <p className="alonday-kicker alonday-kicker--tick">
+            <span className="alonday-section-tick" aria-hidden />
+            Contact
+          </p>
+          <div className="alonday-mark" data-draw>
+            <h2 className="alonday-loud alonday-loud--dial">
+              <a href={alonday.phoneHref}>{alonday.phoneDisplay}</a>
+            </h2>
+            <span className="alonday-draw alonday-draw--phone" aria-hidden />
+          </div>
+          <p className="alonday-sentence">
             Call the number on their card, or write them on Facebook. This
             sample does not take appointments.
           </p>
@@ -334,7 +276,6 @@ export function AlondayExperience() {
           >
             Message KantoCo
           </a>
-          .
         </p>
         <p>
           <Link href="/">Back to the agency</Link>
