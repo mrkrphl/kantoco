@@ -100,8 +100,8 @@ export function AlondayExperience() {
         const padTop = Number.parseFloat(getComputedStyle(treat).paddingTop) || 0;
         const gap = spaceBelow + padTop;
         const target = window.matchMedia("(max-width: 719px)").matches
-          ? 80
-          : 120;
+          ? 64
+          : 100;
         if (gap > target) {
           treat.style.marginTop = `${Math.round(target - gap)}px`;
         }
