@@ -429,6 +429,15 @@ html:has(.alonday) body {
     align-items: start;
   }
 
+  .alonday-treat-copy .alonday-treat-row {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+  }
+
+  .alonday-treat-copy .alonday-treat-desc {
+    grid-column: 2;
+    margin-top: 0.35rem;
+  }
+
   .alonday-treat-sticky {
     display: block;
     position: sticky;
