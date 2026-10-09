@@ -14,11 +14,7 @@ import { AlondayPicture } from "@/components/demos/alonday/AlondayPicture";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const TREAT_TRIGGERS = [
-  { row: "01", group: "A", back: "A" },
-  { row: "04", group: "B", back: "A" },
-  { row: "07", group: "C", back: "B" },
-] as const;
+const TREAT_CAPS = alondayImages.treat.map((item) => item.caption);
 
 function TreatRow({
   row,
@@ -75,98 +71,90 @@ function playOpener(root: HTMLElement) {
 }
 
 function setupStickySwaps(root: HTMLElement, instant: boolean) {
-  const slides = Array.from(
-    root.querySelectorAll<HTMLElement>(".alonday-treat-slide"),
+  const imgs = Array.from(
+    root.querySelectorAll<HTMLImageElement>(".treat-stack img"),
   );
-  const caps = Array.from(
-    root.querySelectorAll<HTMLElement>(".alonday-treat-sticky-caps .alonday-cap"),
-  );
-  if (!slides.length) return;
+  const cap = root.querySelector<HTMLElement>(".treat-cap");
+  if (!imgs.length || !cap) return;
 
-  let current = "A";
+  let current = 0;
+  let tl: gsap.core.Timeline | undefined;
 
-  const parts = (group: string) => {
-    const slide = slides.find((el) => el.dataset.group === group);
-    const cap = caps.find((el) => el.dataset.group === group);
-    return {
-      slide,
-      img: slide?.querySelector("img") ?? null,
-      cap: cap ?? null,
-    };
-  };
-
-  slides.forEach((slide) => {
-    const on = slide.dataset.group === "A";
-    const img = slide.querySelector("img");
-    const cap = caps.find((el) => el.dataset.group === slide.dataset.group);
-    if (img) gsap.set(img, { opacity: on ? 1 : 0, scale: 1 });
-    if (cap) gsap.set(cap, { opacity: on ? 1 : 0 });
-    gsap.set(slide, { zIndex: on ? 2 : 1 });
-  });
-
-  const apply = (next: string) => {
+  const show = (i: number) => {
+    const next = Math.max(0, Math.min(i, imgs.length - 1));
     if (next === current) return;
-    const outgoing = parts(current);
-    const incoming = parts(next);
     current = next;
-    if (!incoming.img || !incoming.slide) return;
 
     if (instant) {
-      if (outgoing.img) gsap.set(outgoing.img, { opacity: 0, scale: 1 });
-      if (outgoing.cap) gsap.set(outgoing.cap, { opacity: 0 });
-      if (outgoing.slide) gsap.set(outgoing.slide, { zIndex: 1 });
-      gsap.set(incoming.img, { opacity: 1, scale: 1 });
-      if (incoming.cap) gsap.set(incoming.cap, { opacity: 1 });
-      gsap.set(incoming.slide, { zIndex: 2 });
+      tl?.kill();
+      imgs.forEach((img, k) => {
+        gsap.set(img, { opacity: k === next ? 1 : 0, scale: 1 });
+      });
+      cap.textContent = TREAT_CAPS[next];
+      gsap.set(cap, { opacity: 1 });
       return;
     }
 
-    gsap.set(incoming.slide, { zIndex: 2 });
-    if (outgoing.slide) gsap.set(outgoing.slide, { zIndex: 1 });
-    if (outgoing.img) {
-      gsap.to(outgoing.img, { opacity: 0, duration: 0.5, overwrite: true });
-    }
-    if (outgoing.cap) {
-      gsap.to(outgoing.cap, { opacity: 0, duration: 0.5, overwrite: true });
-    }
-    gsap.fromTo(
-      incoming.img,
-      { opacity: 0, scale: 1.06 },
-      {
-        opacity: 1,
-        duration: 0.5,
-        overwrite: true,
-        ease: "power2.out",
-      },
-    );
-    gsap.fromTo(
-      incoming.img,
-      { scale: 1.06 },
-      {
-        scale: 1,
-        duration: 0.9,
-        ease: "power2.out",
-        overwrite: "auto",
-      },
-    );
-    if (incoming.cap) {
-      gsap.fromTo(
-        incoming.cap,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.5, overwrite: true },
-      );
-    }
+    tl?.kill();
+    tl = gsap
+      .timeline({ defaults: { ease: "power2.out" } })
+      .to(
+        imgs,
+        { opacity: (k) => (k === next ? 1 : 0), duration: 0.5 },
+        0,
+      )
+      .fromTo(imgs[next], { scale: 1.06 }, { scale: 1, duration: 0.9 }, 0)
+      .to(cap, { opacity: 0, duration: 0.15, ease: "power1.in" }, 0)
+      .call(() => {
+        cap.textContent = TREAT_CAPS[next];
+      }, undefined, 0.25)
+      .to(cap, { opacity: 1, duration: 0.2 }, 0.25);
   };
 
-  TREAT_TRIGGERS.forEach(({ row, group, back }) => {
-    const trigger = root.querySelector(`[data-treat-row="${row}"]`);
-    if (!trigger) return;
+  imgs.forEach((img, k) => {
+    gsap.set(img, { opacity: k === 0 ? 1 : 0, scale: 1 });
+  });
+  cap.textContent = TREAT_CAPS[0];
+  gsap.set(cap, { opacity: 1 });
+
+  const triggers = ["01", "04", "07"];
+  triggers.forEach((row, n) => {
+    const el = root.querySelector(`[data-treat-row="${row}"]`);
+    if (!el) return;
     ScrollTrigger.create({
-      trigger,
+      trigger: el,
       start: "top 50%",
-      onEnter: () => apply(group),
-      onLeaveBack: () => apply(back),
+      onEnter: () => show(n),
+      onLeaveBack: () => show(n - 1),
     });
+  });
+}
+
+function drawTreatRows(root: HTMLElement) {
+  const desktop = window.matchMedia("(min-width: 1024px)");
+  ScrollTrigger.batch(".alonday-treat-row", {
+    start: "top 85%",
+    once: true,
+    onEnter: (els) => {
+      els.forEach((node, i) => {
+        const el = node as HTMLElement;
+        if (desktop.matches) {
+          const vars = { line: 0 };
+          el.style.setProperty("--line", "0");
+          gsap.to(vars, {
+            line: 1,
+            duration: 0.8,
+            ease: "power2.out",
+            delay: i * 0.08,
+            onUpdate: () => el.style.setProperty("--line", String(vars.line)),
+          });
+        } else {
+          gsap.delayedCall(i * 0.08, () =>
+            drawLine(el.querySelector(".alonday-line")),
+          );
+        }
+      });
+    },
   });
 }
 
@@ -206,15 +194,7 @@ export function AlondayExperience() {
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        ScrollTrigger.batch(".alonday-treat-row .alonday-line", {
-          start: "top 85%",
-          once: true,
-          onEnter: (els) => {
-            els.forEach((el, i) => {
-              gsap.delayedCall(i * 0.08, () => drawLine(el));
-            });
-          },
-        });
+        drawTreatRows(root);
 
         root.querySelectorAll<HTMLElement>("[data-draw]").forEach((el) => {
           const start = el.classList.contains("alonday-foot-rule")
@@ -236,10 +216,9 @@ export function AlondayExperience() {
         if (plateFrame && plateImg) {
           gsap.fromTo(
             plateImg,
-            { scale: 1.12, yPercent: -5 },
+            { scale: 1.04 },
             {
               scale: 1,
-              yPercent: 5,
               ease: "none",
               scrollTrigger: {
                 trigger: plateFrame,
@@ -297,6 +276,9 @@ export function AlondayExperience() {
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
+        root.querySelectorAll<HTMLElement>(".alonday-treat-row").forEach((el) => {
+          el.style.setProperty("--line", "1");
+        });
         setupStickySwaps(root, true);
       });
 
@@ -353,27 +335,26 @@ export function AlondayExperience() {
         </div>
       </section>
 
-      <section
-        className={`alonday-plate alonday-plate--${alondayImages.plate.key}`}
-        aria-label="Clinic interior"
-      >
-        <figure className={`plate plate--${alondayImages.plate.key}`}>
-          <div className="plate-frame">
-            <AlondayPicture
-              desktop={alondayImages.plate.desktop}
-              mobile={alondayImages.plate.mobile}
-              alt={alondayImages.plate.alt}
-              sizes={alondayImages.sizes.plate}
-              className="plate-img"
-              fetchPriority="low"
-            />
-          </div>
-          <div className="alonday-wrap">
+      <section className="alonday-plate" aria-label="Clinic interior">
+        <div className="alonday-wrap">
+          <figure className="plate">
+            <div className="plate-frame">
+              <AlondayPicture
+                desktop={alondayImages.plate.desktop}
+                desktop1x={alondayImages.plate.desktop1x}
+                mobile={alondayImages.plate.mobile}
+                alt={alondayImages.plate.alt}
+                sizes={alondayImages.sizes.plate}
+                className="plate-img"
+                fetchPriority="low"
+                loading="eager"
+              />
+            </div>
             <figcaption className="alonday-cap">
               {alondayImages.plate.caption}
             </figcaption>
-          </div>
-        </figure>
+          </figure>
+        </div>
       </section>
 
       <section
@@ -430,35 +411,29 @@ export function AlondayExperience() {
               ))}
             </ol>
           </div>
-          <aside className="alonday-treat-sticky" aria-hidden={false}>
-            <div className="alonday-treat-sticky-frame">
-              {alondayImages.treat.map((item) => (
-                <div
-                  key={item.group}
-                  className="alonday-treat-slide"
-                  data-group={item.group}
-                >
-                  <AlondayPicture
-                    src={item.src}
-                    alt={item.alt}
-                    sizes={alondayImages.sizes.sticky}
-                    only="min-1024"
-                    position={item.position}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="alonday-treat-sticky-caps">
-              {alondayImages.treat.map((item) => (
-                <p
-                  key={item.group}
-                  className="alonday-cap"
-                  data-group={item.group}
-                >
-                  {item.caption}
-                </p>
-              ))}
-            </div>
+          <aside className="alonday-treat-sticky">
+            <figure className="treat-frame">
+              <div className="treat-stack alonday-treat-sticky-frame">
+                {alondayImages.treat.map((item) => (
+                  <div
+                    key={item.group}
+                    className="alonday-treat-slide"
+                    data-group={item.group}
+                  >
+                    <AlondayPicture
+                      src={item.src}
+                      alt={item.alt}
+                      sizes={alondayImages.sizes.sticky}
+                      only="min-1024"
+                      position={item.position}
+                    />
+                  </div>
+                ))}
+              </div>
+              <figcaption className="treat-cap alonday-cap">
+                {alondayImages.treat[0].caption}
+              </figcaption>
+            </figure>
           </aside>
         </div>
       </section>
@@ -517,14 +492,6 @@ export function AlondayExperience() {
                 </a>
               </div>
             </div>
-            <div className="alonday-visit-hours alonday-visit-block">
-              <p className="alonday-kicker alonday-kicker--tick">
-                <span className="alonday-section-tick" aria-hidden />
-                Hours
-              </p>
-              <p className="alonday-visit-heading">{alonday.hoursHeading}</p>
-              <p className="alonday-visit-body">{alonday.hoursBody}</p>
-            </div>
             <figure className="alonday-visit-storefront">
               <div className="alonday-frame alonday-frame--storefront">
                 <AlondayPicture
@@ -537,20 +504,30 @@ export function AlondayExperience() {
                 {alondayImages.storefront.caption}
               </figcaption>
             </figure>
-            <div className="alonday-visit-address alonday-visit-block">
-              <p className="alonday-kicker alonday-kicker--tick">
-                <span className="alonday-section-tick" aria-hidden />
-                Address
-              </p>
-              <p className="alonday-visit-heading">{alonday.address}</p>
-              <a
-                href={alonday.mapsQuery}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="alonday-map-link"
-              >
-                Open the map
-              </a>
+            <div className="alonday-visit-info">
+              <div className="alonday-visit-address alonday-visit-block">
+                <p className="alonday-kicker alonday-kicker--tick">
+                  <span className="alonday-section-tick" aria-hidden />
+                  Address
+                </p>
+                <p className="alonday-visit-heading">{alonday.address}</p>
+                <a
+                  href={alonday.mapsQuery}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="alonday-map-link"
+                >
+                  Open the map
+                </a>
+              </div>
+              <div className="alonday-visit-hours alonday-visit-block">
+                <p className="alonday-kicker alonday-kicker--tick">
+                  <span className="alonday-section-tick" aria-hidden />
+                  Hours
+                </p>
+                <p className="alonday-visit-heading">{alonday.hoursHeading}</p>
+                <p className="alonday-visit-body">{alonday.hoursBody}</p>
+              </div>
             </div>
           </div>
         </div>

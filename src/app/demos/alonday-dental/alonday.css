@@ -109,12 +109,31 @@ html:has(.alonday) body {
 }
 
 .alonday-opener {
+  --opener-block: 402px;
   position: relative;
   min-height: min(calc(100svh - var(--banner-h)), 880px);
   display: grid;
   align-content: center;
   padding-block: clamp(48px, 8vh, 96px);
   background: var(--bg);
+}
+
+@media (max-width: 1409px) {
+  .alonday-opener {
+    --opener-block: 381px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .alonday-opener {
+    min-height: 0;
+    align-content: start;
+    padding-top: max(
+      clamp(48px, 8vh, 96px),
+      calc((min(100svh - var(--banner-h), 880px) - var(--opener-block)) / 2)
+    );
+    padding-bottom: clamp(32px, 4vw, 56px);
+  }
 }
 
 .alonday-opener-copy {
@@ -307,14 +326,13 @@ html:has(.alonday) body {
 
 .plate {
   margin: 0;
-  padding-top: clamp(64px, 8vw, 120px);
+  margin-top: 0;
 }
 
 .plate-frame {
   position: relative;
   overflow: hidden;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  width: 100%;
   aspect-ratio: 4 / 5;
   border-radius: 0;
 }
@@ -327,31 +345,18 @@ html:has(.alonday) body {
 
 .plate-img {
   position: absolute;
-  inset: -10% 0;
+  inset: 0;
   width: 100%;
-  height: 120%;
+  height: 100%;
   object-fit: cover;
-  object-position: 50% 45%;
+  object-position: 50% 50%;
   transform-origin: center center;
   border-radius: 0;
 }
 
-.plate--B .plate-img {
-  object-position: 50% 50%;
-}
-
 @media (min-width: 768px) {
   .plate-frame {
-    aspect-ratio: auto;
-    height: clamp(520px, 78vh, 860px);
-  }
-
-  .plate--A .plate-img {
-    object-position: 50% 50%;
-  }
-
-  .plate--B .plate-img {
-    object-position: 50% 62%;
+    aspect-ratio: 16 / 9;
   }
 
   .alonday-cap {
@@ -438,6 +443,42 @@ html:has(.alonday) body {
     margin-top: 0.35rem;
   }
 
+  .alonday-treat-row {
+    position: relative;
+    padding-bottom: 20px;
+    --line: 1;
+  }
+
+  html.js-anim .alonday-treat-row,
+  [data-motion="pending"] .alonday-treat-row {
+    --line: 0;
+  }
+
+  [data-motion="static"] .alonday-treat-row {
+    --line: 1;
+  }
+
+  .alonday-treat-row .alonday-treat-name {
+    text-decoration: none;
+    border-bottom: 0;
+  }
+
+  .alonday-treat-row .alonday-treat-name::after {
+    content: none;
+  }
+
+  .alonday-treat-row::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(var(--line, 1));
+  }
+
   .alonday-treat-sticky {
     display: block;
     position: sticky;
@@ -475,22 +516,12 @@ html:has(.alonday) body {
     border-radius: 0;
   }
 
-  .alonday-treat-sticky-caps {
-    position: relative;
-    margin-top: 12px;
-    min-height: 2.8em;
-  }
-
-  .alonday-treat-sticky-caps .alonday-cap {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+  .treat-frame {
     margin: 0;
   }
 
-  .alonday-treat-sticky-caps .alonday-cap:not([data-group="A"]) {
-    opacity: 0;
+  .treat-cap {
+    margin-top: 12px;
   }
 
   .alonday-treat-slide:not([data-group="A"]) img {
@@ -649,11 +680,6 @@ h3,
   grid-row: 1;
 }
 
-.alonday-visit-hours {
-  grid-column: 9 / 13;
-  grid-row: 1;
-}
-
 .alonday-visit-storefront {
   grid-column: 1 / 7;
   grid-row: 2;
@@ -661,10 +687,15 @@ h3,
   max-width: min(544px, 882px);
 }
 
-.alonday-visit-address {
+.alonday-visit-info {
   grid-column: 8 / 13;
   grid-row: 2;
   margin-top: 64px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
 }
 
 .alonday-visit-number {
@@ -697,6 +728,10 @@ h3,
 
 .alonday-visit-block + .alonday-visit-block {
   margin-top: 40px;
+}
+
+.alonday-visit-info .alonday-visit-block + .alonday-visit-block {
+  margin-top: 0;
 }
 
 .alonday-visit-heading {
@@ -861,8 +896,9 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
   .alonday-opener-left,
   .alonday-opener-right,
   .alonday-visit-main,
-  .alonday-visit-hours,
   .alonday-visit-storefront,
+  .alonday-visit-info,
+  .alonday-visit-hours,
   .alonday-visit-address,
   .alonday-foot-copy,
   .alonday-foot-links {
@@ -870,10 +906,15 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
     grid-row: auto;
   }
 
+  .alonday-visit-info {
+    display: block;
+    margin-top: 1.4rem;
+    align-self: auto;
+  }
+
   .alonday-opener-right,
-  .alonday-visit-hours,
   .alonday-visit-storefront,
-  .alonday-visit-address {
+  .alonday-visit-hours {
     margin-top: 1.4rem;
   }
 
@@ -966,6 +1007,10 @@ html.js-anim .alonday-opener-ctas .alonday-btn {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .alonday-treat-row {
+    --line: 1;
+  }
+
   .alonday-frame img,
   .plate-img,
   .alonday-treat-mobile-frame img,
