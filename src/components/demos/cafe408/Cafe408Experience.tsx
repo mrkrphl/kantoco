@@ -93,6 +93,7 @@ export function Cafe408Experience() {
     const root = rootRef.current;
     if (!root) return;
 
+    document.documentElement.setAttribute("data-c408-live", "");
     const animate = document.documentElement.classList.contains("js-anim");
     let cancelled = false;
 
@@ -116,14 +117,21 @@ export function Cafe408Experience() {
 
         let tl: gsap.core.Timeline | undefined;
 
+        let current = 0;
+
         const reveal = (i: number) => {
-          frames.forEach((frame, k) => {
-            if (k === i) frame.removeAttribute("aria-hidden");
-            else frame.setAttribute("aria-hidden", "true");
+          imgs.forEach((img, k) => {
+            if (k === i) img.removeAttribute("aria-hidden");
+            else img.setAttribute("aria-hidden", "true");
           });
         };
 
+        reveal(0);
+        cap.textContent = CAFE408_CAPS[0];
+
         const show = (i: number) => {
+          if (i === current) return;
+          current = i;
           reveal(i);
           if (!animate) {
             gsap.set(frames, {
@@ -163,13 +171,21 @@ export function Cafe408Experience() {
               show(n);
               if (n === 0) {
                 imgs.slice(1).forEach((img) => {
-                  void img.decode?.().catch(() => undefined);
+                  void img.decode?.()?.catch(() => undefined);
                 });
               }
             },
             onLeaveBack: () => show(Math.max(0, n - 1)),
           }),
         );
+
+        let initial = 0;
+        rows.forEach((row, n) => {
+          if (row.getBoundingClientRect().top < window.innerHeight * 0.55) {
+            initial = n;
+          }
+        });
+        if (initial !== 0) show(initial);
 
         return () => {
           tl?.kill();
@@ -181,31 +197,36 @@ export function Cafe408Experience() {
 
       const startPour = () => {
         if (cancelled) return;
-        const pour = gsap.timeline();
-        pour.fromTo(
-          root.querySelector(".name-fill"),
-          { clipPath: "inset(100% 0 0 0)" },
-          { clipPath: "inset(0% 0 0 0)", duration: 1.1, ease: "power2.inOut" },
-          0,
-        );
-        pour.fromTo(
-          [root.querySelector(".opener-eyebrow"), root.querySelector(".opener-tagline")],
-          { y: 12, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
-          0.7,
-        );
-        pour.fromTo(
-          root.querySelectorAll(".opener-btns a"),
-          { y: 12, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: "power2.out" },
-          1.1,
-        );
-        pour.fromTo(
-          root.querySelector(".plate-frame"),
-          { y: 16, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-          1.3,
-        );
+        ctx.add(() => {
+          const pour = gsap.timeline();
+          pour.fromTo(
+            root.querySelector(".name-fill"),
+            { clipPath: "inset(100% 0 0 0)" },
+            { clipPath: "inset(0% 0 0 0)", duration: 1.1, ease: "power2.inOut" },
+            0,
+          );
+          pour.fromTo(
+            [
+              root.querySelector(".opener-eyebrow"),
+              root.querySelector(".opener-tagline"),
+            ],
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
+            0.7,
+          );
+          pour.fromTo(
+            root.querySelectorAll(".opener-btns a"),
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: "power2.out" },
+            1.1,
+          );
+          pour.fromTo(
+            root.querySelector(".plate-frame"),
+            { y: 16, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+            1.3,
+          );
+        });
       };
 
       void waitForOpenerAutoplay(120).then(startPour);
@@ -291,6 +312,7 @@ export function Cafe408Experience() {
 
     return () => {
       cancelled = true;
+      document.documentElement.removeAttribute("data-c408-live");
       ctx.revert();
     };
   }, []);
@@ -404,7 +426,7 @@ export function Cafe408Experience() {
               <div className="counter-frame">
                 <div className="counter-stack" data-counter-stack>
                   {CAFE408_COUNTER.map((item, i) => (
-                    <picture key={item.file} aria-hidden={i === 0 ? undefined : true}>
+                    <picture key={item.file}>
                       <source
                         type="image/webp"
                         srcSet={`${CAFE408_ASSET}/${item.file}.webp`}
@@ -416,6 +438,7 @@ export function Cafe408Experience() {
                         height={896}
                         loading="lazy"
                         decoding="async"
+                        aria-hidden={i === 0 ? undefined : true}
                       />
                     </picture>
                   ))}

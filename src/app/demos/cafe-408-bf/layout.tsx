@@ -27,7 +27,7 @@ export default function Cafe408Layout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-c408-live"))document.documentElement.classList.remove("js-anim")},8000)}}catch(e){}`,
         }}
       />
       <link

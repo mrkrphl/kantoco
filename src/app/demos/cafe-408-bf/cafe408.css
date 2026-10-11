@@ -74,7 +74,7 @@ html:has(.c408) body {
   max-width: 100%;
 }
 
-.c408 a {
+.c408 a:not(.c408-btn) {
   color: inherit;
 }
 
@@ -192,7 +192,7 @@ html.js-anim .name-fill {
   grid-column: 8 / 13;
   align-self: end;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
 }
 
@@ -347,7 +347,6 @@ html.js-anim .plate-frame img {
   position: relative;
   display: grid;
   grid-template-columns: 64px 1fr;
-  gap: 0 8px;
   padding: 28px 0;
   min-height: 200px;
   --line: 1;
@@ -594,9 +593,19 @@ html.js-anim .heading-reveal {
   opacity: 0;
 }
 
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .opener-btns {
+    grid-column: 7 / 13;
+  }
+}
+
 @media (max-width: 1023px) {
   .opener {
     padding-block: 56px;
+  }
+
+  .opener-btns {
+    flex-wrap: wrap;
   }
 
   .opener-row,
