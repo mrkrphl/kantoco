@@ -13,6 +13,12 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+declare global {
+  interface Window {
+    __mpStarted?: boolean;
+  }
+}
+
 const PIE_SIZES = "(min-width:1024px) min(640px, 57vw), calc(100vw - 48px)";
 
 function waitForStart() {
@@ -165,7 +171,11 @@ function setupScroll(root: HTMLElement) {
         duration: 0.7,
         stagger: 0.08,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".mp-plate-copy", start: "top 75%", once: true },
+        scrollTrigger: {
+          trigger: root.querySelector(".mp-plate-copy"),
+          start: "top 75%",
+          once: true,
+        },
       },
     );
   }
@@ -204,7 +214,7 @@ function setupScroll(root: HTMLElement) {
         scale: 1.1,
         ease: "none",
         scrollTrigger: {
-          trigger: ".pepperoni",
+          trigger: root.querySelector(".pepperoni"),
           start: "top bottom",
           end: "bottom top",
           scrub: true,
@@ -213,45 +223,51 @@ function setupScroll(root: HTMLElement) {
     );
   }
 
+  const menu = root.querySelector(".mp-menu");
   const menuRows = gsap.utils.toArray<HTMLElement>(".mp-menu-row", root);
-  menuRows.forEach((row, i) => {
-    const vars = { line: 0 };
-    row.style.setProperty("--line", "0");
+  if (menu && menuRows.length) {
     gsap.fromTo(
-      row,
+      menuRows,
       { y: 12, opacity: 0 },
       {
         y: 0,
         opacity: 1,
         duration: 0.8,
+        stagger: 0.07,
         ease: "power3.out",
-        delay: i * 0.07,
-        scrollTrigger: { trigger: row, start: "top 85%", once: true },
+        scrollTrigger: { trigger: menu, start: "top 85%", once: true },
       },
     );
-    gsap.to(vars, {
-      line: 1,
-      duration: 0.8,
-      ease: "power3.out",
-      delay: i * 0.07,
-      onUpdate: () => row.style.setProperty("--line", String(vars.line)),
-      scrollTrigger: { trigger: row, start: "top 85%", once: true },
+    menuRows.forEach((row, i) => {
+      const vars = { line: 0 };
+      row.style.setProperty("--line", "0");
+      gsap.to(vars, {
+        line: 1,
+        duration: 0.8,
+        delay: i * 0.07,
+        ease: "power3.out",
+        onUpdate: () => row.style.setProperty("--line", String(vars.line)),
+        scrollTrigger: { trigger: menu, start: "top 85%", once: true },
+      });
     });
-  });
+  }
 
+  const mealsBox = root.querySelector(".mp-meals");
   const meals = gsap.utils.toArray<HTMLElement>(".mp-meal", root);
-  meals.forEach((row, i) => {
-    const vars = { line: 0 };
-    row.style.setProperty("--line", "0");
-    gsap.to(vars, {
-      line: 1,
-      duration: 0.8,
-      ease: "power3.out",
-      delay: i * 0.07,
-      onUpdate: () => row.style.setProperty("--line", String(vars.line)),
-      scrollTrigger: { trigger: row, start: "top 85%", once: true },
+  if (mealsBox && meals.length) {
+    meals.forEach((row, i) => {
+      const vars = { line: 0 };
+      row.style.setProperty("--line", "0");
+      gsap.to(vars, {
+        line: 1,
+        duration: 0.8,
+        delay: i * 0.07,
+        ease: "power3.out",
+        onUpdate: () => row.style.setProperty("--line", String(vars.line)),
+        scrollTrigger: { trigger: mealsBox, start: "top 85%", once: true },
+      });
     });
-  });
+  }
 
   const groupImg = root.querySelector<HTMLElement>(".group-frame img");
   if (groupImg) {
@@ -262,7 +278,7 @@ function setupScroll(root: HTMLElement) {
         yPercent: 0,
         ease: "none",
         scrollTrigger: {
-          trigger: ".group-frame",
+          trigger: root.querySelector(".group-frame"),
           start: "top bottom",
           end: "bottom top",
           scrub: true,
@@ -280,7 +296,11 @@ function setupScroll(root: HTMLElement) {
         scale: 1,
         duration: 1.2,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".store-frame", start: "top 80%", once: true },
+        scrollTrigger: {
+          trigger: root.querySelector(".store-frame"),
+          start: "top 80%",
+          once: true,
+        },
       },
     );
   }
@@ -299,7 +319,11 @@ function setupScroll(root: HTMLElement) {
         duration: 0.7,
         stagger: 0.08,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".mp-visit-dial", start: "top 85%", once: true },
+        scrollTrigger: {
+          trigger: root.querySelector(".mp-visit-dial"),
+          start: "top 85%",
+          once: true,
+        },
       },
     );
   }
@@ -320,6 +344,7 @@ export function MamangsExperience() {
 
     const start = () => {
       if (!live || !rootRef.current) return;
+      window.__mpStarted = true;
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         playOpener(rootRef.current!);
@@ -327,6 +352,7 @@ export function MamangsExperience() {
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
+        document.documentElement.classList.remove("js-anim");
         const pie = rootRef.current?.querySelector<HTMLElement>(".pie");
         if (pie) gsap.set(pie, { rotate: -14 });
         rootRef.current
@@ -355,14 +381,15 @@ export function MamangsExperience() {
   return (
     <div ref={rootRef} className="mp">
       <p className="mp-bar">
-        <span className="mp-bar-full">
-          <strong className="mp-bar-mark">{DEMO_BADGE}</strong>
-          {"  "}
-          <span className="mp-bar-note">
-            A KantoCo sample, not Mamang&apos;s official site
+        <span className="mp-wrap mp-bar-inner">
+          <span className="mp-bar-full">
+            <strong className="mp-bar-mark">{DEMO_BADGE}</strong>
+            <span className="mp-bar-note">
+              A KantoCo sample, not Mamang&apos;s official site
+            </span>
           </span>
+          <span className="mp-bar-short">{DEMO_BADGE} · KantoCo sample</span>
         </span>
-        <span className="mp-bar-short">SAMPLE | NOT LIVE · KantoCo sample</span>
       </p>
 
       <section className="mp-opener" aria-label={mamangs.fullName}>
@@ -394,30 +421,32 @@ export function MamangsExperience() {
 
       <section className="mp-plate" aria-label="From the brick oven">
         <div className="mp-wrap mp-plate-grid">
-          <figure className="oven">
-            <div className="pie">
-              <Picture
-                name="plate-pizza-1x1"
-                width={1400}
-                height={1400}
-                alt="A whole pizza from above, with basil, anchovies, mozzarella and charred crust spots."
-                sizes={PIE_SIZES}
-                eager
-                className="pie-img"
-                srcSet1x={{ name: "plate-pizza-1x1-1x", w: 700 }}
-              />
-            </div>
-            <figcaption className="mp-cap">
+          <div className="mp-plate-align">
+            <figure className="oven">
+              <div className="pie">
+                <Picture
+                  name="plate-pizza-1x1"
+                  width={1400}
+                  height={1400}
+                  alt="A whole pizza from above, with basil, anchovies, mozzarella and charred crust spots."
+                  sizes={PIE_SIZES}
+                  eager
+                  className="pie-img"
+                  srcSet1x={{ name: "plate-pizza-1x1-1x", w: 700 }}
+                />
+              </div>
+            </figure>
+            <p className="mp-cap oven-cap">
               Their pizza, fresh out of the oven · Liza Viray on Google Maps
-            </figcaption>
-          </figure>
-          <div className="mp-plate-copy">
-            <p className="mp-eyebrow">FROM THE BRICK OVEN</p>
-            <h2 className="mp-h-oven">Pizza that goes through a real brick oven.</h2>
-            <p className="mp-body">
-              Whole pies for a table of two or the whole barkada, plus
-              family-sized ones in the group meals.
             </p>
+            <div className="mp-plate-copy">
+              <p className="mp-eyebrow">FROM THE BRICK OVEN</p>
+              <h2 className="mp-h-oven">Pizza that goes through a real brick oven.</h2>
+              <p className="mp-body">
+                Whole pies for a table of two or the whole barkada, plus
+                family-sized ones in the group meals.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -528,21 +557,22 @@ export function MamangsExperience() {
             </div>
           </div>
           <div className="mp-visit-block">
-            <figure className="mp-store">
-              <div className="mp-frame store-frame">
-                <Picture
-                  name="visit-storefront-4x5"
-                  width={1200}
-                  height={1500}
-                  alt="Mamang's Pizzeria storefront on Aguirre Avenue, with the brick-oven logo over the door."
-                  sizes="(min-width:1024px) 448px, calc(100vw - 48px)"
-                />
-              </div>
-              <figcaption className="mp-cap">
+            <div className="mp-visit-align">
+              <figure className="mp-store">
+                <div className="mp-frame store-frame">
+                  <Picture
+                    name="visit-storefront-4x5"
+                    width={1200}
+                    height={1500}
+                    alt="Mamang's Pizzeria storefront on Aguirre Avenue, with the brick-oven logo over the door."
+                    sizes="(min-width:1024px) 448px, calc(100vw - 48px)"
+                  />
+                </div>
+              </figure>
+              <p className="mp-cap store-cap">
                 Their storefront on Aguirre Ave · Vheneth Franche on Google Maps
-              </figcaption>
-            </figure>
-            <div className="mp-visit-info">
+              </p>
+              <div className="mp-visit-info">
               <div>
                 <p className="mp-eyebrow">ADDRESS</p>
                 <p className="mp-visit-heading">{mamangs.addressVisit}</p>
@@ -568,6 +598,7 @@ export function MamangsExperience() {
                   Hours from Google Maps. Holiday and private-event closures go
                   up on their Facebook first.
                 </p>
+              </div>
               </div>
             </div>
           </div>

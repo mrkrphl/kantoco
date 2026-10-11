@@ -72,16 +72,18 @@ html:has(.mp) body {
   height: var(--bar-h);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
   background: var(--dough);
   color: var(--char);
-  padding: 0 var(--pad);
   margin: 0;
   font-family: var(--sans);
   font-size: 12px;
   line-height: 1;
   white-space: nowrap;
+}
+
+.mp-bar-inner {
+  display: flex;
+  align-items: center;
 }
 
 .mp-bar-full {
@@ -131,7 +133,7 @@ html:has(.mp) body {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
-  align-items: end;
+  align-items: last baseline;
 }
 
 .mp-opener-eyebrow {
@@ -146,7 +148,8 @@ html:has(.mp) body {
 
 .mp-name {
   display: block;
-  overflow: clip;
+  overflow-x: visible;
+  overflow-y: clip;
   padding-bottom: 0.12em;
   font-family: var(--display);
   font-weight: 800;
@@ -165,7 +168,6 @@ html:has(.mp) body {
 
 .mp-opener-side {
   grid-column: 9 / 13;
-  align-self: end;
   min-width: 0;
 }
 
@@ -200,6 +202,7 @@ html:has(.mp) body {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+  align-self: start;
   margin-top: calc(0.11 * var(--name-size) + 24px);
 }
 
@@ -242,12 +245,29 @@ html:has(.mp) body {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
+}
+
+.mp-plate-align {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
   align-items: center;
 }
 
 .oven {
   grid-column: 1 / 8;
   margin: 0;
+}
+
+.oven-cap {
+  grid-column: 1 / 8;
+  grid-row: 2;
+}
+
+.mp-plate-copy {
+  grid-column: 9 / 13;
+  grid-row: 1;
+  min-width: 0;
 }
 
 .pie {
@@ -269,11 +289,6 @@ html:has(.mp) body {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 50%;
-}
-
-.mp-plate-copy {
-  grid-column: 9 / 13;
-  min-width: 0;
 }
 
 .mp-h-oven {
@@ -453,7 +468,8 @@ html:has(.mp) body {
 
 .mp-group-fig {
   grid-column: 7 / 13;
-  grid-row: 1 / -1;
+  grid-row: 1 / span 5;
+  align-self: start;
   margin: 0;
 }
 
@@ -598,13 +614,25 @@ html.js-anim .group-frame img {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
-  align-items: stretch;
   margin-top: 64px;
+}
+
+.mp-visit-align {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: stretch;
 }
 
 .mp-store {
   grid-column: 1 / 6;
+  grid-row: 1;
   margin: 0;
+}
+
+.store-cap {
+  grid-column: 1 / 6;
+  grid-row: 2;
 }
 
 .store-frame {
@@ -613,6 +641,7 @@ html.js-anim .group-frame img {
 
 .mp-visit-info {
   grid-column: 7 / 13;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -694,8 +723,7 @@ html.js-anim .group-frame img {
 }
 
 .mp-foot {
-  border-top: 1px solid var(--rule);
-  padding-block: 40px 64px;
+  padding-block: 0 64px;
 }
 
 .mp-foot-grid {
@@ -703,6 +731,8 @@ html.js-anim .group-frame img {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   align-items: start;
+  border-top: 1px solid var(--rule);
+  padding-top: 40px;
 }
 
 .mp-foot-name {
@@ -751,10 +781,13 @@ html.js-anim .pie {
   opacity: 0;
 }
 
-html.js-anim .menu-anim,
 html.js-anim .mp-menu-row,
 html.js-anim .mp-meal {
   --line: 0;
+}
+
+html.js-anim .mp-menu-row {
+  opacity: 0;
 }
 
 html.js-anim .las-frame {
@@ -762,6 +795,14 @@ html.js-anim .las-frame {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.js-anim .mp-opener-eyebrow,
+  html.js-anim .mp-name .ch,
+  html.js-anim .mp-opener-side > *,
+  html.js-anim .mp-opener .mp-btn,
+  html.js-anim .pie {
+    opacity: 1;
+  }
+
   .pie {
     transform: rotate(-14deg);
   }
@@ -794,8 +835,11 @@ html.js-anim .las-frame {
   .mp-bar {
     height: auto;
     min-height: var(--bar-h);
-    padding: 12px 24px;
     font-size: 11px;
+  }
+
+  .mp-bar-inner {
+    padding-block: 12px;
   }
 
   .mp-bar-full {
@@ -859,10 +903,12 @@ html.js-anim .las-frame {
   }
 
   .mp-plate-grid,
+  .mp-plate-align,
   .mp-table-grid,
   .mp-group-grid,
   .mp-visit-head,
   .mp-visit-block,
+  .mp-visit-align,
   .mp-foot-grid {
     display: block;
   }
@@ -955,6 +1001,10 @@ html.js-anim .las-frame {
 
   .mp-store {
     margin-top: 40px;
+  }
+
+  .store-cap {
+    margin-top: 14px;
   }
 
   .mp-visit-info {

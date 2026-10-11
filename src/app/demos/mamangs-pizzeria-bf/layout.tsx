@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   title: mamangs.title,
   description: mamangs.description,
   robots: { index: false, follow: false },
+  openGraph: {
+    title: mamangs.title,
+    description: mamangs.description,
+  },
 };
 
 export default function MamangsLayout({
@@ -37,7 +41,7 @@ export default function MamangsLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");setTimeout(function(){if(!window.__mpStarted)document.documentElement.classList.remove("js-anim")},2500)}}catch(e){}`,
         }}
       />
       <div className={`${display.variable} ${sans.variable}`}>{children}</div>
