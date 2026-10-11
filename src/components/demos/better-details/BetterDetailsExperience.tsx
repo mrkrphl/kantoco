@@ -172,6 +172,7 @@ export function BetterDetailsExperience() {
 
     return () => {
       live = false;
+      document.documentElement.classList.remove("js-anim");
     };
   }, []);
 
@@ -307,14 +308,18 @@ export function BetterDetailsExperience() {
               }
 
               let swap: gsap.core.Timeline | undefined;
+              let current = 0;
               const show = (i: number) => {
+                const next = Math.max(0, Math.min(i, imgs.length - 1));
+                if (next === current) return;
+                current = next;
                 swap?.kill();
                 imgs.forEach((img, k) => {
-                  img.setAttribute("aria-hidden", k === i ? "false" : "true");
+                  img.setAttribute("aria-hidden", k === next ? "false" : "true");
                 });
                 swap = gsap
                   .timeline({ defaults: { ease: "power2.out" } })
-                  .to(imgs, { opacity: (k) => (k === i ? 1 : 0), duration: 0.5 }, 0)
+                  .to(imgs, { opacity: (k) => (k === next ? 1 : 0), duration: 0.5 }, 0)
                   .to(
                     cap,
                     { opacity: 0, duration: 0.15, ease: "power1.in" },
@@ -322,13 +327,13 @@ export function BetterDetailsExperience() {
                   )
                   .call(
                     () => {
-                      if (cap) cap.textContent = SVC_CAPS[i];
+                      if (cap) cap.textContent = SVC_CAPS[next];
                     },
                     undefined,
                     0.25,
                   )
                   .to(cap, { opacity: 1, duration: 0.2 }, 0.25);
-                markRow(i);
+                markRow(next);
               };
 
               rows.forEach((row, i) => {
@@ -359,17 +364,21 @@ export function BetterDetailsExperience() {
           }
 
           if (reduce && desktop) {
+            let current = 0;
             const show = (i: number) => {
-              gsap.set(imgs, { opacity: (k) => (k === i ? 1 : 0) });
+              const next = Math.max(0, Math.min(i, imgs.length - 1));
+              if (next === current) return;
+              current = next;
+              gsap.set(imgs, { opacity: (k) => (k === next ? 1 : 0) });
               imgs.forEach((img, k) => {
-                img.setAttribute("aria-hidden", k === i ? "false" : "true");
+                img.setAttribute("aria-hidden", k === next ? "false" : "true");
               });
               if (cap) {
-                cap.textContent = SVC_CAPS[i];
+                cap.textContent = SVC_CAPS[next];
                 gsap.set(cap, { opacity: 1 });
               }
               if (svcStack) gsap.set(svcStack, { scale: 1 });
-              markRow(i);
+              markRow(next);
             };
             rows.forEach((row, i) => {
               ScrollTrigger.create({

@@ -39,7 +39,7 @@ export default function BetterDetailsLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
         }}
       />
       <div className={`${archivo.variable} ${plex.variable}`}>{children}</div>

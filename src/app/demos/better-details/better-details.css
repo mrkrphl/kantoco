@@ -631,16 +631,32 @@ html:has(.bd) body {
   color: var(--muted);
 }
 
-.js-anim .reveal-in,
-.js-anim .bd-opener .bd-eyebrow,
-.js-anim .bd-opener .bd-tagline,
-.js-anim .bd-opener .bd-sub,
-.js-anim .bd-opener .bd-btn {
+.js-anim .bd .reveal-in,
+.js-anim .bd .bd-opener .bd-eyebrow,
+.js-anim .bd .bd-opener .bd-tagline,
+.js-anim .bd .bd-opener .bd-sub,
+.js-anim .bd .bd-opener .bd-btn {
   opacity: 0;
 }
 
-.js-anim .reveal-frame {
+.js-anim .bd .reveal-frame {
   clip-path: inset(0 0 100% 0);
+}
+
+html:not(.js) .svc-grid {
+  display: block;
+}
+
+html:not(.js) .svc-sticky {
+  display: none;
+}
+
+html:not(.js) .svc-row {
+  min-height: 0;
+}
+
+html:not(.js) .svc-row-media {
+  display: block;
 }
 
 @media (max-width: 1023px) {
