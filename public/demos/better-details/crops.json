@@ -1,0 +1,169 @@
+{
+ "plate-16x9": {
+  "src": "src/00-big.png",
+  "box": [
+   0,
+   140,
+   1537,
+   1004
+  ],
+  "out": [
+   1536,
+   864
+  ],
+  "scale": 0.999,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 1.515
+ },
+ "plate-16x9-1x": {
+  "src": "src/00-big.png",
+  "box": [
+   0,
+   140,
+   1537,
+   1004
+  ],
+  "out": [
+   1120,
+   630
+  ],
+  "scale": 0.729,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 2.048
+ },
+ "plate-mobile-4x5": {
+  "src": "src/00-big.png",
+  "box": [
+   40,
+   0,
+   858,
+   1023
+  ],
+  "out": [
+   816,
+   1020
+  ],
+  "scale": 0.998,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 1.217
+ },
+ "svc-2-coating-4x5": {
+  "src": "src/01-big.jpg",
+  "box": [
+   200,
+   0,
+   1428,
+   1535
+  ],
+  "out": [
+   896,
+   1120
+  ],
+  "scale": 0.73,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 0.136
+ },
+ "svc-1-ppf-4x5": {
+  "src": "src/28-big.jpg",
+  "box": [
+   137,
+   0,
+   1229,
+   1366
+  ],
+  "out": [
+   896,
+   1120
+  ],
+  "scale": 0.821,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 0.009
+ },
+ "svc-3-tint-4x5": {
+  "src": "src/02-big.jpg",
+  "box": [
+   240,
+   0,
+   1468,
+   1535
+  ],
+  "out": [
+   896,
+   1120
+  ],
+  "scale": 0.73,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 0.35
+ },
+ "work-1-macan-badge-1x1": {
+  "src": "src/12-big.jpg",
+  "box": [
+   0,
+   0,
+   1535,
+   1535
+  ],
+  "out": [
+   1280,
+   1280
+  ],
+  "scale": 0.834,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 0.029
+ },
+ "work-2-macan-front-1x1": {
+  "src": "src/10-big.jpg",
+  "box": [
+   0,
+   0,
+   960,
+   960
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.933,
+  "redact": [
+   [
+    364,
+    110,
+    432,
+    141
+   ]
+  ],
+  "max_channel": 238,
+  "pct_luma_ge_236": 1.562
+ },
+ "work-2-macan-front-4x5": {
+  "src": "src/10-big.jpg",
+  "box": [
+   96,
+   0,
+   864,
+   960
+  ],
+  "out": [
+   768,
+   960
+  ],
+  "scale": 1.0,
+  "redact": [
+   [
+    364,
+    110,
+    432,
+    141
+   ]
+  ],
+  "max_channel": 238,
+  "pct_luma_ge_236": 1.53
+ }
+}
