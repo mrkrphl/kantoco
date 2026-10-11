@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { waitForOpenerAutoplay } from "@/lib/motion";
 import {
   CAFE408,
   CAFE408_ASSET,
@@ -199,19 +200,7 @@ export function Cafe408Experience() {
         );
       };
 
-      const fontsReady = document.fonts?.ready ?? Promise.resolve();
-      const fromFonts = fontsReady.then(
-        () => new Promise<void>((resolve) => window.setTimeout(resolve, 120)),
-      );
-      const fromDcl = new Promise<void>((resolve) => {
-        const start = () => window.setTimeout(resolve, 1000);
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", start, { once: true });
-        } else {
-          start();
-        }
-      });
-      void Promise.race([fromFonts, fromDcl]).then(startPour);
+      void waitForOpenerAutoplay(120).then(startPour);
 
       const plate = root.querySelector(".plate");
       const plateImgs = root.querySelectorAll(".plate-frame img");
