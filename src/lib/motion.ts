@@ -10,6 +10,26 @@ export function waitForFonts(ms = 1600) {
   return Promise.race([ready.then(() => undefined), timeout]);
 }
 
+/** Opener autoplay: fonts.ready + 150ms, or 1000ms after DOMContentLoaded. */
+export function waitForOpenerAutoplay() {
+  return new Promise<void>((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    const fonts = document.fonts?.ready ?? Promise.resolve();
+    fonts.then(() => window.setTimeout(finish, 150));
+    const fallback = () => window.setTimeout(finish, 1000);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fallback, { once: true });
+    } else {
+      fallback();
+    }
+  });
+}
+
 export function revealOnScroll(
   gsap: typeof import("gsap").gsap,
   targets: HTMLElement[],

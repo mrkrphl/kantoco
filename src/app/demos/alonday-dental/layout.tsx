@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Karla, Lora } from "next/font/google";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import "./alonday.css";
 
-const display = Lora({
+const display = Fraunces({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "variable",
   style: ["normal", "italic"],
+  axes: ["SOFT", "opsz"],
   variable: "--font-alonday-display",
 });
 
-const sans = Karla({
+const sans = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-alonday-sans",
 });
 
@@ -28,6 +29,13 @@ export default function AlondayLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${display.variable} ${sans.variable}`}>{children}</div>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+        }}
+      />
+      <div className={`${display.variable} ${sans.variable}`}>{children}</div>
+    </>
   );
 }

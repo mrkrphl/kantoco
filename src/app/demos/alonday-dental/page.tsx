@@ -1,5 +1,5 @@
-import { AlondayHome } from "@/components/demos/alonday/AlondayHome";
+import { AlondayExperience } from "@/components/demos/alonday/AlondayExperience";
 
 export default function AlondayHomePage() {
-  return <AlondayHome />;
+  return <AlondayExperience />;
 }
