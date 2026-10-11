@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { DEMO_BADGE } from "@/lib/demos";
+import { waitForOpenerAutoplay } from "@/lib/motion";
 import {
   FACEBOOK_MSG,
   FACEBOOK_PAGE,
@@ -67,6 +68,7 @@ function Still({
   height,
   eager = false,
   className,
+  hidden = false,
 }: {
   file: string;
   alt: string;
@@ -74,6 +76,7 @@ function Still({
   height: number;
   eager?: boolean;
   className?: string;
+  hidden?: boolean;
 }) {
   return (
     <picture>
@@ -86,13 +89,91 @@ function Still({
         height={height}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
+        aria-hidden={hidden || undefined}
       />
     </picture>
   );
 }
 
+function settleOpener(root: HTMLElement) {
+  root.querySelector(".wordmark")?.classList.add("is-lit");
+  gsap.set(
+    [
+      root.querySelector(".bd-opener .bd-eyebrow"),
+      root.querySelector(".bd-opener .bd-tagline"),
+      root.querySelector(".bd-opener .bd-sub"),
+      ...gsap.utils.toArray<HTMLElement>(".bd-opener .bd-btn", root),
+    ].filter(Boolean),
+    { opacity: 1, y: 0 },
+  );
+}
+
+function playOpener(root: HTMLElement) {
+  const wordmark = root.querySelector<HTMLElement>(".wordmark");
+  const eyebrow = root.querySelector<HTMLElement>(".bd-eyebrow");
+  const tagline = root.querySelector<HTMLElement>(".bd-tagline");
+  const sub = root.querySelector<HTMLElement>(".bd-sub");
+  const buttons = gsap.utils.toArray<HTMLElement>(".bd-opener .bd-btn", root);
+  if (!wordmark) return;
+
+  const tl = gsap.timeline({
+    defaults: { ease: "power2.out" },
+    onComplete: () => wordmark.classList.add("is-lit"),
+  });
+  tl.fromTo(
+    wordmark,
+    { backgroundPosition: "100% 0" },
+    { backgroundPosition: "0% 0", duration: 1.1, ease: "power2.inOut" },
+    0,
+  );
+  if (eyebrow) {
+    tl.fromTo(
+      eyebrow,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.5 },
+      0.15,
+    );
+  }
+  tl.fromTo(
+    [tagline, sub].filter(Boolean),
+    { opacity: 0, y: 12 },
+    { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
+    0.7,
+  );
+  tl.fromTo(
+    buttons,
+    { opacity: 0, y: 12 },
+    { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 },
+    1.0,
+  );
+}
+
 export function BetterDetailsExperience() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const openerPlayed = useRef(false);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.remove("js-anim");
+      return;
+    }
+
+    if (openerPlayed.current) return;
+
+    let live = true;
+    waitForOpenerAutoplay().then(() => {
+      if (!live || !rootRef.current || openerPlayed.current) return;
+      openerPlayed.current = true;
+      playOpener(rootRef.current);
+    });
+
+    return () => {
+      live = false;
+    };
+  }, []);
 
   useGSAP(
     () => {
@@ -113,7 +194,9 @@ export function BetterDetailsExperience() {
           const rows = gsap.utils.toArray<HTMLElement>(".svc-row", root);
           const imgs = gsap.utils.toArray<HTMLElement>(".svc-stack img", root);
           const cap = root.querySelector<HTMLElement>(".svc-cap");
-          const wordmark = root.querySelector<HTMLElement>(".wordmark");
+          const plate = root.querySelector<HTMLElement>(".plate");
+          const plateImg = root.querySelector<HTMLElement>(".plate img");
+          const svcStack = root.querySelector<HTMLElement>(".svc-stack");
 
           const markRow = (i: number) => {
             rows.forEach((row, k) => row.classList.toggle("is-active", k === i));
@@ -177,95 +260,58 @@ export function BetterDetailsExperience() {
               });
           };
 
+          if (reduce) {
+            document.documentElement.classList.remove("js-anim");
+          }
+
           if (motion) {
             document.documentElement.classList.add("js-anim");
-
-            const eyebrow = root.querySelector<HTMLElement>(".bd-eyebrow");
-            const tagline = root.querySelector<HTMLElement>(".bd-tagline");
-            const sub = root.querySelector<HTMLElement>(".bd-sub");
-            const buttons = gsap.utils.toArray<HTMLElement>(
-              ".bd-opener .bd-btn",
-              root,
-            );
-
-            let cancelled = false;
-            const runOpener = () => {
-              if (cancelled || !wordmark) return;
-              const tl = gsap.timeline({
-                defaults: { ease: "power2.out" },
-                onComplete: () => wordmark.classList.add("is-lit"),
+            if (openerPlayed.current) {
+              settleOpener(root);
+            } else {
+              waitForOpenerAutoplay().then(() => {
+                if (!rootRef.current || openerPlayed.current) return;
+                openerPlayed.current = true;
+                playOpener(rootRef.current);
               });
-              tl.fromTo(
-                wordmark,
-                { backgroundPosition: "100% 0" },
-                {
-                  backgroundPosition: "0% 0",
-                  duration: 1.1,
-                  ease: "power2.inOut",
-                },
-                0,
-              );
-              if (eyebrow) {
-                tl.fromTo(
-                  eyebrow,
-                  { opacity: 0, y: 8 },
-                  { opacity: 1, y: 0, duration: 0.5 },
-                  0.15,
-                );
-              }
-              tl.fromTo(
-                [tagline, sub].filter(Boolean),
-                { opacity: 0, y: 12 },
-                { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 },
-                0.7,
-              );
-              tl.fromTo(
-                buttons,
-                { opacity: 0, y: 12 },
-                { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 },
-                1.0,
-              );
-            };
-
-            const ready = Promise.race([
-              document.fonts?.ready ?? Promise.resolve(),
-              new Promise<void>((resolve) => {
-                window.setTimeout(resolve, 1000);
-              }),
-            ]);
-            ready.then(() => {
-              window.setTimeout(runOpener, 150);
-            });
+            }
 
             if (desktop) {
-              gsap.fromTo(
-                ".plate img",
-                { scale: 1.06, yPercent: -3 },
-                {
-                  scale: 1,
-                  yPercent: 3,
-                  ease: "none",
-                  scrollTrigger: {
-                    trigger: ".plate",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true,
+              if (plate && plateImg) {
+                gsap.fromTo(
+                  plateImg,
+                  { scale: 1.06, yPercent: -3 },
+                  {
+                    scale: 1,
+                    yPercent: 3,
+                    ease: "none",
+                    scrollTrigger: {
+                      trigger: plate,
+                      start: "top bottom",
+                      end: "bottom top",
+                      scrub: true,
+                    },
                   },
-                },
-              );
+                );
+              }
 
-              gsap.to(".svc-stack", {
-                scale: 1.06,
-                duration: 10,
-                ease: "sine.inOut",
-                yoyo: true,
-                repeat: -1,
-                transformOrigin: "50% 50%",
-              });
+              if (svcStack) {
+                gsap.to(svcStack, {
+                  scale: 1.06,
+                  duration: 10,
+                  ease: "sine.inOut",
+                  yoyo: true,
+                  repeat: -1,
+                  transformOrigin: "50% 50%",
+                });
+              }
 
               let swap: gsap.core.Timeline | undefined;
               const show = (i: number) => {
                 swap?.kill();
+                imgs.forEach((img, k) => {
+                  img.setAttribute("aria-hidden", k === i ? "false" : "true");
+                });
                 swap = gsap
                   .timeline({ defaults: { ease: "power2.out" } })
                   .to(imgs, { opacity: (k) => (k === i ? 1 : 0), duration: 0.5 }, 0)
@@ -295,34 +341,34 @@ export function BetterDetailsExperience() {
               });
 
               revealFrames(
-                gsap.utils.toArray<HTMLElement>(".work .reveal-frame", root),
+                gsap.utils.toArray<HTMLElement>(
+                  ".work-main .reveal-frame, .work-front-d .reveal-frame",
+                  root,
+                ),
               );
             } else {
               revealFrames(
                 gsap.utils.toArray<HTMLElement>(
-                  ".plate-frame, .svc-row-media .reveal-frame, .work .reveal-frame",
+                  ".plate-frame, .svc-row-media .reveal-frame, .work-main .reveal-frame, .work-front-m .reveal-frame",
                   root,
                 ),
               );
             }
 
             revealCopy();
-
-            return () => {
-              cancelled = true;
-              document.documentElement.classList.remove("js-anim");
-              wordmark?.classList.remove("is-lit");
-            };
           }
 
           if (reduce && desktop) {
             const show = (i: number) => {
               gsap.set(imgs, { opacity: (k) => (k === i ? 1 : 0) });
+              imgs.forEach((img, k) => {
+                img.setAttribute("aria-hidden", k === i ? "false" : "true");
+              });
               if (cap) {
                 cap.textContent = SVC_CAPS[i];
                 gsap.set(cap, { opacity: 1 });
               }
-              gsap.set(".svc-stack", { scale: 1 });
+              if (svcStack) gsap.set(svcStack, { scale: 1 });
               markRow(i);
             };
             rows.forEach((row, i) => {
@@ -336,8 +382,6 @@ export function BetterDetailsExperience() {
           }
         },
       );
-
-      return () => mm.revert();
     },
     { scope: rootRef },
   );
@@ -384,12 +428,12 @@ export function BetterDetailsExperience() {
             <div className="plate-frame">
               <picture>
                 <source
-                  media="(max-width: 767px)"
+                  media="(max-width: 1023px)"
                   type="image/webp"
                   srcSet={`${IMG}/plate-mobile-4x5.webp`}
                 />
                 <source
-                  media="(max-width: 767px)"
+                  media="(max-width: 1023px)"
                   type="image/jpeg"
                   srcSet={`${IMG}/plate-mobile-4x5.jpg`}
                 />
@@ -406,8 +450,8 @@ export function BetterDetailsExperience() {
                 <img
                   src={`${IMG}/plate-16x9-1x.jpg`}
                   alt="The Better Details bay: a white wall with their red chevron sign, bright ceiling panels, a lift and a yellow scooter."
-                  width={1536}
-                  height={864}
+                  width={1120}
+                  height={630}
                   sizes={PLATE_SIZES}
                   loading="eager"
                   decoding="async"
@@ -471,11 +515,14 @@ export function BetterDetailsExperience() {
                       width={896}
                       height={1120}
                       eager={i === 0}
+                      hidden={i !== 0}
                     />
                   ))}
                 </div>
               </div>
-              <figcaption className="svc-cap">{SVC_CAPS[0]}</figcaption>
+              <figcaption className="svc-cap" aria-live="polite">
+                {SVC_CAPS[0]}
+              </figcaption>
             </figure>
           </div>
         </div>

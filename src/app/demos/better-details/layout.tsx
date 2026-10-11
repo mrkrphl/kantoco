@@ -36,6 +36,13 @@ export default function BetterDetailsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${archivo.variable} ${plex.variable}`}>{children}</div>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+        }}
+      />
+      <div className={`${archivo.variable} ${plex.variable}`}>{children}</div>
+    </>
   );
 }
