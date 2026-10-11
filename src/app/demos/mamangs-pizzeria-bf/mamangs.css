@@ -5,6 +5,10 @@ html:has(.mp) body {
   min-height: 100%;
 }
 
+html:has(.mp) {
+  scroll-padding-top: 56px;
+}
+
 .mp {
   --char: #1c1411;
   --dough: #f4e9d8;
@@ -68,6 +72,9 @@ html:has(.mp) body {
 }
 
 .mp-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
   height: var(--bar-h);
   display: flex;
   align-items: center;
@@ -276,6 +283,9 @@ html:has(.mp) body {
   aspect-ratio: 1;
   width: 100%;
   transform: rotate(-14deg);
+  background-color: #b5894d;
+  background-size: cover;
+  background-position: center;
 }
 
 .pie picture,
@@ -681,6 +691,7 @@ html.js-anim .group-frame img {
 
 .mp-hours {
   margin: 0;
+  scroll-margin-top: 64px;
 }
 
 .mp-hour {
@@ -784,8 +795,7 @@ html.js-anim .group-frame img {
 html.js-anim .mp-opener-eyebrow,
 html.js-anim .mp-name .ch,
 html.js-anim .mp-opener-side > *,
-html.js-anim .mp-opener .mp-btn,
-html.js-anim .pie {
+html.js-anim .mp-opener .mp-btn {
   opacity: 0;
 }
 
@@ -806,8 +816,7 @@ html.js-anim .las-frame {
   html.js-anim .mp-opener-eyebrow,
   html.js-anim .mp-name .ch,
   html.js-anim .mp-opener-side > *,
-  html.js-anim .mp-opener .mp-btn,
-  html.js-anim .pie {
+  html.js-anim .mp-opener .mp-btn {
     opacity: 1;
   }
 
@@ -1019,6 +1028,16 @@ html.js-anim .las-frame {
   .mp-visit-info {
     margin-top: 32px;
     gap: 32px;
+  }
+
+  .mp-hours {
+    padding-right: 72px;
+    padding-bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px)));
+    scroll-margin-top: 64px;
+  }
+
+  .mp-hour {
+    scroll-margin-top: 64px;
   }
 
   .mp-foot {

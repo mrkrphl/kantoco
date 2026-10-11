@@ -8,6 +8,8 @@ import {
   MAMANGS_HOURS,
   MAMANGS_MEALS,
   MAMANGS_MENU,
+  MAMANGS_PIE,
+  MAMANGS_PIE_SIZES,
   mamangs,
 } from "@/lib/mamangs";
 
@@ -19,7 +21,7 @@ declare global {
   }
 }
 
-const PIE_SIZES = "(min-width:1024px) min(640px, 57vw), calc(100vw - 48px)";
+const PIE_SIZES = MAMANGS_PIE_SIZES;
 
 function waitForStart() {
   return Promise.race([
@@ -110,7 +112,7 @@ function playOpener(root: HTMLElement) {
   if (eyebrow) gsap.set(eyebrow, { opacity: 0 });
   gsap.set(side, { y: 16, opacity: 0 });
   gsap.set(buttons, { y: 12, opacity: 0 });
-  if (pie) gsap.set(pie, { opacity: 0, scale: 0.96, rotate: -40 });
+  if (pie) gsap.set(pie, { scale: 0.96, rotate: -40 });
 
   const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
   tl.to(
@@ -124,7 +126,7 @@ function playOpener(root: HTMLElement) {
   if (pie) {
     tl.to(
       pie,
-      { opacity: 1, scale: 1, rotate: -14, duration: 1 },
+      { scale: 1, rotate: -14, duration: 1 },
       0.8,
     );
   }
@@ -432,17 +434,36 @@ export function MamangsExperience() {
         <div className="mp-wrap mp-plate-grid">
           <div className="mp-plate-align">
             <figure className="oven">
-              <div className="pie">
-                <Picture
-                  name="plate-pizza-1x1"
-                  width={1400}
-                  height={1400}
-                  alt="A whole pizza from above, with basil, anchovies, mozzarella and charred crust spots."
-                  sizes={PIE_SIZES}
-                  eager
-                  className="pie-img"
-                  srcSet1x={{ name: "plate-pizza-1x1-1x", w: 700 }}
-                />
+              <div
+                className="pie"
+                style={{
+                  backgroundColor: MAMANGS_PIE.color,
+                  backgroundImage: `url("${MAMANGS_PIE.blurDataURL}")`,
+                }}
+              >
+                <picture>
+                  <source
+                    type="image/avif"
+                    srcSet={MAMANGS_PIE.avifSrcSet}
+                    sizes={PIE_SIZES}
+                  />
+                  <source
+                    type="image/webp"
+                    srcSet={MAMANGS_PIE.webpSrcSet}
+                    sizes={PIE_SIZES}
+                  />
+                  <img
+                    className="pie-img"
+                    src={MAMANGS_PIE.src}
+                    alt="A whole pizza from above, with basil, anchovies, mozzarella and charred crust spots."
+                    width={960}
+                    height={960}
+                    sizes={PIE_SIZES}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                </picture>
               </div>
             </figure>
             <p className="mp-cap oven-cap">
