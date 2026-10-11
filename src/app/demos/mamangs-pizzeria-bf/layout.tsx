@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { preload } from "react-dom";
 import { MAMANGS_PIE, MAMANGS_PIE_SIZES, mamangs } from "@/lib/mamangs";
 import "./mamangs.css";
 
@@ -37,16 +38,16 @@ export default function MamangsLayout({
 }: {
   children: React.ReactNode;
 }) {
+  preload(`${mamangs.asset}/hero/plate-960.avif`, {
+    as: "image",
+    type: "image/avif",
+    imageSrcSet: MAMANGS_PIE.avifSrcSet,
+    imageSizes: MAMANGS_PIE_SIZES,
+    fetchPriority: "high",
+  });
+
   return (
     <>
-      <link
-        rel="preload"
-        as="image"
-        type="image/avif"
-        imageSrcSet={MAMANGS_PIE.avifSrcSet}
-        imageSizes={MAMANGS_PIE_SIZES}
-        fetchPriority="high"
-      />
       <script
         dangerouslySetInnerHTML={{
           __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");setTimeout(function(){if(!window.__mpStarted)document.documentElement.classList.remove("js-anim")},2500)}}catch(e){}`,

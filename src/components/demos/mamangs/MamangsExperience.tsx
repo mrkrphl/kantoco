@@ -434,13 +434,12 @@ export function MamangsExperience() {
         <div className="mp-wrap mp-plate-grid">
           <div className="mp-plate-align">
             <figure className="oven">
-              <div
-                className="pie"
-                style={{
-                  backgroundColor: MAMANGS_PIE.color,
-                  backgroundImage: `url("${MAMANGS_PIE.blurDataURL}")`,
-                }}
-              >
+              <div className="pie" style={{ backgroundColor: MAMANGS_PIE.color }}>
+                <div
+                  className="pie-ph"
+                  aria-hidden="true"
+                  style={{ backgroundImage: `url("${MAMANGS_PIE.blurDataURL}")` }}
+                />
                 <picture>
                   <source
                     type="image/avif"

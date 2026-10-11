@@ -278,14 +278,27 @@ html:has(.mp) {
 }
 
 .pie {
+  position: relative;
   border-radius: 50%;
   overflow: hidden;
   aspect-ratio: 1;
   width: 100%;
   transform: rotate(-14deg);
   background-color: #b5894d;
+}
+
+.pie-ph {
+  position: absolute;
+  inset: -16%;
+  background-color: #b5894d;
   background-size: cover;
   background-position: center;
+  filter: blur(20px);
+}
+
+.pie picture {
+  position: relative;
+  z-index: 1;
 }
 
 .pie picture,
@@ -799,6 +812,10 @@ html.js-anim .mp-opener .mp-btn {
   opacity: 0;
 }
 
+html.js-anim .pie {
+  transform: rotate(-40deg) scale(0.96);
+}
+
 html.js-anim .mp-menu-row,
 html.js-anim .mp-meal {
   --line: 0;
@@ -1031,8 +1048,8 @@ html.js-anim .las-frame {
   }
 
   .mp-hours {
-    padding-right: 72px;
-    padding-bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px)));
+    padding-right: 40px;
+    padding-bottom: 48px;
     scroll-margin-top: 64px;
   }
 
