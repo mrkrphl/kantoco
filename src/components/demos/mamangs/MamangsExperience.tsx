@@ -348,8 +348,12 @@ export function MamangsExperience() {
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         if (!canAnimate) return;
-        playOpener(rootRef.current!);
-        setupScroll(rootRef.current!);
+        try {
+          playOpener(rootRef.current!);
+          setupScroll(rootRef.current!);
+        } catch {
+          document.documentElement.classList.remove("js-anim");
+        }
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
