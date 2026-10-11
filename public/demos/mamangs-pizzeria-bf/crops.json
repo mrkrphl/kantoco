@@ -1,0 +1,116 @@
+{
+ "plate-pizza-1x1": {
+  "src": "src/maps-02.jpg",
+  "box": [
+   626,
+   75,
+   3506,
+   2955
+  ],
+  "out": [
+   1400,
+   1400
+  ],
+  "scale": 0.486,
+  "credit": "maps-liza",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 441,
+  "kb_webp": 325
+ },
+ "plate-pizza-1x1-1x": {
+  "src": "src/maps-02.jpg",
+  "box": [
+   626,
+   75,
+   3506,
+   2955
+  ],
+  "out": [
+   700,
+   700
+  ],
+  "scale": 0.243,
+  "credit": "maps-liza",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 137,
+  "kb_webp": 112
+ },
+ "table-lasagna-6x5": {
+  "src": "src/fb-07.jpg",
+  "box": [
+   0,
+   0,
+   1254,
+   1045
+  ],
+  "out": [
+   1254,
+   1045
+  ],
+  "scale": 1.0,
+  "credit": "fb",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 197,
+  "kb_webp": 165
+ },
+ "table-pepperoni-3x2": {
+  "src": "src/fb-04.jpg",
+  "box": [
+   0,
+   533,
+   1000,
+   1200
+  ],
+  "out": [
+   1000,
+   667
+  ],
+  "scale": 1.0,
+  "credit": "fb",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 140,
+  "kb_webp": 101
+ },
+ "group-spread-4x5": {
+  "src": "src/fb-19.jpg",
+  "box": [
+   0,
+   0,
+   1152,
+   1440
+  ],
+  "out": [
+   1152,
+   1440
+  ],
+  "scale": 1.0,
+  "credit": "fb",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 282,
+  "kb_webp": 238
+ },
+ "visit-storefront-4x5": {
+  "src": "src/maps-09.jpg",
+  "box": [
+   0,
+   650,
+   1880,
+   3000
+  ],
+  "out": [
+   1200,
+   1500
+  ],
+  "scale": 0.638,
+  "credit": "maps-vheneth",
+  "max_channel": 235,
+  "pct_luma_ge_250": 0.0,
+  "kb_jpg": 278,
+  "kb_webp": 153
+ }
+}
