@@ -144,6 +144,7 @@ function playOpener(root: HTMLElement) {
       wordmark.classList.add("is-lit");
       wordmark.classList.remove("is-sweeping");
       gsap.set(wordmark, { clearProps: "opacity" });
+      openerTimeline = null;
     },
   });
   tl.fromTo(
