@@ -112,7 +112,7 @@ function settleOpener(root: HTMLElement) {
   const wordmark = root.querySelector<HTMLElement>(".wordmark");
   wordmark?.classList.add("is-lit");
   wordmark?.classList.remove("is-sweeping");
-  if (wordmark) gsap.set(wordmark, { opacity: 1 });
+  if (wordmark) gsap.set(wordmark, { clearProps: "opacity" });
   gsap.set(
     [
       root.querySelector(".bd-opener .bd-eyebrow"),
@@ -138,14 +138,14 @@ function playOpener(root: HTMLElement) {
     onComplete: () => {
       wordmark.classList.add("is-lit");
       wordmark.classList.remove("is-sweeping");
+      gsap.set(wordmark, { clearProps: "opacity" });
     },
   });
   tl.fromTo(
     wordmark,
-    { backgroundPosition: "100% 0", opacity: 0.6 },
+    { backgroundPosition: "100% 0" },
     {
       backgroundPosition: "0% 0",
-      opacity: 1,
       duration: 1.1,
       ease: "power2.inOut",
     },

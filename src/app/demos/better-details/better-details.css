@@ -138,6 +138,11 @@ html:has(.bd) body {
   color: var(--type);
 }
 
+.js-anim .bd .wordmark.is-sweeping,
+.js-anim .bd .wordmark.is-lit {
+  opacity: 1;
+}
+
 @supports (background-clip: text) or (-webkit-background-clip: text) {
   .js-anim .bd .wordmark.is-sweeping {
     background-image: linear-gradient(
@@ -157,8 +162,8 @@ html:has(.bd) body {
   }
 }
 
+.js-anim .bd .wordmark.is-lit,
 .wordmark.is-lit {
-  opacity: 1;
   background: none;
   color: var(--type);
 }
