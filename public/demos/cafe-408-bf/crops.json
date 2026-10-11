@@ -1,0 +1,192 @@
+{
+ "plate-16x9": {
+  "src": "src/fb/00-211425105159240.jpg",
+  "fbid": "211425105159240",
+  "box": [
+   0,
+   0,
+   2046,
+   1151
+  ],
+  "out": [
+   2046,
+   1151
+  ],
+  "scale": 1.0,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "plate-16x9-1x": {
+  "src": "src/fb/00-211425105159240.jpg",
+  "fbid": "211425105159240",
+  "box": [
+   0,
+   0,
+   2046,
+   1151
+  ],
+  "out": [
+   1120,
+   630
+  ],
+  "scale": 0.547,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "plate-mobile-4x5": {
+  "src": "src/fb/00-211425105159240.jpg",
+  "fbid": "211425105159240",
+  "box": [
+   560,
+   0,
+   1481,
+   1151
+  ],
+  "out": [
+   921,
+   1151
+  ],
+  "scale": 1.0,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "counter-1-coffee-1x1": {
+  "src": "src/fb/10-1050984287869980.jpg",
+  "fbid": "1050984287869980",
+  "box": [
+   0,
+   0,
+   998,
+   998
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.898,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "counter-2-matcha-1x1": {
+  "src": "src/fb/09-1056602400641502.jpg",
+  "fbid": "1056602400641502",
+  "box": [
+   200,
+   280,
+   1204,
+   1284
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.892,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "counter-3-plates-1x1": {
+  "src": "src/fb/05-1068233746145034.jpg",
+  "fbid": "1068233746145034",
+  "box": [
+   0,
+   0,
+   1638,
+   1638
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.547,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "counter-4-sandwich-1x1": {
+  "src": "src/fb/25-933356076299469.jpg",
+  "fbid": "933356076299469",
+  "box": [
+   0,
+   0,
+   1536,
+   1536
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.583,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "visit-shadow-2x1": {
+  "src": "src/fb/11-1050984277869981.jpg",
+  "fbid": "1050984277869981",
+  "box": [
+   0,
+   0,
+   1080,
+   540
+  ],
+  "out": [
+   1080,
+   540
+  ],
+  "scale": 1.0,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0
+ },
+ "counter-2-matcha-maps-1x1": {
+  "src": "src/maps/visitor-jehan-marie-yucot-iced-matcha.jpg",
+  "round": "r2",
+  "box": [
+   0,
+   1300,
+   4284,
+   5584
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.209,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0,
+  "source": "Google Maps, Cafe 408 BF Homes Paranaque listing, visitor photo",
+  "contributor": "Jehan Marie Yucot",
+  "contributor_url": "https://maps.google.com/maps/contrib/117859161331900143604",
+  "photo_date": "Jul 2026",
+  "source_px": [
+   4284,
+   5712
+  ],
+  "cdn_base": "https://lh3.googleusercontent.com/gps-cs-s/ANWiy9QE8P_r7cQKjA46dBx2moHpvPXbk95gV_0ZkOdwwg28NAuK4S-r27CPY20cMzAwyYi_I-67ZODEZ1KwVl506mkVKizaYJJACAxcFfIR1nZz73klxrclRXFOQwEP55eyxfRRqzxUcY3spLTc",
+  "replaces": "counter-2-matcha-1x1"
+ },
+ "counter-4-sandwich-maps-1x1": {
+  "src": "src/maps/owner-sandwich-fries-cup.jpg",
+  "round": "r2",
+  "box": [
+   0,
+   250,
+   2448,
+   2698
+  ],
+  "out": [
+   896,
+   896
+  ],
+  "scale": 0.366,
+  "max_channel": 241,
+  "pct_luma_ge_250": 0.0,
+  "source": "Google Maps, Cafe 408 BF Homes Paranaque listing, \"By owner\" photo",
+  "contributor": "Cafe 408 BF Homes Paranaque (owner)",
+  "contributor_url": "https://maps.google.com/maps/contrib/116380793194000073445",
+  "photo_date": "Dec 2024",
+  "source_px": [
+   2448,
+   3059
+  ],
+  "cdn_base": "https://lh3.googleusercontent.com/gps-cs-s/ANWiy9Qnj9Vdg112Ul9BcPPmFuh4JfzZtZ04r3NQSSR-ZoobgKkj9FCtMGJbheZuVm3Ti3-M0X_Tf7J5IBYQzIcSpsrY8crt82QfE2V0XmkCGIF1Pay5Yu4V3DaYhTJ28q5Oyaq4YigR",
+  "replaces": "counter-4-sandwich-1x1"
+ }
+}
