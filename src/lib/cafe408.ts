@@ -11,9 +11,9 @@ export const CAFE408 = {
 
 export const CAFE408_CAPS = [
   "Their iced coffee, from their Facebook.",
-  "Their coconut matcha, from their Facebook.",
+  "Their iced matcha, photo by Jehan Marie Yucot on Google Maps.",
   "Their rice plate, from their Facebook.",
-  "Their sandwich and fries, from their Facebook.",
+  "Their sandwich and fries, from their Google Maps listing.",
 ] as const;
 
 export const CAFE408_COUNTER = [
@@ -29,9 +29,9 @@ export const CAFE408_COUNTER = [
     n: "02",
     name: "Matcha",
     descriptor: "Coconut Matcha and Matcha Cream.",
-    file: "counter-2-matcha-1x1",
+    file: "counter-2-matcha-maps-1x1",
     caption: CAFE408_CAPS[1],
-    alt: "Two glasses of coconut matcha, green on top and white below, on a steel tray.",
+    alt: "An iced matcha in a short glass, with an iced coffee and a cookie on a grey plate behind it.",
   },
   {
     n: "03",
@@ -46,9 +46,9 @@ export const CAFE408_COUNTER = [
     name: "Sandwiches",
     descriptor:
       "The 408 Clubhouse, the Monte Cristo, and chicken tenders, all with fries.",
-    file: "counter-4-sandwich-1x1",
+    file: "counter-4-sandwich-maps-1x1",
     caption: CAFE408_CAPS[3],
-    alt: "A toasted cheese sandwich cut in half, with fries and a small cup of ketchup, on a white plate.",
+    alt: "A toasted sandwich cut in half with fries on a white plate, a white CAFE-408 cup behind it.",
   },
 ] as const;
 

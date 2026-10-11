@@ -538,8 +538,9 @@ export function Cafe408Experience() {
             official site.
           </p>
           <p className="foot-copy">
-            Photos: Cafe 408 (Facebook), used for this private sample only.
-            Hours: Google Maps.
+            Photos: Cafe 408 (Facebook, Google Maps) and Jehan Marie Yucot
+            (Google Maps), used for this private sample only. Hours: Google
+            Maps.
           </p>
           <p className="foot-copy">
             <a href={CAFE408.facebook} target="_blank" rel="noopener">

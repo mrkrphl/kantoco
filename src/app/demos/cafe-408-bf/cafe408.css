@@ -434,6 +434,7 @@ html.js-anim .row {
 
 .counter-cap {
   margin-top: 12px;
+  min-height: 44px;
 }
 
 .visit {
