@@ -108,7 +108,11 @@ function Still({
   );
 }
 
+let openerTimeline: gsap.core.Timeline | null = null;
+
 function settleOpener(root: HTMLElement) {
+  openerTimeline?.progress(1).kill();
+  openerTimeline = null;
   const wordmark = root.querySelector<HTMLElement>(".wordmark");
   wordmark?.classList.add("is-lit");
   wordmark?.classList.remove("is-sweeping");
@@ -132,6 +136,7 @@ function playOpener(root: HTMLElement) {
   const buttons = gsap.utils.toArray<HTMLElement>(".bd-opener .bd-btn", root);
   if (!wordmark) return;
 
+  openerTimeline?.kill();
   wordmark.classList.add("is-sweeping");
   const tl = gsap.timeline({
     defaults: { ease: "power2.out" },
@@ -171,6 +176,7 @@ function playOpener(root: HTMLElement) {
     { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 },
     1.0,
   );
+  openerTimeline = tl;
 }
 
 export function BetterDetailsExperience() {

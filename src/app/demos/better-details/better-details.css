@@ -143,7 +143,8 @@ html:has(.bd) body {
   opacity: 1;
 }
 
-@supports (background-clip: text) or (-webkit-background-clip: text) {
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (color: color-mix(in srgb, red 50%, blue)) {
   .js-anim .bd .wordmark.is-sweeping {
     background-image: linear-gradient(
       100deg,
