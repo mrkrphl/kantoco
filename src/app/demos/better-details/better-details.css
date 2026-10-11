@@ -133,16 +133,21 @@ html:has(.bd) body {
   display: block;
 }
 
+.js-anim .bd .wordmark {
+  opacity: 0.6;
+  color: var(--type);
+}
+
 @supports (background-clip: text) or (-webkit-background-clip: text) {
-  .js-anim .bd .wordmark {
+  .js-anim .bd .wordmark.is-sweeping {
     background-image: linear-gradient(
       100deg,
       var(--type) 0%,
       var(--type) 40%,
       color-mix(in srgb, var(--type) 55%, #fff) 46%,
       var(--type) 49%,
-      #3f3f40 54%,
-      #3f3f40 100%
+      color-mix(in srgb, var(--type) 60%, var(--bg)) 54%,
+      color-mix(in srgb, var(--type) 60%, var(--bg)) 100%
     );
     background-size: 300% 100%;
     background-position: 100% 0;
@@ -153,6 +158,7 @@ html:has(.bd) body {
 }
 
 .wordmark.is-lit {
+  opacity: 1;
   background: none;
   color: var(--type);
 }
@@ -530,6 +536,9 @@ html:has(.bd) body {
 
 .bd a.bd-text-link,
 .bd-text-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
   font-stretch: 100%;
   font-weight: 600;
   font-size: 16px;
@@ -539,6 +548,14 @@ html:has(.bd) body {
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
+}
+
+.bd-arrow {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  vertical-align: -0.125em;
 }
 
 .bd-visit {
@@ -566,17 +583,19 @@ html:has(.bd) body {
 
 .bd-visit-call {
   max-width: calc((8 * (100% - 11 * 32px) / 12) + 7 * 32px);
+  container-type: inline-size;
 }
 
 .bd-phone {
   margin: 8px 0 24px;
   font-stretch: 125%;
   font-weight: 700;
-  font-size: clamp(36px, 5.6vw, 80px);
+  font-size: clamp(24px, 10.5cqi, 80px);
   line-height: 1;
   letter-spacing: -0.02em;
   white-space: nowrap;
   color: var(--type);
+  max-width: 100%;
 }
 
 .bd-visit .bd-actions {

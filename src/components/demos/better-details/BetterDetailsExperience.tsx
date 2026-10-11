@@ -21,6 +21,27 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+function TextArrow() {
+  return (
+    <svg
+      className="bd-arrow"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2.5 8H13.5M13.5 8L9 3.5M13.5 8L9 12.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
+      />
+    </svg>
+  );
+}
+
 function Chevron({ className }: { className?: string }) {
   return (
     <svg
@@ -96,7 +117,10 @@ function Still({
 }
 
 function settleOpener(root: HTMLElement) {
-  root.querySelector(".wordmark")?.classList.add("is-lit");
+  const wordmark = root.querySelector<HTMLElement>(".wordmark");
+  wordmark?.classList.add("is-lit");
+  wordmark?.classList.remove("is-sweeping");
+  if (wordmark) gsap.set(wordmark, { opacity: 1 });
   gsap.set(
     [
       root.querySelector(".bd-opener .bd-eyebrow"),
@@ -116,14 +140,23 @@ function playOpener(root: HTMLElement) {
   const buttons = gsap.utils.toArray<HTMLElement>(".bd-opener .bd-btn", root);
   if (!wordmark) return;
 
+  wordmark.classList.add("is-sweeping");
   const tl = gsap.timeline({
     defaults: { ease: "power2.out" },
-    onComplete: () => wordmark.classList.add("is-lit"),
+    onComplete: () => {
+      wordmark.classList.add("is-lit");
+      wordmark.classList.remove("is-sweeping");
+    },
   });
   tl.fromTo(
     wordmark,
-    { backgroundPosition: "100% 0" },
-    { backgroundPosition: "0% 0", duration: 1.1, ease: "power2.inOut" },
+    { backgroundPosition: "100% 0", opacity: 0.6 },
+    {
+      backgroundPosition: "0% 0",
+      opacity: 1,
+      duration: 1.1,
+      ease: "power2.inOut",
+    },
     0,
   );
   if (eyebrow) {
@@ -592,7 +625,7 @@ export function BetterDetailsExperience() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  See more on Facebook →
+                  See more on Facebook <TextArrow />
                 </a>
               </div>
             </div>
@@ -632,7 +665,7 @@ export function BetterDetailsExperience() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Open in Google Maps →
+                  Open in Google Maps <TextArrow />
                 </a>
               </p>
             </div>
