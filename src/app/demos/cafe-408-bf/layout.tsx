@@ -15,6 +15,11 @@ export default function Cafe408Layout({
 }) {
   return (
     <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+        }}
+      />
       <link
         rel="preload"
         href="/demos/cafe-408-bf/fonts/BricolageGrotesque-Latin.woff2"
