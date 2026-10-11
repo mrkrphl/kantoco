@@ -212,11 +212,13 @@ html:has(.bd) body {
   white-space: nowrap;
 }
 
+.bd a.bd-btn-call,
 .bd-btn-call {
   gap: 11px;
   background: var(--type);
   color: var(--bg);
   border: 1px solid var(--type);
+  flex-shrink: 0;
 }
 
 .bd-btn-call svg {
