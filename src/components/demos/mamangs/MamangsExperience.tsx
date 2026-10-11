@@ -143,7 +143,7 @@ function setupScroll(root: HTMLElement) {
         ease: "none",
         scrollTrigger: {
           trigger: oven,
-          start: "top bottom",
+          start: "clamp(top bottom)",
           end: "bottom top",
           scrub: 0.6,
           onToggle: (self) => {
@@ -344,9 +344,10 @@ export function MamangsExperience() {
 
     const start = () => {
       if (!live || !rootRef.current) return;
-      window.__mpStarted = true;
+      const canAnimate = document.documentElement.classList.contains("js-anim");
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
+        if (!canAnimate) return;
         playOpener(rootRef.current!);
         setupScroll(rootRef.current!);
       });
@@ -362,6 +363,7 @@ export function MamangsExperience() {
           .forEach((el) => el.style.setProperty("--line", "1"));
       });
 
+      window.__mpStarted = true;
       requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
@@ -388,7 +390,10 @@ export function MamangsExperience() {
               A KantoCo sample, not Mamang&apos;s official site
             </span>
           </span>
-          <span className="mp-bar-short">{DEMO_BADGE} · KantoCo sample</span>
+          <span className="mp-bar-short">
+            <strong className="mp-bar-mark">{DEMO_BADGE}</strong>
+            {" · KantoCo sample"}
+          </span>
         </span>
       </p>
 

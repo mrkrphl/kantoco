@@ -24,7 +24,6 @@ html:has(.mp) body {
   font-size: 18px;
   line-height: 28px;
   min-height: 100%;
-  overflow-x: clip;
 }
 
 .mp *,
@@ -257,6 +256,7 @@ html:has(.mp) body {
 .oven {
   grid-column: 1 / 8;
   margin: 0;
+  overflow: clip;
 }
 
 .oven-cap {
@@ -456,6 +456,7 @@ html:has(.mp) body {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   align-items: start;
+  align-content: start;
 }
 
 .mp-group-grid > .mp-eyebrow,
@@ -593,6 +594,7 @@ html.js-anim .group-frame img {
 
 .mp-visit-dial {
   grid-column: 1 / 9;
+  justify-self: start;
   margin: 16px 0 32px;
   font-family: var(--display);
   font-weight: 800;
@@ -731,8 +733,14 @@ html.js-anim .group-frame img {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   align-items: start;
-  border-top: 1px solid var(--rule);
-  padding-top: 40px;
+}
+
+.mp-foot-grid::before {
+  content: "";
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--rule);
+  margin-bottom: 40px;
 }
 
 .mp-foot-name {
@@ -994,6 +1002,7 @@ html.js-anim .las-frame {
 
   .mp-visit-dial {
     display: block;
+    width: fit-content;
     margin: 16px 0 24px;
     font-size: 48px;
     font-variation-settings: "wght" 800, "wdth" 75, "opsz" 48;
@@ -1013,7 +1022,11 @@ html.js-anim .las-frame {
   }
 
   .mp-foot {
-    padding-block: 32px 48px;
+    padding-block: 0 48px;
+  }
+
+  .mp-foot-grid {
+    padding-top: 0;
   }
 
   .mp-foot-name {
