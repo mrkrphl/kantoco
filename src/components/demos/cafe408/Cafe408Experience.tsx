@@ -116,7 +116,15 @@ export function Cafe408Experience() {
 
         let tl: gsap.core.Timeline | undefined;
 
+        const reveal = (i: number) => {
+          frames.forEach((frame, k) => {
+            if (k === i) frame.removeAttribute("aria-hidden");
+            else frame.setAttribute("aria-hidden", "true");
+          });
+        };
+
         const show = (i: number) => {
+          reveal(i);
           if (!animate) {
             gsap.set(frames, {
               opacity: (k: number) => (k === i ? 1 : 0),
@@ -290,11 +298,13 @@ export function Cafe408Experience() {
   return (
     <div className="c408" ref={rootRef}>
       <p className="c408-bar">
-        <span className="c408-bar-desk">
-          SAMPLE | NOT LIVE · A KantoCo sample for Cafe 408. Not the cafe&apos;s
-          official site.
+        <span className="c408-bar-inner c408-wrap">
+          <span className="c408-bar-desk">
+            SAMPLE | NOT LIVE · A KantoCo sample for Cafe 408. Not the cafe&apos;s
+            official site.
+          </span>
+          <span className="c408-bar-mob">SAMPLE | NOT LIVE · KantoCo sample</span>
         </span>
-        <span className="c408-bar-mob">SAMPLE | NOT LIVE · KantoCo sample</span>
       </p>
 
       <main>
@@ -393,8 +403,8 @@ export function Cafe408Experience() {
             <figure className="counter-aside">
               <div className="counter-frame">
                 <div className="counter-stack" data-counter-stack>
-                  {CAFE408_COUNTER.map((item) => (
-                    <picture key={item.file}>
+                  {CAFE408_COUNTER.map((item, i) => (
+                    <picture key={item.file} aria-hidden={i === 0 ? undefined : true}>
                       <source
                         type="image/webp"
                         srcSet={`${CAFE408_ASSET}/${item.file}.webp`}

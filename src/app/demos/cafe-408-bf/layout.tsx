@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: CAFE408.title,
   description: CAFE408.description,
   robots: { index: false, follow: false },
+  openGraph: {
+    title: CAFE408.title,
+    description: CAFE408.description,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: CAFE408.title,
+    description: CAFE408.description,
+  },
 };
 
 export default function Cafe408Layout({

@@ -104,9 +104,16 @@ html:has(.c408) body {
   font-weight: 500;
   font-size: 12px;
   letter-spacing: 0.05em;
-  padding: 0 var(--wrap-pad);
+  padding: 0;
   margin: 0;
   white-space: nowrap;
+}
+
+.c408-bar-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .c408-bar-mob {
@@ -317,7 +324,6 @@ html.js-anim .plate-frame img {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--gutter);
-  align-items: start;
   margin-top: 56px;
 }
 
@@ -328,6 +334,9 @@ html.js-anim .plate-frame img {
 .counter-aside {
   grid-column: 8 / 13;
   margin: 0;
+  position: sticky;
+  top: calc(var(--bar-h) + 48px);
+  align-self: start;
 }
 
 .counter-mobile {
@@ -395,8 +404,6 @@ html.js-anim .row {
 }
 
 .counter-frame {
-  position: sticky;
-  top: calc(var(--bar-h) + 48px);
   aspect-ratio: 1;
   width: 100%;
   border-radius: 6px;
@@ -589,7 +596,7 @@ html.js-anim .heading-reveal {
 
 @media (max-width: 1023px) {
   .opener {
-    padding: 56px 0;
+    padding-block: 56px;
   }
 
   .opener-row,
@@ -684,7 +691,7 @@ html.js-anim .heading-reveal {
     min-height: var(--bar-h);
     max-height: 40px;
     font-size: 11px;
-    padding: 10px 24px;
+    padding-block: 10px;
   }
 
   .c408-bar-desk {
