@@ -134,7 +134,7 @@ html:has(.bd) body {
 }
 
 @supports (background-clip: text) or (-webkit-background-clip: text) {
-  .js-anim .wordmark {
+  .js-anim .bd .wordmark {
     background-image: linear-gradient(
       100deg,
       var(--type) 0%,
