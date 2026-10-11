@@ -733,8 +733,9 @@ html.js-anim .heading-reveal {
 
   .cap {
     margin-top: 10px;
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 16px;
+    line-height: 24px;
+    color: color-mix(in srgb, var(--type) 35%, var(--muted));
   }
 
   .c408-foot {
