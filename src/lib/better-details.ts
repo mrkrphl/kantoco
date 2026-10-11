@@ -1,7 +1,9 @@
 /** One phone record. Mark may switch the display string to 0917 599 8928. */
+const PHONE_DISPLAY = "0997 688 8219";
+
 export const PHONE = {
-  display: "0997 688 8219",
-  href: "tel:+639976888219",
+  display: PHONE_DISPLAY,
+  href: `tel:+63${PHONE_DISPLAY.replaceAll(" ", "").replace(/^0/, "")}`,
 } as const;
 
 export const PHONE_NBSP = PHONE.display.replaceAll(" ", "\u00a0");
