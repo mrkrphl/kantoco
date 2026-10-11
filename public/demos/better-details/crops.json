@@ -116,7 +116,25 @@
   "scale": 0.834,
   "redact": [],
   "max_channel": 238,
-  "pct_luma_ge_236": 0.029
+  "pct_luma_ge_236": 0.029,
+  "do_not_ship": true
+ },
+ "work-1-macan-hood-1x1": {
+  "src": "src/13-big.jpg",
+  "box": [
+   20,
+   160,
+   1320,
+   1460
+  ],
+  "out": [
+   1280,
+   1280
+  ],
+  "scale": 0.985,
+  "redact": [],
+  "max_channel": 238,
+  "pct_luma_ge_236": 0.281
  },
  "work-2-macan-front-1x1": {
   "src": "src/10-big.jpg",

@@ -21,23 +21,15 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-function TextArrow() {
+function LinkArrow() {
   return (
     <svg
-      className="bd-arrow"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
+      className="arrow"
+      viewBox="0 0 12 12"
       aria-hidden="true"
+      focusable="false"
     >
-      <path
-        d="M2.5 8H13.5M13.5 8L9 3.5M13.5 8L9 12.5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="square"
-        strokeLinejoin="miter"
-      />
+      <path d="M1 6h9.5M6.5 2l4 4-4 4" />
     </svg>
   );
 }
@@ -578,14 +570,14 @@ export function BetterDetailsExperience() {
             <figure className="work-main">
               <div className="work-frame work-frame-sq reveal-frame">
                 <Still
-                  file="work-1-macan-badge-1x1"
-                  alt="The PORSCHE lettering and Macan badge on a dark grey tailgate, reflecting the bay lights."
+                  file="work-1-macan-hood-1x1"
+                  alt="Close-up of a dark grey Porsche Macan's hood and headlight, reflecting the bay's ceiling lights."
                   width={1280}
                   height={1280}
                 />
               </div>
               <figcaption className="bd-cap">
-                Their work: Porsche Macan, rear
+                Their work: Porsche Macan, hood and headlight
               </figcaption>
             </figure>
             <figure className="work-front-m">
@@ -620,12 +612,13 @@ export function BetterDetailsExperience() {
                   Both shots come from the same post on their Facebook page.
                 </p>
                 <a
-                  className="bd-text-link"
+                  className="link-arrow"
                   href={FACEBOOK_PAGE}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  See more on Facebook <TextArrow />
+                  See more on Facebook
+                  <LinkArrow />
                 </a>
               </div>
             </div>
@@ -641,7 +634,9 @@ export function BetterDetailsExperience() {
           </p>
           <div className="bd-visit-call reveal-in">
             <p className="bd-kicker">Call or message</p>
-            <p className="bd-phone">{PHONE_NBSP}</p>
+            <a className="bd-phone" href={PHONE.href}>
+              {PHONE_NBSP}
+            </a>
             <Actions />
           </div>
           <div className="bd-visit-meta reveal-in">
@@ -660,12 +655,13 @@ export function BetterDetailsExperience() {
               <p className="bd-kicker">Map</p>
               <p>
                 <a
-                  className="bd-text-link"
+                  className="link-arrow"
                   href={MAPS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Open in Google Maps <TextArrow />
+                  Open in Google Maps
+                  <LinkArrow />
                 </a>
               </p>
             </div>

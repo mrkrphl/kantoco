@@ -7,7 +7,7 @@ export const PHONE = {
 } as const;
 
 export const PHONE_NBSP = PHONE.display.replaceAll(" ", "\u00a0");
-export const PHONE_CALL_LABEL = `Call ${PHONE.display}`;
+export const PHONE_CALL_LABEL = `Call ${PHONE_NBSP}`;
 
 export const FACEBOOK_PAGE = "https://www.facebook.com/BetterDetails";
 export const FACEBOOK_MSG = "https://m.me/BetterDetails";
