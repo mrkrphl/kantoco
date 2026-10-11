@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/demos/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },
@@ -30,14 +30,6 @@ const nextConfig: NextConfig = {
         source: "/demos/alonday-dental/contact",
         destination: "/demos/alonday-dental",
         permanent: false,
-      },
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: "/demos/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },
