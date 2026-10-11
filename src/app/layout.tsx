@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Bricolage_Grotesque, Newsreader } from "next/font/google";
 import "./globals.css";
 
@@ -31,7 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="min-h-full antialiased">
+        <Script id="c408-js-anim" strategy="beforeInteractive">
+          {`(function(){try{if(location.pathname.indexOf("/demos/cafe-408-bf")===0&&!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}})()`}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }
