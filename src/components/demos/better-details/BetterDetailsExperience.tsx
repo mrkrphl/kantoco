@@ -205,6 +205,7 @@ export function BetterDetailsExperience() {
     return () => {
       live = false;
       document.documentElement.classList.remove("js-anim");
+      document.documentElement.removeAttribute("data-bd-live");
     };
   }, []);
 
@@ -214,7 +215,8 @@ export function BetterDetailsExperience() {
       if (!root) return;
 
       const mm = gsap.matchMedia();
-      mm.add(
+      try {
+        mm.add(
         {
           motion: "(prefers-reduced-motion: no-preference)",
           reduce: "(prefers-reduced-motion: reduce)",
@@ -386,10 +388,28 @@ export function BetterDetailsExperience() {
             } else {
               revealFrames(
                 gsap.utils.toArray<HTMLElement>(
-                  ".plate-frame, .svc-row-media .reveal-frame, .work-main .reveal-frame, .work-front-m .reveal-frame",
+                  ".plate-frame, .work-main .reveal-frame, .work-front-m .reveal-frame",
                   root,
                 ),
               );
+              gsap.utils
+                .toArray<HTMLElement>(".svc-row-media .svc-row-frame img", root)
+                .forEach((img) => {
+                  gsap.fromTo(
+                    img,
+                    { scale: 1.06 },
+                    {
+                      scale: 1,
+                      duration: 1.2,
+                      ease: "power3.out",
+                      scrollTrigger: {
+                        trigger: img,
+                        start: "top 92%",
+                        once: true,
+                      },
+                    },
+                  );
+                });
             }
 
             revealCopy();
@@ -423,6 +443,10 @@ export function BetterDetailsExperience() {
           }
         },
       );
+        document.documentElement.setAttribute("data-bd-live", "");
+      } catch {
+        document.documentElement.classList.remove("js-anim");
+      }
     },
     { scope: rootRef },
   );
@@ -519,10 +543,10 @@ export function BetterDetailsExperience() {
               {SERVICES.map((svc, i) => (
                 <article
                   key={svc.file}
-                  className={`svc-row reveal-in${i === 0 ? " is-active" : ""}`}
+                  className={`svc-row${i === 0 ? " is-active" : ""}`}
                 >
                   <div className="svc-row-media">
-                    <div className="svc-row-frame reveal-frame">
+                    <div className="svc-row-frame">
                       <Still
                         file={svc.file}
                         alt={svc.alt}

@@ -198,6 +198,7 @@ export function Cafe408Experience() {
       const startPour = () => {
         if (cancelled) return;
         ctx.add(() => {
+          const desktop = window.matchMedia("(min-width: 1024px)").matches;
           const pour = gsap.timeline();
           pour.fromTo(
             root.querySelector(".name-fill"),
@@ -208,24 +209,36 @@ export function Cafe408Experience() {
           pour.fromTo(
             [
               root.querySelector(".opener-eyebrow"),
-              root.querySelector(".opener-tagline"),
-            ],
+              ...(desktop ? [root.querySelector(".opener-tagline")] : []),
+            ].filter(Boolean),
             { y: 12, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
             0.7,
           );
-          pour.fromTo(
-            root.querySelectorAll(".opener-btns a"),
-            { y: 12, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: "power2.out" },
-            1.1,
-          );
-          pour.fromTo(
-            root.querySelector(".plate-frame"),
-            { y: 16, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-            1.3,
-          );
+          if (desktop) {
+            pour.fromTo(
+              root.querySelectorAll(".opener-btns a"),
+              { y: 12, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: "power2.out" },
+              1.1,
+            );
+            pour.fromTo(
+              root.querySelector(".plate-frame"),
+              { y: 16, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+              1.3,
+            );
+          } else {
+            gsap.set(
+              [
+                root.querySelector(".opener-tagline"),
+                ...root.querySelectorAll(".opener-btns a"),
+                root.querySelector(".plate-frame"),
+                root.querySelector(".intro .heading-reveal"),
+              ].filter(Boolean),
+              { opacity: 1, y: 0 },
+            );
+          }
         });
       };
 
@@ -250,7 +263,9 @@ export function Cafe408Experience() {
         );
       }
 
+      const desktopMotion = window.matchMedia("(min-width: 1024px)").matches;
       root.querySelectorAll(".heading-reveal").forEach((el) => {
+        if (!desktopMotion && el.closest(".intro")) return;
         gsap.fromTo(
           el,
           { y: 16, opacity: 0 },
@@ -330,6 +345,7 @@ export function Cafe408Experience() {
       </p>
 
       <main>
+        <div className="c408-mast">
         <section className="c408-wrap opener">
           <p className="eyebrow opener-eyebrow">
             <span className="eyebrow-desk">
@@ -403,6 +419,7 @@ export function Cafe408Experience() {
             </p>
           </div>
         </section>
+        </div>
 
         <section className="c408-wrap counter">
           <p className="eyebrow heading-reveal">ON THE COUNTER</p>
@@ -542,11 +559,10 @@ export function Cafe408Experience() {
             (Google Maps), used for this private sample only. Hours: Google
             Maps.
           </p>
-          <p className="foot-copy">
+          <p className="foot-copy foot-social">
             <a href={CAFE408.facebook} target="_blank" rel="noopener">
               facebook.com/cafe408
             </a>
-            {" · "}
             <a href={CAFE408.instagram} target="_blank" rel="noopener">
               instagram.com/cafe408_
             </a>
