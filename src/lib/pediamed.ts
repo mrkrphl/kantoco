@@ -1,4 +1,4 @@
-import { DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
+import { KANTOCO_MESSENGER } from "@/lib/demos";
 
 export const PEDIAMED_ASSET = "/demos/pediamed";
 
@@ -21,8 +21,7 @@ export const pediamed = {
   messenger: "https://m.me/PediaMedPH",
   messageLabel: "Message on Facebook",
   directions:
-    "https://www.google.com/maps/dir/?api=1&destination=14.4484969,121.0285809&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
-  mapsPin: "https://maps.google.com/?cid=14557797195464042728",
+    "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic%2C+Lot+5+Block+39+J.+Elizalde%2C+BF+Homes%2C+Para%C3%B1aque&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
   directionsLabel: "Get directions",
   hours: [
     { days: "Mon–Sat", time: "10\u00A0am – 5\u00A0pm" },
@@ -33,9 +32,8 @@ export const pediamed = {
   sampleNote:
     "A KantoCo sample for PediaMED Children's Clinic. Not live, and not the clinic's official site.",
   credit:
-    "Interiors: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
+    "Stock interiors, not PediaMED's: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
   madeBy: "Made by KantoCo · m.me/kantocoph",
-  disclaimer: DEMO_DISCLAIMER,
   kantocoMessenger: KANTOCO_MESSENGER,
   asset: PEDIAMED_ASSET,
 } as const;
@@ -44,17 +42,19 @@ export const PEDIAMED_SHOTS = [
   {
     file: "consult-corner-4x5",
     file1x: "consult-corner-4x5-1x",
-    caption: "Consult corner. Photo: Yusuf P, Pexels.",
-    alt: "Empty exam room with a scale, desk, and two chairs. No people.",
+    caption: "Stock consult room, not PediaMED. Photo: Yusuf P, Pexels.",
+    alt: "Empty exam room with a scale, a desk, and two chairs.",
     width: 1280,
     height: 1600,
+    webp: false,
   },
   {
     file: "play-area-4x5",
     file1x: "play-area-4x5-1x",
-    caption: "Play area. Photo: Hakim Santoso, Pexels.",
-    alt: "Empty play corner with a wooden train set on a grey rug. No people.",
+    caption: "Stock play corner, not PediaMED. Photo: Hakim Santoso, Pexels.",
+    alt: "Empty play corner with a wooden train set on a grey rug.",
     width: 1280,
-    height: 1600,
+    height: 1599,
+    webp: true,
   },
 ] as const;

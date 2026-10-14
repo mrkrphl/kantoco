@@ -45,11 +45,13 @@ function Shot({
   const oneX = `${pediamed.asset}/${item.file1x}`;
   return (
     <picture>
-      <source
-        type="image/webp"
-        srcSet={`${oneX}.webp 640w, ${base}.webp 1280w`}
-        sizes={SHOT_SIZES}
-      />
+      {item.webp ? (
+        <source
+          type="image/webp"
+          srcSet={`${oneX}.webp 640w, ${base}.webp 1280w`}
+          sizes={SHOT_SIZES}
+        />
+      ) : null}
       <img
         src={`${oneX}.jpg`}
         srcSet={`${oneX}.jpg 640w, ${base}.jpg 1280w`}
@@ -79,55 +81,61 @@ export function PediamedExperience() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
+      if (!animate) return;
+
       const playOpener = () => {
-        if (cancelled || !animate) return;
-        const fill = root.querySelector<HTMLElement>(".pm-name-fill");
-        const rise = gsap.utils.toArray<HTMLElement>(
-          ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a, .pm-shot-frame",
-          root,
-        );
-        if (!fill) return;
+        if (cancelled) return;
+        ctx.add(() => {
+          const fill = root.querySelector<HTMLElement>(".pm-name-fill");
+          const rise = gsap.utils.toArray<HTMLElement>(
+            ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a, .pm-rooms .pm-shot-frame",
+            root,
+          );
+          if (!fill) return;
 
-        gsap.set(fill, { clipPath: "inset(100% 0 0 0)" });
-        gsap.set(rise, { opacity: 0, y: 12 });
+          gsap.set(fill, { clipPath: "inset(100% 0 0 0)" });
+          gsap.set(rise, { opacity: 0, y: 12 });
 
-        const tl = gsap.timeline({
-          defaults: { ease: "power2.out" },
-          onComplete: () => {
-            document.documentElement.classList.remove("js-anim");
-          },
+          const tl = gsap.timeline({
+            defaults: { ease: "power2.out" },
+            onComplete: () => {
+              document.documentElement.classList.remove("js-anim");
+            },
+          });
+          tl.to(
+            fill,
+            { clipPath: "inset(0% 0 0 0)", duration: 0.9 },
+            0,
+          );
+          tl.to(
+            rise,
+            { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 },
+            0.35,
+          );
         });
-        tl.to(
-          fill,
-          { clipPath: "inset(0% 0 0 0)", duration: 0.9 },
-          0,
-        );
-        tl.to(
-          rise,
-          { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 },
-          0.35,
-        );
       };
 
       void waitForOpenerAutoplay(120).then(playOpener);
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        root.querySelectorAll<HTMLElement>(".pm-shot-frame img").forEach((img) => {
-          gsap.fromTo(
-            img,
-            { scale: 1.06 },
-            {
-              scale: 1,
-              ease: "none",
-              scrollTrigger: {
-                trigger: img.closest(".pm-shot-frame") ?? img,
-                start: "top bottom",
-                end: "center center",
-                scrub: true,
+        root
+          .querySelectorAll<HTMLElement>(".pm-rooms .pm-shot-frame img")
+          .forEach((img) => {
+            gsap.fromTo(
+              img,
+              { scale: 1.06 },
+              {
+                scale: 1,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: img.closest(".pm-shot-frame") ?? img,
+                  start: "top bottom",
+                  end: "center center",
+                  scrub: true,
+                },
               },
-            },
-          );
-        });
+            );
+          });
 
         gsap.utils.toArray<HTMLElement>(".pm-reveal").forEach((el) => {
           gsap.fromTo(
@@ -151,8 +159,6 @@ export function PediamedExperience() {
       ctx.revert();
     };
   }, []);
-
-  const play = PEDIAMED_SHOTS[1];
 
   return (
     <div className="pm" ref={rootRef}>
@@ -191,7 +197,7 @@ export function PediamedExperience() {
           </div>
         </section>
 
-        <section className="pm-wrap pm-rooms" aria-label="Clinic interiors">
+        <section className="pm-wrap pm-rooms" aria-label="Stock interiors">
           <div className="pm-rooms-grid">
             {PEDIAMED_SHOTS.map((item, i) => (
               <figure className="pm-shot" key={item.file}>
@@ -215,12 +221,6 @@ export function PediamedExperience() {
             </div>
           </div>
           <div className="pm-visit-split">
-            <figure className="pm-visit-photo">
-              <div className="pm-shot-frame">
-                <Shot item={play} />
-              </div>
-              <figcaption className="pm-cap">{play.caption}</figcaption>
-            </figure>
             <div className="pm-visit-info">
               <div className="pm-visit-block">
                 <p className="pm-eyebrow">ADDRESS</p>
@@ -232,8 +232,11 @@ export function PediamedExperience() {
               </div>
               <div className="pm-visit-block">
                 <p className="pm-eyebrow">
-                  HOURS
-                  <span className="pm-confirm">{pediamed.hoursConfirm}</span>
+                  HOURS{" "}
+                  <span className="pm-confirm">
+                    {pediamed.hoursConfirm}
+                    <span className="pm-sr"> hours from Google Maps</span>
+                  </span>
                 </p>
                 {pediamed.hours.map((row) => (
                   <div className="pm-hours-row" key={row.days}>

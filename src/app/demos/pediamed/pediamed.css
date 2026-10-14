@@ -179,7 +179,7 @@ html.js-anim .pm-name-fill {
 html.js-anim .pm-opener-eyebrow,
 html.js-anim .pm-opener-copy,
 html.js-anim .pm-opener-btns a,
-html.js-anim .pm-shot-frame {
+html.js-anim .pm-rooms .pm-shot-frame {
   opacity: 0;
 }
 
@@ -304,13 +304,8 @@ html.js-anim .pm-shot-frame img {
   align-items: start;
 }
 
-.pm-visit-photo {
-  grid-column: 1 / 7;
-  margin: 0;
-}
-
 .pm-visit-info {
-  grid-column: 8 / 13;
+  grid-column: 1 / 8;
 }
 
 .pm-visit-block + .pm-visit-block {
@@ -350,6 +345,7 @@ html.js-anim .pm-shot-frame img {
 }
 
 .pm-confirm {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -393,13 +389,25 @@ html.js-anim .pm-shot-frame img {
   align-items: center;
   min-height: 44px;
   min-width: 44px;
-  text-decoration: none;
-}
-
-.pm-foot a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: var(--accent);
+}
+
+.pm-foot a:hover {
+  color: var(--type);
+}
+
+.pm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 html.js-anim .pm-reveal {
@@ -412,7 +420,7 @@ html.js-anim .pm-reveal {
   }
 
   .pm-visit-info {
-    grid-column: 7 / 13;
+    grid-column: 1 / 8;
   }
 }
 
@@ -456,10 +464,6 @@ html.js-anim .pm-reveal {
 
   .pm-visit-btns {
     margin-top: 28px;
-  }
-
-  .pm-visit-photo {
-    margin-top: 48px;
   }
 
   .pm-visit-info {
