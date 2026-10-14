@@ -13,29 +13,36 @@ export const pediamed = {
   kickerMob: "Children's Clinic · BF Homes",
   services: "Outpatient care for kids",
   addressLines: [
-    "Lot 5 Block 39, J.\u00A0Elizalde",
-    "BF\u00A0Homes, Parañaque 1720",
+    "Unit C, 2nd floor, LG Centre Building",
+    "J.\u00A0Elizalde St, BF\u00A0Homes",
   ],
-  addressPlain: "Lot 5 Block 39, J. Elizalde, BF Homes, Parañaque 1720",
   facebook: "https://www.facebook.com/PediaMedPH",
   messenger: "https://m.me/PediaMedPH",
   messageLabel: "Message on Facebook",
   directions:
     "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic%2C+Lot+5+Block+39+J.+Elizalde%2C+BF+Homes%2C+Para%C3%B1aque&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
   directionsLabel: "Get directions",
+  hoursLabel: "Hours per Google Maps",
   hours: [
     { days: "Mon–Sat", time: "10\u00A0am – 5\u00A0pm" },
     { days: "Sunday", time: "Closed" },
   ],
-  hoursNote: "From their Google Maps listing.",
-  hoursConfirm: "CONFIRM",
   sampleNote:
     "A KantoCo sample for PediaMED Children's Clinic. Not live, and not the clinic's official site.",
   credit:
-    "Stock interiors, not PediaMED's: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
+    "Hero: Haikal Vivar, Unsplash. Interiors: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
   madeBy: "Made by KantoCo · m.me/kantocoph",
   kantocoMessenger: KANTOCO_MESSENGER,
   asset: PEDIAMED_ASSET,
+} as const;
+
+export const PEDIAMED_HERO = {
+  file: "hero-waiting-16x9",
+  file1x: "hero-waiting-16x9-1x",
+  caption: "Stock waiting room, not PediaMED. Photo: Haikal Vivar, Unsplash.",
+  alt: "Empty waiting room with two rows of black chairs against a white wall.",
+  width: 1600,
+  height: 900,
 } as const;
 
 export const PEDIAMED_SHOTS = [
@@ -46,6 +53,7 @@ export const PEDIAMED_SHOTS = [
     alt: "Empty exam room with a scale, a desk, and two chairs.",
     width: 1280,
     height: 1600,
+    displayMax: 320,
     webp: false,
   },
   {
@@ -55,6 +63,7 @@ export const PEDIAMED_SHOTS = [
     alt: "Empty play corner with a wooden train set on a grey rug.",
     width: 1280,
     height: 1599,
+    displayMax: 320,
     webp: true,
   },
 ] as const;

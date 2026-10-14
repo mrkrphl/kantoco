@@ -1,6 +1,12 @@
 {
   "shots": [
     {
+      "id": "hero-waiting-16x9",
+      "source": "https://unsplash.com/photos/a-row-of-empty-chairs-sitting-in-a-room-IhIlMEkVQvQ",
+      "author": "Haikal Vivar",
+      "license": "Unsplash License"
+    },
+    {
       "id": "consult-corner-4x5",
       "source": "https://www.pexels.com/photo/empty-doctors-office-12454146/",
       "author": "Yusuf P",
