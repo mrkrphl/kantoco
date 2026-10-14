@@ -1,0 +1,87 @@
+{
+ "plate-16x9": {
+  "src": "src/stock/unsplash-sam-moghadam-red-chair-window.jpg",
+  "box": [
+   0,
+   300,
+   2400,
+   1650
+  ],
+  "out": [
+   2240,
+   1260
+  ],
+  "scale": 0.933,
+  "max_channel": 239,
+  "pct_luma_ge_250": 0.0,
+  "kb_webp": 341
+ },
+ "plate-16x9-1x": {
+  "src": "src/stock/unsplash-sam-moghadam-red-chair-window.jpg",
+  "box": [
+   0,
+   300,
+   2400,
+   1650
+  ],
+  "out": [
+   1120,
+   630
+  ],
+  "scale": 0.467,
+  "max_channel": 239,
+  "pct_luma_ge_250": 0.0,
+  "kb_webp": 88
+ },
+ "plate-mobile-4x5": {
+  "src": "src/stock/unsplash-sam-moghadam-red-chair-window.jpg",
+  "box": [
+   880,
+   0,
+   2303,
+   1779
+  ],
+  "out": [
+   1200,
+   1500
+  ],
+  "scale": 0.843,
+  "max_channel": 239,
+  "pct_luma_ge_250": 0.0,
+  "kb_webp": 216
+ },
+ "clinic-sign-5x4": {
+  "src": "src/maps/visitor-randolph-novino-reception.jpg",
+  "box": [
+   320,
+   320,
+   1451,
+   1225
+  ],
+  "out": [
+   1131,
+   905
+  ],
+  "scale": 1.0,
+  "max_channel": 239,
+  "pct_luma_ge_250": 0.0,
+  "kb_webp": 107
+ },
+ "neon-own-2x1": {
+  "src": "src/fb-04-neon.jpg",
+  "box": [
+   80,
+   6,
+   1380,
+   656
+  ],
+  "out": [
+   1300,
+   650
+  ],
+  "scale": 1.0,
+  "max_channel": 238,
+  "pct_luma_ge_250": 0.0,
+  "kb_webp": 30
+ }
+}
