@@ -71,35 +71,81 @@ export function PediamedExperience() {
     if (!root) return;
 
     document.documentElement.setAttribute("data-pm-live", "");
-    const animate = document.documentElement.classList.contains("js-anim");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animate =
+      document.documentElement.classList.contains("js-anim") && !reduce;
     let cancelled = false;
+    let revealed = false;
 
-    const ctx = gsap.context(() => {
+    const showName = () => {
+      revealed = true;
+      document.documentElement.classList.remove("js-anim");
+      const names = root.querySelectorAll<HTMLElement>(".pm-name-rise");
+      try {
+        gsap.killTweensOf(names);
+      } catch {
+        /* GSAP failed — still force the name visible below */
+      }
+      names.forEach((el) => {
+        el.classList.add("pm-name-in");
+        try {
+          gsap.set(el, { y: 0, yPercent: 0, clearProps: "transform" });
+        } catch {
+          /* ignore */
+        }
+        el.style.transform = "none";
+      });
+    };
+
+    if (!animate) {
+      showName();
+    }
+
+    const failsafe = window.setTimeout(showName, 2500);
+
+    let ctx: gsap.Context | undefined;
+    try {
+      ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
-
-      if (!animate) return;
 
       const playOpener = () => {
         if (cancelled) return;
-        ctx.add(() => {
-          const tiles = gsap.utils.toArray<HTMLElement>(".pm-tile", root);
-          const names = gsap.utils.toArray<HTMLElement>(".pm-name-rise", root);
-          const rise = gsap.utils.toArray<HTMLElement>(
-            ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a",
-            root,
-          );
-          if (!tiles.length || !names.length) return;
+        const tiles = gsap.utils.toArray<HTMLElement>(".pm-tile", root);
+        const names = gsap.utils.toArray<HTMLElement>(".pm-name-rise", root);
+        const rise = gsap.utils.toArray<HTMLElement>(
+          ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a",
+          root,
+        );
+        if (!names.length || !animate || revealed) {
+          showName();
+          return;
+        }
 
+        try {
           gsap.set(tiles, { opacity: 0, scale: 0.6, rotate: -6 });
-          gsap.set(names, { yPercent: 105 });
           gsap.set(rise, { opacity: 0, y: 12 });
 
           const tl = gsap.timeline({
             onComplete: () => {
-              document.documentElement.classList.remove("js-anim");
+              showName();
               ScrollTrigger.refresh();
             },
+            onInterrupt: showName,
           });
+          tl.fromTo(
+            names,
+            { yPercent: 105, y: 0 },
+            {
+              yPercent: 0,
+              y: 0,
+              duration: 0.53,
+              stagger: 0.12,
+              ease: "power3.out",
+              immediateRender: false,
+              overwrite: true,
+            },
+            0.35,
+          );
           tl.to(
             tiles,
             {
@@ -113,16 +159,6 @@ export function PediamedExperience() {
             0,
           );
           tl.to(
-            names,
-            {
-              yPercent: 0,
-              duration: 0.53,
-              stagger: 0.12,
-              ease: "power3.out",
-            },
-            0.35,
-          );
-          tl.to(
             rise,
             {
               opacity: 1,
@@ -133,10 +169,13 @@ export function PediamedExperience() {
             },
             0.9,
           );
-        });
+        } catch {
+          showName();
+        }
       };
 
       const bindScroll = () => {
+        if (!animate) return;
         mm.add("(prefers-reduced-motion: no-preference)", () => {
           gsap.utils.toArray<HTMLElement>(".pm-reveal").forEach((el) => {
             gsap.fromTo(
@@ -147,6 +186,7 @@ export function PediamedExperience() {
                 y: 0,
                 duration: 0.7,
                 ease: "power2.out",
+                immediateRender: false,
                 scrollTrigger: { trigger: el, start: "top 85%" },
               },
             );
@@ -162,6 +202,7 @@ export function PediamedExperience() {
                   scale: 1,
                   duration: 0.4,
                   ease: "back.out(1.4)",
+                  immediateRender: false,
                   scrollTrigger: { trigger: row, start: "top 88%" },
                 },
               );
@@ -173,6 +214,7 @@ export function PediamedExperience() {
                 "--line": 1,
                 duration: 0.8,
                 ease: "power2.out",
+                immediateRender: false,
                 scrollTrigger: { trigger: row, start: "top 88%" },
               },
             );
@@ -182,11 +224,13 @@ export function PediamedExperience() {
           if (visitH) {
             gsap.fromTo(
               visitH,
-              { yPercent: 105 },
+              { yPercent: 105, y: 0 },
               {
                 yPercent: 0,
+                y: 0,
                 duration: 0.7,
                 ease: "power3.out",
+                immediateRender: false,
                 scrollTrigger: { trigger: visitH, start: "top 88%" },
               },
             );
@@ -199,11 +243,20 @@ export function PediamedExperience() {
         bindScroll();
       });
     }, root);
+    } catch {
+      showName();
+    }
 
     return () => {
       cancelled = true;
+      window.clearTimeout(failsafe);
       document.documentElement.removeAttribute("data-pm-live");
-      ctx.revert();
+      document.documentElement.classList.remove("js-anim");
+      ctx?.revert();
+      root.querySelectorAll<HTMLElement>(".pm-name-rise").forEach((el) => {
+        el.classList.add("pm-name-in");
+        el.style.transform = "none";
+      });
     };
   }, []);
 

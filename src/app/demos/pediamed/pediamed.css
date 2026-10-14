@@ -153,6 +153,7 @@ html:has(.pm) body {
   letter-spacing: -0.02em;
   line-height: 0.92;
   color: var(--type);
+  transform: none;
 }
 
 .pm-name-sub .pm-name-rise {
@@ -218,17 +219,17 @@ html:has(.pm) body {
   background: var(--t-mint);
 }
 
-html.js-anim .pm-opener-eyebrow,
-html.js-anim .pm-opener-copy,
-html.js-anim .pm-opener-btns a {
+html.js.js-anim .pm-opener-eyebrow,
+html.js.js-anim .pm-opener-copy,
+html.js.js-anim .pm-opener-btns a {
   opacity: 0;
 }
 
-html.js-anim .pm-name-rise {
+html.js.js-anim .pm-name-rise:not(.pm-name-in) {
   transform: translateY(105%);
 }
 
-html.js-anim .pm-tile {
+html.js.js-anim .pm-tile {
   opacity: 0;
   transform: scale(0.6) rotate(-6deg);
 }
@@ -384,11 +385,11 @@ html.js-anim .pm-tile {
   text-decoration-color: var(--accent);
 }
 
-html.js-anim .pm-know-row {
+html.js.js-anim .pm-know-row {
   --line: 0;
 }
 
-html.js-anim .pm-marker {
+html.js.js-anim .pm-marker {
   transform: scale(0);
 }
 
@@ -532,11 +533,11 @@ html.js-anim .pm-marker {
   color: var(--type);
 }
 
-html.js-anim .pm-reveal {
+html.js.js-anim .pm-reveal {
   opacity: 0;
 }
 
-html.js-anim .pm-visit-h {
+html.js.js-anim .pm-visit-h {
   transform: translateY(105%);
 }
 
@@ -656,5 +657,11 @@ html.js-anim .pm-visit-h {
 
   .pm-visit-block + .pm-visit-block {
     margin-top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js.js-anim .pm-name-rise {
+    transform: none;
   }
 }
