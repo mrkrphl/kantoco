@@ -87,3 +87,9 @@ Pitch sample only. Not on the homepage list. Shop stills only. See
 
 Pitch sample only. Not on the homepage list. Facebook stills were a facts
 source only. Zero photos on the page — see `alonday-dental/ATTRIBUTION.md`.
+
+## PediaMED Children's Clinic (unlisted)
+
+Pitch sample only. Not on the homepage list. Empty interiors only. See
+`pediamed/ATTRIBUTION.md`.
+

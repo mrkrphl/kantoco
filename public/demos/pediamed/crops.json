@@ -1,0 +1,17 @@
+{
+  "note": "Stand-in 4:5 crops while the attached pediamed-slim pack was not mounted on this VM. Grade is the source file as downloaded.",
+  "shots": [
+    {
+      "id": "consult-corner-4x5",
+      "source": "https://www.pexels.com/photo/empty-doctors-office-12454146/",
+      "author": "Yusuf P",
+      "license": "Pexels License"
+    },
+    {
+      "id": "play-area-4x5",
+      "source": "https://www.pexels.com/photo/minimalist-child-s-playroom-with-wooden-bench-30607331/",
+      "author": "Hakim Santoso",
+      "license": "Pexels License"
+    }
+  ]
+}
