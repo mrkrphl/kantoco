@@ -205,6 +205,7 @@ export function BetterDetailsExperience() {
     return () => {
       live = false;
       document.documentElement.classList.remove("js-anim");
+      document.documentElement.removeAttribute("data-bd-live");
     };
   }, []);
 
@@ -213,8 +214,11 @@ export function BetterDetailsExperience() {
       const root = rootRef.current;
       if (!root) return;
 
+      document.documentElement.setAttribute("data-bd-live", "");
+
       const mm = gsap.matchMedia();
-      mm.add(
+      try {
+        mm.add(
         {
           motion: "(prefers-reduced-motion: no-preference)",
           reduce: "(prefers-reduced-motion: reduce)",
@@ -274,6 +278,7 @@ export function BetterDetailsExperience() {
           const revealCopy = () => {
             gsap.utils
               .toArray<HTMLElement>(".reveal-in", root)
+              .filter((el) => !el.classList.contains("svc-row"))
               .forEach((el) => {
                 gsap.fromTo(
                   el,
@@ -386,10 +391,28 @@ export function BetterDetailsExperience() {
             } else {
               revealFrames(
                 gsap.utils.toArray<HTMLElement>(
-                  ".plate-frame, .svc-row-media .reveal-frame, .work-main .reveal-frame, .work-front-m .reveal-frame",
+                  ".plate-frame, .work-main .reveal-frame, .work-front-m .reveal-frame",
                   root,
                 ),
               );
+              gsap.utils
+                .toArray<HTMLElement>(".svc-row-media .reveal-frame img", root)
+                .forEach((img) => {
+                  gsap.fromTo(
+                    img,
+                    { scale: 1.06 },
+                    {
+                      scale: 1,
+                      duration: 1.2,
+                      ease: "power3.out",
+                      scrollTrigger: {
+                        trigger: img,
+                        start: "top 92%",
+                        once: true,
+                      },
+                    },
+                  );
+                });
             }
 
             revealCopy();
@@ -423,6 +446,9 @@ export function BetterDetailsExperience() {
           }
         },
       );
+      } catch {
+        document.documentElement.classList.remove("js-anim");
+      }
     },
     { scope: rootRef },
   );

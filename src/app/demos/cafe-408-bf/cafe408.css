@@ -198,9 +198,22 @@ html.js-anim .name-fill {
 
 html.js-anim .opener-eyebrow,
 html.js-anim .opener-tagline,
-html.js-anim .opener-btns a,
-html.js-anim .plate-frame {
+html.js-anim .opener-btns a {
   opacity: 0;
+}
+
+@media (min-width: 1024px) {
+  html.js-anim .plate-frame {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  html.js-anim .opener-tagline,
+  html.js-anim .opener-btns a,
+  html.js-anim .intro .heading-reveal {
+    opacity: 1;
+  }
 }
 
 .c408-btn {
@@ -590,6 +603,18 @@ html.js-anim .row {
   text-decoration-color: var(--accent);
 }
 
+.foot-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+
+.foot-social a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 html.js-anim .heading-reveal {
   opacity: 0;
 }
@@ -692,6 +717,52 @@ html.js-anim .heading-reveal {
 }
 
 @media (max-width: 767px) {
+  .c408-mast {
+    display: flex;
+    flex-direction: column;
+    padding-inline: var(--wrap-pad);
+  }
+
+  .c408-mast > .c408-wrap {
+    padding-inline: 0;
+    max-width: none;
+  }
+
+  .c408-mast .opener {
+    display: contents;
+    padding: 0;
+  }
+
+  .c408-mast .opener-eyebrow {
+    order: 1;
+    padding-top: 20px;
+  }
+
+  .c408-mast .name {
+    order: 2;
+  }
+
+  .c408-mast .plate-sec {
+    order: 3;
+    margin-top: 16px;
+  }
+
+  .c408-mast .intro {
+    order: 4;
+    margin-top: 20px;
+  }
+
+  .c408-mast .opener-row {
+    order: 5;
+    margin-top: 24px;
+    padding-bottom: 28px;
+  }
+
+  .c408-mast .intro-line {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
   .c408 {
     --bar-h: 38px;
   }

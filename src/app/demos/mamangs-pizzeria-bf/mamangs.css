@@ -200,7 +200,8 @@ html:has(.mp) {
   font-weight: 500;
   font-size: 15px;
   line-height: 1.4;
-  color: var(--ash);
+  color: #ece0cf;
+  color: color-mix(in srgb, var(--dough) 88%, var(--ash));
 }
 
 .mp-ctas {
@@ -691,8 +692,10 @@ html.js-anim .group-frame img {
 }
 
 .mp-map {
-  display: inline-block;
-  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
   color: var(--ember);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -795,6 +798,9 @@ html.js-anim .group-frame img {
 
 .mp-made,
 .mp a.mp-made {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--dough);
   font-weight: 600;
   text-decoration: none;

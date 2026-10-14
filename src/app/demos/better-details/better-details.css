@@ -545,6 +545,7 @@ html:has(.bd) body {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
+  min-height: 44px;
   font-stretch: 100%;
   font-weight: 600;
   font-size: 16px;
@@ -691,7 +692,7 @@ html:has(.bd) body {
   color: var(--muted);
 }
 
-.js-anim .bd .reveal-in,
+.js-anim .bd .reveal-in:not(.svc-row),
 .js-anim .bd .bd-opener .bd-eyebrow,
 .js-anim .bd .bd-opener .bd-tagline,
 .js-anim .bd .bd-opener .bd-sub,
@@ -699,8 +700,22 @@ html:has(.bd) body {
   opacity: 0;
 }
 
-.js-anim .bd .reveal-frame {
+.js-anim .bd .reveal-frame:not(.svc-row-frame) {
   clip-path: inset(0 0 100% 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .bd .reveal-in,
+  .js-anim .bd .bd-opener .bd-eyebrow,
+  .js-anim .bd .bd-opener .bd-tagline,
+  .js-anim .bd .bd-opener .bd-sub,
+  .js-anim .bd .bd-opener .bd-btn {
+    opacity: 1;
+  }
+
+  .js-anim .bd .reveal-frame {
+    clip-path: none;
+  }
 }
 
 html:not(.js) .svc-grid {
