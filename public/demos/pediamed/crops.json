@@ -1,0 +1,28 @@
+{
+ "play-area": {
+  "src": "maps-photos.png",
+  "box": [
+   418,
+   64,
+   904,
+   526
+  ],
+  "size": [
+   486,
+   462
+  ]
+ },
+ "consult-corner": {
+  "src": "maps-photo-interior-2.jpg",
+  "box": [
+   418,
+   64,
+   904,
+   526
+  ],
+  "size": [
+   486,
+   462
+  ]
+ }
+}
