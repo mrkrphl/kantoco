@@ -37,7 +37,7 @@ export default function SwissDentalLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js-anim")}catch(e){}`,
+          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-sd-live"))document.documentElement.classList.remove("js-anim")},8000)}}catch(e){}`,
         }}
       />
       <div className={inter.variable}>{children}</div>

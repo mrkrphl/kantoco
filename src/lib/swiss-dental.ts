@@ -7,9 +7,13 @@ export const SWISS = {
   badge: DEMO_BADGE,
   facebook: "https://www.facebook.com/swissdentalclinicph",
   messenger: "https://m.me/swissdentalclinicph",
-  maps: "https://www.google.com/maps/search/?api=1&query=Swiss%20Dental%20Clinic&query_place_id=ChIJlUw5cI3OlzMRz_0FHVbV1fY",
+  maps:
+    "https://www.google.com/maps/search/?api=1&query=Swiss%20Dental%20Clinic%2C%2011%20Jordan%20St%2C%20Para%C3%B1aque%201719&query_place_id=ChIJlUw5cI3OlzMRz_0FHVbV1fY",
+  directions:
+    "https://www.google.com/maps/dir/?api=1&destination=Swiss%20Dental%20Clinic%2C%2011%20Jordan%20St%2C%20Para%C3%B1aque&destination_place_id=ChIJlUw5cI3OlzMRz_0FHVbV1fY",
   address: ["Ledesma Bldg", "11 Jordan St", "Parañaque 1719"],
   rating: "4.9 on Google Maps (156 reviews)",
+  ratingCheckedOn: "2026-10-14",
 } as const;
 
 export const IMG = "/demos/swiss-dental";
@@ -35,6 +39,8 @@ export const PHOTOS = {
     mobileHeight: 1020,
   },
   clinic: {
+    // Stand-in until the Facebook reception crop lands. Caption/footer
+    // strings are the stamp r1.1 copy and stay as specified.
     file: "neon-own-2x1",
     alt: "The Swiss Dental Clinic reception sign.",
     caption: "Their reception sign, from their Facebook.",

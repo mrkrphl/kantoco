@@ -172,12 +172,15 @@ html:has(.sd) body {
 }
 
 .sd-actions {
-  grid-column: 7 / 13;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
   align-items: center;
   gap: 12px;
+}
+
+.sd-intro .sd-actions {
+  grid-column: 7 / 13;
+  justify-content: flex-end;
 }
 
 .sd-btn {
@@ -278,6 +281,10 @@ html.js-anim .sd-plate-frame img {
   overflow: hidden;
 }
 
+html.js-anim .sd-clinic-frame {
+  clip-path: inset(0 0 100% 0);
+}
+
 .sd-clinic-frame picture,
 .sd-clinic-frame img {
   width: 100%;
@@ -315,7 +322,7 @@ html.js-anim .sd-plate-frame img {
   grid-column: span 4;
 }
 
-.sd-visit-block p {
+.sd-visit-block > p:not(.sd-kicker):not(.sd-rating):not(.sd-phone-row) {
   margin: 0;
   font-size: 16px;
   line-height: 1.5;
@@ -439,14 +446,16 @@ html.js-anim .sd-reveal {
 }
 
 @media (prefers-reduced-motion: reduce) {
-html.js-anim .sd-eyebrow,
-html.js-anim .sd-wordmark,
-html.js-anim .sd-copy,
-html.js-anim .sd-opener .sd-btn,
-html.js-anim .sd-mark,
-html.js-anim .sd-reveal,
-html.js-anim .sd-plate-frame img {
-  opacity: 1;
-  transform: none;
-}
+  html.js-anim .sd-eyebrow,
+  html.js-anim .sd-wordmark,
+  html.js-anim .sd-copy,
+  html.js-anim .sd-opener .sd-btn,
+  html.js-anim .sd-mark,
+  html.js-anim .sd-reveal,
+  html.js-anim .sd-plate-frame img,
+  html.js-anim .sd-clinic-frame {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
 }

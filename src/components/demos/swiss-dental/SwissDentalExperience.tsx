@@ -27,7 +27,7 @@ function Actions() {
       </a>
       <a
         className="sd-btn sd-btn-dir"
-        href={SWISS.maps}
+        href={SWISS.directions}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -45,6 +45,8 @@ export function SwissDentalExperience() {
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
+
+    document.documentElement.setAttribute("data-sd-live", "");
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.remove("js-anim");
@@ -72,6 +74,7 @@ export function SwissDentalExperience() {
     return () => {
       live = false;
       document.documentElement.classList.remove("js-anim");
+      document.documentElement.removeAttribute("data-sd-live");
     };
   }, []);
 
