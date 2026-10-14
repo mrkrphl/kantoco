@@ -1,22 +1,28 @@
 {
-  "shots": [
-    {
-      "id": "hero-waiting-16x9",
-      "source": "https://unsplash.com/photos/a-row-of-empty-chairs-sitting-in-a-room-IhIlMEkVQvQ",
-      "author": "Haikal Vivar",
-      "license": "Unsplash License"
-    },
-    {
-      "id": "consult-corner-4x5",
-      "source": "https://www.pexels.com/photo/empty-doctors-office-12454146/",
-      "author": "Yusuf P",
-      "license": "Pexels License"
-    },
-    {
-      "id": "play-area-4x5",
-      "source": "https://www.pexels.com/photo/minimalist-child-s-playroom-with-wooden-bench-30607331/",
-      "author": "Hakim Santoso",
-      "license": "Pexels License"
-    }
+ "play-area": {
+  "src": "maps-photos.png",
+  "box": [
+   418,
+   64,
+   904,
+   526
+  ],
+  "size": [
+   486,
+   462
   ]
+ },
+ "consult-corner": {
+  "src": "maps-photo-interior-2.jpg",
+  "box": [
+   418,
+   64,
+   904,
+   526
+  ],
+  "size": [
+   486,
+   462
+  ]
+ }
 }

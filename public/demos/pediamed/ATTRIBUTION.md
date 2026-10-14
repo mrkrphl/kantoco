@@ -1,10 +1,10 @@
-# PediaMED Children's Clinic (unlisted)
+# PediaMed Children's Clinic (unlisted)
 
 Pitch sample only. Not on the homepage list. No people. No Facebook
-logo. No landline. Text wordmark only.
+logo. No landline. Text wordmark only. Maps interiors ship at native
+486×462 and render at or below that width.
 
 | File | Source | Author | License |
 | --- | --- | --- | --- |
-| `hero-waiting-16x9.jpg` | https://unsplash.com/photos/a-row-of-empty-chairs-sitting-in-a-room-IhIlMEkVQvQ | Haikal Vivar | Unsplash License |
-| `consult-corner-4x5.jpg` | https://www.pexels.com/photo/empty-doctors-office-12454146/ | Yusuf P | Pexels License |
-| `play-area-4x5.jpg` | https://www.pexels.com/photo/minimalist-child-s-playroom-with-wooden-bench-30607331/ | Hakim Santoso | Pexels License |
+| `play-area.jpg` | Google Maps listing, Nov 2022 (`maps-photos.png` crop) | PediaMED Children's Clinic listing | Used for this private sample only |
+| `consult-corner.jpg` | Google Maps listing, Nov 2022 (`maps-photo-interior-2.jpg` crop) | PediaMED Children's Clinic listing | Used for this private sample only |

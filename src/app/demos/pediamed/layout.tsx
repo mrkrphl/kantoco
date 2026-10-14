@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
-import { Fraunces, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { pediamed } from "@/lib/pediamed";
 import "./pediamed.css";
 
-const display = Fraunces({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["SOFT", "opsz"],
+const display = localFont({
+  src: "./fonts/fredoka-latin-ext.woff2",
   variable: "--font-pm-display",
+  display: "swap",
+  weight: "300 700",
+  preload: true,
+  adjustFontFallback: "Arial",
 });
 
-const sans = Instrument_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const sans = localFont({
+  src: "./fonts/figtree-latin-ext.woff2",
   variable: "--font-pm-sans",
+  display: "swap",
+  weight: "300 900",
+  preload: true,
+  adjustFontFallback: "Arial",
 });
 
 export const metadata: Metadata = {

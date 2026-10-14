@@ -4,66 +4,95 @@ export const PEDIAMED_ASSET = "/demos/pediamed";
 
 /** Public listing facts only. Never contact the clinic. */
 export const pediamed = {
-  title: "PediaMED Children's Clinic · KantoCo sample",
+  title: "PediaMed Children's Clinic · KantoCo sample",
   description:
-    "KantoCo sample for PediaMED Children's Clinic on J. Elizalde, BF Homes, Parañaque. Sample only. Not the clinic's official site.",
-  name: "PediaMED",
-  fullName: "PediaMED Children's Clinic",
-  kicker: "Children's Clinic · BF Homes, Parañaque",
-  kickerMob: "Children's Clinic · BF Homes",
+    "KantoCo sample for PediaMed Children's Clinic on J. Elizalde, BF Homes, Parañaque. Sample only. Not the clinic's official site.",
+  name: "PediaMed",
+  nameSub: "Children's Clinic",
+  fullName: "PediaMed Children's Clinic",
+  kicker: "Pediatric clinic · BF Homes, Parañaque",
+  kickerMob: "Pediatric clinic · BF Homes, Parañaque",
   services: "Outpatient care for kids",
   addressLines: [
     "Unit C, 2nd floor, LG Centre Building",
     "J.\u00A0Elizalde St, BF\u00A0Homes",
   ],
+  visitH: "Unit C, 2nd floor, LG Centre Building, BF\u00A0Homes.",
+  phone: "0956 164 8522",
+  phoneTel: "tel:+639561648522",
+  callLabel: "Call 0956 164 8522",
+  email: "pediamedph@gmail.com",
+  emailHref: "mailto:pediamedph@gmail.com",
   facebook: "https://www.facebook.com/PediaMedPH",
+  facebookHandle: "facebook.com/PediaMedPH",
   messenger: "https://m.me/PediaMedPH",
   messageLabel: "Message on Facebook",
   directions:
-    "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic%2C+Unit+C+2nd+floor+LG+Centre+Building%2C+J.+Elizalde+St%2C+BF+Homes%2C+Para%C3%B1aque&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
+    "https://www.google.com/maps/search/?api=1&query=PediaMED+Children%27s+Clinic+BF+Homes+Paranaque&query_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
   directionsLabel: "Get directions",
   hoursLabel: "Hours per Google Maps",
   hours: [
-    { days: "Mon–Sat", time: "10\u00A0am – 5\u00A0pm" },
-    { days: "Sunday", time: "Closed" },
+    { days: "Mon–Sat", time: "10 AM–5 PM" },
+    { days: "Sunday", time: "closed" },
   ],
+  comeLine: "Call or message the clinic to set your child's visit.",
+  intro:
+    "If you searched for PediaMed, this is the clinic's own page: the full address, the mobile number, the hours and its Facebook, in one place.",
   sampleNote:
-    "A KantoCo sample for PediaMED Children's Clinic. Not live, and not the clinic's official site.",
+    "A KantoCo sample for PediaMed Children's Clinic. Not live, and not the clinic's official site.",
   credit:
-    "Stock photos, not PediaMED's. Hero: Haikal Vivar, Unsplash. Interiors: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
+    "Photos: the clinic's Google Maps listing (Nov 2022). Address, mobile and email: the clinic's Facebook page. Hours: Google Maps. Used for this private sample only.",
   madeBy: "Made by KantoCo · m.me/kantocoph",
   kantocoMessenger: KANTOCO_MESSENGER,
   asset: PEDIAMED_ASSET,
 } as const;
 
-export const PEDIAMED_HERO = {
-  file: "hero-waiting-16x9",
-  file1x: "hero-waiting-16x9-1x",
-  caption: "Stock waiting room, not PediaMED. Photo: Haikal Vivar, Unsplash.",
-  alt: "Empty waiting room with two banks of black chairs against a white wall.",
-  width: 2132,
-  height: 1200,
-} as const;
+export const PEDIAMED_TILES = [
+  "red",
+  "mint",
+  "green",
+  "blue",
+  "yellow",
+  "mint",
+] as const;
 
 export const PEDIAMED_SHOTS = [
   {
-    file: "consult-corner-4x5",
-    file1x: "consult-corner-4x5-1x",
-    caption: "Stock consult room, not PediaMED. Photo: Yusuf P, Pexels.",
-    alt: "Empty exam room with a scale, a desk, and two chairs.",
-    width: 1280,
-    height: 1600,
-    displayMax: 320,
-    webp: false,
+    file: "play-area",
+    caption: "Their play corner, from their Google Maps listing.",
+    heading: "A corner to play while you wait",
+    body: "Foam mats, toy cubbies and a window that lets the light in.",
+    alt: "An empty play corner with blue and cream foam mats, toy cubbies and a row of little paper houses under a window.",
+    width: 486,
+    height: 462,
   },
   {
-    file: "play-area-4x5",
-    file1x: "play-area-4x5-1x",
-    caption: "Stock play corner, not PediaMED. Photo: Hakim Santoso, Pexels.",
-    alt: "Empty play corner with a wooden train set on a grey rug.",
-    width: 1280,
-    height: 1599,
-    displayMax: 320,
-    webp: true,
+    file: "consult-corner",
+    caption: "Their consult room, from their Google Maps listing.",
+    heading: "A calm room for the checkup",
+    body: "Sky-blue walls, soft chairs for you, a step stool for them.",
+    alt: "An empty consult room with a wood desk, two teal armchairs, a yellow step stool and sky-blue walls.",
+    width: 486,
+    height: 462,
+  },
+] as const;
+
+export const PEDIAMED_KNOW = [
+  {
+    marker: "red",
+    title: "Call",
+    detail: "Mobile 0956 164 8522.",
+  },
+  {
+    marker: "green",
+    title: "Message or email",
+    detail:
+      "Send a message to facebook.com/PediaMedPH, or email pediamedph@gmail.com.",
+  },
+  {
+    marker: "yellow",
+    title: "Check the hours",
+    detail:
+      "Monday to Saturday, 10 AM to 5 PM. Closed Sunday. Hours per Google Maps.",
   },
 ] as const;
