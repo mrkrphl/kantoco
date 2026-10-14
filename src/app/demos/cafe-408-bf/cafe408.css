@@ -196,23 +196,15 @@ html.js-anim .name-fill {
   gap: 12px;
 }
 
-html.js-anim .opener-eyebrow,
-html.js-anim .opener-tagline,
-html.js-anim .opener-btns a {
+html.js-anim .opener-eyebrow {
   opacity: 0;
 }
 
 @media (min-width: 1024px) {
-  html.js-anim .plate-frame {
-    opacity: 0;
-  }
-}
-
-@media (max-width: 1023px) {
   html.js-anim .opener-tagline,
   html.js-anim .opener-btns a,
-  html.js-anim .intro .heading-reveal {
-    opacity: 1;
+  html.js-anim .plate-frame {
+    opacity: 0;
   }
 }
 
@@ -617,6 +609,12 @@ html.js-anim .row {
 
 html.js-anim .heading-reveal {
   opacity: 0;
+}
+
+@media (max-width: 1023px) {
+  html.js-anim .intro .heading-reveal {
+    opacity: 1;
+  }
 }
 
 @media (min-width: 1024px) and (max-width: 1199px) {

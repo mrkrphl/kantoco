@@ -228,6 +228,16 @@ export function Cafe408Experience() {
               { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
               1.3,
             );
+          } else {
+            gsap.set(
+              [
+                root.querySelector(".opener-tagline"),
+                ...root.querySelectorAll(".opener-btns a"),
+                root.querySelector(".plate-frame"),
+                root.querySelector(".intro .heading-reveal"),
+              ].filter(Boolean),
+              { opacity: 1, y: 0 },
+            );
           }
         });
       };

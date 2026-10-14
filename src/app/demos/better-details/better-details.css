@@ -542,6 +542,7 @@ html:has(.bd) body {
 
 .bd a.link-arrow,
 .link-arrow {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -552,8 +553,19 @@ html:has(.bd) body {
   line-height: 1.3;
   color: var(--type);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
-  padding-bottom: 4px;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.bd a.link-arrow::after,
+.link-arrow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(50% - 0.85em);
+  height: 1px;
+  background: var(--accent);
 }
 
 .arrow {
@@ -692,7 +704,7 @@ html:has(.bd) body {
   color: var(--muted);
 }
 
-.js-anim .bd .reveal-in:not(.svc-row),
+.js-anim .bd .reveal-in,
 .js-anim .bd .bd-opener .bd-eyebrow,
 .js-anim .bd .bd-opener .bd-tagline,
 .js-anim .bd .bd-opener .bd-sub,
@@ -700,7 +712,7 @@ html:has(.bd) body {
   opacity: 0;
 }
 
-.js-anim .bd .reveal-frame:not(.svc-row-frame) {
+.js-anim .bd .reveal-frame {
   clip-path: inset(0 0 100% 0);
 }
 

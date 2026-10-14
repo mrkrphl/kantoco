@@ -214,8 +214,6 @@ export function BetterDetailsExperience() {
       const root = rootRef.current;
       if (!root) return;
 
-      document.documentElement.setAttribute("data-bd-live", "");
-
       const mm = gsap.matchMedia();
       try {
         mm.add(
@@ -278,7 +276,6 @@ export function BetterDetailsExperience() {
           const revealCopy = () => {
             gsap.utils
               .toArray<HTMLElement>(".reveal-in", root)
-              .filter((el) => !el.classList.contains("svc-row"))
               .forEach((el) => {
                 gsap.fromTo(
                   el,
@@ -396,7 +393,7 @@ export function BetterDetailsExperience() {
                 ),
               );
               gsap.utils
-                .toArray<HTMLElement>(".svc-row-media .reveal-frame img", root)
+                .toArray<HTMLElement>(".svc-row-media .svc-row-frame img", root)
                 .forEach((img) => {
                   gsap.fromTo(
                     img,
@@ -446,6 +443,7 @@ export function BetterDetailsExperience() {
           }
         },
       );
+        document.documentElement.setAttribute("data-bd-live", "");
       } catch {
         document.documentElement.classList.remove("js-anim");
       }
@@ -545,10 +543,10 @@ export function BetterDetailsExperience() {
               {SERVICES.map((svc, i) => (
                 <article
                   key={svc.file}
-                  className={`svc-row reveal-in${i === 0 ? " is-active" : ""}`}
+                  className={`svc-row${i === 0 ? " is-active" : ""}`}
                 >
                   <div className="svc-row-media">
-                    <div className="svc-row-frame reveal-frame">
+                    <div className="svc-row-frame">
                       <Still
                         file={svc.file}
                         alt={svc.alt}
