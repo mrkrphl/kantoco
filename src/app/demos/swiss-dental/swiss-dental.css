@@ -258,6 +258,7 @@ html:has(.sd) body {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+  gap: 0.35em;
 }
 
 .sd-landline a {
@@ -458,22 +459,6 @@ html.js-anim .sd-clinic-frame img {
   border-bottom: 1px solid color-mix(in srgb, var(--type) 35%, transparent);
 }
 
-.sd-confirm {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 5px 7px;
-  border: 1px solid var(--accent);
-  font-family: var(--display);
-  font-weight: 600;
-  font-stretch: 95%;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: var(--accent);
-  vertical-align: 2px;
-}
-
 .sd-visit {
   margin-top: 128px;
   padding-block: clamp(72px, 8vw, 112px);
@@ -672,9 +657,12 @@ html.js-anim .sd-visit-mask > * {
     margin-top: 28px;
   }
 
-  .sd-confirm {
-    margin-left: 0;
-    margin-top: 8px;
+  .sd-tap,
+  .sd-landline a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: 10px;
   }
 }
 

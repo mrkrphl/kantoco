@@ -30,7 +30,8 @@ function Actions({ landline = false }: { landline?: boolean }) {
       </a>
       {landline ? (
         <p className="sd-landline">
-          Landline <a href={SWISS.landlineTel}>{SWISS.landline}</a>
+          Landline{" "}
+          <a href={SWISS.landlineTel}>{SWISS.landline}</a>
         </p>
       ) : null}
     </div>
@@ -390,8 +391,14 @@ export function SwissDentalExperience() {
               <p className="sd-row-title">Call</p>
               <p className="sd-row-detail">
                 Mobile{" "}
-                <a href={SWISS.mobileTel}>{SWISS.mobile}</a>, also on WhatsApp.
-                Landline <a href={SWISS.landlineTel}>{SWISS.landline}</a>.
+                <a className="sd-tap" href={SWISS.mobileTel}>
+                  {SWISS.mobile}
+                </a>
+                , also on WhatsApp. Landline{" "}
+                <a className="sd-tap" href={SWISS.landlineTel}>
+                  {SWISS.landline}
+                </a>
+                .
               </p>
             </div>
             <div className="sd-row">
@@ -407,15 +414,17 @@ export function SwissDentalExperience() {
                   {SWISS.facebookHandle}
                 </a>
                 . Email works too:{" "}
-                <a href={`mailto:${SWISS.email}`}>{SWISS.email}</a>.
+                <a className="sd-tap" href={`mailto:${SWISS.email}`}>
+                  {SWISS.email}
+                </a>
+                .
               </p>
             </div>
             <div className="sd-row">
               <p className="sd-row-n">03</p>
               <p className="sd-row-title">Check the hours</p>
               <p className="sd-row-detail">
-                Ask the clinic for this week&apos;s hours before you go.{" "}
-                <span className="sd-confirm">Confirm</span>
+                Ask the clinic for this week&apos;s hours before you go.
               </p>
             </div>
           </div>
@@ -469,9 +478,7 @@ export function SwissDentalExperience() {
             </div>
             <div className="sd-visit-block">
               <p className="sd-kicker">Hours</p>
-              <p>
-                Ask the clinic. <span className="sd-confirm">Confirm</span>
-              </p>
+              <p>Ask the clinic.</p>
             </div>
             {readySlots.length > 0 ? (
               <div className="sd-slots is-ready">
