@@ -838,6 +838,14 @@ html:not(.js) .svc-row-media {
     max-width: none;
   }
 
+  .bd a.bd-phone,
+  .bd-phone {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: max(0px, calc((44px - 1em) / 2));
+  }
+
   .bd-visit-meta {
     display: flex;
     flex-direction: column;
