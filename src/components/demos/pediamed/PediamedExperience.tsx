@@ -43,12 +43,12 @@ function Hero() {
         <picture>
           <source
             type="image/webp"
-            srcSet={`${oneX}.webp 800w, ${base}.webp 1600w`}
+            srcSet={`${oneX}.webp 800w, ${base}.webp 2132w`}
             sizes={HERO_SIZES}
           />
           <img
             src={`${oneX}.jpg`}
-            srcSet={`${oneX}.jpg 800w, ${base}.jpg 1600w`}
+            srcSet={`${oneX}.jpg 800w, ${base}.jpg 2132w`}
             sizes={HERO_SIZES}
             width={PEDIAMED_HERO.width}
             height={PEDIAMED_HERO.height}
@@ -121,7 +121,7 @@ export function PediamedExperience() {
         ctx.add(() => {
           const fill = root.querySelector<HTMLElement>(".pm-name-fill");
           const rise = gsap.utils.toArray<HTMLElement>(
-            ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a, .pm-hero-frame",
+            ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a",
             root,
           );
           if (!fill) return;
@@ -234,7 +234,7 @@ export function PediamedExperience() {
           <Hero />
         </section>
 
-        <section className="pm-wrap pm-rooms" aria-label="Clinic interiors">
+        <section className="pm-wrap pm-rooms" aria-label="Stock interiors">
           <div className="pm-rooms-grid">
             {PEDIAMED_SHOTS.map((item) => (
               <Interior item={item} key={item.file} />

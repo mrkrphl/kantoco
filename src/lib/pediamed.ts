@@ -20,7 +20,7 @@ export const pediamed = {
   messenger: "https://m.me/PediaMedPH",
   messageLabel: "Message on Facebook",
   directions:
-    "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic%2C+Lot+5+Block+39+J.+Elizalde%2C+BF+Homes%2C+Para%C3%B1aque&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
+    "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic%2C+Unit+C+2nd+floor+LG+Centre+Building%2C+J.+Elizalde+St%2C+BF+Homes%2C+Para%C3%B1aque&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
   directionsLabel: "Get directions",
   hoursLabel: "Hours per Google Maps",
   hours: [
@@ -30,7 +30,7 @@ export const pediamed = {
   sampleNote:
     "A KantoCo sample for PediaMED Children's Clinic. Not live, and not the clinic's official site.",
   credit:
-    "Hero: Haikal Vivar, Unsplash. Interiors: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
+    "Stock photos, not PediaMED's. Hero: Haikal Vivar, Unsplash. Interiors: consult-corner, Yusuf P (Pexels); play-area, Hakim Santoso (Pexels). Hours: Google Maps.",
   madeBy: "Made by KantoCo · m.me/kantocoph",
   kantocoMessenger: KANTOCO_MESSENGER,
   asset: PEDIAMED_ASSET,
@@ -40,9 +40,9 @@ export const PEDIAMED_HERO = {
   file: "hero-waiting-16x9",
   file1x: "hero-waiting-16x9-1x",
   caption: "Stock waiting room, not PediaMED. Photo: Haikal Vivar, Unsplash.",
-  alt: "Empty waiting room with two rows of black chairs against a white wall.",
-  width: 1600,
-  height: 900,
+  alt: "Empty waiting room with two banks of black chairs against a white wall.",
+  width: 2132,
+  height: 1200,
 } as const;
 
 export const PEDIAMED_SHOTS = [

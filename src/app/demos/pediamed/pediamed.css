@@ -182,8 +182,7 @@ html.js-anim .pm-name-fill {
 
 html.js-anim .pm-opener-eyebrow,
 html.js-anim .pm-opener-copy,
-html.js-anim .pm-opener-btns a,
-html.js-anim .pm-hero-frame {
+html.js-anim .pm-opener-btns a {
   opacity: 0;
 }
 
@@ -236,10 +235,6 @@ html.js-anim .pm-hero-frame {
 .pm-hero-frame img {
   object-fit: cover;
   transform-origin: 50% 50%;
-}
-
-html.js-anim .pm-hero-frame img {
-  transform: scale(1.04);
 }
 
 .pm-rooms {
