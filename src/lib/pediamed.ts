@@ -28,7 +28,7 @@ export const pediamed = {
   messenger: "https://m.me/PediaMedPH",
   messageLabel: "Message on Facebook",
   directions:
-    "https://www.google.com/maps/search/?api=1&query=PediaMED+Children%27s+Clinic+BF+Homes+Paranaque&query_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
+    "https://www.google.com/maps/dir/?api=1&destination=PediaMED+Children%27s+Clinic&destination_place_id=ChIJW_qmPgnPlzMR6OjPM2uvB8o",
   directionsLabel: "Get directions",
   hoursLabel: "Hours per Google Maps",
   hours: [
