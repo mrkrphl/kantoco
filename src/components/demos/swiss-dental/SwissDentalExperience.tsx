@@ -14,25 +14,25 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-function Actions() {
+function Actions({ landline = false }: { landline?: boolean }) {
   return (
-    <div className="sd-actions">
+    <div className="sd-cta">
+      <a className="sd-btn sd-btn-pri" href={SWISS.mobileTel}>
+        Call {SWISS.mobile}
+      </a>
       <a
-        className="sd-btn sd-btn-msg"
+        className="sd-btn sd-btn-sec"
         href={SWISS.messenger}
         target="_blank"
         rel="noopener noreferrer"
       >
         Message on Facebook
       </a>
-      <a
-        className="sd-btn sd-btn-dir"
-        href={SWISS.directions}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Get directions
-      </a>
+      {landline ? (
+        <p className="sd-landline">
+          Landline <a href={SWISS.landlineTel}>{SWISS.landline}</a>
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -54,21 +54,65 @@ export function SwissDentalExperience() {
     }
 
     let live = true;
-    waitForOpenerAutoplay().then(() => {
+    waitForOpenerAutoplay(120).then(() => {
       if (!live || !rootRef.current) return;
       const node = rootRef.current;
-      const bits = [
-        node.querySelector(".sd-mark"),
-        node.querySelector(".sd-eyebrow"),
-        node.querySelector(".sd-wordmark"),
-        node.querySelector(".sd-copy"),
-        ...gsap.utils.toArray<HTMLElement>(".sd-opener .sd-btn", node),
-      ].filter(Boolean);
-      gsap.fromTo(
-        bits,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.55, stagger: 0.07, ease: "power2.out" },
-      );
+      const tl = gsap.timeline();
+      tl.fromTo(
+        node.querySelector(".sd-cross"),
+        { clipPath: "inset(50% 50% 50% 50%)" },
+        { clipPath: "inset(0%)", duration: 0.35, ease: "power3.out" },
+        0,
+      )
+        .fromTo(
+          node.querySelector(".sd-cross-h"),
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.35, ease: "power2.out" },
+          0.25,
+        )
+        .fromTo(
+          node.querySelector(".sd-cross-v"),
+          { scaleY: 0 },
+          { scaleY: 1, duration: 0.35, ease: "power2.out" },
+          0.45,
+        )
+        .fromTo(
+          [
+            node.querySelector(".sd-l1 > span"),
+            node.querySelector(".sd-word > span"),
+          ].filter(Boolean),
+          { yPercent: 105, y: 0 },
+          {
+            yPercent: 0,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.12,
+            ease: "power3.out",
+          },
+          0.5,
+        )
+        .fromTo(
+          [
+            node.querySelector(".sd-eyebrow"),
+            node.querySelector(".sd-doctor"),
+            node.querySelector(".sd-tagline"),
+          ].filter(Boolean),
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, stagger: 0.08, ease: "power2.out" },
+          1,
+        )
+        .fromTo(
+          node.querySelector(".sd-opener .sd-cta"),
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" },
+          1.2,
+        )
+        .fromTo(
+          node.querySelector(".sd-plate-frame"),
+          { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, ease: "power2.out" },
+          1.35,
+        );
     });
 
     return () => {
@@ -96,12 +140,31 @@ export function SwissDentalExperience() {
         if (plate && plateImg) {
           gsap.fromTo(
             plateImg,
-            { scale: 1.05 },
+            { scale: 1.06 },
             {
               scale: 1,
               ease: "none",
               scrollTrigger: {
                 trigger: plate,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+              },
+            },
+          );
+        }
+
+        const clinicImg = root.querySelector<HTMLElement>(".sd-clinic-frame img");
+        const clinic = root.querySelector<HTMLElement>(".sd-clinic-frame");
+        if (clinic && clinicImg) {
+          gsap.fromTo(
+            clinicImg,
+            { scale: 1.05 },
+            {
+              scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: clinic,
                 start: "top bottom",
                 end: "bottom top",
                 scrub: true,
@@ -117,7 +180,7 @@ export function SwissDentalExperience() {
             {
               opacity: 1,
               y: 0,
-              duration: 0.6,
+              duration: 0.7,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
@@ -128,17 +191,52 @@ export function SwissDentalExperience() {
           );
         });
 
-        const clinic = root.querySelector<HTMLElement>(".sd-clinic-frame");
-        if (clinic) {
+        gsap.utils.toArray<HTMLElement>(".sd-row", root).forEach((row) => {
           gsap.fromTo(
-            clinic,
-            { clipPath: "inset(0 0 100% 0)" },
+            row,
+            { "--line": 0 },
             {
-              clipPath: "inset(0 0 0% 0)",
-              duration: 0.9,
+              "--line": 1,
+              duration: 0.8,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: row,
+                start: "top 80%",
+                once: true,
+              },
+            },
+          );
+          const num = row.querySelector<HTMLElement>(".sd-row-n");
+          if (num) {
+            gsap.fromTo(
+              num,
+              { opacity: 0 },
+              {
+                opacity: 1,
+                duration: 0.6,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: row,
+                  start: "top 80%",
+                  once: true,
+                },
+              },
+            );
+          }
+        });
+
+        const visitMask = root.querySelector<HTMLElement>(".sd-visit-mask > *");
+        if (visitMask) {
+          gsap.fromTo(
+            visitMask,
+            { yPercent: 105, y: 0 },
+            {
+              yPercent: 0,
+              y: 0,
+              duration: 0.7,
               ease: "power3.out",
               scrollTrigger: {
-                trigger: clinic,
+                trigger: visitMask.parentElement,
                 start: "top 85%",
                 once: true,
               },
@@ -154,43 +252,41 @@ export function SwissDentalExperience() {
     <div className="sd" ref={rootRef}>
       <div className="sd-bar">
         <div className="sd-bar-inner sd-wrap">
-          <span className="sd-bar-full">
-            {SWISS.badge} · KantoCo sample, not the clinic&apos;s site
+          <span className="sd-bar-mark">{SWISS.badge}</span>
+          <span className="sd-bar-note">
+            A KantoCo sample page for Swiss Dental Clinic. Not the clinic&apos;s
+            official site.
           </span>
-          <span className="sd-bar-short">{SWISS.badge} · KantoCo sample</span>
         </div>
       </div>
 
       <section className="sd-opener">
         <div className="sd-wrap">
-          <div className="sd-mark">
-            <picture>
-              <source type="image/webp" srcSet={`${IMG}/heart.webp`} />
-              <img
-                src={`${IMG}/heart.png`}
-                alt=""
-                width={56}
-                height={56}
-                decoding="async"
-              />
-            </picture>
-          </div>
-          <p className="sd-eyebrow">Jordan St · Parañaque</p>
-          <h1 className="sd-wordmark">
-            <span>Swiss Dental</span>
-            <span>Clinic</span>
+          <p className="sd-eyebrow">
+            Dental clinic · Jordan Street, Parañaque
+          </p>
+          <h1 className="sd-name">
+            <span className="sd-l1">
+              <span>Swiss Dental</span>
+            </span>
+            <span className="sd-l2">
+              <span className="sd-cross" aria-hidden="true">
+                <span className="sd-cross-h" />
+                <span className="sd-cross-v" />
+              </span>
+              <span className="sd-word">
+                <span>Clinic</span>
+              </span>
+            </span>
           </h1>
-          <div className="sd-intro">
-            <div className="sd-copy">
-              <p className="sd-tagline">On Jordan Street, in Ledesma Bldg.</p>
-              <p className="sd-sub">
-                A KantoCo sample for the clinic. Not their website, and it takes
-                no bookings.
-              </p>
-              <p className="sd-rating">{SWISS.rating}</p>
-            </div>
-            <Actions />
+          <div className="sd-under">
+            <p className="sd-doctor">{SWISS.doctor}</p>
+            <p className="sd-tagline">
+              A dental clinic in Ledesma Bldg, 11 Jordan Street, Parañaque. Call
+              the clinic or send a message on Facebook to set your visit.
+            </p>
           </div>
+          <Actions landline />
         </div>
       </section>
 
@@ -200,23 +296,23 @@ export function SwissDentalExperience() {
             <div className="sd-plate-frame">
               <picture>
                 <source
-                  media="(max-width: 1023px)"
+                  media="(max-width: 767px)"
                   type="image/webp"
                   srcSet={`${IMG}/${PHOTOS.plate.mobile}.webp`}
                 />
                 <source
-                  media="(max-width: 1023px)"
+                  media="(max-width: 767px)"
                   type="image/jpeg"
                   srcSet={`${IMG}/${PHOTOS.plate.mobile}.jpg`}
                 />
                 <source
                   type="image/webp"
-                  srcSet={`${IMG}/${PHOTOS.plate.desktop1x}.webp 1120w, ${IMG}/${PHOTOS.plate.desktop}.webp 1536w`}
+                  srcSet={`${IMG}/${PHOTOS.plate.desktop1x}.webp 1120w, ${IMG}/${PHOTOS.plate.desktop}.webp 2240w`}
                   sizes={PLATE_SIZES}
                 />
                 <source
                   type="image/jpeg"
-                  srcSet={`${IMG}/${PHOTOS.plate.desktop1x}.jpg 1120w, ${IMG}/${PHOTOS.plate.desktop}.jpg 1536w`}
+                  srcSet={`${IMG}/${PHOTOS.plate.desktop1x}.jpg 1120w, ${IMG}/${PHOTOS.plate.desktop}.jpg 2240w`}
                   sizes={PLATE_SIZES}
                 />
                 <img
@@ -224,10 +320,9 @@ export function SwissDentalExperience() {
                   alt={PHOTOS.plate.alt}
                   width={PHOTOS.plate.width}
                   height={PHOTOS.plate.height}
-                  sizes={PLATE_SIZES}
                   loading="eager"
                   decoding="async"
-                  fetchPriority="high"
+                  fetchPriority="low"
                 />
               </picture>
             </div>
@@ -236,10 +331,21 @@ export function SwissDentalExperience() {
         </div>
       </section>
 
+      <section className="sd-angle">
+        <div className="sd-wrap">
+          <div className="sd-cols">
+            <p className="sd-reveal">
+              If you searched for Swiss Dental Clinic, this is the clinic&apos;s
+              own page: the right address, both numbers, and its Facebook, in
+              one place.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="sd-clinic-sec">
         <div className="sd-wrap">
           <p className="sd-kicker sd-reveal">The clinic</p>
-          <h2 className="sd-clinic-h sd-reveal">On Jordan Street.</h2>
           <div className="sd-cols">
             <figure className="sd-clinic">
               <div className="sd-clinic-frame">
@@ -260,61 +366,125 @@ export function SwissDentalExperience() {
               </div>
               <figcaption className="sd-cap">{PHOTOS.clinic.caption}</figcaption>
             </figure>
+            <div className="sd-clinic-copy">
+              <h2 className="sd-h2 sd-reveal">Look for the red cross.</h2>
+              <p className="sd-body sd-reveal">
+                The clinic&apos;s sign hangs over reception: SWISS in white
+                light, a red cross under it, on a wall of wood slats.
+              </p>
+              <p className="sd-fact sd-reveal">{SWISS.rating}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="sd-before">
+        <div className="sd-wrap">
+          <p className="sd-kicker sd-reveal">Before you come</p>
+          <div className="sd-cols">
+            <h2 className="sd-h2 sd-reveal">Two ways to reach the clinic.</h2>
+          </div>
+          <div className="sd-rows">
+            <div className="sd-row">
+              <p className="sd-row-n">01</p>
+              <p className="sd-row-title">Call</p>
+              <p className="sd-row-detail">
+                Mobile{" "}
+                <a href={SWISS.mobileTel}>{SWISS.mobile}</a>, also on WhatsApp.
+                Landline <a href={SWISS.landlineTel}>{SWISS.landline}</a>.
+              </p>
+            </div>
+            <div className="sd-row">
+              <p className="sd-row-n">02</p>
+              <p className="sd-row-title">Message on Facebook</p>
+              <p className="sd-row-detail">
+                Send a message to{" "}
+                <a
+                  href={SWISS.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {SWISS.facebookHandle}
+                </a>
+                . Email works too:{" "}
+                <a href={`mailto:${SWISS.email}`}>{SWISS.email}</a>.
+              </p>
+            </div>
+            <div className="sd-row">
+              <p className="sd-row-n">03</p>
+              <p className="sd-row-title">Check the hours</p>
+              <p className="sd-row-detail">
+                Ask the clinic for this week&apos;s hours before you go.{" "}
+                <span className="sd-confirm">Confirm</span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="sd-visit">
         <div className="sd-wrap">
-          <p className="sd-kicker sd-reveal">Visit</p>
-          <p className="sd-visit-lead sd-reveal">
-            Message on Facebook, or open the map.
-          </p>
+          <p className="sd-kicker">Visit</p>
+          <div className="sd-cols">
+            <div className="sd-visit-mask sd-visit-lead">
+              <h2 className="sd-h2">{SWISS.addressLine}</h2>
+            </div>
+          </div>
+          <Actions />
           <div className="sd-visit-grid">
-            <div className="sd-visit-block sd-reveal">
+            <div className="sd-visit-block">
               <p className="sd-kicker">Address</p>
               {SWISS.address.map((line) => (
                 <p key={line}>{line}</p>
               ))}
-            </div>
-            <div className="sd-visit-block sd-reveal">
-              <p className="sd-kicker">Map</p>
-              <p className="sd-phone-row">
+              <p>
                 <a
                   className="sd-link"
-                  href={SWISS.maps}
+                  href={SWISS.directions}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Open in Google Maps
+                  Get directions
                 </a>
               </p>
-              <p className="sd-rating">{SWISS.rating}</p>
             </div>
-            <div className="sd-visit-block sd-reveal">
-              <p className="sd-kicker">Message</p>
-              <Actions />
+            <div className="sd-visit-block">
+              <p className="sd-kicker">Phone</p>
+              <p>Mobile {SWISS.mobile}</p>
+              <p>(WhatsApp)</p>
+              <p>Landline {SWISS.landline}</p>
+            </div>
+            <div className="sd-visit-block">
+              <p className="sd-kicker">Facebook</p>
+              <p>
+                <a
+                  href={SWISS.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  facebook.com/<wbr />
+                  swissdentalclinicph
+                </a>
+              </p>
+            </div>
+            <div className="sd-visit-block">
+              <p className="sd-kicker">Hours</p>
+              <p>
+                Ask the clinic. <span className="sd-confirm">Confirm</span>
+              </p>
             </div>
             {readySlots.length > 0 ? (
               <div className="sd-slots is-ready">
                 {readySlots.map((slot) => (
                   <figure className="sd-slot" key={slot.id}>
-                    <div className="sd-slot-frame">
-                      <picture>
-                        <source
-                          type="image/webp"
-                          srcSet={`${IMG}/${slot.file}.webp`}
-                        />
-                        <img
-                          src={`${IMG}/${slot.file}.jpg`}
-                          alt={slot.alt}
-                          width={slot.width}
-                          height={slot.height}
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </picture>
-                    </div>
+                    <img
+                      src={`${IMG}/${slot.file}.jpg`}
+                      alt={slot.alt}
+                      width={slot.width}
+                      height={slot.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
                     {slot.caption ? (
                       <figcaption className="sd-cap">{slot.caption}</figcaption>
                     ) : null}
@@ -328,11 +498,13 @@ export function SwissDentalExperience() {
 
       <footer className="sd-foot">
         <div className="sd-wrap">
-          <p>{PHOTOS.clinic.footer}</p>
-          <p>
-            {PHOTOS.plate.credit}. This is a KantoCo sample, not the
-            clinic&apos;s website, and it takes no bookings.
-          </p>
+          <div className="sd-cols">
+            <p>
+              A KantoCo sample for Swiss Dental Clinic. Not live, and not the
+              clinic&apos;s official site.
+            </p>
+            <p>{PHOTOS.clinic.footer}</p>
+          </div>
         </div>
       </footer>
     </div>
