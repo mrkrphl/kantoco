@@ -615,9 +615,13 @@ html.js-anim .tcc-heart {
   .tcc-opener-visual {
     width: 100%;
     max-width: 320px;
-    margin-top: 28px;
+    margin-top: 12px;
     justify-self: start;
     order: 6;
+  }
+
+  .tcc-oak-wave {
+    aspect-ratio: 4 / 3;
   }
 
   .tcc-name-rise {
