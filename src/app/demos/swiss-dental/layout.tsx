@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { SWISS } from "@/lib/swiss-dental";
+import { PLATE_PRELOAD, PLATE_SIZES, SWISS } from "@/lib/swiss-dental";
 import "./swiss-dental.css";
 
 const archivo = localFont({
@@ -57,8 +57,26 @@ export default function SwissDentalLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-sd-live"))document.documentElement.classList.remove("js-anim")},8000)}}catch(e){}`,
+          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim")}window.setTimeout(function(){document.documentElement.classList.remove("js-anim");document.documentElement.classList.remove("sd-opener-anim");document.querySelectorAll(".sd-name-rise").forEach(function(el){el.classList.add("sd-name-in");el.style.transform="none"})},2500)}catch(e){}`,
         }}
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={PLATE_PRELOAD.mobileWebp}
+        type="image/webp"
+        media="(max-width: 767px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={PLATE_PRELOAD.desktopWebp}
+        type="image/webp"
+        media="(min-width: 768px)"
+        imageSrcSet={PLATE_PRELOAD.desktopWebpSrcSet}
+        imageSizes={PLATE_SIZES}
+        fetchPriority="high"
       />
       <div
         className={`${archivo.variable} ${schibsted.variable} ${schibstedItalic.variable}`}

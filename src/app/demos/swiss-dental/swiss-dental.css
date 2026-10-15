@@ -94,6 +94,8 @@ html:has(.sd) body {
   font-stretch: 95%;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  flex: 0 0 auto;
+  min-width: 12em;
 }
 
 .sd-bar-note,
@@ -266,6 +268,11 @@ html:has(.sd) body {
   gap: 0.35em;
 }
 
+.sd-landline > span:first-child {
+  flex: 0 0 auto;
+  min-width: 8ch;
+}
+
 .sd-landline a,
 .sd-row-detail a,
 .sd-tap {
@@ -298,6 +305,7 @@ html:has(.sd) body {
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  background: color-mix(in srgb, var(--type) 22%, var(--bg));
 }
 
 .sd-plate-frame picture,
@@ -553,29 +561,20 @@ html.js-anim .sd-clinic-frame img {
   margin-bottom: 0;
 }
 
-html.js-anim .sd-cross {
+html.js.js-anim.sd-opener-anim .sd-cross:not(.sd-cross-in) {
   clip-path: inset(50% 50% 50% 50%);
 }
 
-html.js-anim .sd-cross-h {
+html.js.js-anim.sd-opener-anim .sd-cross-h:not(.sd-cross-in) {
   transform: scaleX(0);
 }
 
-html.js-anim .sd-cross-v {
+html.js.js-anim.sd-opener-anim .sd-cross-v:not(.sd-cross-in) {
   transform: scaleY(0);
 }
 
-html.js-anim .sd-l1 > span,
-html.js-anim .sd-word > span {
+html.js.js-anim.sd-opener-anim .sd-name-rise:not(.sd-name-in) {
   transform: translateY(105%);
-}
-
-html.js-anim .sd-eyebrow,
-html.js-anim .sd-doctor,
-html.js-anim .sd-tagline,
-html.js-anim .sd-cta,
-html.js-anim .sd-plate-frame {
-  opacity: 0;
 }
 
 html.js-anim .sd-reveal {
@@ -622,9 +621,17 @@ html.js-anim .sd-visit-mask > * {
     display: block;
   }
 
+  .sd-eyebrow {
+    min-height: calc(2 * 1.2em);
+  }
+
   .sd-tagline,
   .sd-cta {
     margin-top: 24px;
+  }
+
+  .sd-tagline {
+    min-height: calc(4 * 1.45em);
   }
 
   .sd-cta {
@@ -700,6 +707,11 @@ html.js-anim .sd-visit-mask > * {
   html.js-anim .sd-cross-v,
   html.js-anim .sd-l1 > span,
   html.js-anim .sd-word > span,
+  html.js-anim .sd-name-rise,
+  html.js.js-anim.sd-opener-anim .sd-cross,
+  html.js.js-anim.sd-opener-anim .sd-cross-h,
+  html.js.js-anim.sd-opener-anim .sd-cross-v,
+  html.js.js-anim.sd-opener-anim .sd-name-rise,
   html.js-anim .sd-eyebrow,
   html.js-anim .sd-doctor,
   html.js-anim .sd-tagline,
