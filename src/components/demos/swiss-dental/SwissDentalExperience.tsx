@@ -30,7 +30,7 @@ function Actions({ landline = false }: { landline?: boolean }) {
       </a>
       {landline ? (
         <p className="sd-landline">
-          Landline{" "}
+          <span>Landline</span>{" "}
           <a href={SWISS.landlineTel}>{SWISS.landline}</a>
         </p>
       ) : null}
@@ -48,77 +48,131 @@ export function SwissDentalExperience() {
     if (!root) return;
 
     document.documentElement.setAttribute("data-sd-live", "");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animate =
+      document.documentElement.classList.contains("js-anim") && !reduce;
+    let cancelled = false;
+    let revealed = false;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const showName = () => {
+      revealed = true;
       document.documentElement.classList.remove("js-anim");
-      return;
+      document.documentElement.classList.remove("sd-opener-anim");
+      const names = root.querySelectorAll<HTMLElement>(".sd-name-rise");
+      const cross = root.querySelectorAll<HTMLElement>(
+        ".sd-cross, .sd-cross-h, .sd-cross-v",
+      );
+      try {
+        gsap.killTweensOf(names);
+        gsap.killTweensOf(cross);
+      } catch {
+        /* GSAP failed — still force the name visible below */
+      }
+      names.forEach((el) => {
+        el.classList.add("sd-name-in");
+        try {
+          gsap.set(el, { y: 0, yPercent: 0, clearProps: "transform" });
+        } catch {
+          /* ignore */
+        }
+        el.style.transform = "none";
+      });
+      cross.forEach((el) => {
+        el.classList.add("sd-cross-in");
+        try {
+          gsap.set(el, { clearProps: "clipPath,transform" });
+        } catch {
+          /* ignore */
+        }
+        el.style.clipPath = "none";
+        el.style.transform = "none";
+      });
+    };
+
+    if (!animate) {
+      showName();
     }
 
-    let live = true;
-    waitForOpenerAutoplay(120).then(() => {
-      if (!live || !rootRef.current) return;
-      const node = rootRef.current;
-      const tl = gsap.timeline();
-      tl.fromTo(
-        node.querySelector(".sd-cross"),
-        { clipPath: "inset(50% 50% 50% 50%)" },
-        { clipPath: "inset(0%)", duration: 0.35, ease: "power3.out" },
-        0,
-      )
-        .fromTo(
-          node.querySelector(".sd-cross-h"),
-          { scaleX: 0 },
-          { scaleX: 1, duration: 0.35, ease: "power2.out" },
-          0.25,
-        )
-        .fromTo(
-          node.querySelector(".sd-cross-v"),
-          { scaleY: 0 },
-          { scaleY: 1, duration: 0.35, ease: "power2.out" },
-          0.45,
-        )
-        .fromTo(
-          [
-            node.querySelector(".sd-l1 > span"),
-            node.querySelector(".sd-word > span"),
-          ].filter(Boolean),
-          { yPercent: 105, y: 0 },
-          {
-            yPercent: 0,
-            y: 0,
-            duration: 0.65,
-            stagger: 0.12,
-            ease: "power3.out",
+    const failsafe = window.setTimeout(showName, 2500);
+
+    void waitForOpenerAutoplay(120).then(() => {
+      if (cancelled || !rootRef.current) return;
+      const names = gsap.utils.toArray<HTMLElement>(".sd-name-rise", root);
+      if (!names.length || !animate || revealed) {
+        showName();
+        return;
+      }
+
+      try {
+        document.documentElement.classList.add("sd-opener-anim");
+        const node = rootRef.current;
+        const tl = gsap.timeline({
+          onComplete: () => {
+            showName();
+            ScrollTrigger.refresh();
           },
-          0.5,
+          onInterrupt: showName,
+        });
+        tl.fromTo(
+          node.querySelector(".sd-cross"),
+          { clipPath: "inset(50% 50% 50% 50%)" },
+          {
+            clipPath: "inset(0%)",
+            duration: 0.35,
+            ease: "power3.out",
+            immediateRender: false,
+            overwrite: true,
+          },
+          0,
         )
-        .fromTo(
-          [
-            node.querySelector(".sd-eyebrow"),
-            node.querySelector(".sd-doctor"),
-            node.querySelector(".sd-tagline"),
-          ].filter(Boolean),
-          { y: 12, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.45, stagger: 0.08, ease: "power2.out" },
-          1,
-        )
-        .fromTo(
-          node.querySelector(".sd-opener .sd-cta"),
-          { y: 12, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" },
-          1.2,
-        )
-        .fromTo(
-          node.querySelector(".sd-plate-frame"),
-          { y: 16, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55, ease: "power2.out" },
-          1.35,
-        );
+          .fromTo(
+            node.querySelector(".sd-cross-h"),
+            { scaleX: 0 },
+            {
+              scaleX: 1,
+              duration: 0.35,
+              ease: "power2.out",
+              immediateRender: false,
+              overwrite: true,
+            },
+            0.25,
+          )
+          .fromTo(
+            node.querySelector(".sd-cross-v"),
+            { scaleY: 0 },
+            {
+              scaleY: 1,
+              duration: 0.35,
+              ease: "power2.out",
+              immediateRender: false,
+              overwrite: true,
+            },
+            0.45,
+          )
+          .fromTo(
+            names,
+            { yPercent: 105, y: 0 },
+            {
+              yPercent: 0,
+              y: 0,
+              duration: 0.65,
+              stagger: 0.12,
+              ease: "power3.out",
+              immediateRender: false,
+              overwrite: true,
+            },
+            0,
+          );
+      } catch {
+        showName();
+      }
     });
 
     return () => {
-      live = false;
+      cancelled = true;
+      window.clearTimeout(failsafe);
       document.documentElement.classList.remove("js-anim");
+      document.documentElement.classList.remove("sd-opener-anim");
       document.documentElement.removeAttribute("data-sd-live");
     };
   }, []);
@@ -134,8 +188,6 @@ export function SwissDentalExperience() {
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        document.documentElement.classList.add("js-anim");
-
         const plateImg = root.querySelector<HTMLElement>(".sd-plate-frame img");
         const plate = root.querySelector<HTMLElement>(".sd-plate-frame");
         if (plate && plateImg) {
@@ -145,6 +197,7 @@ export function SwissDentalExperience() {
             {
               scale: 1,
               ease: "none",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: plate,
                 start: "top bottom",
@@ -164,6 +217,7 @@ export function SwissDentalExperience() {
             {
               scale: 1,
               ease: "none",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: clinic,
                 start: "top bottom",
@@ -183,6 +237,7 @@ export function SwissDentalExperience() {
               y: 0,
               duration: 0.7,
               ease: "power2.out",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: el,
                 start: "top 85%",
@@ -200,6 +255,7 @@ export function SwissDentalExperience() {
               "--line": 1,
               duration: 0.8,
               ease: "power2.out",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: row,
                 start: "top 80%",
@@ -207,23 +263,6 @@ export function SwissDentalExperience() {
               },
             },
           );
-          const num = row.querySelector<HTMLElement>(".sd-row-n");
-          if (num) {
-            gsap.fromTo(
-              num,
-              { opacity: 0 },
-              {
-                opacity: 1,
-                duration: 0.6,
-                ease: "power2.out",
-                scrollTrigger: {
-                  trigger: row,
-                  start: "top 80%",
-                  once: true,
-                },
-              },
-            );
-          }
         });
 
         const visitMask = root.querySelector<HTMLElement>(".sd-visit-mask > *");
@@ -236,6 +275,7 @@ export function SwissDentalExperience() {
               y: 0,
               duration: 0.7,
               ease: "power3.out",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: visitMask.parentElement,
                 start: "top 85%",
@@ -258,6 +298,9 @@ export function SwissDentalExperience() {
             A KantoCo sample page for Swiss Dental Clinic. Not the clinic&apos;s
             official site.
           </span>
+          <span className="sd-bar-note-mob">
+            Not the clinic&apos;s official site
+          </span>
         </div>
       </div>
 
@@ -268,7 +311,7 @@ export function SwissDentalExperience() {
           </p>
           <h1 className="sd-name">
             <span className="sd-l1">
-              <span>Swiss Dental</span>
+              <span className="sd-name-rise">Swiss Dental</span>
             </span>
             <span className="sd-l2">
               <span className="sd-cross" aria-hidden="true">
@@ -276,7 +319,7 @@ export function SwissDentalExperience() {
                 <span className="sd-cross-v" />
               </span>
               <span className="sd-word">
-                <span>Clinic</span>
+                <span className="sd-name-rise">Clinic</span>
               </span>
             </span>
           </h1>
@@ -294,6 +337,9 @@ export function SwissDentalExperience() {
       <section className="sd-plate-sec">
         <div className="sd-wrap">
           <figure className="sd-plate">
+            <figcaption className="sd-cap sd-cap-plate">
+              {PHOTOS.plate.caption}
+            </figcaption>
             <div className="sd-plate-frame">
               <picture>
                 <source
@@ -323,11 +369,10 @@ export function SwissDentalExperience() {
                   height={PHOTOS.plate.height}
                   loading="eager"
                   decoding="async"
-                  fetchPriority="low"
+                  fetchPriority="high"
                 />
               </picture>
             </div>
-            <figcaption className="sd-cap">{PHOTOS.plate.caption}</figcaption>
           </figure>
         </div>
       </section>
@@ -336,9 +381,8 @@ export function SwissDentalExperience() {
         <div className="sd-wrap">
           <div className="sd-cols">
             <p className="sd-reveal">
-              If you searched for Swiss Dental Clinic, this is the clinic&apos;s
-              own page: the right address, both numbers, and its Facebook, in
-              one place.
+              If you searched for Swiss Dental Clinic, this sample gathers the
+              right address, both numbers, and its Facebook, in one place.
             </p>
           </div>
         </div>
@@ -373,7 +417,7 @@ export function SwissDentalExperience() {
                 The clinic&apos;s sign hangs over reception: SWISS in white
                 light, a red cross under it, on a wall of wood slats.
               </p>
-              <p className="sd-fact sd-reveal">{SWISS.rating}</p>
+              <p className="sd-fact">{SWISS.rating}</p>
             </div>
           </div>
         </div>
@@ -381,9 +425,9 @@ export function SwissDentalExperience() {
 
       <section className="sd-before">
         <div className="sd-wrap">
-          <p className="sd-kicker sd-reveal">Before you come</p>
+          <p className="sd-kicker">Before you come</p>
           <div className="sd-cols">
-            <h2 className="sd-h2 sd-reveal">Two ways to reach the clinic.</h2>
+            <h2 className="sd-h2">Three ways to reach the clinic.</h2>
           </div>
           <div className="sd-rows">
             <div className="sd-row">
@@ -407,11 +451,13 @@ export function SwissDentalExperience() {
               <p className="sd-row-detail">
                 Send a message to{" "}
                 <a
+                  className="sd-tap"
                   href={SWISS.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {SWISS.facebookHandle}
+                  facebook.com/<wbr />
+                  swissdentalclinicph
                 </a>
                 . Email works too:{" "}
                 <a className="sd-tap" href={`mailto:${SWISS.email}`}>

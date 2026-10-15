@@ -112,10 +112,6 @@ export function PediamedExperience() {
         if (cancelled) return;
         const tiles = gsap.utils.toArray<HTMLElement>(".pm-tile", root);
         const names = gsap.utils.toArray<HTMLElement>(".pm-name-rise", root);
-        const rise = gsap.utils.toArray<HTMLElement>(
-          ".pm-opener-eyebrow, .pm-opener-copy, .pm-opener-btns a",
-          root,
-        );
         if (!names.length || !animate || revealed) {
           showName();
           return;
@@ -123,7 +119,6 @@ export function PediamedExperience() {
 
         try {
           gsap.set(tiles, { opacity: 0, scale: 0.6, rotate: -6 });
-          gsap.set(rise, { opacity: 0, y: 12 });
 
           const tl = gsap.timeline({
             onComplete: () => {
@@ -157,17 +152,6 @@ export function PediamedExperience() {
               ease: "back.out(1.4)",
             },
             0,
-          );
-          tl.to(
-            rise,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.29,
-              stagger: 0.07,
-              ease: "power2.out",
-            },
-            0.9,
           );
         } catch {
           showName();
@@ -268,7 +252,9 @@ export function PediamedExperience() {
             SAMPLE | NOT LIVE · A KantoCo sample page for PediaMed
             Children&apos;s Clinic. Not the clinic&apos;s official site.
           </span>
-          <span className="pm-bar-mob">SAMPLE | NOT LIVE</span>
+          <span className="pm-bar-mob">
+            SAMPLE | NOT LIVE · Not the clinic&apos;s official site
+          </span>
         </span>
       </p>
 

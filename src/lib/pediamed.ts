@@ -37,7 +37,7 @@ export const pediamed = {
   ],
   comeLine: "Call or message the clinic to set your child's visit.",
   intro:
-    "If you searched for PediaMed, this is the clinic's own page: the full address, the mobile number, the hours and its Facebook, in one place.",
+    "If you searched for PediaMed, this sample gathers the full address, the mobile number, the hours and its Facebook, in one place.",
   sampleNote:
     "A KantoCo sample for PediaMed Children's Clinic. Not live, and not the clinic's official site.",
   credit:

@@ -29,6 +29,12 @@ export const IMG = "/demos/swiss-dental";
 export const PLATE_SIZES =
   "(min-width: 1312px) 1120px, calc(100vw - 2 * clamp(24px, 6vw, 96px))";
 
+export const PLATE_PRELOAD = {
+  mobileWebp: `${IMG}/plate-mobile-4x5.webp`,
+  desktopWebp: `${IMG}/plate-16x9-1x.webp`,
+  desktopWebpSrcSet: `${IMG}/plate-16x9-1x.webp 1120w, ${IMG}/plate-16x9.webp 2240w`,
+} as const;
+
 /**
  * Every still on the page. Flip `facebookLater[].ready` (and fill
  * alt/caption/file) when more Facebook photos land.
