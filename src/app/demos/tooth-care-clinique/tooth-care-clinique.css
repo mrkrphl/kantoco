@@ -140,7 +140,6 @@ html:has(.tcc) body {
 
 .tcc-name-line {
   display: block;
-  overflow: hidden;
 }
 
 .tcc-name-rise {
@@ -407,6 +406,7 @@ html:has(.tcc) body {
   align-items: center;
   min-height: 44px;
   color: var(--accent);
+  text-decoration: underline;
   text-underline-offset: 3px;
 }
 
@@ -509,6 +509,7 @@ html:has(.tcc) body {
   min-height: 44px;
   min-width: 44px;
   color: var(--accent);
+  text-decoration: underline;
   text-underline-offset: 3px;
 }
 
@@ -561,24 +562,6 @@ html.js-anim .tcc-oak-inner {
 
 html.js-anim .tcc-heart {
   transform: scale(0);
-}
-
-html.js-anim .tcc-reveal {
-  opacity: 0;
-}
-
-html.js-anim .tcc-book-rule {
-  transform: scaleX(0);
-}
-
-html.js-anim .tcc-book-n,
-html.js-anim .tcc-book-title,
-html.js-anim .tcc-book-detail {
-  opacity: 0;
-}
-
-html.js-anim .tcc-zoom img {
-  transform: scale(1.05);
 }
 
 @media (min-width: 768px) {
@@ -711,12 +694,14 @@ html.js-anim .tcc-zoom img {
 
   html.js .tcc-dock {
     opacity: 0;
+    visibility: hidden;
     transform: translateY(110%);
     pointer-events: none;
   }
 
   html.js .tcc-dock.is-show {
     opacity: 1;
+    visibility: visible;
     transform: none;
     pointer-events: auto;
   }
@@ -737,13 +722,7 @@ html.js-anim .tcc-zoom img {
 
   html.js-anim .tcc-oak,
   html.js-anim .tcc-oak-inner,
-  html.js-anim .tcc-heart,
-  html.js-anim .tcc-reveal,
-  html.js-anim .tcc-book-rule,
-  html.js-anim .tcc-book-n,
-  html.js-anim .tcc-book-title,
-  html.js-anim .tcc-book-detail,
-  html.js-anim .tcc-zoom img {
+  html.js-anim .tcc-heart {
     opacity: 1;
     transform: none;
     clip-path: none;

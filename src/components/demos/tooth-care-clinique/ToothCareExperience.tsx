@@ -101,63 +101,72 @@ export function ToothCareExperience() {
     if (!root) return;
 
     document.documentElement.setAttribute("data-tcc-live", "");
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animate =
+      document.documentElement.classList.contains("js-anim") && !reduce;
+    if (!animate) {
       document.documentElement.classList.remove("js-anim");
-      return;
+      return () => {
+        document.documentElement.removeAttribute("data-tcc-live");
+      };
     }
 
     let live = true;
+    let ctx: gsap.Context | undefined;
     waitForOpenerAutoplay(120).then(() => {
       if (!live || !rootRef.current) return;
+      if (!document.documentElement.classList.contains("js-anim")) return;
       const node = rootRef.current;
-      const lines = node.querySelectorAll(".tcc-wave-line");
-      const oak = node.querySelector(".tcc-oak");
-      const inner = node.querySelector(".tcc-oak-inner");
-      const heart = node.querySelector(".tcc-heart");
+      ctx = gsap.context(() => {
+        const lines = node.querySelectorAll(".tcc-wave-line");
+        const oak = node.querySelector(".tcc-oak");
+        const inner = node.querySelector(".tcc-oak-inner");
+        const heart = node.querySelector(".tcc-heart");
 
-      const tl = gsap.timeline();
-      if (lines.length) {
-        tl.fromTo(
-          lines,
-          { strokeDashoffset: 1 },
-          {
-            strokeDashoffset: 0,
-            duration: 0.9,
-            stagger: 0.09,
-            ease: "power2.inOut",
-          },
-          0,
-        );
-      }
-      if (oak) {
-        tl.fromTo(
-          oak,
-          { clipPath: "inset(0 0 100% 0)" },
-          { clipPath: "inset(0)", duration: 0.7, ease: "power3.out" },
-          0,
-        );
-      }
-      if (inner) {
-        tl.fromTo(
-          inner,
-          { scale: 1.06 },
-          { scale: 1, duration: 1.2, ease: "power2.out" },
-          0,
-        );
-      }
-      if (heart) {
-        tl.fromTo(
-          heart,
-          { scale: 0 },
-          { scale: 1, duration: 0.5, ease: "back.out(1.6)" },
-          0.9,
-        );
-      }
+        const tl = gsap.timeline();
+        if (lines.length) {
+          tl.fromTo(
+            lines,
+            { strokeDashoffset: 1 },
+            {
+              strokeDashoffset: 0,
+              duration: 0.9,
+              stagger: 0.09,
+              ease: "power2.inOut",
+            },
+            0,
+          );
+        }
+        if (oak) {
+          tl.fromTo(
+            oak,
+            { clipPath: "inset(0 0 100% 0)" },
+            { clipPath: "inset(0)", duration: 0.7, ease: "power3.out" },
+            0,
+          );
+        }
+        if (inner) {
+          tl.fromTo(
+            inner,
+            { scale: 1.06 },
+            { scale: 1, duration: 1.2, ease: "power2.out" },
+            0,
+          );
+        }
+        if (heart) {
+          tl.fromTo(
+            heart,
+            { scale: 0 },
+            { scale: 1, duration: 0.5, ease: "back.out(1.6)" },
+            0.9,
+          );
+        }
+      }, node);
     });
 
     return () => {
       live = false;
+      ctx?.revert();
       document.documentElement.classList.remove("js-anim");
       document.documentElement.removeAttribute("data-tcc-live");
     };
@@ -174,7 +183,15 @@ export function ToothCareExperience() {
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const canAnimate =
+          document.documentElement.classList.contains("js-anim");
+        if (!canAnimate) return;
+
+        const belowFold = (el: HTMLElement) =>
+          el.getBoundingClientRect().top >= window.innerHeight;
+
         gsap.utils.toArray<HTMLElement>(".tcc-reveal", root).forEach((el) => {
+          if (!belowFold(el)) return;
           gsap.fromTo(
             el,
             { opacity: 0, y: 16 },
@@ -195,6 +212,7 @@ export function ToothCareExperience() {
         gsap.utils
           .toArray<HTMLElement>(".tcc-book-col", root)
           .forEach((col, i) => {
+            if (!belowFold(col)) return;
             const rule = col.querySelector<HTMLElement>(".tcc-book-rule");
             const copy = col.querySelectorAll<HTMLElement>(
               ".tcc-book-n, .tcc-book-title, .tcc-book-detail",
@@ -266,7 +284,9 @@ export function ToothCareExperience() {
           const openerInView = ctaBox.bottom > 48;
           const visitInView =
             visitBox.top < window.innerHeight && visitBox.bottom > 0;
-          dock.classList.toggle("is-show", !openerInView && !visitInView);
+          const show = !openerInView && !visitInView;
+          dock.classList.toggle("is-show", show);
+          dock.toggleAttribute("inert", !show);
         };
 
         apply();
@@ -277,7 +297,10 @@ export function ToothCareExperience() {
           onUpdate: apply,
           onRefresh: apply,
         });
-        return () => dock.classList.remove("is-show");
+        return () => {
+          dock.classList.remove("is-show");
+          dock.removeAttribute("inert");
+        };
       });
     },
     { scope: rootRef },

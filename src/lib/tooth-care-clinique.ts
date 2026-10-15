@@ -33,7 +33,7 @@ export const tcc = {
   instagramHandle: "@toothcareclinique",
   placeId: PLACE_ID,
   placeName: PLACE_NAME,
-  directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(PLACE_NAME)}&destination_place_id=${PLACE_ID}`,
+  directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${PLACE_NAME}, 18 France St, Parañaque`)}&destination_place_id=${PLACE_ID}`,
   directionsLabel: "Get directions",
   intro:
     "If you searched for Tooth Care Clinique, this is one page with the address, the number, the appointment days and the clinic's Messenger.",
