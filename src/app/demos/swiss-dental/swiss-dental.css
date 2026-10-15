@@ -96,10 +96,15 @@ html:has(.sd) body {
   text-transform: uppercase;
 }
 
-.sd-bar-note {
+.sd-bar-note,
+.sd-bar-note-mob {
   font-family: var(--body);
   font-weight: 400;
-  opacity: 0.75;
+  opacity: 0.9;
+}
+
+.sd-bar-note-mob {
+  display: none;
 }
 
 .sd-opener {
@@ -116,7 +121,7 @@ html:has(.sd) body {
   letter-spacing: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #3a3e42;
 }
 
 .sd-name {
@@ -261,8 +266,20 @@ html:has(.sd) body {
   gap: 0.35em;
 }
 
+.sd-landline a,
+.sd-row-detail a,
+.sd-tap {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--type) 35%, transparent);
+}
+
 .sd-landline a {
-  border-bottom: 1px solid color-mix(in srgb, var(--muted) 45%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent);
 }
 
 .sd-plate-sec {
@@ -271,6 +288,8 @@ html:has(.sd) body {
 
 .sd-plate {
   margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sd-plate-frame {
@@ -304,6 +323,11 @@ html.js-anim .sd-plate-frame img {
   font-size: 14px;
   line-height: 20px;
   color: var(--muted);
+}
+
+.sd-plate .sd-cap-plate {
+  margin: 0 0 12px;
+  color: var(--type);
 }
 
 .sd-angle {
@@ -374,6 +398,7 @@ html.js-anim .sd-clinic-frame img {
   font-size: clamp(40px, 4.4vw, 64px);
   letter-spacing: -0.02em;
   line-height: 1;
+  color: var(--type);
 }
 
 .sd-clinic-copy .sd-body {
@@ -387,7 +412,7 @@ html.js-anim .sd-clinic-frame img {
   padding-top: 16px;
   border-top: 1px solid var(--rule);
   font-size: 15px;
-  color: var(--muted);
+  color: #3a3e42;
 }
 
 .sd-before {
@@ -435,7 +460,7 @@ html.js-anim .sd-clinic-frame img {
   font-weight: 600;
   font-stretch: 95%;
   font-size: 14px;
-  color: var(--accent);
+  color: #8a0b20;
 }
 
 .sd-row-title {
@@ -453,10 +478,6 @@ html.js-anim .sd-clinic-frame img {
   margin: 0;
   font-size: 18px;
   line-height: 1.55;
-}
-
-.sd-row-detail a {
-  border-bottom: 1px solid color-mix(in srgb, var(--type) 35%, transparent);
 }
 
 .sd-visit {
@@ -576,8 +597,20 @@ html.js-anim .sd-visit-mask > * {
     --gutter: 16px;
   }
 
+  .sd-bar {
+    font-size: 11px;
+  }
+
+  .sd-bar-inner {
+    gap: 8px;
+  }
+
   .sd-bar-note {
     display: none;
+  }
+
+  .sd-bar-note-mob {
+    display: inline;
   }
 
   .sd-under,
@@ -657,13 +690,6 @@ html.js-anim .sd-visit-mask > * {
     margin-top: 28px;
   }
 
-  .sd-tap,
-  .sd-landline a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding-block: 10px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

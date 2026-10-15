@@ -207,23 +207,6 @@ export function SwissDentalExperience() {
               },
             },
           );
-          const num = row.querySelector<HTMLElement>(".sd-row-n");
-          if (num) {
-            gsap.fromTo(
-              num,
-              { opacity: 0 },
-              {
-                opacity: 1,
-                duration: 0.6,
-                ease: "power2.out",
-                scrollTrigger: {
-                  trigger: row,
-                  start: "top 80%",
-                  once: true,
-                },
-              },
-            );
-          }
         });
 
         const visitMask = root.querySelector<HTMLElement>(".sd-visit-mask > *");
@@ -257,6 +240,9 @@ export function SwissDentalExperience() {
           <span className="sd-bar-note">
             A KantoCo sample page for Swiss Dental Clinic. Not the clinic&apos;s
             official site.
+          </span>
+          <span className="sd-bar-note-mob">
+            Not the clinic&apos;s official site
           </span>
         </div>
       </div>
@@ -294,6 +280,9 @@ export function SwissDentalExperience() {
       <section className="sd-plate-sec">
         <div className="sd-wrap">
           <figure className="sd-plate">
+            <figcaption className="sd-cap sd-cap-plate">
+              {PHOTOS.plate.caption}
+            </figcaption>
             <div className="sd-plate-frame">
               <picture>
                 <source
@@ -327,7 +316,6 @@ export function SwissDentalExperience() {
                 />
               </picture>
             </div>
-            <figcaption className="sd-cap">{PHOTOS.plate.caption}</figcaption>
           </figure>
         </div>
       </section>
@@ -336,9 +324,8 @@ export function SwissDentalExperience() {
         <div className="sd-wrap">
           <div className="sd-cols">
             <p className="sd-reveal">
-              If you searched for Swiss Dental Clinic, this is the clinic&apos;s
-              own page: the right address, both numbers, and its Facebook, in
-              one place.
+              If you searched for Swiss Dental Clinic, this sample gathers the
+              right address, both numbers, and its Facebook, in one place.
             </p>
           </div>
         </div>
@@ -373,7 +360,7 @@ export function SwissDentalExperience() {
                 The clinic&apos;s sign hangs over reception: SWISS in white
                 light, a red cross under it, on a wall of wood slats.
               </p>
-              <p className="sd-fact sd-reveal">{SWISS.rating}</p>
+              <p className="sd-fact">{SWISS.rating}</p>
             </div>
           </div>
         </div>
@@ -381,9 +368,9 @@ export function SwissDentalExperience() {
 
       <section className="sd-before">
         <div className="sd-wrap">
-          <p className="sd-kicker sd-reveal">Before you come</p>
+          <p className="sd-kicker">Before you come</p>
           <div className="sd-cols">
-            <h2 className="sd-h2 sd-reveal">Two ways to reach the clinic.</h2>
+            <h2 className="sd-h2">Three ways to reach the clinic.</h2>
           </div>
           <div className="sd-rows">
             <div className="sd-row">
@@ -407,6 +394,7 @@ export function SwissDentalExperience() {
               <p className="sd-row-detail">
                 Send a message to{" "}
                 <a
+                  className="sd-tap"
                   href={SWISS.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
