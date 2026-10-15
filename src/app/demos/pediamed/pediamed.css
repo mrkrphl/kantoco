@@ -654,12 +654,4 @@ html.js.js-anim .pm-visit-h {
   html.js.js-anim .pm-name-rise {
     transform: none;
   }
-
-  html.js.js-anim .pm-opener-copy,
-  html.js.js-anim .pm-opener-btns a,
-  html.js.js-anim .pm-opener-eyebrow,
-  html.js.js-anim .pm-tile {
-    opacity: 1;
-    transform: none;
-  }
 }

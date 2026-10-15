@@ -271,6 +271,8 @@ html:has(.sd) body {
 .sd-tap {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
   min-height: 44px;
   border-bottom: none;
   text-decoration: underline;

@@ -399,7 +399,8 @@ export function SwissDentalExperience() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {SWISS.facebookHandle}
+                  facebook.com/<wbr />
+                  swissdentalclinicph
                 </a>
                 . Email works too:{" "}
                 <a className="sd-tap" href={`mailto:${SWISS.email}`}>
