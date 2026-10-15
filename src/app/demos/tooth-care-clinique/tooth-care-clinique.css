@@ -559,16 +559,6 @@ html.js-anim .tcc-oak-inner {
   transform: scale(1.06);
 }
 
-html.js-anim .tcc-name-rise {
-  transform: translateY(105%);
-}
-
-html.js-anim .tcc-chip,
-html.js-anim .tcc-opener-tag,
-html.js-anim .tcc-opener .tcc-cta {
-  opacity: 0;
-}
-
 html.js-anim .tcc-heart {
   transform: scale(0);
 }
@@ -747,10 +737,6 @@ html.js-anim .tcc-zoom img {
 
   html.js-anim .tcc-oak,
   html.js-anim .tcc-oak-inner,
-  html.js-anim .tcc-name-rise,
-  html.js-anim .tcc-chip,
-  html.js-anim .tcc-opener-tag,
-  html.js-anim .tcc-opener .tcc-cta,
   html.js-anim .tcc-heart,
   html.js-anim .tcc-reveal,
   html.js-anim .tcc-book-rule,

@@ -47,7 +47,7 @@ export default function ToothCareCliniqueLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-tcc-live"))document.documentElement.classList.remove("js-anim")},8000)}}catch(e){}`,
+          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-tcc-live"))document.documentElement.classList.remove("js-anim")},2500)}}catch(e){}`,
         }}
       />
       <div className={`${display.variable} ${sans.variable}`}>{children}</div>

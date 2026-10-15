@@ -38,7 +38,7 @@ export const tcc = {
   intro:
     "If you searched for Tooth Care Clinique, this is one page with the address, the number, the appointment days and the clinic's Messenger.",
   hoursLine: "Mon, Wed, Fri 9 AM–6 PM · Sun 10 AM–3 PM.",
-  hoursVisit: ["Mon, Wed, Fri 9 AM–6 PM", "Sun 10 AM–3 PM"],
+  hoursVisit: ["Mon, Wed, Fri 9 AM–6 PM", "Sun 10 AM–3 PM"] as const,
   confirm: "CONFIRM",
   addressLines: [
     "2F 18 France St., Better Living Subdivision",
@@ -66,13 +66,13 @@ export const TCC_BOOK = [
   {
     n: "2",
     title: "Pick a clinic day",
-    detail: "Mon, Wed, Fri 9 AM–6 PM · Sun 10 AM–3 PM.",
+    detail: tcc.hoursLine,
     confirm: true,
   },
   {
     n: "3",
     title: "Find the 2nd floor",
-    detail: "18 France St., near BDO Better Living at Dona Soledad Ave.",
+    detail: tcc.findFloor,
     confirm: false,
   },
 ] as const;

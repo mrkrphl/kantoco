@@ -114,10 +114,7 @@ export function ToothCareExperience() {
       const lines = node.querySelectorAll(".tcc-wave-line");
       const oak = node.querySelector(".tcc-oak");
       const inner = node.querySelector(".tcc-oak-inner");
-      const names = node.querySelectorAll(".tcc-name-rise");
-      const chip = node.querySelector(".tcc-chip");
       const heart = node.querySelector(".tcc-heart");
-      const rise = node.querySelectorAll(".tcc-opener-tag, .tcc-opener .tcc-cta");
 
       const tl = gsap.timeline();
       if (lines.length) {
@@ -149,48 +146,12 @@ export function ToothCareExperience() {
           0,
         );
       }
-      if (names.length) {
-        tl.fromTo(
-          names,
-          { yPercent: 105, y: 0 },
-          {
-            yPercent: 0,
-            y: 0,
-            duration: 0.65,
-            stagger: 0.12,
-            ease: "power3.out",
-          },
-          0.3,
-        );
-      }
-      if (chip) {
-        tl.fromTo(
-          chip,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.4, ease: "power2.out" },
-          0.9,
-        );
-      }
       if (heart) {
         tl.fromTo(
           heart,
           { scale: 0 },
           { scale: 1, duration: 0.5, ease: "back.out(1.6)" },
           0.9,
-        );
-      }
-      if (rise.length) {
-        tl.fromTo(
-          rise,
-          { y: 12, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            stagger: 0.07,
-            ease: "power2.out",
-          },
-          0.95,
         );
       }
     });
@@ -213,8 +174,6 @@ export function ToothCareExperience() {
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        document.documentElement.classList.add("js-anim");
-
         gsap.utils.toArray<HTMLElement>(".tcc-reveal", root).forEach((el) => {
           gsap.fromTo(
             el,
@@ -433,9 +392,9 @@ export function ToothCareExperience() {
           </div>
         </section>
 
-        <section className="tcc-wrap tcc-inside" aria-label="Inside">
-          <div className={insideReady ? "tcc-inside-grid" : undefined}>
-            {insideReady ? (
+        {insideReady ? (
+          <section className="tcc-wrap tcc-inside" aria-label="Inside">
+            <div className="tcc-inside-grid">
               <figure className="tcc-inside-shot">
                 <div
                   className="tcc-zoom tcc-inside-frame"
@@ -452,14 +411,14 @@ export function ToothCareExperience() {
                   </figcaption>
                 ) : null}
               </figure>
-            ) : null}
-            <div>
-              <p className="tcc-eyebrow tcc-reveal">INSIDE</p>
-              <h2 className="tcc-h2 tcc-reveal">{tcc.insideH}</h2>
-              <p className="tcc-inside-body tcc-reveal">{tcc.insideBody}</p>
+              <div>
+                <p className="tcc-eyebrow tcc-reveal">INSIDE</p>
+                <h2 className="tcc-h2 tcc-reveal">{tcc.insideH}</h2>
+                <p className="tcc-inside-body tcc-reveal">{tcc.insideBody}</p>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
 
         <section className="tcc-visit" aria-label="Visit">
           <div className="tcc-wrap">
