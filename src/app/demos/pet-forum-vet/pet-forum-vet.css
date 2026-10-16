@@ -79,6 +79,11 @@ html:has(.pf) body {
   padding-inline: var(--pad);
 }
 
+.pf-wrap.pf-opener,
+.pf-wrap.pf-sec {
+  padding-inline: var(--pad);
+}
+
 .pf-bar {
   position: sticky;
   top: 0;
@@ -114,7 +119,7 @@ html:has(.pf) body {
   grid-template-columns: 1fr 1fr;
   gap: 64px;
   align-items: start;
-  padding: 64px 0 200px;
+  padding-block: 64px 88px;
   position: relative;
 }
 
@@ -154,8 +159,7 @@ html:has(.pf) body {
 }
 
 .pf-name-line {
-  overflow: hidden;
-  padding-bottom: 0.08em;
+  padding-bottom: 0.12em;
 }
 
 .pf-name-rise {
@@ -281,10 +285,17 @@ html:has(.pf) body {
   border-radius: 28px;
   overflow: hidden;
   border: 8px solid var(--card);
+  aspect-ratio: 1340 / 510;
+  background-color: #f6deb0;
+  background-image: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCAASADADASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAIDBAUG/8QALhAAAQMCAwYDCQAAAAAAAAAAAQIDEQAEEiExBRMUQVGSBlSRIjJCU2FxgeHw/8QAFwEAAwEAAAAAAAAAAAAAAAAAAAECA//EABkRAQEAAwEAAAAAAAAAAAAAAAABESExIv/aAAwDAQACEQMRAD8A0tnNvMIdL7rrukYjPpVpLile+gpExnWD4bQu5trpDxn2kxB01rcQwsKG8ViAEGTJNT6zMK84KH7eTiSEkTqPrFOFsBZBGGAM560y2JACYTBPwzrrS8OoggqTnEyjpWqdAuMQTvDH3P8AcqqbQUpVpNo+tKgsSR0/NWjbTElOXLB61S2+nc7IcWyMK8Scxlz/AHSo05m3edaxbpxaJ1wqImpDeXXmXu80UVM4L0yLy58y93mpEXdyTncO95oopg/FXHz3e81DePvLYwrdWoFWhUTRRSvBH//Z");
+  background-size: cover;
+  background-position: center;
 }
 
 .pf-frame img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
   transform-origin: 50% 50%;
 }
 
@@ -340,7 +351,7 @@ html:has(.pf) body {
 }
 
 .pf-sec {
-  padding: 110px 0;
+  padding-block: 110px;
 }
 
 .pf-services {
@@ -591,32 +602,11 @@ html.js-anim .pf-blob {
   transform: scale(0.6);
 }
 
-html.js-anim .pf-frame {
-  clip-path: inset(100% 0 0 0);
-}
-
-html.js-anim .pf-frame img {
-  transform: scale(1.08);
-}
-
-html.js-anim .pf-name-rise:not(.is-in) {
-  transform: translateY(105%);
-}
-
 html.js-anim .pf-sticker {
   transform: translateY(-40px) rotate(-8deg);
 }
 
 html.js-anim .pf-paw {
-  opacity: 0;
-}
-
-html.js-anim .pf-cta-anim {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
-html.js-anim .pf-reveal {
   opacity: 0;
 }
 
@@ -648,8 +638,17 @@ html.js-anim .pf-reveal {
 
   .pf-opener {
     grid-template-columns: 1fr;
-    gap: 48px;
-    padding: 36px 0 150px;
+    gap: 16px;
+    padding-block: 16px 36px;
+  }
+
+  .pf-name {
+    font-size: clamp(44px, 12vw, 56px);
+    margin: 10px 0 10px;
+  }
+
+  .pf-name-vet {
+    margin-top: 4px;
   }
 
   .pf-name-pair {
@@ -660,6 +659,7 @@ html.js-anim .pf-reveal {
 
   .pf-tag {
     font-size: 18px;
+    margin: 12px 0 16px;
   }
 
   .pf-ctas {
@@ -686,8 +686,8 @@ html.js-anim .pf-reveal {
 
   .pf-sticker {
     right: 8px;
-    bottom: -108px;
-    width: min(118px, 36%);
+    bottom: -64px;
+    width: min(96px, 30%);
   }
 
   .pf-pic-credit {
@@ -695,7 +695,7 @@ html.js-anim .pf-reveal {
   }
 
   .pf-sec {
-    padding: 80px 0;
+    padding-block: 80px;
   }
 
   .pf-services {
@@ -726,7 +726,7 @@ html.js-anim .pf-reveal {
   }
 
   .pf-hours {
-    padding: 72px 0;
+    padding-block: 72px;
   }
 
   .pf-dock {
@@ -800,5 +800,4 @@ html.js-anim .pf-reveal {
     transform: none;
     clip-path: none;
   }
-
 }

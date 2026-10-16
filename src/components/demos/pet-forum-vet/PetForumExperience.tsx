@@ -150,10 +150,7 @@ export function PetForumExperience() {
     const root = rootRef.current;
     if (!root) return;
 
-    document.documentElement.setAttribute("data-pf-live", "");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const animate =
-      document.documentElement.classList.contains("js-anim") && !reduce;
     let cancelled = false;
     let revealed = false;
     let ctx: gsap.Context | undefined;
@@ -162,59 +159,53 @@ export function PetForumExperience() {
       if (revealed) return;
       revealed = true;
       document.documentElement.classList.remove("js-anim");
-      const names = root.querySelectorAll<HTMLElement>(".pf-name-rise");
       try {
         gsap.killTweensOf(
           root.querySelectorAll(
-            ".pf-blob, .pf-frame, .pf-name-rise, .pf-sticker, .pf-paw, .pf-cta-anim, .pf-chip i",
+            ".pf-blob, .pf-sticker, .pf-paw, .pf-chip i",
           ),
         );
       } catch {
         /* still force visible below */
       }
-      names.forEach((el) => {
-        el.classList.add("is-in");
+      root.querySelectorAll<HTMLElement>(
+        ".pf-name-rise, .pf-name-line, .pf-cta-anim, .pf-frame, .pf-frame img, .pf-reveal, .pf-card-in",
+      ).forEach((el) => {
         el.style.transform = "none";
+        el.style.opacity = "1";
+        el.style.clipPath = "none";
+        el.style.overflow = "visible";
       });
       const sticker = root.querySelector<HTMLElement>(".pf-sticker");
       if (sticker) sticker.style.transform = "rotate(3deg)";
       const blob = root.querySelector<HTMLElement>(".pf-blob");
       if (blob) blob.style.transform = "none";
-      const frame = root.querySelector<HTMLElement>(".pf-frame");
-      if (frame) frame.style.clipPath = "none";
-      root.querySelectorAll<HTMLElement>(".pf-cta-anim").forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
       root.querySelectorAll<HTMLElement>(".pf-paw").forEach((el) => {
         el.style.opacity = "0.22";
       });
     };
 
-    if (!animate) {
+    const failsafe = window.setTimeout(settle, 2500);
+
+    if (reduce) {
       settle();
       return () => {
-        document.documentElement.removeAttribute("data-pf-live");
+        window.clearTimeout(failsafe);
       };
     }
 
-    const failsafe = window.setTimeout(settle, 2500);
-
-    void waitForOpenerAutoplay(120).then(() => {
+    void waitForOpenerAutoplay(50).then(() => {
       if (cancelled || !rootRef.current || revealed) {
         settle();
         return;
       }
       const node = rootRef.current;
       try {
+        document.documentElement.classList.add("js-anim");
         ctx = gsap.context(() => {
           const blob = node.querySelector(".pf-blob");
-          const frame = node.querySelector(".pf-frame");
-          const frameImg = node.querySelector(".pf-frame img");
-          const names = gsap.utils.toArray<HTMLElement>(".pf-name-rise", node);
           const sticker = node.querySelector(".pf-sticker");
           const paws = gsap.utils.toArray<HTMLElement>(".pf-paw", node);
-          const ctas = gsap.utils.toArray<HTMLElement>(".pf-cta-anim", node);
           const dot = node.querySelector(".pf-chip i");
 
           const tl = gsap.timeline({
@@ -240,47 +231,6 @@ export function PetForumExperience() {
               0,
             );
           }
-          if (frame) {
-            tl.fromTo(
-              frame,
-              { clipPath: "inset(100% 0 0 0)" },
-              {
-                clipPath: "inset(0%)",
-                duration: 0.95,
-                ease: "power3.out",
-                immediateRender: false,
-              },
-              0.15,
-            );
-          }
-          if (frameImg) {
-            tl.fromTo(
-              frameImg,
-              { scale: 1.08 },
-              {
-                scale: 1,
-                duration: 0.95,
-                ease: "power3.out",
-                immediateRender: false,
-              },
-              0.15,
-            );
-          }
-          if (names.length) {
-            tl.fromTo(
-              names,
-              { yPercent: 105, y: 0 },
-              {
-                yPercent: 0,
-                y: 0,
-                duration: 0.65,
-                stagger: 0.11,
-                ease: "power3.out",
-                immediateRender: false,
-              },
-              0.25,
-            );
-          }
           if (sticker) {
             tl.fromTo(
               sticker,
@@ -303,21 +253,6 @@ export function PetForumExperience() {
                 opacity: 0.22,
                 duration: 0.24,
                 stagger: 0.12,
-                ease: "power2.out",
-                immediateRender: false,
-              },
-              0.9,
-            );
-          }
-          if (ctas.length) {
-            tl.fromTo(
-              ctas,
-              { y: 12, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.45,
-                stagger: 0.07,
                 ease: "power2.out",
                 immediateRender: false,
               },
@@ -350,7 +285,6 @@ export function PetForumExperience() {
       window.clearTimeout(failsafe);
       ctx?.revert();
       document.documentElement.classList.remove("js-anim");
-      document.documentElement.removeAttribute("data-pf-live");
     };
   }, []);
 
@@ -625,7 +559,6 @@ export function PetForumExperience() {
             <h2 className="pf-h2 pf-reveal">{pf.hoursH}</h2>
             <div className="pf-hours-grid">
               <div className="pf-block">
-                <p className="pf-eyebrow">Hours</p>
                 {pf.hours.map((line) => (
                   <p key={line}>{line}</p>
                 ))}

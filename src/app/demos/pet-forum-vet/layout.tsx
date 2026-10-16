@@ -46,7 +46,7 @@ export default function PetForumVetLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `try{document.documentElement.classList.add("js");if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("js-anim");window.setTimeout(function(){if(!document.documentElement.hasAttribute("data-pf-live")){document.documentElement.classList.remove("js-anim")}},2500)}}catch(e){}`,
+          __html: `try{document.documentElement.classList.add("js");window.setTimeout(function(){document.documentElement.classList.remove("js-anim");var n=document.querySelectorAll(".pf-name-rise,.pf-cta-anim,.pf-frame,.pf-frame img,.pf-reveal,.pf-sticker,.pf-blob,.pf-paw,.pf-card-in,.pf-name-line");for(var i=0;i<n.length;i++){n[i].style.transform="none";n[i].style.opacity="1";n[i].style.clipPath="none";n[i].style.overflow="visible"}}},2500)}catch(e){}`,
         }}
       />
       <link

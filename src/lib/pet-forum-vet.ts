@@ -31,13 +31,13 @@ export const pf = {
   email: "petforumvc@gmail.com",
   emailHref: "mailto:petforumvc@gmail.com",
   /**
-   * Spec search URL. Logged-out Maps HTML names this listing at
-   * 14.4478971, 121.0279753 (ftid 0x3397cf0020e898d7:0xfa658bf3d87ba2c7)
-   * from Design's own Maps photo URLs. ChIJ was not in the logged-out
-   * payload, so this does not guess a query_place_id.
+   * Exact pin. CID 18042981361555055303
+   * (ftid 0x3397cf0020e898d7:0xfa658bf3d87ba2c7) at 14.4478971, 121.0279753.
+   * Logged-out Maps HTML never emitted a ChIJ place_id, so this uses the
+   * CID URL rather than guessing query_place_id. Playwright on the CID
+   * URL opened "Pet Forum Veterinary Clinic" at those coordinates.
    */
-  directions:
-    "https://www.google.com/maps/search/?api=1&query=Pet+Forum+Veterinary+Clinic+Elsie+Gaches+Monserrat+Paranaque",
+  directions: "https://maps.google.com/?cid=18042981361555055303",
   directionsLabel: "Get directions",
   confirm: "CONFIRM",
   address:
