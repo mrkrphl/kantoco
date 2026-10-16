@@ -1025,6 +1025,10 @@ html.js-anim .pf-paw {
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 3;
+    background-color: #a5a4a4;
+    background-image: url("/demos/pet-forum-vet/window-decals.webp");
+    background-size: cover;
+    background-position: 50% 38%;
   }
 
   .pf-win picture,
