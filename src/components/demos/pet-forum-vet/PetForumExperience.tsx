@@ -197,10 +197,6 @@ export function PetForumExperience() {
         el.style.clipPath = "none";
         el.style.overflow = "visible";
       });
-      root.querySelectorAll<HTMLElement>(".pf-win, .pf-win img").forEach((el) => {
-        el.style.opacity = "1";
-        el.style.visibility = "visible";
-      });
       const sticker = root.querySelector<HTMLElement>(".pf-sticker");
       if (sticker) sticker.style.transform = "rotate(3deg)";
       const blob = root.querySelector<HTMLElement>(".pf-blob");
