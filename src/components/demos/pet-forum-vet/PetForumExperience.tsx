@@ -197,6 +197,10 @@ export function PetForumExperience() {
         el.style.clipPath = "none";
         el.style.overflow = "visible";
       });
+      root.querySelectorAll<HTMLElement>(".pf-win, .pf-win img").forEach((el) => {
+        el.style.opacity = "1";
+        el.style.visibility = "visible";
+      });
       const sticker = root.querySelector<HTMLElement>(".pf-sticker");
       if (sticker) sticker.style.transform = "rotate(3deg)";
       const blob = root.querySelector<HTMLElement>(".pf-blob");
@@ -566,6 +570,7 @@ export function PetForumExperience() {
                   <Pic
                     photo={PF_PHOTOS.window}
                     sizes="(min-width: 768px) 420px, calc(100vw - 2 * clamp(22px, 6vw, 96px))"
+                    eager
                   />
                 </div>
                 <div className="pf-inset">
