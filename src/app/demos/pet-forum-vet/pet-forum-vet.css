@@ -610,6 +610,15 @@ html.js-anim .pf-paw {
   opacity: 0;
 }
 
+.pf-locale,
+.pf-locale-grid {
+  display: contents;
+}
+
+.pf-card-desk {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .pf {
     padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px));
@@ -799,5 +808,237 @@ html.js-anim .pf-paw {
     opacity: 1;
     transform: none;
     clip-path: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pf-wrap {
+    max-width: calc(1200px + 2 * var(--pad));
+  }
+
+  .pf-opener {
+    height: calc(100svh - var(--bar-h));
+    min-height: calc(100svh - var(--bar-h));
+    max-height: calc(100svh - var(--bar-h));
+    align-items: stretch;
+    gap: 40px;
+    padding-block: 24px 28px;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    overflow: hidden;
+  }
+
+  .pf-opener > div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding-right: 8px;
+  }
+
+  .pf-name {
+    font-size: clamp(56px, 5.6vw, 88px);
+    margin: 14px 0 14px;
+  }
+
+  .pf-tag {
+    margin: 18px 0 22px;
+  }
+
+  .pf-photo {
+    margin-top: 0;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  .pf-blob {
+    inset: 10% 8% -4% 6%;
+  }
+
+  .pf-frame {
+    position: relative;
+    width: 100%;
+    flex: 0 0 auto;
+    aspect-ratio: 1340 / 510;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .pf-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+
+  .pf-sticker {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: min(82%, 420px);
+    max-width: none;
+    flex: 1 1 auto;
+    align-self: flex-end;
+    margin-top: -28px;
+    padding: 12px 12px 10px;
+    transform: rotate(3deg);
+    min-height: 0;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+
+  .pf-sticker picture {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+  }
+
+  .pf-sticker img {
+    aspect-ratio: auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+
+  .pf-sticker .pf-pic-credit {
+    align-self: stretch;
+  }
+
+  .pf-paws {
+    left: auto;
+    right: 6%;
+    top: 28%;
+    bottom: auto;
+    height: 160px;
+    z-index: 0;
+  }
+
+  .pf-sec {
+    padding-block: 68px;
+  }
+
+  .pf-services {
+    padding-top: 48px;
+  }
+
+  .pf-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .pf-card-desk {
+    display: block;
+  }
+
+  .pf-card {
+    padding: 22px;
+  }
+
+  .pf-locale {
+    display: block;
+    background: var(--sunsoft);
+  }
+
+  .pf-locale-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 36px;
+    width: 100%;
+    max-width: calc(1200px + 2 * var(--pad));
+    margin-inline: auto;
+    padding: 68px var(--pad);
+    box-sizing: border-box;
+    align-items: start;
+  }
+
+  .pf-find-sec.pf-wrap.pf-sec {
+    grid-column: 1;
+    width: auto;
+    max-width: none;
+    margin-inline: 0;
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  .pf-find {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .pf-find-visual {
+    max-width: 240px;
+    justify-self: start;
+  }
+
+  .pf-address {
+    margin: 16px 0 12px;
+  }
+
+  .pf-locale .pf-h2 {
+    font-size: clamp(28px, 2.5vw, 36px);
+    margin: 12px 0 10px;
+  }
+
+  .pf-hours {
+    grid-column: 2 / 4;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 36px;
+    align-items: start;
+    background: transparent;
+    padding: 0;
+  }
+
+  .pf-hours > .pf-wrap {
+    display: contents;
+  }
+
+  .pf-hours-head {
+    grid-column: 1;
+  }
+
+  .pf-hours .pf-h2 {
+    grid-column: 1;
+  }
+
+  .pf-hours-grid {
+    display: contents;
+  }
+
+  .pf-hours-block {
+    grid-column: 1;
+  }
+
+  .pf-contact-block {
+    grid-column: 2;
+  }
+
+  .pf-hours-ctas {
+    grid-column: 2;
+    margin-top: 20px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pf-hours-ctas .pf-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pf-foot {
+    padding: 36px 0 48px;
   }
 }

@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { waitForOpenerAutoplay } from "@/lib/motion";
 import {
+  PF_DOG_SIZES,
   PF_PHOTOS,
   PF_SERVICES,
   PF_SIGN_SIZES,
@@ -92,6 +93,26 @@ function SyringeIcon() {
       aria-hidden="true"
     >
       <path d="M4 20l5-5M14 4l6 6M8 12l4 4 8-8-4-4z" />
+    </svg>
+  );
+}
+
+function PetsIcon() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#7A2E55"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="8" cy="9" r="3.2" />
+      <circle cx="16.5" cy="10.2" r="2.5" />
+      <path d="M4.6 18.2c.7-2.5 2.3-3.9 4.2-3.9 1.9 0 3.3 1.3 4 3.5" />
+      <path d="M13.4 18.2c.5-1.8 1.7-2.9 3.2-2.9s2.7 1.1 3.2 2.9" />
     </svg>
   );
 }
@@ -475,7 +496,7 @@ export function PetForumExperience() {
               />
             </div>
             <div className="pf-sticker">
-              <Pic photo={PF_PHOTOS.dog} sizes="176px" eager />
+              <Pic photo={PF_PHOTOS.dog} sizes={PF_DOG_SIZES} eager />
               <span className="pf-pic-credit">{PF_PHOTOS.dog.caption}</span>
             </div>
           </div>
@@ -502,11 +523,18 @@ export function PetForumExperience() {
                 <p>{svc.body}</p>
               </article>
             ))}
+            <article className="pf-card pf-card-in pf-card-desk">
+              <div className="pf-ic">
+                <PetsIcon />
+              </div>
+              <h3>{pf.petsTileTitle}</h3>
+              <p>{pf.servicesLead}</p>
+            </article>
             <article className="pf-card pf-cardph pf-card-in">
               <div className="pf-zoom">
                 <Pic
                   photo={PF_PHOTOS.cat}
-                  sizes="(min-width: 768px) 360px, calc(100vw - 2 * clamp(22px, 6vw, 96px))"
+                  sizes="(min-width: 1024px) 280px, (min-width: 768px) 360px, calc(100vw - 2 * clamp(22px, 6vw, 96px))"
                 />
               </div>
               <span className="pf-lbl">{PF_PHOTOS.cat.caption}</span>
@@ -514,7 +542,9 @@ export function PetForumExperience() {
           </div>
         </section>
 
-        <section className="pf-wrap pf-sec" aria-label="Find us">
+        <div className="pf-locale">
+          <div className="pf-locale-grid">
+        <section className="pf-wrap pf-sec pf-find-sec" aria-label="Find us">
           <div className="pf-find">
             <div className="pf-find-copy">
               <p className="pf-eyebrow pf-reveal">Find us</p>
@@ -558,13 +588,13 @@ export function PetForumExperience() {
             </div>
             <h2 className="pf-h2 pf-reveal">{pf.hoursH}</h2>
             <div className="pf-hours-grid">
-              <div className="pf-block">
+              <div className="pf-block pf-hours-block">
                 {pf.hours.map((line) => (
                   <p key={line}>{line}</p>
                 ))}
                 <p className="pf-hours-note">{pf.hoursNote}</p>
               </div>
-              <div className="pf-block">
+              <div className="pf-block pf-contact-block">
                 <p className="pf-eyebrow">Contact</p>
                 <p>
                   Call or text{" "}
@@ -588,6 +618,8 @@ export function PetForumExperience() {
             <Actions className="pf-ctas pf-hours-ctas" />
           </div>
         </section>
+          </div>
+        </div>
       </main>
 
       <footer className="pf-foot">

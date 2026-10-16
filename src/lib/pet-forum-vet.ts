@@ -58,6 +58,7 @@ export const pf = {
   servicesH2: "and deworming.",
   servicesLead:
     "For dogs and cats. Not sure if we can help? Call, text or message us first.",
+  petsTileTitle: "Dogs and cats",
   sampleNote:
     "A KantoCo sample for Pet Forum Veterinary Clinic. Not live, and not the clinic's official site.",
   credit:
@@ -124,4 +125,6 @@ export const PF_PHOTOS = {
 
 export const PF_SIGN_PRELOAD = `${PF_ASSET}/${PF_PHOTOS.sign.file}.webp`;
 export const PF_SIGN_SIZES =
-  "(min-width: 768px) min(534px, calc((1180px - 64px) / 2)), calc(100vw - 2 * clamp(22px, 6vw, 96px))";
+  "(min-width: 1024px) min(640px, calc((1200px - 48px) / 2)), (min-width: 768px) min(534px, calc((1180px - 64px) / 2)), calc(100vw - 2 * clamp(22px, 6vw, 96px))";
+export const PF_DOG_SIZES =
+  "(min-width: 1024px) 360px, 176px";
