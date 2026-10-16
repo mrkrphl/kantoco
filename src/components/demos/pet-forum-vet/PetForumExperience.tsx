@@ -570,7 +570,6 @@ export function PetForumExperience() {
                   <Pic
                     photo={PF_PHOTOS.window}
                     sizes="(min-width: 768px) 420px, calc(100vw - 2 * clamp(22px, 6vw, 96px))"
-                    eager
                   />
                 </div>
                 <div className="pf-inset">
