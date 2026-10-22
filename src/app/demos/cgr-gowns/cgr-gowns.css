@@ -1117,7 +1117,7 @@
      double up mid-fade. The tone filter keeps the #878789 gray fixed (no box)
      while moving the still's reds and whites toward the WebGL render. */
   transform: translateY(2%) scale(0.868);
-  filter: brightness(0.99) contrast(1.2) saturate(1.15);
+  filter: url(#cg-poster-tone); /* r5b: dress-only darkening, see GownViewer */
 }
 /* model-viewer's poster slot holds the same webp with the same framing. */
 .cg-mv-poster {
@@ -1249,4 +1249,26 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
+}
+
+/* ---- r5b ---- */
+.cg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+/* "Spin 360°" sits top-right, where the loading pill appears after the tap:
+   clear of the gown (and its hem) at 375, 390 and 1440. */
+.cg-poster-btn,
+.cg-poster-msg {
+  top: 12px;
+  right: 12px;
+}
+.cg-poster-btn {
+  bottom: auto;
+  left: auto;
+  transform: none;
+  min-height: 44px;
+  padding: 0 16px;
 }

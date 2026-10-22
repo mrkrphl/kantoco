@@ -106,6 +106,36 @@ function GownViewer() {
 
   return (
     <figure className="cg-viewer">
+      {/* r5b: darkens only the red dress in the poster still (mask = R-G),
+          so it matches the WebGL render while the gray and the white form
+          stay exactly as they are (no box). sRGB, per-channel slopes. */}
+      <svg className="cg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <filter
+          id="cg-poster-tone"
+          colorInterpolationFilters="sRGB"
+          x="0"
+          y="0"
+          width="1"
+          height="1"
+        >
+          <feColorMatrix
+            in="SourceGraphic"
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  10 -10 0 0 -1.1"
+            result="dress"
+          />
+          <feComponentTransfer in="SourceGraphic" result="dark">
+            <feFuncR type="linear" slope="0.56" />
+            <feFuncG type="linear" slope="0.26" />
+            <feFuncB type="linear" slope="0.28" />
+          </feComponentTransfer>
+          <feComposite in="dark" in2="dress" operator="in" result="darkDress" />
+          <feMerge>
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="darkDress" />
+          </feMerge>
+        </filter>
+      </svg>
       <div className="cg-viewer-frame" ref={frameRef} data-gown-viewer="">
         {modelSrc ? (
           <model-viewer
@@ -184,7 +214,7 @@ function GownViewer() {
               onFocus={arm}
               onClick={arm}
             >
-              Tap to spin 360°
+              Spin 360°
             </button>
           )}
         </div>
