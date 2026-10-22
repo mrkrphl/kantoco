@@ -8,17 +8,43 @@ const nextConfig: NextConfig = {
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
       {
-        // Tiara try-on: the page may only fetch its own files plus the
-        // MediaPipe wasm (jsDelivr) and face model (Google storage). No other
-        // network destination is reachable, so camera data can't be sent.
+        // Tiara try-on. Everything the page loads comes from this site: the
+        // MediaPipe wasm + face model are self-hosted under /mediapipe (copied
+        // at build time). No other origin can be fetched or run, so camera
+        // data has nowhere to go. 'unsafe-inline' covers Next.js's inline
+        // bootstrap scripts; 'wasm-unsafe-eval' lets the face tracker compile.
         source: "/demos/cgr-gowns",
         headers: [
           {
             key: "Content-Security-Policy",
-            value:
-              "connect-src 'self' data: blob: https://cdn.jsdelivr.net https://storage.googleapis.com; frame-ancestors 'none'",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
+              "connect-src 'self' data: blob:",
+              "img-src 'self' data: blob:",
+              "media-src 'self' blob: mediastream:",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self'",
+              "worker-src 'self' blob:",
+              "frame-src 'none'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'none'",
+              "frame-ancestors 'none'",
+            ].join("; "),
           },
           { key: "Permissions-Policy", value: "camera=(self), microphone=()" },
+        ],
+      },
+      {
+        // Versioned, build-time copies: safe to cache for a year.
+        source: "/mediapipe/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
     ];

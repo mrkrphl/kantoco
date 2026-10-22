@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# MediaPipe runtime + model, copied/downloaded at build time (scripts/fetch-mediapipe.mjs)
+/public/mediapipe/
