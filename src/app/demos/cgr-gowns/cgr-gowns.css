@@ -1070,47 +1070,98 @@
   }
 }
 
-/* ---- r4: light poster until the 360 gown is in view (same box: CLS 0) ---- */
+/* ---- r4c: poster still until the 360 gown loads (same box: CLS 0) ----
+   The frame is the poster's own studio gray (#878789), so the still and the
+   live 3D render both sit on one continuous backdrop; a soft inset vignette
+   (on top of both, never on the page) keeps it from reading as a flat box. */
+.cg-viewer-frame {
+  background: #878789;
+  isolation: isolate;
+}
+.cg-viewer-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 72px rgba(20, 18, 22, 0.28);
+  pointer-events: none;
+}
+.cg-viewer-badge {
+  z-index: 3;
+}
 .cg-poster {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: grid;
-  grid-template-rows: 1fr auto;
-  justify-items: center;
-  padding: 12% 16px 24px;
-  color: #e3d2bf;
+  place-items: center;
+  color: #9a9a9c;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+.cg-poster.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+.cg-poster-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Scaled to the 3D camera's front framing (0deg 85deg), so the handoff
+     doesn't jump: measured at 390 and 1440. */
+  transform: translateY(-3%) scale(0.865);
+}
+/* model-viewer's poster slot holds the same webp with the same framing. */
+.cg-mv-poster {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 .cg-poster-art {
+  height: 76%;
   width: auto;
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
 }
+.cg-poster.is-loading .cg-poster-img,
 .cg-poster.is-loading .cg-poster-art {
-  animation: cg-poster-pulse 1.4s ease-in-out infinite;
+  animation: cg-poster-pulse 1.6s ease-in-out infinite;
 }
 @keyframes cg-poster-pulse {
   50% {
-    opacity: 0.55;
+    opacity: 0.8;
   }
 }
+/* Button and status sit on a white pill over the still: AA on any pixel. */
+.cg-poster-btn,
 .cg-poster-msg {
-  /* same height as the poster button, so swapping them shifts nothing */
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  z-index: 3;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.cg-poster-btn {
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(20, 18, 22, 0.22);
+}
+.cg-poster-msg {
   display: grid;
   place-items: center;
   min-height: 48px;
-  margin: 12px 0 0;
-  color: var(--muted);
+  margin: 0;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
   font-size: 15px;
   font-weight: 600;
 }
-.cg-poster-btn {
-  margin-top: 12px;
-  pointer-events: auto;
-}
 .cg-btn-light {
-  border-color: #cbb8a4;
+  border-color: #fff;
   background: #fff;
   color: var(--ink);
 }
@@ -1118,6 +1169,10 @@
   background: #fbf6ef;
 }
 @media (prefers-reduced-motion: reduce) {
+  .cg-poster {
+    transition: none;
+  }
+  .cg-poster.is-loading .cg-poster-img,
   .cg-poster.is-loading .cg-poster-art {
     animation: none;
   }

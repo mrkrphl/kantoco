@@ -19,16 +19,20 @@ const REAL_GOWN = {
   src: "/demos/cgr-gowns/cgr-red-gown.glb",
   alt: "A red sequin mermaid gown with a nude illusion bodice and a short train, on a headless dress form, shown in 3D. Drag to turn it.",
   note: "KantoCo 3D sample of the red sequin gown, close to the photo but not exact.",
+  /** Blender front still on #878789 gray (600x984, 57 KB). The viewer frame uses the same gray. */
+  poster: "/demos/cgr-gowns/cgr-red-gown-poster.webp",
 } as const;
 
 const PLACEHOLDER_GOWN = {
   src: "/demos/cgr-gowns/placeholder-gown.gltf",
   alt: "A red ball gown on a stand, shown in 3D. Drag to turn it.",
   note: "Stand-in model. The real CGR gown in 3D goes here.",
+  poster: null,
 } as const;
 
 export const GOWN = GOWN_IS_PLACEHOLDER ? PLACEHOLDER_GOWN : REAL_GOWN;
 export const GOWN_MODEL_SRC = GOWN.src;
+export const GOWN_POSTER_SIZE = { width: 600, height: 984 } as const;
 
 /**
  * MediaPipe Face Landmarker, self-hosted. scripts/fetch-mediapipe.mjs copies

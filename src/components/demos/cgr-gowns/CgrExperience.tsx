@@ -6,6 +6,7 @@ import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
 import {
   GOWN,
   GOWN_MODEL_SRC,
+  GOWN_POSTER_SIZE,
   SAMPLE_GOWNS,
   SAMPLE_LABEL,
   WEEK_DAYS,
@@ -31,7 +32,10 @@ type Sheet = { kind: "reserve"; gown?: string } | { kind: "messenger" } | null;
  *    or presses Enter on "Tap to spin 360°". Never on scroll or idle.
  *  - desktop: the viewer frame is at least 20% on screen (IntersectionObserver,
  *    no rootMargin, no timer), or the same tap / focus on the poster.
- * Until then a light SVG poster holds the same box (CLS 0).
+ * Until then the poster still (or, for the placeholder, an SVG silhouette)
+ * holds the same fixed-aspect box (CLS 0). The frame is the poster's own gray,
+ * so neither the poster nor the 3D render reads as a box, and the poster
+ * cross-fades out once the model has rendered (no flash).
  */
 const PHONE_QUERY = "(pointer: coarse), (max-width: 767px)";
 function GownViewer() {
@@ -108,14 +112,15 @@ function GownViewer() {
             className="cg-model"
             src={GOWN_MODEL_SRC}
             alt={GOWN.alt}
+            {...(GOWN.poster ? { poster: GOWN.poster } : {})}
             loading="eager"
             camera-controls=""
             {...(reduced ? {} : { "auto-rotate": "" })}
-            auto-rotate-delay="0"
+            auto-rotate-delay="900"
             rotation-per-second="18deg"
             interaction-prompt="none"
             touch-action="pan-y"
-            camera-orbit="20deg 78deg auto"
+            camera-orbit="0deg 85deg auto"
             min-camera-orbit="auto 60deg auto"
             max-camera-orbit="auto 100deg auto"
             field-of-view="auto"
@@ -123,35 +128,65 @@ function GownViewer() {
             shadow-softness="0.8"
             exposure="1.05"
             disable-pan=""
-          />
+          >
+            {GOWN.poster ? (
+              // Same webp in model-viewer's poster slot, framed exactly like
+              // the overlay below, so its built-in poster never ghosts.
+              <div slot="poster" className="cg-mv-poster" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="cg-poster-img"
+                  src={GOWN.poster}
+                  alt=""
+                  width={GOWN_POSTER_SIZE.width}
+                  height={GOWN_POSTER_SIZE.height}
+                  decoding="async"
+                />
+              </div>
+            ) : null}
+          </model-viewer>
         ) : null}
-        {!loaded ? (
-          <div className={`cg-poster${armed ? " is-loading" : ""}`}>
+        <div
+          className={`cg-poster${armed ? " is-loading" : ""}${loaded ? " is-done" : ""}`}
+          aria-hidden={loaded ? true : undefined}
+        >
+          {GOWN.poster ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="cg-poster-img"
+              src={GOWN.poster}
+              alt=""
+              width={GOWN_POSTER_SIZE.width}
+              height={GOWN_POSTER_SIZE.height}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
             <svg className="cg-poster-art" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
               <path
                 d="M84 40 Q100 34 116 40 L118 96 Q100 102 82 96 Z M82 96 Q100 102 118 96 C124 140 120 178 114 198 C132 222 152 238 166 250 Q100 260 34 250 C48 238 68 222 86 198 C80 178 76 140 82 96 Z"
                 fill="currentColor"
               />
             </svg>
-            {failed ? (
-              <p className="cg-poster-msg">The 3D gown couldn&apos;t load here.</p>
-            ) : armed ? (
-              <p className="cg-poster-msg" role="status">
-                Loading the 3D gown…
-              </p>
-            ) : (
-              <button
-                type="button"
-                className="cg-btn cg-btn-light cg-poster-btn"
-                onPointerDown={arm}
-                onFocus={arm}
-                onClick={arm}
-              >
-                Tap to spin 360°
-              </button>
-            )}
-          </div>
-        ) : null}
+          )}
+          {loaded ? null : failed ? (
+            <p className="cg-poster-msg">The 3D gown couldn&apos;t load here.</p>
+          ) : armed ? (
+            <p className="cg-poster-msg" role="status">
+              Loading the 3D gown…
+            </p>
+          ) : (
+            <button
+              type="button"
+              className="cg-btn cg-btn-light cg-poster-btn"
+              onPointerDown={arm}
+              onFocus={arm}
+              onClick={arm}
+            >
+              Tap to spin 360°
+            </button>
+          )}
+        </div>
         <p className="cg-viewer-badge" aria-hidden="true">
           360° · drag
         </p>
