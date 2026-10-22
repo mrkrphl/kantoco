@@ -1,5 +1,4 @@
-import { MEDIAPIPE_WASM_BASE } from "@/lib/cgr-gowns";
-import { getModelBytes, getPoseModelBytes } from "./mediapipe-warm";
+import { getModelBytes, getPoseModelBytes, getWearFileset } from "./mediapipe-warm";
 
 type Lm = { x: number; y: number; z: number; visibility?: number };
 export type PoseTracker = {
@@ -11,11 +10,8 @@ export type FaceTracker = {
   close: () => void;
 };
 
-/** Both trackers run on this device (GPU, else CPU) from the self-hosted wasm. */
-async function fileset() {
-  const { FilesetResolver } = await import("@mediapipe/tasks-vision");
-  return FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_BASE);
-}
+/** Both trackers run on this device (GPU, else CPU) from the one self-hosted wasm download. */
+const fileset = getWearFileset;
 
 export async function createPoseTracker(): Promise<PoseTracker> {
   const [{ PoseLandmarker }, model, fs] = await Promise.all([

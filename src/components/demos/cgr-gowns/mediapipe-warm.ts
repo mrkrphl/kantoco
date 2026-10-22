@@ -76,12 +76,37 @@ export function getPoseModelBytes(): Promise<Uint8Array> {
   return poseBytes;
 }
 
+type Fileset = { wasmLoaderPath: string; wasmBinaryPath: string };
+let wearFs: Promise<Fileset> | null = null;
+
 /**
- * Pointerdown on "Wear it live": start the pose model + shared wasm right away
- * (same files the tiara uses, so a second try-on reuses the cache). Never on
- * idle, scroll or focus, on phones and desktop alike.
+ * The shared self-hosted wasm for the Wear it live trackers, downloaded ONCE
+ * and handed to both trackers (pose + face) as a blob: URL, so it is never
+ * fetched twice even with the HTTP cache off. Same files the tiara uses.
+ */
+export function getWearFileset(): Promise<Fileset> {
+  if (!wearFs) {
+    wearFs = import("@mediapipe/tasks-vision")
+      .then(({ FilesetResolver }) => FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_BASE))
+      .then(async (fs) => {
+        const r = await fetch(fs.wasmBinaryPath);
+        if (!r.ok) throw new Error(`wasm ${r.status}`);
+        const blob = new Blob([await r.arrayBuffer()], { type: "application/wasm" });
+        return { wasmLoaderPath: fs.wasmLoaderPath, wasmBinaryPath: URL.createObjectURL(blob) };
+      })
+      .catch((e) => {
+        wearFs = null;
+        throw e;
+      });
+  }
+  return wearFs;
+}
+
+/**
+ * Pointerdown on "Wear it live": start the pose model + the shared wasm right
+ * away. Never on idle, scroll or focus, on phones and desktop alike.
  */
 export function warmWear() {
   getPoseModelBytes().catch(() => {});
-  warmRuntime().catch(() => {});
+  getWearFileset().catch(() => {});
 }

@@ -179,20 +179,20 @@ export function WearLive({ onClose }: { onClose: () => void }) {
 
       setStatus("loading");
       let overlay: Awaited<ReturnType<typeof createWearScene>>;
+      // Tracker (model + wasm) and the gown art load in parallel.
+      const sceneP = import("three").then((THREE) => createWearScene(THREE, canvas));
       try {
-        const [THREE, tracker] = await Promise.all([import("three"), createPoseTracker()]);
+        const [tracker, scene] = await Promise.all([createPoseTracker(), sceneP]);
+        pose = tracker;
+        overlay = scene;
         if (cancelled) {
           tracker.close();
+          scene.dispose();
           return;
         }
-        pose = tracker;
-        overlay = await createWearScene(THREE, canvas);
       } catch {
+        sceneP.then((sc) => sc.dispose()).catch(() => {});
         if (!cancelled) setStatus("error");
-        return;
-      }
-      if (cancelled) {
-        overlay.dispose();
         return;
       }
       const resize = () => {
