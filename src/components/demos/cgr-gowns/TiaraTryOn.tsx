@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  FACE_LANDMARKER_MODEL,
-  MEDIAPIPE_WASM_BASE,
-} from "@/lib/cgr-gowns";
+import { MEDIAPIPE_WASM_BASE } from "@/lib/cgr-gowns";
 import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
+import { getModelBytes } from "./mediapipe-warm";
 import { createTiaraScene } from "./tiara-scene";
 import { smoothPose, tiaraPose, type TiaraPose } from "@/lib/cgr-tiara-pose";
+
+/** Show the framing tip after this long with no face found. */
+export const NO_FACE_TIP_MS = 5000;
 
 type Status =
   | "starting"
@@ -68,13 +69,14 @@ type Landmarker = {
 };
 
 async function createLandmarker(): Promise<Landmarker> {
-  const { FaceLandmarker, FilesetResolver } = await import(
-    "@mediapipe/tasks-vision"
-  );
+  const [{ FaceLandmarker, FilesetResolver }, model] = await Promise.all([
+    import("@mediapipe/tasks-vision"),
+    getModelBytes(),
+  ]);
   const fileset = await FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_BASE);
   const make = (delegate: "GPU" | "CPU") =>
     FaceLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: FACE_LANDMARKER_MODEL, delegate },
+      baseOptions: { modelAssetBuffer: model, delegate },
       runningMode: "VIDEO",
       numFaces: 1,
       outputFaceBlendshapes: false,
@@ -94,10 +96,13 @@ export function TiaraTryOn({ onClose }: { onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const [status, setStatus] = useState<Status>("starting");
   const [faceSeen, setFaceSeen] = useState(true);
+  /** No face for 5 s since going live (or since last seen): show a tip. */
+  const [needTip, setNeedTip] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   const retry = useCallback(() => {
     setStatus("starting");
+    setNeedTip(false);
     setAttempt((n) => n + 1);
   }, []);
 
@@ -224,8 +229,9 @@ export function TiaraTryOn({ onClose }: { onClose: () => void }) {
       setStatus("live");
       let lastVideoTime = -1;
       let pose: TiaraPose | null = null;
-      let lastSeen = 0;
+      let lastSeen = performance.now();
       let seen = true;
+      let tip = false;
 
       const loop = () => {
         if (cancelled || !landmarker) return;
@@ -262,6 +268,11 @@ export function TiaraTryOn({ onClose }: { onClose: () => void }) {
         if (visible !== seen) {
           seen = visible;
           setFaceSeen(visible);
+        }
+        const wantTip = !visible && now - lastSeen > NO_FACE_TIP_MS;
+        if (wantTip !== tip) {
+          tip = wantTip;
+          setNeedTip(wantTip);
         }
         overlay.update(pose, visible);
         overlay.render();
@@ -329,8 +340,14 @@ export function TiaraTryOn({ onClose }: { onClose: () => void }) {
             ) : null}
           </div>
         ) : !faceSeen ? (
-          <p className="cg-hint" role="status" aria-live="polite">
-            Look straight at the camera
+          <p
+            className={needTip ? "cg-hint cg-hint-tip" : "cg-hint"}
+            role="status"
+            aria-live="polite"
+          >
+            {needTip
+              ? "Hold the phone at arm’s length, face the light"
+              : "Look straight at the camera"}
           </p>
         ) : null}
       </div>

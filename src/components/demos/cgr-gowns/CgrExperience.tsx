@@ -3,14 +3,25 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
-import { GOWN_IS_PLACEHOLDER, GOWN_MODEL_SRC } from "@/lib/cgr-gowns";
+import {
+  GOWN_IS_PLACEHOLDER,
+  GOWN_MODEL_SRC,
+  SAMPLE_GOWNS,
+  SAMPLE_LABEL,
+  WEEK_DAYS,
+} from "@/lib/cgr-gowns";
 import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
+import { EarringsArt, GownArt } from "./GownArt";
+import { MessengerSheet, ReserveSheet } from "./SampleSheets";
+import { warmFull, warmLight } from "./mediapipe-warm";
 
-// Camera + tracker code only downloads when someone taps "Try the tiara".
+// Camera + tracker code only downloads when someone heads for the button.
 const TiaraTryOn = dynamic(
   () => import("./TiaraTryOn").then((m) => m.TiaraTryOn),
   { ssr: false },
 );
+
+type Sheet = { kind: "reserve"; gown?: string } | { kind: "messenger" } | null;
 
 function GownViewer() {
   const [ready, setReady] = useState(false);
@@ -60,6 +71,9 @@ function GownViewer() {
         ) : (
           <p className="cg-viewer-wait">Loading the 3D gown…</p>
         )}
+        <p className="cg-viewer-badge" aria-hidden="true">
+          360° · drag
+        </p>
       </div>
       <figcaption className="cg-viewer-cap">
         <span>Drag to turn the gown all the way around.</span>
@@ -73,14 +87,110 @@ function GownViewer() {
   );
 }
 
+function MessengerIcon() {
+  return (
+    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <path
+        d="M10 2C5.6 2 2 5.3 2 9.4c0 2.3 1.1 4.4 2.9 5.7V18l2.7-1.5c.8.2 1.6.3 2.4.3 4.4 0 8-3.3 8-7.4S14.4 2 10 2Zm.8 9.9-2-2.2-4 2.2 4.4-4.7 2.1 2.2 3.9-2.2-4.4 4.7Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** Reserve + Messenger, both SAMPLE placeholders that open inert sheets. */
+function ContactActions({
+  onReserve,
+  onMessenger,
+  className,
+}: {
+  onReserve: () => void;
+  onMessenger: () => void;
+  className?: string;
+}) {
+  return (
+    <div className={`cg-contact ${className ?? ""}`}>
+      <button type="button" className="cg-btn cg-btn-dark" onClick={onReserve}>
+        Reserve <span className="cg-btn-tag">sample</span>
+      </button>
+      <button type="button" className="cg-btn cg-btn-msg" onClick={onMessenger}>
+        <MessengerIcon />
+        Messenger <span className="cg-btn-tag">sample</span>
+      </button>
+    </div>
+  );
+}
+
+function WeekDots({ week }: { week: readonly boolean[] }) {
+  return (
+    <ol className="cg-week" aria-label="This week, sample availability">
+      {WEEK_DAYS.map((d, i) => (
+        <li
+          key={d}
+          className={week[i] ? "is-free" : "is-booked"}
+          aria-label={`${d}: ${week[i] ? "free" : "booked"}`}
+        >
+          <span>{d.slice(0, 1)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export function CgrExperience() {
   const [tryOn, setTryOn] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>(null);
   const open = useCallback(() => setTryOn(true), []);
   const close = useCallback(() => setTryOn(false), []);
+  const closeSheet = useCallback(() => setSheet(null), []);
+  const reserve = useCallback((gown?: string) => setSheet({ kind: "reserve", gown }), []);
+  const messenger = useCallback(() => setSheet({ kind: "messenger" }), []);
+  const overlayOpen = tryOn || sheet !== null;
+
+  // Button in view for 1.5 s: light warm-up (tracker JS + model), skipped on
+  // Save-Data. Hover / focus / pointerdown do the full warm-up incl. wasm.
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection;
+    if (conn?.saveData || !("IntersectionObserver" in window)) return;
+    let timer = 0;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          if (!timer) {
+            timer = window.setTimeout(() => {
+              warmLight();
+              io.disconnect();
+            }, 1500);
+          }
+        } else if (timer) {
+          window.clearTimeout(timer);
+          timer = 0;
+        }
+      },
+      { rootMargin: "120px 0px" },
+    );
+    document
+      .querySelectorAll<HTMLElement>("[data-try-tiara]")
+      .forEach((b) => io.observe(b));
+    return () => {
+      io.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  const tryProps = (i: number) => ({
+    "data-try-tiara": i,
+    onPointerEnter: warmFull,
+    onPointerDown: warmFull,
+    onFocus: warmFull,
+    onClick: open,
+    type: "button" as const,
+  });
 
   return (
     <div className="cg-root">
-      <div className="cg-bar" inert={tryOn}>
+      <div className="cg-bar" inert={overlayOpen}>
         <div className="cg-bar-inner">
           <span className="cg-bar-full">
             {DEMO_BADGE} · KantoCo sample, not the shop&apos;s site
@@ -89,7 +199,7 @@ export function CgrExperience() {
         </div>
       </div>
 
-      <main className="cg-main" inert={tryOn}>
+      <main className="cg-main" inert={overlayOpen}>
         <section className="cg-hero cg-wrap">
           <div className="cg-hero-copy">
             <p className="cg-eyebrow">Gown rentals · Cavite</p>
@@ -97,24 +207,132 @@ export function CgrExperience() {
               CGR <span>Cavite Gown Rentals</span>
             </h1>
             <p className="cg-lede">
-              See the gown from every side, then try a tiara on live with your
-              phone camera before you visit.
+              See the gown from every side, try a tiara on live with your phone
+              camera, then check the dates and reserve.
             </p>
             <div className="cg-actions">
-              <button
-                type="button"
-                className="cg-btn cg-btn-primary"
-                onClick={open}
-              >
+              <button {...tryProps(0)} className="cg-btn cg-btn-primary">
                 Try the tiara
               </button>
+              <ContactActions onReserve={() => reserve()} onMessenger={messenger} />
             </div>
             <p className="cg-small">
-              Works on your phone&apos;s front camera. Nothing is recorded or
-              sent.
+              Try-on uses your front camera. Nothing is recorded or sent.
             </p>
+
+            <div className="cg-hero-cards">
+              <div className="cg-mini">
+                <p className="cg-mini-h">
+                  Crimson ball gown this week{" "}
+                  <span className="cg-sample-tag">{SAMPLE_LABEL}</span>
+                </p>
+                <WeekDots week={SAMPLE_GOWNS[0].week} />
+                <p className="cg-mini-key">
+                  <span className="cg-key is-free" /> Free{" "}
+                  <span className="cg-key is-booked" /> Booked
+                </p>
+              </div>
+              <div className="cg-mini cg-mini-tiara">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={TIARA_IMAGE_SRC}
+                  alt="Teal crystal tiara"
+                  width={TIARA_IMAGE_SIZE.width}
+                  height={TIARA_IMAGE_SIZE.height}
+                  decoding="async"
+                />
+                <p className="cg-mini-h">Pairs with: teal crystal tiara</p>
+              </div>
+            </div>
           </div>
           <GownViewer />
+        </section>
+
+        <section className="cg-how cg-wrap" aria-labelledby="cg-how-h">
+          <h2 id="cg-how-h" className="cg-h2">
+            How it works
+          </h2>
+          <ol className="cg-steps">
+            <li>
+              <span className="cg-step-n">1</span>
+              <h3>Turn the gown</h3>
+              <p>Drag the 3D gown to see the back, sides and train.</p>
+            </li>
+            <li>
+              <span className="cg-step-n">2</span>
+              <h3>Try the tiara</h3>
+              <p>Your front camera puts the tiara on your head, live.</p>
+            </li>
+            <li>
+              <span className="cg-step-n">3</span>
+              <h3>Check the dates</h3>
+              <p>See which days each gown is free this week.</p>
+            </li>
+            <li>
+              <span className="cg-step-n">4</span>
+              <h3>Reserve or message</h3>
+              <p>Hold the gown, or ask CGR on Messenger first.</p>
+            </li>
+          </ol>
+        </section>
+
+        <section className="cg-catalog cg-wrap" aria-labelledby="cg-cat-h">
+          <div className="cg-sec-head">
+            <h2 id="cg-cat-h" className="cg-h2">
+              Gowns &amp; accessories
+            </h2>
+            <p className="cg-sample-tag">Sample catalogue</p>
+          </div>
+          <ul className="cg-grid">
+            {SAMPLE_GOWNS.map((g) => (
+              <li key={g.id} className="cg-card">
+                <div className="cg-card-art">
+                  <GownArt shape={g.shape} color={g.color} shade={g.shade} title={g.name} />
+                </div>
+                <h3 className="cg-card-h">{g.name}</h3>
+                <p className="cg-card-note">{g.note}</p>
+                <WeekDots week={g.week} />
+                <button
+                  type="button"
+                  className="cg-btn cg-btn-small"
+                  onClick={() => reserve(g.id)}
+                >
+                  Reserve <span className="cg-btn-tag">sample</span>
+                </button>
+              </li>
+            ))}
+            <li className="cg-card">
+              <div className="cg-card-art cg-card-art-wide">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={TIARA_IMAGE_SRC}
+                  alt="Gold tiara set with teal crystals"
+                  width={TIARA_IMAGE_SIZE.width}
+                  height={TIARA_IMAGE_SIZE.height}
+                  decoding="async"
+                />
+              </div>
+              <h3 className="cg-card-h">Teal crystal tiara</h3>
+              <p className="cg-card-note">Try it on live</p>
+              <button {...tryProps(2)} className="cg-btn cg-btn-small">
+                Try the tiara
+              </button>
+            </li>
+            <li className="cg-card">
+              <div className="cg-card-art cg-card-art-wide">
+                <EarringsArt />
+              </div>
+              <h3 className="cg-card-h">Teal drop earrings</h3>
+              <p className="cg-card-note">Matches the tiara</p>
+              <button
+                type="button"
+                className="cg-btn cg-btn-small"
+                onClick={() => reserve()}
+              >
+                Reserve <span className="cg-btn-tag">sample</span>
+              </button>
+            </li>
+          </ul>
         </section>
 
         <section className="cg-tiara cg-wrap" aria-labelledby="cg-tiara-h">
@@ -137,29 +355,97 @@ export function CgrExperience() {
               Gold band, teal crystal drops. Tap Try the tiara and it sits on
               your head in the camera view. It tilts and turns as you move.
             </p>
-            <button type="button" className="cg-btn" onClick={open}>
+            <button {...tryProps(1)} className="cg-btn cg-btn-primary">
               Try the tiara
             </button>
+            <p className="cg-after-h">Like it? Hold the gown or ask first.</p>
+            <ContactActions onReserve={() => reserve()} onMessenger={messenger} />
           </div>
+        </section>
+
+        <section className="cg-avail cg-wrap" aria-labelledby="cg-avail-h">
+          <div className="cg-sec-head">
+            <h2 id="cg-avail-h" className="cg-h2">
+              Availability this week
+            </h2>
+            <p className="cg-sample-tag">
+              {SAMPLE_LABEL}, not CGR&apos;s real calendar
+            </p>
+          </div>
+          <div className="cg-table-wrap">
+            <table className="cg-table">
+              <thead>
+                <tr>
+                  <th scope="col">Gown</th>
+                  {WEEK_DAYS.map((d) => (
+                    <th key={d} scope="col">
+                      {d}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {SAMPLE_GOWNS.map((g) => (
+                  <tr key={g.id}>
+                    <th scope="row">
+                      <span className="cg-swatch" style={{ background: g.color }} />
+                      {g.name}
+                    </th>
+                    {g.week.map((free, i) => (
+                      <td key={WEEK_DAYS[i]}>
+                        <span className={`cg-cell ${free ? "is-free" : "is-booked"}`}>
+                          {free ? "Free" : "Booked"}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button
+            type="button"
+            className="cg-btn cg-btn-dark"
+            onClick={() => reserve()}
+          >
+            Reserve a free day <span className="cg-btn-tag">sample</span>
+          </button>
         </section>
 
         <section className="cg-privacy-block cg-wrap" aria-labelledby="cg-priv-h">
           <h2 id="cg-priv-h" className="cg-h2">
             Your camera stays on your phone
           </h2>
-          <ul className="cg-list">
-            <li>The face tracker runs inside your browser.</li>
-            <li>No video or photo is recorded, saved or uploaded.</li>
-            <li>The camera turns off as soon as you close the try-on.</li>
+          <ul className="cg-priv-cols">
+            <li>
+              <h3>On your phone</h3>
+              <p>The face tracker runs inside your browser, on your phone.</p>
+            </li>
+            <li>
+              <h3>Nothing saved</h3>
+              <p>No video or photo is recorded, saved or uploaded.</p>
+            </li>
+            <li>
+              <h3>Off when you close</h3>
+              <p>The camera turns off as soon as you close the try-on.</p>
+            </li>
           </ul>
         </section>
       </main>
 
-      <footer className="cg-footer cg-wrap" inert={tryOn}>
+      <footer className="cg-footer cg-wrap" inert={overlayOpen}>
         <p>{DEMO_DISCLAIMER}</p>
+        <p>
+          Reserve, Messenger and availability are sample placeholders. They
+          aren&apos;t connected to CGR.
+        </p>
       </footer>
 
       {tryOn ? <TiaraTryOn onClose={close} /> : null}
+      {sheet?.kind === "reserve" ? (
+        <ReserveSheet onClose={closeSheet} initialGown={sheet.gown} />
+      ) : null}
+      {sheet?.kind === "messenger" ? <MessengerSheet onClose={closeSheet} /> : null}
     </div>
   );
 }
