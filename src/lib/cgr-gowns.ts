@@ -45,6 +45,93 @@ export const MEDIAPIPE_WASM_BASE = `/mediapipe/${MEDIAPIPE_VERSION}/wasm`;
 export const FACE_LANDMARKER_MODEL =
   "/mediapipe/models/face_landmarker-float16-v1.task";
 
+/** MediaPipe Pose Landmarker (lite), self-hosted and SHA-256 pinned like the face model (r6). */
+export const POSE_LANDMARKER_MODEL =
+  "/mediapipe/models/pose_landmarker_lite-float16-v1.task";
+
+/* ---------- "Wear it live" art (r6) ---------- */
+
+/**
+ * true: the real cutouts Apple Dev committed (c5b12f8) under
+ * public/demos/cgr-gowns/wear/. false: the SVG stand-ins in
+ * public/demos/cgr-gowns/wear/placeholder/ (same canvas sizes).
+ * Spec and how to flip: /workspace/cgr-work/wear-assets-spec.md.
+ */
+export const WEAR_ASSETS_REAL = true;
+
+const WEAR_DIR = "/demos/cgr-gowns/wear";
+
+/**
+ * The ONE place every "Wear it live" art path, size and anchor is read from.
+ * Filenames and canvas sizes are the ones given to Chip. Anchor numbers are
+ * MEASURED in the real files (r6): the export stretched the bodice ~1.29x and
+ * squeezed the full gown below the hips ~0.77x to hit the spec lines, so the
+ * spec y-anchors (180/820/1990, 120/900) would warp it. Measured by matching
+ * each cutout back to the source photo and running Pose Landmarker on it.
+ * x: centreX/shoulderW are image px; y anchors can sit outside the canvas.
+ */
+const WEAR_SPEC = {
+  /** Front view, gown only. Strapless, so the shoulder line is above the art. */
+  gownFull: {
+    file: "gown-full.webp",
+    width: 1024,
+    height: 2048,
+    maxKB: 450,
+    centreX: 497,
+    shoulderY: 196,
+    hipY: 929,
+    kneeY: 1367,
+    ankleY: 1723,
+    shoulderW: 490,
+  },
+  /** Bodice only. Its hip line falls just below the canvas. */
+  gownBodice: {
+    file: "gown-bodice.webp",
+    width: 1024,
+    height: 1024,
+    maxKB: 250,
+    centreX: 500,
+    shoulderY: 111,
+    hipY: 1085,
+    shoulderW: 490,
+  },
+  /** Centred; band centreline y=96 at the middle (it curves up to ~85 at the ends). */
+  choker: { file: "choker.webp", width: 512, height: 192, maxKB: 60, bandY: 96, bandW: 390 },
+  /** Both wrists use the same art. */
+  bracelet: { file: "bracelet.webp", width: 256, height: 128, maxKB: 40 },
+} as const;
+
+/** No earring art yet (Apple Dev). The earring code stays; null shows nothing. */
+const EARRINGS = {
+  earringLeft: null as null | { file: string; width: 128; height: 256; hookX: 64; hookY: 16 },
+  earringRight: null as null | { file: string; width: 128; height: 256; hookX: 64; hookY: 16 },
+};
+
+const wearSrc = (file: string) =>
+  WEAR_ASSETS_REAL
+    ? `${WEAR_DIR}/${file}`
+    : `${WEAR_DIR}/placeholder/${file.replace(/\.webp$/, ".svg")}`;
+
+type WithSrc<T> = T & { src: string };
+type WearSpec = typeof WEAR_SPEC;
+type EarringSpec = NonNullable<(typeof EARRINGS)["earringLeft"]>;
+export type WearAssets = { [K in keyof WearSpec]: WithSrc<WearSpec[K]> } & {
+  earringLeft: WithSrc<EarringSpec> | null;
+  earringRight: WithSrc<EarringSpec> | null;
+};
+
+export const WEAR_ASSETS: WearAssets = {
+  ...(Object.fromEntries(
+    Object.entries(WEAR_SPEC).map(([k, v]) => [k, { ...v, src: wearSrc(v.file) }]),
+  ) as { [K in keyof WearSpec]: WithSrc<WearSpec[K]> }),
+  earringLeft: EARRINGS.earringLeft
+    ? { ...EARRINGS.earringLeft, src: wearSrc(EARRINGS.earringLeft.file) }
+    : null,
+  earringRight: EARRINGS.earringRight
+    ? { ...EARRINGS.earringRight, src: wearSrc(EARRINGS.earringRight.file) }
+    : null,
+};
+
 export const cgr = {
   title: "CGR Cavite Gown Rentals · KantoCo sample (not live)",
   description:
