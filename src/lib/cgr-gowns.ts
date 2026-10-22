@@ -42,6 +42,15 @@ export type SampleGown = {
 };
 
 export const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+export const WEEK_DAYS_LONG = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
 
 export const SAMPLE_GOWNS: readonly SampleGown[] = [
   {
@@ -83,3 +92,25 @@ export const SAMPLE_GOWNS: readonly SampleGown[] = [
 ];
 
 export const SAMPLE_LABEL = "Sample data";
+
+/**
+ * The example Messenger question. Gown and day come from SAMPLE_GOWNS so the
+ * copy can never disagree with the calendar: it asks about the preferred day
+ * (Sunday) and, if the data ever marks that day booked, the first free day.
+ */
+const SAMPLE_ASK_GOWN = "crimson-ball";
+const SAMPLE_ASK_PREFERRED_DAY = 6; // Sun
+
+export function sampleMessengerAsk() {
+  const gown = SAMPLE_GOWNS.find((g) => g.id === SAMPLE_ASK_GOWN) ?? SAMPLE_GOWNS[0];
+  const day = gown.week[SAMPLE_ASK_PREFERRED_DAY]
+    ? SAMPLE_ASK_PREFERRED_DAY
+    : Math.max(0, gown.week.findIndex(Boolean));
+  return {
+    gown,
+    dayIndex: day,
+    dayName: WEEK_DAYS_LONG[day],
+    free: gown.week[day],
+    text: `Hi! Is the ${gown.name} free this ${WEEK_DAYS_LONG[day]}? I tried the teal tiara on the site too.`,
+  };
+}

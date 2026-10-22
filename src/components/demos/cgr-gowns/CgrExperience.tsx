@@ -13,7 +13,7 @@ import {
 import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
 import { EarringsArt, GownArt } from "./GownArt";
 import { MessengerSheet, ReserveSheet } from "./SampleSheets";
-import { warmFull, warmLight } from "./mediapipe-warm";
+import { warmFull } from "./mediapipe-warm";
 
 // Camera + tracker code only downloads when someone heads for the button.
 const TiaraTryOn = dynamic(
@@ -147,41 +147,27 @@ export function CgrExperience() {
   const messenger = useCallback(() => setSheet({ kind: "messenger" }), []);
   const overlayOpen = tryOn || sheet !== null;
 
-  // Button in view for 1.5 s: light warm-up (tracker JS + model), skipped on
-  // Save-Data. Hover / focus / pointerdown do the full warm-up incl. wasm.
+  // The face model + wasm (~15 MB) load ONLY when the try-on section itself
+  // scrolls into view, or on tap / pointerdown / focus of a Try button. No
+  // idle or timer trigger, no hover, no rootMargin look-ahead.
   useEffect(() => {
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
-      .connection;
-    if (conn?.saveData || !("IntersectionObserver" in window)) return;
-    let timer = 0;
+    const section = document.getElementById("cg-tryon-section");
+    if (!section || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          if (!timer) {
-            timer = window.setTimeout(() => {
-              warmLight();
-              io.disconnect();
-            }, 1500);
-          }
-        } else if (timer) {
-          window.clearTimeout(timer);
-          timer = 0;
+          io.disconnect();
+          warmFull();
         }
       },
-      { rootMargin: "120px 0px" },
+      { threshold: 0.2 },
     );
-    document
-      .querySelectorAll<HTMLElement>("[data-try-tiara]")
-      .forEach((b) => io.observe(b));
-    return () => {
-      io.disconnect();
-      window.clearTimeout(timer);
-    };
+    io.observe(section);
+    return () => io.disconnect();
   }, []);
 
   const tryProps = (i: number) => ({
     "data-try-tiara": i,
-    onPointerEnter: warmFull,
     onPointerDown: warmFull,
     onFocus: warmFull,
     onClick: open,
@@ -335,7 +321,7 @@ export function CgrExperience() {
           </ul>
         </section>
 
-        <section className="cg-tiara cg-wrap" aria-labelledby="cg-tiara-h">
+        <section id="cg-tryon-section" className="cg-tiara cg-wrap" aria-labelledby="cg-tiara-h">
           <div className="cg-tiara-card">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -372,36 +358,63 @@ export function CgrExperience() {
               {SAMPLE_LABEL}, not CGR&apos;s real calendar
             </p>
           </div>
-          <div className="cg-table-wrap">
-            <table className="cg-table">
-              <thead>
-                <tr>
-                  <th scope="col">Gown</th>
-                  {WEEK_DAYS.map((d) => (
-                    <th key={d} scope="col">
-                      {d}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SAMPLE_GOWNS.map((g) => (
-                  <tr key={g.id}>
-                    <th scope="row">
-                      <span className="cg-swatch" style={{ background: g.color }} />
-                      {g.name}
-                    </th>
-                    {g.week.map((free, i) => (
-                      <td key={WEEK_DAYS[i]}>
-                        <span className={`cg-cell ${free ? "is-free" : "is-booked"}`}>
-                          {free ? "Free" : "Booked"}
-                        </span>
-                      </td>
+          <p className="cg-swipe-hint" aria-hidden="true">
+            <span>Swipe the table to see all 7 days</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M5 12h13m-5-5 5 5-5 5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </p>
+          <div className="cg-table-scroller">
+            <div
+              className="cg-table-wrap"
+              role="region"
+              aria-label="Sample availability, Monday to Sunday. Scrolls sideways on small screens."
+              tabIndex={0}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                el.parentElement?.classList.toggle(
+                  "is-end",
+                  el.scrollLeft + el.clientWidth >= el.scrollWidth - 4,
+                );
+              }}
+            >
+              <table className="cg-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Gown</th>
+                    {WEEK_DAYS.map((d) => (
+                      <th key={d} scope="col">
+                        {d}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {SAMPLE_GOWNS.map((g) => (
+                    <tr key={g.id}>
+                      <th scope="row">
+                        <span className="cg-swatch" style={{ background: g.color }} />
+                        {g.name}
+                      </th>
+                      {g.week.map((free, i) => (
+                        <td key={WEEK_DAYS[i]}>
+                          <span className={`cg-cell ${free ? "is-free" : "is-booked"}`}>
+                            {free ? "Free" : "Booked"}
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <button
             type="button"

@@ -5,6 +5,7 @@ import {
   SAMPLE_GOWNS,
   SAMPLE_LABEL,
   WEEK_DAYS,
+  sampleMessengerAsk,
 } from "@/lib/cgr-gowns";
 
 /** Shared bottom sheet / centred dialog. Esc and backdrop close it. */
@@ -71,10 +72,7 @@ export function MessengerSheet({ onClose }: { onClose: () => void }) {
         any page, so nothing opens and nothing is sent.
       </p>
       <div className="cg-chat" aria-label="Example message (sample)">
-        <p className="cg-chat-bubble">
-          Hi! Is the Crimson ball gown free this Saturday? I tried the teal
-          tiara on the site too.
-        </p>
+        <p className="cg-chat-bubble">{sampleMessengerAsk().text}</p>
         <p className="cg-chat-note">Example message · sample only</p>
       </div>
       <button type="button" className="cg-btn cg-btn-primary cg-btn-wide" onClick={onClose}>

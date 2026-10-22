@@ -1,10 +1,10 @@
 import { FACE_LANDMARKER_MODEL, MEDIAPIPE_WASM_BASE } from "@/lib/cgr-gowns";
 
 /**
- * Warm-up for the try-on, all same-origin. Called when the visitor looks
- * about to tap "Try the tiara" (hover, focus, pointerdown, or the button
- * sitting in view for a moment). Results are memoised; a failed warm-up is
- * forgotten so the real start can retry.
+ * Warm-up for the try-on, all same-origin. Called ONLY when the try-on
+ * section scrolls into view or a Try button gets pointerdown / focus / tap.
+ * Results are memoised; a failed warm-up is forgotten so the real start can
+ * retry.
  */
 let modelBytes: Promise<Uint8Array> | null = null;
 let runtime: Promise<unknown> | null = null;
@@ -45,14 +45,8 @@ export function warmRuntime(): Promise<unknown> {
   return runtime;
 }
 
-/** Light warm-up (button in view): tracker JS + model (~3.8 MB). */
-export function warmLight() {
-  getModelBytes().catch(() => {});
-  import("@mediapipe/tasks-vision").catch(() => {});
-}
-
-/** Full warm-up (hover / focus / pointerdown): adds the ~11 MB wasm. */
+/** Model (~3.7 MB) + tracker JS + the ~11 MB wasm, all into cache. */
 export function warmFull() {
-  warmLight();
+  getModelBytes().catch(() => {});
   warmRuntime().catch(() => {});
 }
