@@ -1000,3 +1000,72 @@
     transition: none;
   }
 }
+
+/* ---- r3: availability table scroll cue (mobile) ---- */
+.cg-table-scroller {
+  position: relative;
+  margin-bottom: 20px;
+}
+.cg-table-scroller .cg-table-wrap {
+  margin-bottom: 0;
+}
+.cg-table-wrap:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 2px;
+}
+.cg-swipe-hint {
+  display: none;
+}
+@media (max-width: 767px) {
+  .cg-swipe-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .cg-table-scroller::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    width: 56px;
+    border-radius: 0 15px 15px 0;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.92) 70%,
+      #fff
+    );
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .cg-table-scroller.is-end::after {
+    opacity: 0;
+  }
+  /* Keep the gown name pinned while the days scroll under it. */
+  .cg-table thead th:first-child,
+  .cg-table tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+    box-shadow: 1px 0 0 var(--line);
+  }
+  .cg-table tbody th {
+    white-space: normal;
+    min-width: 140px;
+    max-width: 148px;
+    padding-left: 34px;
+    text-indent: -20px;
+    line-height: 1.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-table-scroller::after {
+    transition: none;
+  }
+}
