@@ -122,12 +122,18 @@ function GownViewer() {
             in="SourceGraphic"
             type="matrix"
             values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  10 -10 0 0 -1.1"
-            result="dress"
+            result="dressRaw"
           />
+          {/* r6: close the mask (dilate then erode, 3px) so the pale sheen
+              specks inside the hem get the same darkening, then soften it. */}
+          <feMorphology in="dressRaw" operator="dilate" radius="3" result="dressWide" />
+          <feMorphology in="dressWide" operator="erode" radius="3" result="dressClosed" />
+          {/* soften the closed mask's square corners (no blocky patches) */}
+          <feGaussianBlur in="dressClosed" stdDeviation="1.5" result="dress" />
           <feComponentTransfer in="SourceGraphic" result="dark">
-            <feFuncR type="linear" slope="0.56" />
-            <feFuncG type="linear" slope="0.26" />
-            <feFuncB type="linear" slope="0.28" />
+            <feFuncR type="linear" slope="0.50" />
+            <feFuncG type="linear" slope="0.22" />
+            <feFuncB type="linear" slope="0.24" />
           </feComponentTransfer>
           <feComposite in="dark" in2="dress" operator="in" result="darkDress" />
           <feMerge>
