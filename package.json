@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/fetch-mediapipe.mjs && next dev",
-    "build": "node scripts/fetch-mediapipe.mjs && next build",
+    "dev": "node scripts/fetch-mediapipe.mjs && node scripts/copy-draco-decoder.mjs && next dev",
+    "build": "node scripts/fetch-mediapipe.mjs && node scripts/copy-draco-decoder.mjs && next build",
     "start": "next start",
     "lint": "eslint"
   },
