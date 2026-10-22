@@ -38,6 +38,17 @@ const nextConfig: NextConfig = {
       },
       {
         // Versioned, build-time copies: safe to cache for a year.
+        source: "/vendor/draco/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        // Versioned, build-time copies: safe to cache for a year.
         source: "/mediapipe/:path*",
         headers: [
           {

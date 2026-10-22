@@ -1,13 +1,34 @@
 /** CGR Cavite Gown Rentals: unlisted KantoCo sample (not the shop's site). */
 
 /**
- * The gown shown in the 360° viewer. Swap this one path when Apple Dev's
- * real gown .glb lands (e.g. "/demos/cgr-gowns/cgr-red-gown.glb").
- * Current file: a self-made placeholder (lathe-built ball gown on a stand,
- * CC0, no third-party asset).
+ * The gown shown in the 360° viewer.
+ *
+ * REAL: KantoCo's 3D build of the red sequin gown (Blender, Draco-compressed,
+ * 1024 WebP textures, about 0.66 MB). Gown mesh and textures were made by
+ * KantoCo (procedural shape, painted sequins); the headless dress form is
+ * Blender Studio "Human Base Meshes" v1.4.1, CC0. No scan or photo of a
+ * person is in the file. Needs the self-hosted Draco decoder (DRACO_DECODER_BASE).
+ *
+ * PLACEHOLDER: self-made CC0 lathe-built ball gown on a stand (r1).
+ *
+ * Flip GOWN_IS_PLACEHOLDER to switch; both files live in public/demos/cgr-gowns/.
  */
-export const GOWN_MODEL_SRC = "/demos/cgr-gowns/placeholder-gown.gltf";
 export const GOWN_IS_PLACEHOLDER = true;
+
+const REAL_GOWN = {
+  src: "/demos/cgr-gowns/cgr-red-gown.glb",
+  alt: "A red sequin mermaid gown with a nude illusion bodice and a short train, on a headless dress form, shown in 3D. Drag to turn it.",
+  note: "KantoCo 3D sample of the red sequin gown, close to the photo but not exact.",
+} as const;
+
+const PLACEHOLDER_GOWN = {
+  src: "/demos/cgr-gowns/placeholder-gown.gltf",
+  alt: "A red ball gown on a stand, shown in 3D. Drag to turn it.",
+  note: "Stand-in model. The real CGR gown in 3D goes here.",
+} as const;
+
+export const GOWN = GOWN_IS_PLACEHOLDER ? PLACEHOLDER_GOWN : REAL_GOWN;
+export const GOWN_MODEL_SRC = GOWN.src;
 
 /**
  * MediaPipe Face Landmarker, self-hosted. scripts/fetch-mediapipe.mjs copies

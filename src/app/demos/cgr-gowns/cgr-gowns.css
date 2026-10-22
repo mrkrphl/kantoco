@@ -1069,3 +1069,56 @@
     transition: none;
   }
 }
+
+/* ---- r4: light poster until the 360 gown is in view (same box: CLS 0) ---- */
+.cg-poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  padding: 12% 16px 24px;
+  color: #e3d2bf;
+  pointer-events: none;
+}
+.cg-poster-art {
+  width: auto;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+.cg-poster.is-loading .cg-poster-art {
+  animation: cg-poster-pulse 1.4s ease-in-out infinite;
+}
+@keyframes cg-poster-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+.cg-poster-msg {
+  /* same height as the poster button, so swapping them shifts nothing */
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+.cg-poster-btn {
+  margin-top: 12px;
+  pointer-events: auto;
+}
+.cg-btn-light {
+  border-color: #cbb8a4;
+  background: #fff;
+  color: var(--ink);
+}
+.cg-btn-light:hover {
+  background: #fbf6ef;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-poster.is-loading .cg-poster-art {
+    animation: none;
+  }
+}

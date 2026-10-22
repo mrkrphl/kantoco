@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
 import {
-  GOWN_IS_PLACEHOLDER,
+  GOWN,
   GOWN_MODEL_SRC,
   SAMPLE_GOWNS,
   SAMPLE_LABEL,
@@ -14,6 +14,7 @@ import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
 import { EarringsArt, GownArt } from "./GownArt";
 import { MessengerSheet, ReserveSheet } from "./SampleSheets";
 import { warmFull } from "./mediapipe-warm";
+import { DRACO_DECODER_BASE } from "@/lib/cgr-decoders.mjs";
 
 // Camera + tracker code only downloads when someone heads for the button.
 const TiaraTryOn = dynamic(
@@ -23,36 +24,82 @@ const TiaraTryOn = dynamic(
 
 type Sheet = { kind: "reserve"; gown?: string } | { kind: "messenger" } | null;
 
+/**
+ * 360° gown. Nothing 3D loads up front: model-viewer, the Draco decoder and
+ * the .glb are fetched only once the viewer frame is at least 20% on screen
+ * (IntersectionObserver, no rootMargin, no timer) or on pointerdown / focus /
+ * tap of the poster. Until then a light SVG poster holds the same box (CLS 0).
+ */
 function GownViewer() {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [armed, setArmed] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const arm = useCallback(() => setArmed(true), []);
 
   useEffect(() => {
+    const el = frameRef.current;
+    if (!el || !("IntersectionObserver" in window)) {
+      setArmed(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.2)) {
+          io.disconnect();
+          setArmed(true);
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!armed) return;
     let live = true;
+    // Self-hosted Draco decoder (copied from three at build time). Must be set
+    // before model-viewer is defined; the page CSP blocks Google's CDN.
+    const w = self as typeof self & {
+      ModelViewerElement?: Record<string, unknown>;
+    };
+    w.ModelViewerElement = {
+      ...(w.ModelViewerElement ?? {}),
+      dracoDecoderLocation: DRACO_DECODER_BASE,
+    };
     import("@google/model-viewer")
       .then(() => {
         if (!live) return;
-        setReduced(
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-        );
+        setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
         setReady(true);
       })
       .catch(() => {
-        /* viewer stays as the static fallback card */
+        if (live) setFailed(true);
       });
     return () => {
       live = false;
     };
+  }, [armed]);
+
+  const onModel = useCallback((el: HTMLElement | null) => {
+    if (!el) return;
+    el.addEventListener("load", () => setLoaded(true), { once: true });
+    el.addEventListener("error", () => setFailed(true), { once: true });
   }, []);
 
   return (
     <figure className="cg-viewer">
-      <div className="cg-viewer-frame">
+      <div className="cg-viewer-frame" ref={frameRef} data-gown-viewer="">
         {ready ? (
           <model-viewer
+            ref={onModel}
             className="cg-model"
             src={GOWN_MODEL_SRC}
-            alt="A red ball gown on a stand, shown in 3D. Drag to turn it."
+            alt={GOWN.alt}
+            loading="eager"
             camera-controls=""
             {...(reduced ? {} : { "auto-rotate": "" })}
             auto-rotate-delay="0"
@@ -68,20 +115,41 @@ function GownViewer() {
             exposure="1.05"
             disable-pan=""
           />
-        ) : (
-          <p className="cg-viewer-wait">Loading the 3D gown…</p>
-        )}
+        ) : null}
+        {!loaded ? (
+          <div className={`cg-poster${armed ? " is-loading" : ""}`}>
+            <svg className="cg-poster-art" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+              <path
+                d="M84 40 Q100 34 116 40 L118 96 Q100 102 82 96 Z M82 96 Q100 102 118 96 C124 140 120 178 114 198 C132 222 152 238 166 250 Q100 260 34 250 C48 238 68 222 86 198 C80 178 76 140 82 96 Z"
+                fill="currentColor"
+              />
+            </svg>
+            {failed ? (
+              <p className="cg-poster-msg">The 3D gown couldn&apos;t load here.</p>
+            ) : armed ? (
+              <p className="cg-poster-msg" role="status">
+                Loading the 3D gown…
+              </p>
+            ) : (
+              <button
+                type="button"
+                className="cg-btn cg-btn-light cg-poster-btn"
+                onPointerDown={arm}
+                onFocus={arm}
+                onClick={arm}
+              >
+                Turn the gown in 360°
+              </button>
+            )}
+          </div>
+        ) : null}
         <p className="cg-viewer-badge" aria-hidden="true">
           360° · drag
         </p>
       </div>
       <figcaption className="cg-viewer-cap">
         <span>Drag to turn the gown all the way around.</span>
-        {GOWN_IS_PLACEHOLDER ? (
-          <span className="cg-viewer-note">
-            Stand-in model. The real CGR gown in 3D goes here.
-          </span>
-        ) : null}
+        <span className="cg-viewer-note">{GOWN.note}</span>
       </figcaption>
     </figure>
   );
