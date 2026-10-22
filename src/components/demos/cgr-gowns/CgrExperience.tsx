@@ -13,12 +13,18 @@ import {
 import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
 import { EarringsArt, GownArt } from "./GownArt";
 import { MessengerSheet, ReserveSheet } from "./SampleSheets";
-import { warmFull } from "./mediapipe-warm";
+import { warmFull, warmWear } from "./mediapipe-warm";
 import { startGown } from "./gown-prefetch";
 
 // Camera + tracker code only downloads when someone heads for the button.
 const TiaraTryOn = dynamic(
   () => import("./TiaraTryOn").then((m) => m.TiaraTryOn),
+  { ssr: false },
+);
+
+// r6 "Wear it live": camera, pose tracker and gown art load only on tap.
+const WearLive = dynamic(
+  () => import("./WearLive").then((m) => m.WearLive),
   { ssr: false },
 );
 
@@ -291,10 +297,13 @@ export function CgrExperience() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const open = useCallback(() => setTryOn(true), []);
   const close = useCallback(() => setTryOn(false), []);
+  const [wearOn, setWearOn] = useState(false);
+  const openWear = useCallback(() => setWearOn(true), []);
+  const closeWear = useCallback(() => setWearOn(false), []);
   const closeSheet = useCallback(() => setSheet(null), []);
   const reserve = useCallback((gown?: string) => setSheet({ kind: "reserve", gown }), []);
   const messenger = useCallback(() => setSheet({ kind: "messenger" }), []);
-  const overlayOpen = tryOn || sheet !== null;
+  const overlayOpen = tryOn || wearOn || sheet !== null;
 
   // The face model + wasm load on tap / pointerdown / focus of a Try button.
   // Desktop also warms them when the try-on section scrolls into view; phones
@@ -504,6 +513,38 @@ export function CgrExperience() {
           </div>
         </section>
 
+        <section id="cg-wear-section" className="cg-tiara cg-wear cg-wrap" aria-labelledby="cg-wear-h">
+          <div className="cg-tiara-card cg-wear-card">
+            <GownArt shape="mermaid" color="#9b1b2e" shade="#5e0f1b" title="The red sequin mermaid gown" />
+          </div>
+          <div className="cg-tiara-copy">
+            <h2 id="cg-wear-h" className="cg-h2">
+              Wear it live
+            </h2>
+            <p>
+              See the red sequin gown on you in your camera view, with the
+              choker, bracelets and tiara. Whole body in view shows the full
+              gown; closer up shows the bodice.
+            </p>
+            <p className="cg-wear-tip">
+              <strong>Tip:</strong> Step back ~2 m, phone at chest height, face the camera.
+            </p>
+            <p className="cg-wear-honest">
+              It works face-on. Side turns or crossed arms will break it.
+            </p>
+            {/* Pose model + wasm start on pointerdown of this button only (never idle). */}
+            <button
+              type="button"
+              className="cg-btn cg-btn-primary"
+              data-wear-live
+              onPointerDown={warmWear}
+              onClick={openWear}
+            >
+              Wear it live
+            </button>
+          </div>
+        </section>
+
         <section className="cg-avail cg-wrap" aria-labelledby="cg-avail-h">
           <div className="cg-sec-head">
             <h2 id="cg-avail-h" className="cg-h2">
@@ -658,6 +699,7 @@ export function CgrExperience() {
       </footer>
 
       {tryOn ? <TiaraTryOn onClose={close} /> : null}
+      {wearOn ? <WearLive onClose={closeWear} /> : null}
       {sheet?.kind === "reserve" ? (
         <ReserveSheet onClose={closeSheet} initialGown={sheet.gown} />
       ) : null}

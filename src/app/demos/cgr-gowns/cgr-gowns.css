@@ -1272,3 +1272,63 @@
   min-height: 44px;
   padding: 0 16px;
 }
+
+/* ---------- r6: Wear it live ---------- */
+.cg-wear-card {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 640 / 315;
+}
+.cg-wear-card svg {
+  height: 100%;
+  width: auto;
+  max-height: 260px;
+}
+.cg-tiara-copy .cg-wear-tip {
+  color: var(--ink, #2a1a1f);
+}
+.cg-tiara-copy .cg-wear-honest {
+  font-size: 15px;
+}
+/* Mode switch at the bottom, so it never covers the head (tiara) at the top. */
+.cg-wear-modes {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(18, 12, 14, 0.82);
+}
+.cg-wear-mode {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #fbf6ef;
+  font: 600 14px/1 var(--sans);
+  cursor: pointer;
+}
+.cg-wear-mode[aria-pressed="true"] {
+  background: #fbf6ef;
+  color: #120c0e;
+}
+.cg-wear-mode:focus-visible {
+  outline: 3px solid #f2c46b;
+  outline-offset: 2px;
+}
+.cg-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.cg-wear-live .cg-hint {
+  bottom: 72px;
+}
