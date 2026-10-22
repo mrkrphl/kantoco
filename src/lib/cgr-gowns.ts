@@ -79,10 +79,11 @@ export const WEEK_DAYS_LONG = [
 
 export const SAMPLE_GOWNS: readonly SampleGown[] = [
   {
-    id: "crimson-ball",
-    name: "Crimson ball gown",
+    // r5: the 3D gown is a red sequin mermaid, so the card says (and draws) that.
+    id: "red-mermaid",
+    name: "Red sequin mermaid",
     note: "The one in 3D above",
-    shape: "ball",
+    shape: "mermaid",
     color: "#9b1b2e",
     shade: "#5e0f1b",
     week: [true, true, false, true, false, false, true],
@@ -123,7 +124,7 @@ export const SAMPLE_LABEL = "Sample data";
  * copy can never disagree with the calendar: it asks about the preferred day
  * (Sunday) and, if the data ever marks that day booked, the first free day.
  */
-const SAMPLE_ASK_GOWN = "crimson-ball";
+const SAMPLE_ASK_GOWN = "red-mermaid";
 const SAMPLE_ASK_PREFERRED_DAY = 6; // Sun
 
 export function sampleMessengerAsk() {

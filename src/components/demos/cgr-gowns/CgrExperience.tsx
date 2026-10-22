@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DEMO_BADGE, DEMO_DISCLAIMER } from "@/lib/demos";
 import {
   GOWN,
-  GOWN_MODEL_SRC,
   GOWN_POSTER_SIZE,
   SAMPLE_GOWNS,
   SAMPLE_LABEL,
@@ -15,7 +14,7 @@ import { TIARA_IMAGE_SIZE, TIARA_IMAGE_SRC } from "@/lib/cgr-tiara-image";
 import { EarringsArt, GownArt } from "./GownArt";
 import { MessengerSheet, ReserveSheet } from "./SampleSheets";
 import { warmFull } from "./mediapipe-warm";
-import { DRACO_DECODER_BASE } from "@/lib/cgr-decoders.mjs";
+import { startGown } from "./gown-prefetch";
 
 // Camera + tracker code only downloads when someone heads for the button.
 const TiaraTryOn = dynamic(
@@ -26,8 +25,8 @@ const TiaraTryOn = dynamic(
 type Sheet = { kind: "reserve"; gown?: string } | { kind: "messenger" } | null;
 
 /**
- * 360° gown. Nothing 3D loads up front: model-viewer, the Draco decoder and
- * the .glb are fetched only when
+ * 360° gown. Nothing 3D loads up front. model-viewer, the Draco decoder and
+ * the .glb download together, in parallel (gown-prefetch.ts), only when
  *  - phones (coarse pointer or viewport under 768px): the visitor taps, focuses
  *    or presses Enter on "Tap to spin 360°". Never on scroll or idle.
  *  - desktop: the viewer frame is at least 20% on screen (IntersectionObserver,
@@ -41,11 +40,18 @@ const PHONE_QUERY = "(pointer: coarse), (max-width: 767px)";
 function GownViewer() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [armed, setArmed] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [modelSrc, setModelSrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const arm = useCallback(() => setArmed(true), []);
+  // Auto-rotate starts only once model-viewer has swapped its poster for the
+  // first rendered frame, so the handoff is front view to front view (r5).
+  const [revealed, setRevealed] = useState(false);
+  // Start the downloads in the event handler itself (not after a re-render).
+  const arm = useCallback(() => {
+    startGown().catch(() => {});
+    setArmed(true);
+  }, []);
 
   useEffect(() => {
     const el = frameRef.current;
@@ -62,6 +68,7 @@ function GownViewer() {
       (entries) => {
         if (entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.2)) {
           io.disconnect();
+          startGown().catch(() => {});
           setArmed(true);
         }
       },
@@ -74,20 +81,13 @@ function GownViewer() {
   useEffect(() => {
     if (!armed) return;
     let live = true;
-    // Self-hosted Draco decoder (copied from three at build time). Must be set
-    // before model-viewer is defined; the page CSP blocks Google's CDN.
-    const w = self as typeof self & {
-      ModelViewerElement?: Record<string, unknown>;
-    };
-    w.ModelViewerElement = {
-      ...(w.ModelViewerElement ?? {}),
-      dracoDecoderLocation: DRACO_DECODER_BASE,
-    };
-    import("@google/model-viewer")
-      .then(() => {
+    // Viewer code, .glb and Draco all download in parallel (gown-prefetch.ts);
+    // usually already started by the pointerdown that armed us.
+    startGown()
+      .then(({ src }) => {
         if (!live) return;
         setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-        setReady(true);
+        setModelSrc(src);
       })
       .catch(() => {
         if (live) setFailed(true);
@@ -100,22 +100,23 @@ function GownViewer() {
   const onModel = useCallback((el: HTMLElement | null) => {
     if (!el) return;
     el.addEventListener("load", () => setLoaded(true), { once: true });
+    el.addEventListener("poster-dismissed", () => setRevealed(true), { once: true });
     el.addEventListener("error", () => setFailed(true), { once: true });
   }, []);
 
   return (
     <figure className="cg-viewer">
       <div className="cg-viewer-frame" ref={frameRef} data-gown-viewer="">
-        {ready ? (
+        {modelSrc ? (
           <model-viewer
             ref={onModel}
             className="cg-model"
-            src={GOWN_MODEL_SRC}
+            src={modelSrc}
             alt={GOWN.alt}
             {...(GOWN.poster ? { poster: GOWN.poster } : {})}
             loading="eager"
             camera-controls=""
-            {...(reduced ? {} : { "auto-rotate": "" })}
+            {...(reduced || !revealed ? {} : { "auto-rotate": "" })}
             auto-rotate-delay="900"
             rotation-per-second="18deg"
             interaction-prompt="none"
@@ -172,8 +173,8 @@ function GownViewer() {
           {loaded ? null : failed ? (
             <p className="cg-poster-msg">The 3D gown couldn&apos;t load here.</p>
           ) : armed ? (
-            <p className="cg-poster-msg" role="status">
-              Loading the 3D gown…
+            <p className="cg-poster-msg" role="status" aria-label="Loading the 3D gown">
+              Loading 3D…
             </p>
           ) : (
             <button
@@ -259,12 +260,18 @@ export function CgrExperience() {
   const messenger = useCallback(() => setSheet({ kind: "messenger" }), []);
   const overlayOpen = tryOn || sheet !== null;
 
-  // The face model + wasm (~15 MB) load ONLY when the try-on section itself
-  // scrolls into view, or on tap / pointerdown / focus of a Try button. No
-  // idle or timer trigger, no hover, no rootMargin look-ahead.
+  // The face model + wasm load on tap / pointerdown / focus of a Try button.
+  // Desktop also warms them when the try-on section scrolls into view; phones
+  // (coarse pointer or under 768px) never do: tap only (r5).
   useEffect(() => {
     const section = document.getElementById("cg-tryon-section");
-    if (!section || !("IntersectionObserver" in window)) return;
+    if (
+      !section ||
+      window.matchMedia(PHONE_QUERY).matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      return;
+    }
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -321,7 +328,7 @@ export function CgrExperience() {
             <div className="cg-hero-cards">
               <div className="cg-mini">
                 <p className="cg-mini-h">
-                  Crimson ball gown this week{" "}
+                  Red sequin mermaid this week{" "}
                   <span className="cg-sample-tag">{SAMPLE_LABEL}</span>
                 </p>
                 <WeekDots week={SAMPLE_GOWNS[0].week} />
@@ -535,6 +542,54 @@ export function CgrExperience() {
           >
             Reserve a free day <span className="cg-btn-tag">sample</span>
           </button>
+        </section>
+
+        {/* r5: SAMPLE visit info. Placeholder details only: no real CGR phone,
+            address or links, and nothing here is a tel:/mailto:/map link. */}
+        <section className="cg-info cg-wrap" aria-labelledby="cg-info-h">
+          <div className="cg-sec-head">
+            <h2 id="cg-info-h" className="cg-h2">
+              Hours, location &amp; contact
+            </h2>
+            <p className="cg-sample-tag">Sample details, not CGR&apos;s real info</p>
+          </div>
+          <ul className="cg-info-cols">
+            <li className="cg-info-col">
+              <h3>Hours</h3>
+              <dl className="cg-info-dl">
+                <div>
+                  <dt>Mon–Sat</dt>
+                  <dd>10:00 AM – 7:00 PM</dd>
+                </div>
+                <div>
+                  <dt>Sun</dt>
+                  <dd>Fittings by appointment</dd>
+                </div>
+              </dl>
+              <p className="cg-info-note">Sample hours</p>
+            </li>
+            <li className="cg-info-col">
+              <h3>Location</h3>
+              <p>
+                Sample Street, Brgy. Sample
+                <br />
+                Cavite, Philippines
+              </p>
+              <p className="cg-info-note">Placeholder address, no map</p>
+            </li>
+            <li className="cg-info-col">
+              <h3>Contact</h3>
+              <p>
+                Phone: <span className="cg-info-fake">09XX XXX XXXX</span>
+                <br />
+                Email: <span className="cg-info-fake">hello@sample.invalid</span>
+              </p>
+              <p className="cg-info-note">Placeholders, not linked</p>
+              <button type="button" className="cg-btn cg-btn-small" onClick={messenger}>
+                Messenger <span className="cg-btn-tag">sample</span>
+              </button>
+            </li>
+          </ul>
         </section>
 
         <section className="cg-privacy-block cg-wrap" aria-labelledby="cg-priv-h">

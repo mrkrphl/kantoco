@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { GownShape } from "@/lib/cgr-gowns";
 
 /** Flat gown illustrations (no people, no photos). viewBox 200x260. */
@@ -29,7 +30,8 @@ export function GownArt({
   shade: string;
   title: string;
 }) {
-  const id = `g-${shape}`;
+  // Unique per drawing: two gowns can share a shape (two mermaids).
+  const id = `g-${shape}-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   return (
     <svg
       className="cg-art"

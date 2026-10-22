@@ -1111,9 +1111,13 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Scaled to the 3D camera's front framing (0deg 85deg), so the handoff
-     doesn't jump: measured at 390 and 1440. */
-  transform: translateY(-3%) scale(0.865);
+  /* r5: fitted to the 3D camera's first frame (0deg 85deg, turntable 0) by
+     a silhouette grid search at 360, 390 and 1440 (scale 0.865-0.870, shift
+     +1.75%..+2.25% of the frame, all three agree), so the arms and hem don't
+     double up mid-fade. The tone filter keeps the #878789 gray fixed (no box)
+     while moving the still's reds and whites toward the WebGL render. */
+  transform: translateY(2%) scale(0.868);
+  filter: brightness(0.99) contrast(1.2) saturate(1.15);
 }
 /* model-viewer's poster slot holds the same webp with the same framing. */
 .cg-mv-poster {
@@ -1175,5 +1179,74 @@
   .cg-poster.is-loading .cg-poster-img,
   .cg-poster.is-loading .cg-poster-art {
     animation: none;
+  }
+}
+
+/* ---- r5 ---- */
+/* Loading status: top-right corner, off the gown (it sat on the hem). */
+.cg-poster-msg {
+  top: 14px;
+  right: 14px;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+/* SAMPLE hours / location / contact: three columns on desktop, stacked on phones. */
+.cg-info {
+  padding-top: clamp(32px, 6vh, 56px);
+  padding-bottom: clamp(32px, 6vh, 56px);
+  border-top: 1px solid var(--line);
+}
+.cg-info-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cg-info-col {
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: var(--card);
+}
+.cg-info-col h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.cg-info-col p,
+.cg-info-dl {
+  margin: 0 0 10px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.cg-info-dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cg-info-dl dt {
+  font-weight: 600;
+}
+.cg-info-dl dd {
+  margin: 0;
+  text-align: right;
+}
+.cg-info-fake {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cg-info-col .cg-info-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+@media (max-width: 899px) {
+  .cg-info-cols {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 }
