@@ -1,0 +1,395 @@
+/* CGR Cavite Gown Rentals: unlisted KantoCo sample. Scoped to .cg-* */
+.cg-root {
+  --bg: #fbf6ef;
+  --card: #f3eadf;
+  --ink: #1e1418;
+  --muted: #5a474e;
+  --red: #8a1c2b;
+  --red-ink: #fff8f2;
+  --gold: #7a5a1e;
+  --line: #e2d4c4;
+  --bar-h: 36px;
+  --pad: clamp(20px, 5vw, 56px);
+  --serif: var(--font-body), Georgia, "Times New Roman", serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.cg-wrap {
+  width: 100%;
+  max-width: calc(1120px + 2 * var(--pad));
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* SAMPLE | NOT LIVE bar */
+.cg-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: var(--bar-h);
+  display: flex;
+  align-items: center;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.cg-bar-inner {
+  width: 100%;
+  max-width: calc(1120px + 2 * var(--pad));
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+.cg-bar-short {
+  display: none;
+}
+
+/* Hero */
+.cg-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  padding-top: clamp(32px, 6vh, 72px);
+  padding-bottom: clamp(40px, 6vh, 72px);
+}
+.cg-eyebrow {
+  margin: 0 0 14px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.cg-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(44px, 6.4vw, 84px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.cg-title span {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.56em;
+  letter-spacing: -0.01em;
+  margin-top: 0.22em;
+  color: var(--red);
+}
+.cg-lede {
+  margin: 22px 0 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: clamp(17px, 1.5vw, 19px);
+}
+.cg-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cg-small {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Buttons: 48px tall, 44px+ tap targets */
+.cg-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 44px;
+  padding: 0 22px;
+  border: 1.5px solid var(--red);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--red);
+  font: 600 16px/1 var(--sans);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.cg-btn:hover {
+  background: rgba(138, 28, 43, 0.08);
+}
+.cg-btn:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+.cg-btn-primary {
+  background: var(--red);
+  color: var(--red-ink);
+}
+.cg-btn-primary:hover {
+  background: #74131f;
+}
+
+/* 3D viewer: fixed aspect box, so no layout shift when it loads */
+.cg-viewer {
+  margin: 0;
+}
+.cg-viewer-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% 30%, #fffaf3 0%, #efe3d4 70%, #e7d8c6 100%);
+}
+.cg-model {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  --poster-color: transparent;
+  --progress-bar-color: transparent;
+}
+.cg-viewer-wait {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.cg-viewer-cap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.cg-viewer-note {
+  color: var(--gold);
+}
+
+/* Tiara section */
+.cg-tiara {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  padding-top: clamp(32px, 6vh, 64px);
+  padding-bottom: clamp(32px, 6vh, 64px);
+  border-top: 1px solid var(--line);
+}
+.cg-tiara-card {
+  border-radius: 20px;
+  background: var(--card);
+  padding: clamp(20px, 4vw, 48px);
+}
+.cg-tiara-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 640 / 315;
+}
+.cg-h2 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height: 1.1;
+}
+.cg-tiara-copy p {
+  margin: 0 0 22px;
+  color: var(--muted);
+  max-width: 40ch;
+}
+
+.cg-privacy-block {
+  padding-top: clamp(32px, 6vh, 56px);
+  padding-bottom: clamp(32px, 6vh, 56px);
+  border-top: 1px solid var(--line);
+}
+.cg-list {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--muted);
+}
+.cg-list li + li {
+  margin-top: 6px;
+}
+
+.cg-footer {
+  padding-top: 24px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+.cg-footer p {
+  margin: 0;
+}
+
+/* Try-on dialog */
+.cg-tryon {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: #120c0e;
+  color: #fbf6ef;
+  font-family: var(--sans);
+}
+.cg-tryon-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+}
+.cg-tryon-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 22px;
+}
+.cg-btn-ghost {
+  border-color: rgba(251, 246, 239, 0.7);
+  color: #fbf6ef;
+}
+.cg-btn-ghost:hover {
+  background: rgba(251, 246, 239, 0.12);
+}
+.cg-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
+  overflow: hidden;
+  background: #000;
+}
+.cg-video,
+.cg-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.cg-video {
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.cg-overlay {
+  pointer-events: none;
+}
+.cg-stage-msg {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  margin-inline: auto;
+  max-width: 420px;
+  padding: 18px 20px 20px;
+  border-radius: 16px;
+  background: rgba(18, 12, 14, 0.88);
+  text-align: center;
+}
+.cg-stage[data-status="nocamera"] .cg-stage-msg,
+.cg-stage[data-status="unsupported"] .cg-stage-msg,
+.cg-stage[data-status="denied"] .cg-stage-msg,
+.cg-stage[data-status="busy"] .cg-stage-msg,
+.cg-stage[data-status="error"] .cg-stage-msg {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+.cg-stage-msg-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 18px;
+}
+.cg-stage-msg-body {
+  margin: 0;
+  font-size: 15px;
+  color: #e9ddd2;
+}
+.cg-stage-msg .cg-btn {
+  margin-top: 16px;
+  border-color: #fbf6ef;
+  color: #fbf6ef;
+}
+.cg-stage-tiara {
+  display: block;
+  width: 70%;
+  height: auto;
+  aspect-ratio: 640 / 315;
+  margin: 16px auto 0;
+}
+.cg-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(18, 12, 14, 0.8);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.cg-privacy {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+  font-size: 13px;
+  line-height: 1.45;
+  color: #e9ddd2;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .cg-root {
+    font-size: 16px;
+  }
+  .cg-bar {
+    font-size: 11px;
+  }
+  .cg-bar-full {
+    display: none;
+  }
+  .cg-bar-short {
+    display: inline;
+  }
+  .cg-hero,
+  .cg-tiara {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cg-hero {
+    padding-top: 28px;
+  }
+  .cg-viewer-frame {
+    aspect-ratio: 1 / 1;
+  }
+  .cg-actions .cg-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-btn {
+    transition: none;
+  }
+}
