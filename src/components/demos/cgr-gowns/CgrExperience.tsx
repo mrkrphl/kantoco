@@ -26,10 +26,14 @@ type Sheet = { kind: "reserve"; gown?: string } | { kind: "messenger" } | null;
 
 /**
  * 360° gown. Nothing 3D loads up front: model-viewer, the Draco decoder and
- * the .glb are fetched only once the viewer frame is at least 20% on screen
- * (IntersectionObserver, no rootMargin, no timer) or on pointerdown / focus /
- * tap of the poster. Until then a light SVG poster holds the same box (CLS 0).
+ * the .glb are fetched only when
+ *  - phones (coarse pointer or viewport under 768px): the visitor taps, focuses
+ *    or presses Enter on "Tap to spin 360°". Never on scroll or idle.
+ *  - desktop: the viewer frame is at least 20% on screen (IntersectionObserver,
+ *    no rootMargin, no timer), or the same tap / focus on the poster.
+ * Until then a light SVG poster holds the same box (CLS 0).
  */
+const PHONE_QUERY = "(pointer: coarse), (max-width: 767px)";
 function GownViewer() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [armed, setArmed] = useState(false);
@@ -41,8 +45,13 @@ function GownViewer() {
 
   useEffect(() => {
     const el = frameRef.current;
-    if (!el || !("IntersectionObserver" in window)) {
-      setArmed(true);
+    // Phones never auto-load the 3D gown: tap only. (No IntersectionObserver:
+    // the poster button still loads it.)
+    if (
+      !el ||
+      window.matchMedia(PHONE_QUERY).matches ||
+      !("IntersectionObserver" in window)
+    ) {
       return;
     }
     const io = new IntersectionObserver(
@@ -138,7 +147,7 @@ function GownViewer() {
                 onFocus={arm}
                 onClick={arm}
               >
-                Turn the gown in 360°
+                Tap to spin 360°
               </button>
             )}
           </div>
