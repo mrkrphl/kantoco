@@ -13,7 +13,7 @@
  *
  * Flip GOWN_IS_PLACEHOLDER to switch; both files live in public/demos/cgr-gowns/.
  */
-export const GOWN_IS_PLACEHOLDER = true;
+export const GOWN_IS_PLACEHOLDER = false;
 
 const REAL_GOWN = {
   src: "/demos/cgr-gowns/cgr-red-gown.glb",
