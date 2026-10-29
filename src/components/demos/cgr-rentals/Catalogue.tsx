@@ -19,6 +19,7 @@ import {
   type GownSize,
 } from "@/lib/cgr-rentals";
 import { VisitSection } from "@/components/demos/cgr-rentals/Visit";
+import { Story } from "@/components/demos/cgr-rentals/Story";
 
 export function Catalogue() {
   const [cat, setCat] = useState<GownCategory | "all">("all");
@@ -36,66 +37,10 @@ export function Catalogue() {
 
   return (
     <>
-      <section className="cgr-wrap cgr-hero" aria-labelledby="cgr-hero-title">
-        <div className="cgr-hero-media">
-          <Link
-            href={`${CGR_BASE}/gown/red-sequin-evening`}
-            className="cgr-hero-main"
-          >
-            <img
-              src={`${CGR_ASSET}/gown-red-full.webp`}
-              alt="Deep red sequin evening gown, full length. Face-free cutout."
-              width={1024}
-              height={2048}
-              fetchPriority="high"
-              decoding="async"
-            />
-            <span className="cgr-hero-tag">Red sequin evening gown</span>
-          </Link>
-          <Link
-            href={`${CGR_BASE}/gown/blue-ball-gown`}
-            className="cgr-hero-side"
-          >
-            <img
-              src={`${CGR_ASSET}/gown-blue-1.webp`}
-              alt="Icy blue ball gown on a headless mannequin."
-              width={896}
-              height={912}
-              fetchPriority="high"
-              decoding="async"
-            />
-            <span className="cgr-hero-tag">Icy blue ball gown</span>
-          </Link>
-          <Link
-            href={`${CGR_BASE}/gown/red-lace-corset`}
-            className="cgr-hero-side"
-          >
-            <img
-              src={`${CGR_ASSET}/gown-red-detail.webp`}
-              alt="Close-up of a red gown's beaded lace bodice."
-              width={570}
-              height={1280}
-              decoding="async"
-            />
-            <span className="cgr-hero-tag">Beaded lace detail</span>
-          </Link>
-        </div>
-        <div className="cgr-hero-copy">
-          <h1 className="cgr-h1" id="cgr-hero-title">
-            Rent the look. Hold the date.
-          </h1>
-          <p className="cgr-lead">{cgr.tagline}</p>
-          <div className="cgr-hero-actions">
-            <a className="cgr-btn cgr-btn-primary" href="#gowns">
-              Browse gowns
-            </a>
-            <a className="cgr-btn cgr-btn-secondary" href="#accessories">
-              Accessories
-            </a>
-          </div>
-          <p className="cgr-note">{cgr.sampleNote}</p>
-        </div>
-      </section>
+      <Story />
+      <div className="cgr-wrap">
+        <p className="cgr-note cgr-story-note">{cgr.sampleNote}</p>
+      </div>
 
       <div className="cgr-wrap cgr-sec-head" id="gowns">
         <h2 className="cgr-h2">Gowns</h2>
