@@ -56,6 +56,18 @@ void main() {
 
 type Tex = { tex: WebGLTexture; w: number; h: number };
 
+/**
+ * Low-end / data-saver check for the GPU extras (ripple, alpha hero canvas):
+ * 4 or fewer cores, 4 GB or less device memory, or prefers-reduced-data.
+ */
+export function isLowEndDevice(): boolean {
+  if (typeof navigator === "undefined") return true;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  if ((nav.hardwareConcurrency || 8) <= 4) return true;
+  if (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) return true;
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-data: reduce)").matches;
+}
+
 export type Ripple = {
   attach: (host: HTMLElement, src: string) => void;
   move: (u: number, v: number) => void;

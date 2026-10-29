@@ -12,7 +12,7 @@ import {
   type Gown,
 } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
-import { createRipple, type Ripple } from "./ripple";
+import { createRipple, isLowEndDevice, type Ripple } from "./ripple";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -189,25 +189,31 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       },
     });
 
-    // WebGL ripple on hover (fine pointers only).
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    // WebGL ripple on hover: fine pointers on capable devices only. Touch /
+    // coarse pointers, low-end devices and prefers-reduced-data get the CSS
+    // sheen instead (no WebGL context at all).
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches && !isLowEndDevice();
     let ripple: Ripple | null = null;
-    if (fine) {
-      ripple = createRipple();
-      root.dataset.gl = ripple ? "on" : "off";
-    }
+    if (fine) ripple = createRipple();
+    root.dataset.gl = ripple ? "on" : "off";
     const medias = cards.map((c) => c.querySelector<HTMLElement>(".cgr-cf-media"));
     const enter = (i: number) => () => {
       const m = medias[i];
+      hoverRect = m ? m.getBoundingClientRect() : null;
       if (ripple && m) ripple.attach(m, `${CGR_ASSET}/${items[i].images[0].file}.webp`);
     };
+    // The card rect is read once on enter, not on every pointermove.
+    let hoverRect: DOMRect | null = null;
     const move = (i: number) => (e: PointerEvent) => {
       const m = medias[i];
       if (!ripple || !m) return;
-      const r = m.getBoundingClientRect();
+      const r = hoverRect ?? (hoverRect = m.getBoundingClientRect());
       ripple.move((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
     };
-    const leave = () => ripple?.detach();
+    const leave = () => {
+      hoverRect = null;
+      ripple?.detach();
+    };
     const handlers = medias.map((_, i) => ({ en: enter(i), mv: move(i) }));
     if (fine) {
       medias.forEach((m, i) => {
