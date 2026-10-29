@@ -16,15 +16,20 @@ import {
   useBookings,
 } from "@/components/demos/cgr-rentals/bookings";
 
+const COUNTED = new Set<BookingStatus>(["confirmed", "out", "returned"]);
+
 export function OwnerView() {
   const stored = useBookings();
   const ready = stored !== null;
   const list: Booking[] = useMemo(() => stored ?? [], [stored]);
 
+  // Only confirmed holds earn commission (incl. ones later marked out /
+  // returned). Pending and cancelled never count.
   const billable = useMemo(
-    () => list.filter((b) => b.status !== "cancelled"),
+    () => list.filter((b) => COUNTED.has(b.status)),
     [list],
   );
+  const pending = list.filter((b) => b.status === "pending").length;
   const commission = billable.length * COMMISSION_PHP;
 
   function onStatus(ref: string, status: BookingStatus) {
@@ -45,8 +50,11 @@ export function OwnerView() {
           <p className="cgr-stat-kicker">Commission</p>
           <p className="cgr-stat-num">{formatPhp(commission)}</p>
           <p className="cgr-stat-sub">
-            {billable.length} booking{billable.length === 1 ? "" : "s"} ×{" "}
-            {formatPhp(COMMISSION_PHP)}
+            {billable.length} confirmed booking
+            {billable.length === 1 ? "" : "s"} × {formatPhp(COMMISSION_PHP)}
+          </p>
+          <p className="cgr-stat-sub cgr-stat-fine">
+            Pending ({ready ? pending : 0}) and cancelled are not counted.
           </p>
         </div>
       </div>

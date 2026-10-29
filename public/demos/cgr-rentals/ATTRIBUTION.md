@@ -7,6 +7,7 @@ for this private KantoCo sample only.
 - `gown-red-*.webp` — red sequin evening gown (cutouts / bodice / skirt crops; no faces)
 - `gown-blue-*.webp` — icy blue ball gown on a headless mannequin (FB photo grid crops)
 - `accessories-tiaras*.webp` — tiara display crops (person and payment QR cropped out)
+- `accessory-tiara-ruby.webp`, `accessory-tiara-rose.webp` — single-tiara crops from `accessories-tiaras-2.webp` (no faces)
 - `accessory-choker.webp`, `accessory-bracelet.webp` — accessory cutouts
 
 Prices, sizes and booked dates in the sample app are **mock / sample data**.

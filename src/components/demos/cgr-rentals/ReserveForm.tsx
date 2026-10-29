@@ -112,8 +112,7 @@ export function ReserveForm({
           <h1 className="cgr-h1 cgr-h1-sm">Reservation request</h1>
           <p className="cgr-lead">
             Saves a sample booking in this browser (localStorage) with a{" "}
-            <strong>CGR-XXXX</strong> reference so the ₱200 commission can be
-            counted in Owner. Nothing is sent to the shop.
+            <strong>CGR-XXXX</strong> reference. Nothing is sent to the shop.
           </p>
           <dl className="cgr-specs">
             <div>

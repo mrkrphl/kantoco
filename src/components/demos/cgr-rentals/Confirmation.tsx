@@ -3,9 +3,7 @@
 import Link from "next/link";
 import {
   CGR_BASE,
-  COMMISSION_PHP,
   STATUS_LABEL,
-  formatPhp,
   type Booking,
 } from "@/lib/cgr-rentals";
 import { useBookings } from "@/components/demos/cgr-rentals/bookings";
@@ -47,8 +45,8 @@ export function Confirmation({ refCode }: { refCode: string }) {
         {booking.ref}
       </p>
       <p className="cgr-lead">
-        Sample booking only — stored in this browser. Owner can change status
-        and count commission at {formatPhp(COMMISSION_PHP)} per booking.
+        Sample booking only — stored in this browser. The shop confirms your
+        hold; bring this code when you fit or pick up.
       </p>
       <dl className="cgr-specs cgr-specs-wide">
         <div>
