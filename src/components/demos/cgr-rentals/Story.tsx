@@ -17,7 +17,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  * mode "loop" is a muted, playsinline autoplay loop. Reduced motion: poster only.
  */
 export const HERO_VIDEO: { src: string | null; mode: "scrub" | "loop" } = {
-  src: null,
+  src: `${CGR_ASSET}/cgr-gown-360-web.mp4`,
   mode: "scrub",
 };
 
@@ -179,16 +179,23 @@ export function Story() {
       if (video && useVideo && mode === "scrub") {
         let target = 0;
         let raf = 0;
+        let seekAt = 0;
         const apply = () => {
           raf = 0;
-          if (!video.duration || video.seeking) return;
+          if (!video.duration) return;
+          // One seek in flight; if a seek has hung for 250ms, supersede it.
+          if (video.seeking && performance.now() - seekAt < 250) return;
           const t = target * (video.duration - 0.05);
-          if (Math.abs(video.currentTime - t) > 0.02) video.currentTime = t;
+          if (Math.abs(video.currentTime - t) > 0.02) {
+            seekAt = performance.now();
+            video.currentTime = t;
+          }
         };
         const onSeeked = () => {
           if (!raf) raf = requestAnimationFrame(apply);
         };
         video.addEventListener("seeked", onSeeked);
+        video.addEventListener("loadedmetadata", onSeeked);
         // iOS needs a play() gesture-free unlock before seeks paint.
         void video.play().then(() => video.pause()).catch(() => {});
         const st = ScrollTrigger.create({
@@ -203,6 +210,7 @@ export function Story() {
         return () => {
           st.kill();
           video.removeEventListener("seeked", onSeeked);
+          video.removeEventListener("loadedmetadata", onSeeked);
           if (raf) cancelAnimationFrame(raf);
         };
       }
@@ -229,9 +237,9 @@ export function Story() {
                 muted
                 playsInline
                 preload="auto"
-                width={480}
-                height={848}
-                aria-label="Sample 360° turntable render of the red sequin evening gown."
+                width={540}
+                height={960}
+                aria-label="Sample render: the red sequin evening gown turning 360° on a faceless mannequin."
               >
                 <source src={src} type="video/mp4" />
               </video>
@@ -247,7 +255,7 @@ export function Story() {
               />
             )}
           </div>
-          {src ? <p className="cgr-story-render">Sample render</p> : null}
+          {useVideo ? <p className="cgr-story-render">Sample render</p> : null}
         </div>
 
         <Layer name="red" pieces={RED} />

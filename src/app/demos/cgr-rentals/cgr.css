@@ -1,6 +1,7 @@
 html:has(.cgr),
 html:has(.cgr) body {
   background: #f4efe8;
+  scroll-behavior: auto;
   height: auto;
   min-height: 100%;
   overflow-x: clip;
@@ -1013,13 +1014,15 @@ html:has(.cgr) body {
   top: 5%;
   bottom: 5%;
   right: 12%;
-  aspect-ratio: 480 / 848;
+  aspect-ratio: 9 / 16;
   z-index: 1;
 }
 
 .cgr-story-turn {
   width: 100%;
   height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
   will-change: transform, opacity;
 }
 
@@ -1193,7 +1196,7 @@ html:has(.cgr) body {
   .cgr-story-turnbox {
     top: 3%;
     bottom: auto;
-    height: 52%;
+    height: 58%;
     right: auto;
     left: 50%;
     transform: translateX(-50%);
@@ -1267,6 +1270,10 @@ html:has(.cgr) body {
     display: flex;
     flex-direction: column;
     gap: 22px;
+  }
+
+  .cgr-story-step {
+    align-self: stretch;
   }
 
   .cgr-story-step + .cgr-story-step .cgr-story-title {
