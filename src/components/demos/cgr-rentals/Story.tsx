@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -70,6 +70,8 @@ const FLOATS = [
   { k: "rent", speed: 1.9 },
 ] as const;
 
+const noopSubscribe = () => () => {};
+
 function armInline(video: HTMLVideoElement) {
   video.muted = true;
   video.defaultMuted = true;
@@ -86,6 +88,10 @@ export function Story() {
   const src = HERO_VIDEO.src;
   const mode = HERO_VIDEO.mode;
   const useVideo = Boolean(src) && !reduced;
+  // The server can't know the motion preference, so the SSR <video> has no
+  // <source>: nothing downloads until the client has ruled out reduced motion
+  // (reduced motion then shows mavy-poster.jpg only, with no mp4 request).
+  const onClient = useSyncExternalStore(noopSubscribe, () => true, () => false);
   // The "Sample render" label shows only once a clip has a decoded frame.
   const [hasFrames, setHasFrames] = useState(false);
 
@@ -110,7 +116,7 @@ export function Story() {
       video.removeEventListener("loadeddata", onData);
       if (tryPlay) video.removeEventListener("canplay", tryPlay);
     };
-  }, [useVideo, mode]);
+  }, [useVideo, mode, onClient]);
 
   useGSAP(
     () => {
@@ -369,7 +375,7 @@ export function Story() {
         frame.style.clipPath = "";
       };
     },
-    { scope: rootRef, dependencies: [ready, reduced, mode, useVideo] },
+    { scope: rootRef, dependencies: [ready, reduced, mode, useVideo, onClient] },
   );
 
   const hours = cgr.hours[0];
@@ -512,7 +518,7 @@ export function Story() {
                   preload="auto"
                   aria-label="Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
                 >
-                  <source src={src} type="video/mp4" />
+                  {onClient ? <source src={src} type="video/mp4" /> : null}
                 </video>
               ) : HERO_CLIP ? (
                 <img
