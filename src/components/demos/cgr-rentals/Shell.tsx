@@ -34,7 +34,6 @@ export function CgrShell({
             <Link href={CGR_BASE} className="cgr-name">
               {cgr.name}
             </Link>
-            <p className="cgr-chip">{cgr.chip}</p>
           </div>
           <nav aria-label="Sample app">
             <ul className="cgr-nav">
