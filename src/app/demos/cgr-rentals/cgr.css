@@ -2437,6 +2437,21 @@ html.cgr-has-cursor [data-cursor="rent"] * {
   bottom: auto;
 }
 
+/* Desktop: "Rent now" floats right of her, below the S, clear of the tagline. */
+@media (min-width: 861px) {
+  .cgr-intro[data-clip="on"] .cgr-float-rent { right: -40%; bottom: 22%; }
+}
+
+/* Phone: the word fills the top band, so the label moves to the right edge below it. */
+@media (max-width: 860px) {
+  .cgr-intro[data-clip="on"] .cgr-intro-render {
+    top: 23%;
+    left: auto;
+    right: max(12px, calc(50% - 50vw + 12px));
+    translate: 0 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cgr-intro[data-clip="on"] .cgr-intro-arch {
     top: calc(var(--hero-h) / 2);
