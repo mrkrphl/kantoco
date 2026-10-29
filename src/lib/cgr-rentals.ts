@@ -24,12 +24,8 @@ export const cgr = {
   maps: "https://www.google.com/maps/search/?api=1&query=Cavite+Gown+Rentals+Jose+Abad+Santos+Ave+Salawag+Dasmarinas",
   address: "071 Lolit Bldg, Jose Abad Santos Ave, Salawag, Dasmariñas, Cavite",
   hoursNote:
-    "Public listings disagree (some say open daily 9–8; some say closed Wed/Thu). Confirm on Facebook before you go.",
-  hours: [
-    { day: "Mon–Tue", time: "9:00 AM – 8:00 PM" },
-    { day: "Wed–Thu", time: "Confirm on Facebook" },
-    { day: "Fri–Sun", time: "9:00 AM – 8:00 PM" },
-  ] as const,
+    "Sample hours from the shop's public listing. Confirm on Facebook before you go.",
+  hours: [{ day: "Mon–Sun", time: "9:00 AM – 8:00 PM" }] as const,
   sampleNote:
     "Sample data only. Prices, sizes and booked dates are mocked for this KantoCo preview. Photos are face-free crops from the shop's public Facebook / Maps listings.",
   credit:
