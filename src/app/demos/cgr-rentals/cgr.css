@@ -1,6 +1,6 @@
 html:has(.cgr),
 html:has(.cgr) body {
-  background: #f4efe8;
+  background: #000;
   scroll-behavior: auto;
   height: auto;
   min-height: 100%;
@@ -8,16 +8,18 @@ html:has(.cgr) body {
 }
 
 .cgr {
-  --bg: #f4efe8;
-  --type: #1c1418;
-  --accent: #7a1f2b;
-  --accent-ink: #fff8f4;
-  --muted: #5e534c;
-  --card: #fffdf9;
-  --line: color-mix(in srgb, var(--type) 14%, var(--bg));
-  --band: color-mix(in srgb, var(--type) 6%, var(--bg));
-  --ok: #1f5c3a;
-  --no: #8a1c1c;
+  /* Round 5: full dark. Rose accent on near-black; AA checked on --bg and --card. */
+  color-scheme: dark;
+  --bg: #000;
+  --type: #f6eee9;
+  --accent: #f2a7b4;
+  --accent-ink: #1c1418;
+  --muted: #c2b4ae;
+  --card: #141013;
+  --line: rgb(255 248 244 / 0.16);
+  --band: #0d0a0c;
+  --ok: #86d8a6;
+  --no: #ff9d9d;
   --bar-h: 36px;
   --wrap: clamp(20px, 4vw, 64px);
   --max: 1180px;
@@ -1337,7 +1339,7 @@ html:has(.cgr) body {
   background: #000;
   clip-path: inset(0 round 50% 50% 22px 22px / 30% 30% 22px 22px);
   transform-origin: 50% 50%;
-  will-change: transform, clip-path;
+  will-change: transform;
 }
 
 .cgr-intro-media {
@@ -2030,13 +2032,13 @@ html:has(.cgr) body {
 }
 
 .cgr-lb-book {
-  --lb-shift: -1;
   position: relative;
   width: min(100%, 860px);
   aspect-ratio: 2 / 1.36;
   margin-inline: auto;
   perspective: 2000px;
-  transform: translateX(calc(var(--lb-shift) * 25%));
+  /* JS writes translate3d directly while turning (no CSS-var restyle). */
+  transform: translate3d(-25%, 0, 0);
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -2060,7 +2062,15 @@ html:has(.cgr) body {
   height: 100%;
   transform-origin: 0 50%;
   transform-style: preserve-3d;
+}
+
+/* Layers are promoted only while a page turns. */
+.cgr-lb-book.is-flipping .cgr-lb-leaf {
   will-change: transform;
+}
+
+.cgr-lb-book.is-flipping .cgr-lb-shade {
+  will-change: opacity;
 }
 
 .cgr-lb-face {
@@ -2069,28 +2079,27 @@ html:has(.cgr) body {
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  background: #fffaf3;
+  background: #171115;
   color: var(--type);
+  border: 1px solid rgb(255 248 244 / 0.1);
   border-radius: 4px 14px 14px 4px;
-  box-shadow: 0 18px 40px rgb(28 20 24 / 0.18), inset 10px 0 18px -12px rgb(28 20 24 / 0.35);
 }
 
 .cgr-lb-back {
   transform: rotateY(180deg);
   border-radius: 14px 4px 4px 14px;
-  box-shadow: 0 18px 40px rgb(28 20 24 / 0.18), inset -10px 0 18px -12px rgb(28 20 24 / 0.35);
 }
 
 .cgr-lb-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to left, rgb(28 20 24 / 0.6), rgb(28 20 24 / 0.1));
-  opacity: var(--lb-shade, 0);
+  background: linear-gradient(to left, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.15));
+  opacity: 0;
   pointer-events: none;
 }
 
 .cgr-lb-back .cgr-lb-shade {
-  background: linear-gradient(to right, rgb(28 20 24 / 0.6), rgb(28 20 24 / 0.1));
+  background: linear-gradient(to right, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.15));
 }
 
 .cgr-lb-cover {
@@ -2292,7 +2301,8 @@ html:has(.cgr) body {
   color: #1c1418;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 0.15s;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0s 0.15s;
 }
 
 .cgr-cursor[data-mode="link"] .cgr-cursor-ring {
@@ -2308,7 +2318,8 @@ html:has(.cgr) body {
 
 .cgr-cursor[data-mode="rent"] .cgr-cursor-label {
   opacity: 1;
-  transition-delay: 0.08s;
+  visibility: visible;
+  transition: opacity 0.15s 0.08s, visibility 0s;
 }
 
 .cgr-cursor.is-press .cgr-cursor-ring {
@@ -2428,28 +2439,7 @@ html.cgr-has-cursor [data-cursor="rent"] * {
   .cgr-intro[data-clip="on"] .cgr-float-sequin { left: 9%; top: 24%; width: 22%; }
   .cgr-intro[data-clip="on"] .cgr-float-tiara { left: auto; right: 9%; top: 40%; width: 26%; }
   .cgr-intro[data-clip="on"] .cgr-float-price { left: 9%; right: auto; bottom: 24%; }
-  .cgr-intro[data-clip="on"] .cgr-float-rent { left: auto; right: 9%; bottom: 14%; }
-}
-
-/* The render label sits under the spotlight, clear of the scroll cue. */
-.cgr-intro[data-clip="on"] .cgr-intro-render {
-  top: 7%;
-  bottom: auto;
-}
-
-/* Desktop: "Rent now" floats right of her, below the S, clear of the tagline. */
-@media (min-width: 861px) {
-  .cgr-intro[data-clip="on"] .cgr-float-rent { right: -40%; bottom: 22%; }
-}
-
-/* Phone: the word fills the top band, so the label moves to the right edge below it. */
-@media (max-width: 860px) {
-  .cgr-intro[data-clip="on"] .cgr-intro-render {
-    top: 23%;
-    left: auto;
-    right: max(12px, calc(50% - 50vw + 12px));
-    translate: 0 0;
-  }
+  .cgr-intro[data-clip="on"] .cgr-float-rent { left: auto; right: 9%; bottom: 22%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2553,5 +2543,179 @@ html.cgr-has-cursor [data-cursor="rent"] * {
 
   .cgr-intro-lead {
     display: block;
+  }
+}
+
+/* ---------- Round 5: full dark ---------- */
+/* Bar, header and footer are explicit dark surfaces (the vars above flipped). */
+.cgr-bar {
+  background: #120d10;
+  color: #f6eee9;
+  border-bottom: 1px solid rgb(255 248 244 / 0.1);
+}
+
+.cgr-head {
+  background: #000;
+}
+
+.cgr-foot {
+  background: #0d0a0c;
+  color: var(--type);
+  border-top: 1px solid var(--line);
+}
+
+.cgr-foot .cgr-mute,
+.cgr-credit {
+  color: var(--muted);
+}
+
+.cgr-btn-ghost {
+  color: var(--type);
+  border-color: rgb(255 248 244 / 0.35);
+}
+
+.cgr-field input,
+.cgr-field select,
+.cgr-field textarea,
+.cgr-table select {
+  background: #1b1519;
+  color: var(--type);
+}
+
+.cgr-field input::placeholder,
+.cgr-field textarea::placeholder {
+  color: #a3958f;
+}
+
+/* Bento cells: dark cards. */
+.cgr-bento-gowns {
+  background: #1a1216;
+  color: #f6eee9;
+  border: 1px solid rgb(255 248 244 / 0.12);
+}
+
+.cgr-bento-thumb-img {
+  background: #2a2025;
+}
+
+.cgr-bento-thumb-p {
+  color: #f3c3ca;
+}
+
+.cgr-bento-date {
+  background: #141013;
+  color: #f6eee9;
+  border: 1px solid rgb(232 191 92 / 0.45);
+}
+
+.cgr-bento-date .cgr-bento-h {
+  color: #f1c97a;
+}
+
+.cgr-bento-strip li {
+  background: rgb(255 248 244 / 0.08);
+}
+
+.cgr-bento-strip li.is-booked {
+  background: #7a1f2b;
+  color: #fff8f4;
+}
+
+/* ---------- Round 5: intro ---------- */
+/* Clip mode: no black frame behind the masked clip, so the word is never cut
+   by a hard rectangle; the clip's own feathered mask blends into the stage. */
+.cgr-intro[data-clip="on"] .cgr-intro-frame {
+  background: transparent;
+}
+
+/* The clip itself never moves inside its frame: no extra layer. */
+.cgr-intro[data-clip="on"] .cgr-intro-media {
+  will-change: auto;
+}
+
+/* "Sample render": bottom-left corner of the stage at every width. */
+.cgr-intro-renderwrap {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: 12px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.cgr-intro-renderwrap .cgr-intro-render {
+  position: static;
+  translate: none;
+}
+
+/* Phone: the word sits in the black above her, with side margins; it never
+   touches the stage edges (r4 was exactly 100vw wide). */
+@media (max-width: 860px) {
+  .cgr-intro-word {
+    font-size: 21vw;
+  }
+}
+
+/* Desktop fallback: the word sits high, behind her head; the clip mask hugs
+   her (head + body ellipses) so the letters fade into her instead of being
+   chopped by the clip rectangle. */
+@media (min-width: 861px) {
+  .cgr-intro[data-clip="on"] .cgr-intro-video,
+  .cgr-intro[data-clip="on"] .cgr-intro-still {
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0, #000 5%, #000 56%, rgb(0 0 0 / 0.35) 76%, transparent 93%),
+      radial-gradient(ellipse 15% 12% at 50% 19%, #000 50%, transparent 100%),
+      radial-gradient(ellipse 44% 52% at 50% 62%, #000 62%, transparent 100%);
+    -webkit-mask-composite: source-in, source-over;
+    mask-image:
+      linear-gradient(to bottom, transparent 0, #000 5%, #000 56%, rgb(0 0 0 / 0.35) 76%, transparent 93%),
+      radial-gradient(ellipse 15% 12% at 50% 19%, #000 50%, transparent 100%),
+      radial-gradient(ellipse 44% 52% at 50% 62%, #000 62%, transparent 100%);
+    mask-composite: intersect, add, add;
+  }
+
+  /* Cards around her, clear of the word band and of the tagline. */
+  .cgr-intro[data-clip="on"] .cgr-float-sequin { left: -30%; top: 40%; }
+  .cgr-intro[data-clip="on"] .cgr-float-tiara { right: -22%; top: 35%; }
+  .cgr-intro[data-clip="on"] .cgr-float-price { left: -30%; bottom: 20%; }
+  .cgr-intro[data-clip="on"] .cgr-float-rent { right: -44%; bottom: 36%; }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+  .cgr-intro[data-clip="on"] .cgr-intro-word {
+    inset: 5% 0 auto;
+    font-size: clamp(110px, 16vw, 300px);
+  }
+}
+
+/* HERO_ALPHA (off by default): the stacked-alpha video stays hidden and feeds
+   the canvas; the word goes behind her at every width. */
+.cgr-intro-alphasrc {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cgr-intro-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cgr-intro[data-alpha="on"] .cgr-intro-word {
+  z-index: 0;
+}
+
+/* Reduced motion, desktop: same composition as the motion front frame — the
+   word high behind her head, cards below it. */
+@media (prefers-reduced-motion: reduce) and (min-width: 861px) {
+  .cgr-intro[data-clip="on"] .cgr-intro-word {
+    align-items: flex-start;
+    padding-top: calc(var(--hero-h) * 0.04);
+    font-size: clamp(110px, 16vw, 300px);
   }
 }

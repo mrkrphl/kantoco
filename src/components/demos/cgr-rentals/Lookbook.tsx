@@ -34,9 +34,14 @@ export function Lookbook({ items }: { items: Gown[] }) {
     const book = bookRef.current;
     if (!book || !ready || reduced) return;
     const els = leavesRef.current.slice(0, leaves);
+    // Per-leaf shade layers (front + back) and last-written z-index, so each
+    // frame writes only transform + opacity (no CSS-var restyles, no layout).
+    const shades = els.map((el) => Array.from(el.querySelectorAll<HTMLElement>(".cgr-lb-shade")));
+    const zs = els.map(() => -1);
     const st = { flip: 0 };
     let raf = 0;
     let last = -1;
+    let lastShift = NaN;
 
     const render = () => {
       raf = 0;
@@ -45,18 +50,32 @@ export function Lookbook({ items }: { items: Gown[] }) {
         const f = clamp(F - i, 0, 1);
         el.style.transform = `rotateY(${(-180 * f).toFixed(2)}deg)`;
         const moving = f > 0 && f < 1;
-        el.style.zIndex = String(moving ? leaves + 2 : f >= 0.5 ? i + 1 : leaves - i);
-        const sh = Math.sin(Math.PI * f) * 0.45;
-        el.style.setProperty("--lb-shade", sh.toFixed(3));
+        const z = moving ? leaves + 2 : f >= 0.5 ? i + 1 : leaves - i;
+        if (z !== zs[i]) {
+          zs[i] = z;
+          el.style.zIndex = String(z);
+        }
+        const sh = (Math.sin(Math.PI * f) * 0.45).toFixed(3);
+        for (const s of shades[i]) s.style.opacity = sh;
       });
       // Closed book: center the cover. Finished: center the back cover.
       const shift = F < 1 ? -(1 - F) : F > leaves - 1 ? F - (leaves - 1) : 0;
-      book.style.setProperty("--lb-shift", shift.toFixed(3));
+      if (shift !== lastShift) {
+        lastShift = shift;
+        book.style.transform = `translate3d(${(shift * 25).toFixed(2)}%, 0, 0)`;
+      }
       const s = Math.round(F);
       if (s !== last) {
         last = s;
         setSpread(s);
       }
+    };
+    // will-change only while a page is turning (tween or drag).
+    let flipping = false;
+    const setFlipping = (on: boolean) => {
+      if (on === flipping) return;
+      flipping = on;
+      book.classList.toggle("is-flipping", on);
     };
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(render);
@@ -65,11 +84,16 @@ export function Lookbook({ items }: { items: Gown[] }) {
     const to = (target: number) => {
       tween?.kill();
       const t = clamp(Math.round(target), 0, leaves);
+      setFlipping(true);
       tween = gsap.to(st, {
         flip: t,
         duration: 0.5 + Math.abs(t - st.flip) * 0.25,
         ease: "power2.inOut",
         onUpdate: kick,
+        onComplete: () => {
+          kick();
+          setFlipping(false);
+        },
       });
     };
     goRef.current = to;
@@ -102,6 +126,7 @@ export function Lookbook({ items }: { items: Gown[] }) {
         tween?.kill();
         book.setPointerCapture(e.pointerId);
         book.classList.add("is-dragging");
+        setFlipping(true);
       }
       const now = performance.now();
       vel = (e.clientX - lastX) / Math.max(1, now - lastT);
@@ -143,6 +168,8 @@ export function Lookbook({ items }: { items: Gown[] }) {
     render();
     return () => {
       tween?.kill();
+      setFlipping(false);
+      book.style.transform = "";
       if (raf) cancelAnimationFrame(raf);
       book.removeEventListener("pointerdown", onDown);
       book.removeEventListener("pointermove", onMove);

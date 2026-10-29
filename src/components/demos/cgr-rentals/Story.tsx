@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, CGR_BASE, cgr, formatPhp, getGown } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
+import { createAlphaRenderer, supportsAlphaCanvas } from "./heroAlpha";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -21,6 +22,17 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  * Reduced motion: a static black hero (arch + word + cards), then the bento.
  */
 const HERO_CLIP = true;
+
+/**
+ * Stacked-alpha hero (round 5, OFF): a future mp4 with colour in the top half
+ * and a greyscale luma matte (white = opaque) in the bottom half, drawn to a
+ * WebGL canvas and scrubbed with the same seek logic, so GOWNS sits behind
+ * her. Needs WebGL; without it (or with this false) the plain clip below is
+ * used and no alpha file is requested. Spec: 540x1920 (two 540x960 halves),
+ * H.264 High yuv420p, 24 fps, 8 s, GOP 6, no B-frames, faststart, no audio.
+ */
+const HERO_ALPHA = false;
+export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 
 export const HERO_VIDEO: {
   src: string | null;
@@ -94,6 +106,25 @@ export function Story() {
   const onClient = useSyncExternalStore(noopSubscribe, () => true, () => false);
   // The "Sample render" label shows only once a clip has a decoded frame.
   const [hasFrames, setHasFrames] = useState(false);
+  // Alpha canvas path: only with the switch on, on the client, with WebGL.
+  const alphaOk = useSyncExternalStore(
+    noopSubscribe,
+    () => HERO_ALPHA && supportsAlphaCanvas(),
+    () => false,
+  );
+  const alpha = useVideo && alphaOk;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const clipSrc = alpha ? HERO_ALPHA_SRC : src;
+
+  // Alpha: redraw the canvas whenever the hidden stacked video shows a new frame.
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!alpha || !video || !canvas) return;
+    const r = createAlphaRenderer(canvas, video);
+    if (!r) return;
+    return () => r.destroy();
+  }, [alpha, onClient]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -116,7 +147,7 @@ export function Story() {
       video.removeEventListener("loadeddata", onData);
       if (tryPlay) video.removeEventListener("canplay", tryPlay);
     };
-  }, [useVideo, mode, onClient]);
+  }, [useVideo, mode, onClient, alpha]);
 
   useGSAP(
     () => {
@@ -133,6 +164,7 @@ export function Story() {
       const col = q(".cgr-intro-col")[0] as HTMLElement | undefined;
       const cue = q(".cgr-intro-cue")[0] as HTMLElement;
       const overIn = q(".cgr-intro-over > *") as HTMLElement[];
+      const pill = q(".cgr-intro-renderwrap")[0] as HTMLElement | undefined;
       const cells = q(".cgr-bento-cell:not(.cgr-bento-arch)") as HTMLElement[];
       const copy = q(".cgr-bento-copy > *") as HTMLElement[];
 
@@ -217,10 +249,12 @@ export function Story() {
       // (The clip carries its own walk and spin; only the content moves.)
       tl.to(cue, { autoAlpha: 0, duration: 0.05 }, B.black);
       // Content arrives around her while she turns, complete when she faces front.
+      // The word grows into place from slightly smaller, so it never overflows
+      // the stage mid-tween (r4 entered at 1.25x and got cropped at both edges).
       tl.fromTo(
         word,
-        { autoAlpha: 0, scale: 1.25, xPercent: 8 },
-        { autoAlpha: 1, scale: 1, xPercent: 0, duration: 0.7 * win, ease: "power2.out" },
+        { autoAlpha: 0, scale: 0.92 },
+        { autoAlpha: 1, scale: 1, duration: 0.7 * win, ease: "power2.out" },
         B.contentIn,
       );
       floats.forEach((f, i) => {
@@ -243,6 +277,7 @@ export function Story() {
       // Facing front -> the arch shrinks into its bento cell.
       tl.to(shrink, { k: 1, duration: span, ease: "power2.inOut", onUpdate: paint }, B.front);
       tl.to(word, { autoAlpha: 0, scale: 0.9, duration: 0.6 * span }, B.front);
+      if (pill) tl.to(pill, { autoAlpha: 0, duration: 0.3 * span }, B.front);
       tl.to(
         floats,
         { autoAlpha: 0, scale: 0.6, duration: 0.47 * span, stagger: 0.07 * span, ease: "power1.in" },
@@ -271,9 +306,11 @@ export function Story() {
       const step = () => {
         popRaf = 0;
         let moving = false;
+        // Read every rect first, then write: one layout per frame, no thrash.
+        const rects = floats.map((p) => p.getBoundingClientRect());
         floats.forEach((p, i) => {
           const b = bodies[i];
-          const r = p.getBoundingClientRect();
+          const r = rects[i];
           const dx = r.left + r.width / 2 - mx;
           const dy = r.top + r.height / 2 - my;
           const d = Math.hypot(dx, dy) || 1;
@@ -375,7 +412,7 @@ export function Story() {
         frame.style.clipPath = "";
       };
     },
-    { scope: rootRef, dependencies: [ready, reduced, mode, useVideo, onClient] },
+    { scope: rootRef, dependencies: [ready, reduced, mode, useVideo, onClient, alpha] },
   );
 
   const hours = cgr.hours[0];
@@ -399,6 +436,7 @@ export function Story() {
       data-motion={reduced ? "static" : "on"}
       data-media={useVideo ? "video" : "poster"}
       data-clip={HERO_CLIP ? "on" : "off"}
+      data-alpha={alpha ? "on" : "off"}
     >
       <div className="cgr-intro-stage">
         <p className="cgr-intro-word" aria-hidden="true">
@@ -508,18 +546,34 @@ export function Story() {
         <div className="cgr-intro-arch">
           <div className="cgr-intro-frame">
             <div className="cgr-intro-media" data-fit={HERO_VIDEO.fit}>
-              {useVideo && src ? (
-                <video
-                  ref={videoRef}
-                  className="cgr-intro-video"
-                  poster={HERO_VIDEO.poster}
-                  muted
-                  playsInline
-                  preload="auto"
-                  aria-label="Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
-                >
-                  {onClient ? <source src={src} type="video/mp4" /> : null}
-                </video>
+              {useVideo && clipSrc ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    key={alpha ? "alpha" : "clip"}
+                    className={alpha ? "cgr-intro-alphasrc" : "cgr-intro-video"}
+                    poster={alpha ? undefined : HERO_VIDEO.poster}
+                    muted
+                    playsInline
+                    preload="auto"
+                    aria-hidden={alpha ? true : undefined}
+                    aria-label={
+                      alpha
+                        ? undefined
+                        : "Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
+                    }
+                  >
+                    {onClient ? <source src={clipSrc} type="video/mp4" /> : null}
+                  </video>
+                  {alpha ? (
+                    <canvas
+                      ref={canvasRef}
+                      className="cgr-intro-canvas"
+                      role="img"
+                      aria-label="Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
+                    />
+                  ) : null}
+                </>
               ) : HERO_CLIP ? (
                 <img
                   className="cgr-intro-still"
@@ -555,7 +609,6 @@ export function Story() {
               )}
             </div>
             <div className="cgr-intro-shade" aria-hidden="true" />
-            {useVideo && hasFrames ? <p className="cgr-intro-render">Sample render</p> : null}
           </div>
 
           <div className="cgr-floats" aria-hidden="true">
@@ -578,6 +631,11 @@ export function Story() {
               <span className="cgr-float-in">Rent now ↗</span>
             </span>
           </div>
+        </div>
+
+        {/* Bottom-left corner of the stage: never over the word or her head. */}
+        <div className="cgr-intro-renderwrap">
+          {useVideo && hasFrames ? <p className="cgr-intro-render">Sample render</p> : null}
         </div>
 
         <p className="cgr-intro-cue" aria-hidden="true">
