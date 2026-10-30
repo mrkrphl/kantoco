@@ -198,7 +198,7 @@ export function Lookbook({ items }: { items: Gown[] }) {
         ref={bookRef}
         className="cgr-lb-book"
         tabIndex={0}
-        aria-label="Lookbook. Use left and right arrow keys to turn pages."
+        aria-label="Lookbook, left and right arrow keys turn the pages."
       >
         {Array.from({ length: leaves }, (_, i) => (
           <div
@@ -252,7 +252,7 @@ function Cover() {
     <div className="cgr-lb-cover">
       <p className="cgr-lb-kick cgr-micro">CGR · Lookbook</p>
       <p className="cgr-lb-ctitle">
-        The crown <em>room</em>
+        Tiaras and crowns
       </p>
       <p className="cgr-lb-csub">Tiaras, crowns and crystals to finish the gown.</p>
       <p className="cgr-lb-hintc cgr-micro">Tap or drag to turn</p>
@@ -264,9 +264,9 @@ function BackCover() {
   return (
     <div className="cgr-lb-cover cgr-lb-backcover">
       <p className="cgr-lb-ctitle">
-        Pick a <em>piece.</em>
+        Accessories for a gown hold
       </p>
-      <p className="cgr-lb-csub">Every one can ride along on a gown hold.</p>
+      <p className="cgr-lb-csub">Any of these can be added to a gown hold.</p>
       <a className="cgr-btn" href="#cgr-acc-grid">
         See all accessories
       </a>

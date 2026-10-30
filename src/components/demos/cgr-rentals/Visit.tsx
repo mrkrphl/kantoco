@@ -10,7 +10,7 @@ export function VisitSection() {
       <div className="cgr-visit-head">
         <p className="cgr-micro">Visit</p>
         <h2 className="cgr-h2" id="cgr-visit-h">
-          Hours, place, <em>message.</em>
+          Hours and location
         </h2>
       </div>
       <div className="cgr-visit-grid">

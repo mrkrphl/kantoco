@@ -37,8 +37,8 @@ export function Confirmation({ refCode }: { refCode: string }) {
               {booking.ref}
             </p>
             <p className="cgr-cn-lead">
-              Sample hold only, stored in this browser. The shop confirms your hold; bring this code when you fit or
-              pick up.
+              Sample hold only, stored in this browser. The shop confirms the hold, and this code is what you show at the
+              fitting and at pickup.
             </p>
             <dl className="cgr-cn-dl">
               <div>

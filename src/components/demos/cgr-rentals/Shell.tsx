@@ -102,7 +102,7 @@ export function CgrShell({
           <div>
             <p className="mono cgr-foot-k">this is a sample</p>
             <p className="mono cgr-foot-dim">
-              sample site by kantoco · examples. {DEMO_DISCLAIMER.toLowerCase()} gowns, rates and dates are examples.
+              {DEMO_DISCLAIMER.toLowerCase()} gowns, rates and dates are examples.
             </p>
             <Link className="ulink" href={`${CGR_BASE}/owner`}>
               owner view
