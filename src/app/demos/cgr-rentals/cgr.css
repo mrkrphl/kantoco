@@ -916,11 +916,13 @@ html:has(.cgr) {
 
 
 
-  /* r7.2: 48px @390 on three lines. */
+  /* r7.3: "Gown and suit rentals" is the longest of the three lines
+     (~8.9em in Anton), so 9.8vw keeps it inside 20px gutters at 360-899px
+     (38px @390, 35px @360). Line-height 1.14 + the extended clip stay. */
   .cgr .cgr-intro-h {
     left: 20px;
     top: 64.4%;
-    font-size: clamp(36px, 12.3vw, 56px);
+    font-size: clamp(32px, 9.8vw, 56px);
   }
 
   .cgr-intro-sub {
@@ -941,313 +943,715 @@ html:has(.cgr) {
 }
 
 /* ==========================================================================
-   03  Mood board ("Every gown, on the table.")
+   03  Racks (r7.3): catalogue, Filipiniana band, men's formal, accessories.
+   Replaces the r7 mood board. Stamp: kantoco-cgr/r7.3 (r73.css).
    ========================================================================== */
-.cgr-mb {
+.cgr {
+  --ivory: #f7f1e6;
+  --line: rgb(18 10 9 / 0.14);
+  --line-d: rgb(242 232 216 / 0.16);
+  --fs-sec: clamp(76px, 9.17vw, 132px);
+  --fs-cat: clamp(28px, 2.8vw, 40px);
+  --sn-h: 64px;
+}
+
+.cgr .ivory {
+  background: var(--ivory);
+  color: var(--ink);
+}
+
+/* ---------- Condensed nav (fixed, transform-only) ---------- */
+.cgr-sn {
+  position: fixed;
+  top: var(--bar-h);
+  left: 0;
+  right: 0;
+  z-index: 82;
+  height: var(--sn-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 var(--gut);
+  background: var(--ivory);
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition:
+    transform 0.32s var(--ease-out),
+    visibility 0s linear 0.32s,
+    background-color 0.2s linear,
+    color 0.2s linear;
+}
+
+.cgr-sn[data-on="true"] {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 0.32s var(--ease-out),
+    visibility 0s,
+    background-color 0.2s linear,
+    color 0.2s linear;
+}
+
+.cgr-sn[data-tone="dark"] {
+  background: var(--black);
+  color: var(--cream);
+  border-color: var(--line-d);
+}
+
+.cgr .cgr-sn-wm {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.cgr-sn-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.cgr .cgr-sn-a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.cgr .cgr-sn-a:hover {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+
+/* Active link: --hot on ivory is decoration only (thick underline + ink
+   text keeps AA); the colour cue is the hot bar under it. */
+.cgr .cgr-sn-a[data-active="true"] {
+  box-shadow: inset 0 -3px 0 var(--hot);
+}
+
+.cgr .cgr-sn .btn-nav {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.cgr-sn-mob {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.cgr .cgr-sn .cgr-menu-btn {
+  color: inherit;
+}
+
+.cgr .cgr-sn .cgr-menu-panel {
+  inset: calc(var(--bar-h) + var(--sn-h)) 0 0 0;
+  color: var(--cream);
+}
+
+@media (max-width: 899px) {
+  .cgr-sn {
+    padding: 0 20px;
+  }
+
+  .cgr-sn-nav {
+    display: none;
+  }
+
+  .cgr-sn-mob {
+    display: flex;
+  }
+
+  .cgr .cgr-sn-wm {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Section frame ---------- */
+.cgr .cgr-rk {
   position: relative;
   isolation: isolate;
-  min-height: clamp(900px, 69vw, 1080px);
-  padding: 150px var(--gut) 80px;
   overflow: hidden;
+  min-height: max(100svh, 860px);
+  padding: 112px var(--gut) 96px;
+  scroll-margin-top: var(--bar-h);
 }
 
-.cgr-mb-wave {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-  width: 100%;
-  fill: var(--ox);
-  pointer-events: none;
-}
-
-.cgr-mb-wave-desk {
-  height: 140px;
-}
-
-.cgr-mb-wave-phone {
-  display: none;
-  height: 60px;
-}
-
-/* No z-index here: the title's difference blend must see the cards and the
-   cream behind it (one isolated group: .cgr-mb). */
-.cgr-mb-text {
-  position: relative;
-  width: min(420px, 30vw);
-}
-
-.cgr-mb-title {
-  position: relative;
-  z-index: 30;
-  width: 6.2em;
-  font-size: clamp(64px, 9.45vw, 136px);
+.cgr .cgr-rk-men {
+  background: var(--black);
   color: var(--cream);
-  mix-blend-mode: difference;
-  pointer-events: none;
+  padding-top: 186px;
 }
 
-.cgr-mb-copy {
+.cgr .cgr-rk-fil {
+  min-height: 640px;
+  padding-top: 96px;
+}
+
+.cgr .cgr-rk-acc {
+  padding-top: 190px;
+}
+
+.cgr-rk-text {
   position: relative;
-  z-index: 6;
-  max-width: 380px;
-  margin-top: 40px;
+  z-index: 5;
+  width: min(560px, 40vw);
+}
+
+.cgr-rk-men .cgr-rk-text {
+  width: min(580px, 41vw);
+}
+
+.cgr .cgr-rk-eye {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.cgr-rk-men .cgr-rk-eye {
+  color: var(--cream-2);
+}
+
+.cgr .cgr-rk-h {
+  margin-top: 22px;
+  font-size: var(--fs-sec);
+  line-height: 0.9;
+}
+
+.cgr .cgr-rk-fil .cgr-rk-h {
+  margin-top: 20px;
+  font-size: clamp(64px, 8.06vw, 116px);
+}
+
+.cgr .cgr-rk-lead {
+  margin-top: 24px;
+  max-width: 31em;
   font-size: 19px;
-  line-height: 1.45;
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
-.cgr-mb-filters {
-  position: relative;
-  z-index: 6;
-  max-width: 360px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
+.cgr-rk-men .cgr-rk-lead {
+  margin-top: 18px;
+  color: var(--cream-2);
+}
+
+.cgr-rk-fil .cgr-rk-lead {
+  margin-top: 16px;
+}
+
+.cgr-rk-fil .ulink {
+  margin-top: 8px;
+}
+
+.cgr-rk-pt {
   margin-top: 26px;
 }
 
-.cgr-chip {
-  display: inline-flex;
-  align-items: flex-start;
+.cgr .cgr-rk-ptag {
+  display: inline-block;
+  padding: 5px 9px;
+  border: 1px dashed currentColor;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.cgr-rk-men .cgr-rk-ptag {
+  color: var(--cream-2);
+}
+
+/* Category rows */
+.cgr-rk-list {
+  margin-top: 34px;
+}
+
+.cgr .cgr-rk-cats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.cgr-rk-cats li {
+  border-bottom: 1px solid var(--line);
+}
+
+.cgr .cgr-rk-cats a,
+.cgr .cgr-rk-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: baseline;
+  gap: 12px;
   min-height: 44px;
-  padding: 6px 8px;
-  margin-left: -8px;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: 0;
-  cursor: pointer;
-  transition: background-color 0.25s var(--ease-punch), color 0.25s var(--ease-punch);
+  padding: 15px 0 13px 16px;
+  text-decoration: none;
 }
 
-.cgr-chip sup {
-  margin-left: 3px;
-  position: relative;
-  top: 2px;
-  vertical-align: top;
-}
-
-.cgr .cgr-chip sup.mono {
-  font-size: 11px;
-  line-height: 1;
-}
-
-.cgr-chip:hover {
+.cgr .cgr-rk-cats a:hover .cgr-rk-nm {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 5px;
 }
 
-.cgr-chip[aria-pressed="true"] {
-  background: var(--ox);
-  color: var(--cream);
-  text-decoration: none;
+.cgr .cgr-rk-n,
+.cgr .cgr-rk-ct {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-2);
 }
 
-.cgr-mb-board {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-}
-
-/* A card: ink title bar, 2px ink border, hard shadow. */
-.cgr .win {
-  position: absolute;
-  left: var(--l);
-  top: var(--t);
-  width: var(--w);
-  margin: 0;
-  background: var(--cream);
-  border: 2px solid var(--ink);
-  box-shadow: var(--shadow-hard);
-  transform: rotate(var(--r));
-  touch-action: none;
-  cursor: grab;
-}
-
-.cgr .win.is-held {
-  cursor: grabbing;
-  box-shadow: 16px 16px 0 var(--ink);
-}
-
-.cgr .win-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  height: 30px;
-  padding: 0 10px;
-  background: var(--ink);
-  color: var(--cream);
+.cgr .cgr-rk-ct {
+  text-align: right;
   white-space: nowrap;
-  overflow: hidden;
 }
 
-.cgr .win-bar.mono {
-  font-size: 11px;
+.cgr .cgr-rk-nm {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-cat);
   line-height: 1;
+  text-transform: uppercase;
 }
 
-.win-name {
+.cgr-rk-cats li.is-on {
+  box-shadow: inset 4px 0 0 var(--hot);
+}
+
+/* Active row: the hot inset bar is the marker; the number goes ink (hot
+   12px text on ivory would miss AA). */
+.cgr .cgr-rk-cats li.is-on .cgr-rk-n {
+  color: var(--ink);
+}
+
+.cgr .cgr-rk-cats li.is-empty .cgr-rk-nm {
+  color: var(--ink-2);
+}
+
+.cgr .cgr-rk-ph {
+  padding: 2px 6px;
+  border: 1px dashed currentColor;
+}
+
+.cgr-rk-ctas {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-top: 36px;
+}
+
+.cgr .cgr-rk-ctas .btn {
+  min-height: 56px;
+}
+
+.cgr .cgr-rk-ghost {
+  min-height: 56px;
+  color: var(--cream);
+  font-size: 17px;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+/* ---------- 3D strip ---------- */
+.cgr-rk-stage {
+  position: absolute;
+  z-index: 1;
+  left: 45.8%;
+  right: 0;
+  top: 64px;
+  bottom: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  perspective: 1500px;
+  perspective-origin: 10% 46%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 150px);
+  mask-image: linear-gradient(90deg, transparent 0, #000 150px);
 }
 
-.win-ph {
-  display: block;
+.cgr-rk-strip {
+  position: absolute;
+  right: -150px;
+  top: max(70px, calc(50% - 350px));
+  transform-origin: 100% 50%;
+  transform: rotateY(-40deg);
+  transform-style: preserve-3d;
+}
+
+.cgr-rk-track {
+  display: flex;
+  gap: 20px;
+  transform-style: preserve-3d;
+}
+
+.cgr .cgr-rk-card {
+  flex: none;
   position: relative;
-  aspect-ratio: 1 / var(--a);
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 580px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.32s var(--ease-out);
+}
+
+.cgr a.cgr-rk-card:hover,
+.cgr a.cgr-rk-card:focus-visible {
+  transform: translateZ(40px);
+}
+
+.cgr a.cgr-rk-card:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.cgr-rk-im {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   background: var(--ink);
-  cursor: inherit;
 }
 
-.win-ph img {
+.cgr-rk-im img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 20%;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
+  object-position: 50% 18%;
 }
 
-.cgr .cgr-mb-hint {
-  position: absolute;
-  right: 7%;
-  bottom: 9%;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.cgr .cgr-rk-cap {
+  display: block;
+  padding-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.cgr .cgr-rk-cap b {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
   color: var(--ink);
-  pointer-events: none;
 }
 
-.cgr-mb-hint {
-  background: none;
+.cgr-rk-men .cgr-rk-cap {
+  color: var(--cream-2);
 }
 
-.cgr-mb-hint::after {
-  content: none;
+.cgr .cgr-rk-men .cgr-rk-cap b {
+  color: var(--cream);
 }
 
-.cgr .cgr-mb-hint {
-  padding: 2px 6px 2px 0;
+/* Empty cards (no photo in the repo) */
+.cgr .cgr-rk-card.is-none {
+  height: 600px;
 }
 
-.cgr-mb-grab {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 2px solid var(--ink);
-  background:
-    linear-gradient(var(--ink), var(--ink)) center / 14px 2px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) center / 2px 14px no-repeat,
-    var(--hot);
+.cgr-rk-card.is-none .cgr-rk-im {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  background: transparent;
+  border: 1.5px dashed rgb(242 232 216 / 0.34);
 }
 
-.cgr-mb-shuffle {
-  display: none;
+.cgr-rk-fil .cgr-rk-card.is-none .cgr-rk-im {
+  border-color: rgb(18 10 9 / 0.26);
 }
 
+.cgr .cgr-rk-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cream-2);
+}
+
+.cgr .cgr-rk-fil .cgr-rk-tag {
+  color: var(--ink-2);
+}
+
+.cgr .cgr-rk-word {
+  font-family: var(--font-display);
+  font-size: 84px;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--cream-2);
+}
+
+.cgr .cgr-rk-fil .cgr-rk-word {
+  font-size: 62px;
+  -webkit-text-stroke-color: var(--ink-2);
+}
+
+.cgr-rk-fil .cgr-rk-stage {
+  top: 0;
+}
+
+.cgr-rk-fil .cgr-rk-strip {
+  top: 70px;
+}
+
+.cgr .cgr-rk-fil .cgr-rk-card.is-none {
+  width: 280px;
+  height: 420px;
+}
+
+.cgr-rk-men .cgr-rk-strip {
+  top: max(60px, calc(50% - 360px));
+}
+
+/* Accessories: small crops, never upscaled past the stamp's 330 x 300. */
+.cgr-rk-acc .cgr-rk-stage {
+  top: 0;
+}
+
+.cgr-rk-acc .cgr-rk-strip {
+  right: -170px;
+  top: 250px;
+}
+
+.cgr .cgr-rk-acc .cgr-rk-card {
+  width: 330px;
+  height: 300px;
+}
+
+/* The crops are small (248-696px wide): scale-down never enlarges them. */
+.cgr-rk-acc .cgr-rk-im img {
+  object-fit: scale-down;
+  object-position: 50% 50%;
+}
+
+.cgr-rk-floor {
+  position: absolute;
+  z-index: 0;
+  left: 44.4%;
+  right: 0;
+  top: calc(100% - 68px);
+  height: 1px;
+  background: var(--line);
+}
+
+.cgr-rk-acc .cgr-rk-floor {
+  top: 720px;
+}
+
+/* Men's: "Other racks" row */
+.cgr-rk-other {
+  position: absolute;
+  z-index: 5;
+  left: var(--gut);
+  right: var(--gut);
+  bottom: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-d);
+}
+
+.cgr .cgr-rk-other a {
+  display: inline-flex;
+  align-items: baseline;
+  min-height: 44px;
+  padding-top: 6px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cream);
+}
+
+.cgr .cgr-rk-other a.is-empty {
+  color: var(--cream-2);
+}
+
+.cgr .cgr-rk-other a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.cgr .cgr-rk-other small {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: lowercase;
+  color: var(--cream-2);
+}
+
+/* ---------- Phone: text, strip, list, button (static strip) ---------- */
 @media (max-width: 899px) {
-  .cgr-mb {
+  .cgr .cgr-rk,
+  .cgr .cgr-rk-men,
+  .cgr .cgr-rk-fil,
+  .cgr .cgr-rk-acc {
     min-height: 0;
-    padding: 84px 0 56px;
+    padding: 96px 20px 56px;
+    display: flex;
+    flex-direction: column;
   }
 
-  .cgr-mb-wave-desk {
-    display: none;
+  .cgr-rk-text,
+  .cgr-rk-men .cgr-rk-text {
+    display: contents;
   }
 
-  .cgr-mb-wave-phone {
-    display: block;
+  .cgr .cgr-rk-h,
+  .cgr .cgr-rk-fil .cgr-rk-h {
+    margin-top: 16px;
+    font-size: clamp(60px, 19.5vw, 76px);
   }
 
-  .cgr-mb-text {
-    width: auto;
+  .cgr .cgr-rk-fil .cgr-rk-h {
+    font-size: clamp(52px, 16.4vw, 64px);
   }
 
-  .cgr-mb-title {
-    width: auto;
-    max-width: 7em;
-    padding: 0 20px;
-    font-size: clamp(48px, 15.9vw, 72px);
-  }
-
-  .cgr-mb-copy {
-    padding: 0 20px;
-    margin-top: 20px;
+  .cgr .cgr-rk-lead {
+    margin-top: 16px;
     font-size: 17px;
   }
 
-  .cgr-mb-filters {
-    max-width: none;
-    flex-wrap: nowrap;
-    gap: 8px;
-    margin-top: 18px;
-    padding: 0 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    white-space: nowrap;
+  .cgr .cgr-rk-men .cgr-rk-lead {
+    margin-top: 14px;
   }
 
-  .cgr-mb-filters::-webkit-scrollbar {
-    display: none;
+  .cgr-rk-pt {
+    margin-top: 20px;
   }
 
-  .cgr-chip {
-    flex: none;
-    margin-left: 0;
-    font-size: 20px;
+  .cgr .cgr-rk-ptag {
+    font-size: 11px;
   }
 
-  /* Phone: a pile. --d is the depth (0 on top); three show. */
-  .cgr-mb-board {
+  .cgr-rk-stage {
     position: relative;
-    inset: auto;
-    height: min(520px, 132vw);
-    margin-top: 24px;
+    order: 5;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    margin: 24px -20px 0;
+    height: 400px;
+    perspective: 900px;
+    perspective-origin: 0% 50%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70px);
+    mask-image: linear-gradient(90deg, transparent 0, #000 70px);
   }
 
-  .cgr .win {
-    left: 50%;
-    top: 34px;
-    width: min(270px, 69vw);
-    transform: none;
-    translate: calc(-50% + sin(calc(var(--d) * 2.1rad)) * 22%) calc(var(--d) * -14px);
-    rotate: calc(-1.5deg + sin(calc(var(--d) * 2.6rad)) * 5deg);
-    z-index: calc(50 - var(--d));
-    opacity: clamp(0, calc(3 - var(--d)), 1);
-    touch-action: auto;
-    cursor: pointer;
+  .cgr-rk-strip,
+  .cgr-rk-men .cgr-rk-strip,
+  .cgr-rk-fil .cgr-rk-strip {
+    right: -70px;
+    top: 10px;
+    transform: rotateY(-30deg);
   }
 
-  .win-ph {
-    aspect-ratio: 4 / 5;
+  .cgr-rk-track {
+    gap: 12px;
   }
 
-  .cgr .cgr-mb-hint {
+  .cgr .cgr-rk-card {
+    width: 190px;
+    height: 330px;
+  }
+
+  .cgr .cgr-rk-card.is-none,
+  .cgr .cgr-rk-fil .cgr-rk-card.is-none {
+    width: 190px;
+    height: 300px;
+  }
+
+  .cgr .cgr-rk-word {
+    font-size: 54px;
+  }
+
+  .cgr .cgr-rk-fil .cgr-rk-word {
+    font-size: 38px;
+  }
+
+  .cgr-rk-men .cgr-rk-stage,
+  .cgr-rk-fil .cgr-rk-stage {
+    height: 340px;
+  }
+
+  .cgr .cgr-rk-acc .cgr-rk-card {
+    width: 220px;
+    height: 200px;
+  }
+
+  .cgr-rk-acc .cgr-rk-stage {
+    height: 280px;
+  }
+
+  .cgr-rk-acc .cgr-rk-strip {
+    right: -70px;
+    top: 20px;
+  }
+
+  .cgr-rk-list,
+  .cgr-rk-men .cgr-rk-ctas {
+    order: 6;
+    margin-top: 10px;
+  }
+
+  .cgr-rk-fil .ulink {
+    order: 6;
+  }
+
+  .cgr-rk-ctas {
+    margin-top: 26px;
+  }
+
+  .cgr .cgr-rk-ctas .btn {
+    flex: 1;
+  }
+
+  .cgr-rk-cat .cgr-rk-ctas .ulink {
     display: none;
   }
 
-  .cgr-mb-shuffle {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 0 20px;
-    color: var(--ink);
+  .cgr-rk-floor,
+  .cgr-rk-other {
+    display: none;
+  }
+}
+
+/* Reduced motion: static strips, no hover travel, instant nav. */
+@media (prefers-reduced-motion: reduce) {
+  .cgr .cgr-rk-card,
+  .cgr-sn,
+  .cgr-sn[data-on="true"] {
+    transition: none;
   }
 
-  .cgr-mb-shuffle .btn-ghost {
-    color: var(--ink);
+  .cgr a.cgr-rk-card:hover,
+  .cgr a.cgr-rk-card:focus-visible {
+    transform: none;
   }
 }
 
@@ -2730,6 +3134,14 @@ tr[data-status="cancelled"] .cgr-ow-c {
   transform: rotate(-8deg);
 }
 
+/* r7.3: cream like the hero script (vermilion stays on CTAs and accents);
+   beats .cgr .hand. */
+.cgr .cgr-foot-hand {
+  color: var(--cream);
+  /* Same soft dark halo as .cgr-intro-hand: the script crosses the cream wordmark. */
+  text-shadow: 0 0 1px rgb(0 0 0 / 0.95), 0 0 2px rgb(0 0 0 / 0.9), 0 0 5px rgb(0 0 0 / 0.7), 0 1px 14px rgb(0 0 0 / 0.5);
+}
+
 @media (max-width: 899px) {
   .cgr-foot {
     padding: 30px 20px 0;
@@ -2790,11 +3202,6 @@ tr[data-status="cancelled"] .cgr-ow-c {
   .cgr-dt-thumb:hover {
     transition: none;
     transform: none;
-  }
-
-  .cgr .win {
-    cursor: pointer;
-    touch-action: auto;
   }
 }
 

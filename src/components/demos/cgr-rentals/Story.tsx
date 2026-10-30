@@ -21,7 +21,7 @@ const DRIFT = CustomEase.create("cgrDrift", "0.45,0,0.55,1");
  * WebGL canvas in front of it (heroAlpha.ts). The clip scrubs with scroll.
  * Over the last 20% of the intro an oxblood S-curve rises from the bottom
  * edge and her hem and veil fall over it (canvas z 6, curve z 3), then the
- * landed headline "Gown rentals in Dasmariñas, Cavite." reveals on the curve.
+ * landed headline "Gown and suit rentals in Dasmariñas, Cavite." reveals on the curve.
  * r7.2: the script accent is a one-pass rotator, "for your" + a noun
  * (stamp r7.2/rotator.md); screen readers get one sr-only sentence instead.
  *
@@ -471,11 +471,11 @@ export function Story() {
         <div className="cgr-intro-end">
           <h1 className="cgr-intro-h ext" id="cgr-hero-title">
             <span className="ln">
-              <span>Gown rentals in</span>
+              <span>Gown and suit rentals</span>
             </span>{" "}
             <span className="ln ln-2">
               <span>
-                <em>Dasmariñas,</em>
+                in <em>Dasmariñas,</em>
               </span>
             </span>{" "}
             <span className="ln ln-3">
