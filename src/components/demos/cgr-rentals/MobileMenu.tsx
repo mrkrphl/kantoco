@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 
 /**
- * Phone header: a "Menu" text link opens a scrollable text tab row of the
- * section links under the header (overlay, so nothing below shifts).
+ * Phone header: a mono "menu" link opens a full-width ink panel with the
+ * section links (overlay, so nothing below shifts). Escape closes it.
  */
 export function MobileMenu({
   items,
@@ -28,12 +28,12 @@ export function MobileMenu({
     <div className="cgr-menu">
       <button
         type="button"
-        className="cgr-menu-btn"
+        className="cgr-menu-btn mono"
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? "Close" : "Menu"}
+        {open ? "close" : "menu"}
       </button>
       <nav
         id={id}
@@ -42,12 +42,12 @@ export function MobileMenu({
         data-open={open ? "true" : "false"}
         hidden={!open}
       >
-        <ul className="cgr-tabs-scroll">
+        <ul>
           {items.map((it) => (
             <li key={it.label}>
               <Link
                 href={it.href}
-                className="cgr-nav-a"
+                className="cgr-menu-a"
                 aria-current={it.on ? "page" : undefined}
                 onClick={() => setOpen(false)}
               >
