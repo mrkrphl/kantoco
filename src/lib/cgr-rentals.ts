@@ -13,7 +13,7 @@ export const cgr = {
   badge: DEMO_BADGE,
   barDesk:
     "A KantoCo sample for Cavite Gown Rentals. Not the shop's official site. Prices & sizes are sample data.",
-  barMob: "KantoCo sample · not live",
+  barMob: "KantoCo sample, not the shop's site",
   name: "Cavite Gown Rentals",
   shortName: "CGR",
   eyebrow: "Gown and suit rentals · Dasmariñas, Cavite",

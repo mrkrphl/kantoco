@@ -13,9 +13,10 @@ import {
 } from "@/lib/cgr-rentals";
 import { updateBookingStatus, useBookings } from "@/components/demos/cgr-rentals/bookings";
 import { humanDate } from "@/components/demos/cgr-rentals/GownDetail";
+import { COUNTED_STATUSES, ownerCommission } from "@/components/demos/cgr-rentals/reserveMath";
 
 /** Statuses that earn the ₱200 commission. Pending and cancelled are ₱0. */
-const COUNTED = new Set<BookingStatus>(["confirmed", "out", "returned"]);
+const COUNTED = new Set<BookingStatus>(COUNTED_STATUSES);
 
 export function OwnerView() {
   const stored = useBookings();
@@ -23,7 +24,10 @@ export function OwnerView() {
   const list: Booking[] = useMemo(() => stored ?? [], [stored]);
   const billable = useMemo(() => list.filter((b) => COUNTED.has(b.status)), [list]);
   const pending = list.filter((b) => b.status === "pending").length;
-  const commission = billable.length * COMMISSION_PHP;
+  const commission = ownerCommission(
+    list.map((b) => b.status),
+    COMMISSION_PHP,
+  );
 
   return (
     <div className="cgr-ow cream grain">
