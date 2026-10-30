@@ -166,7 +166,8 @@ export function Rack() {
     active: "",
   });
 
-  // Condensed nav: on while any room sits under the sample bar.
+  // Condensed nav (r7.7): sticks under the SAMPLE bar from the first room to
+  // the end of the page; its tone follows the section underneath.
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
@@ -174,18 +175,22 @@ export function Rack() {
     let raf = 0;
     const read = () => {
       raf = 0;
-      const bar = parseFloat(getComputedStyle(root).getPropertyValue("--bar-h")) || 24;
+      const bar = parseFloat(getComputedStyle(root).getPropertyValue("--bar-h")) || 28;
       const y = bar + 32;
-      const hit = racks.find((r) => {
-        const b = r.getBoundingClientRect();
+      const under = (el: Element) => {
+        const b = el.getBoundingClientRect();
         return b.top <= y && b.bottom > y;
-      });
-      const next = hit
-        ? {
-            on: true,
-            tone: (hit.dataset.rack === "dark" ? "dark" : "light") as Tone,
-            active: (hit.dataset.nav ?? "") as Active,
-          }
+      };
+      const hit = racks.find(under);
+      const started = racks.length > 0 && racks[0].getBoundingClientRect().top <= y;
+      let tone: Tone = "light";
+      if (hit) tone = hit.dataset.rack === "dark" ? "dark" : "light";
+      else {
+        const later = Array.from(document.querySelectorAll(".cgr-cf, .cgr-tm, .cgr-foot")).find(under);
+        if (later && !later.classList.contains("cgr-tm")) tone = "dark";
+      }
+      const next = started
+        ? { on: true, tone, active: (hit?.dataset.nav ?? "") as Active }
         : { on: false, tone: "light" as Tone, active: "" as Active };
       setNav((p) => (p.on === next.on && p.tone === next.tone && p.active === next.active ? p : next));
     };
