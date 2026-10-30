@@ -7,9 +7,15 @@ const display = Bricolage_Grotesque({
   variable: "--font-display",
 });
 
+// No route renders text in Newsreader today; it is only the body fallback in
+// globals.css. preload: false keeps the face and --font-body available
+// site-wide but stops the file being fetched on pages that never draw with
+// it. /demos/cgr-rentals also points its page shell at a system face in
+// cgr.css, so it never fetches Newsreader at all.
 const body = Newsreader({
   subsets: ["latin"],
   variable: "--font-body",
+  preload: false,
 });
 
 export const metadata: Metadata = {

@@ -159,16 +159,25 @@ export function Story() {
         { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 },
         0,
       );
+      // The wipe box is padded past the glyphs (negative inset) so the soft
+      // text-shadow is never cut into a hard-edged plate. When the write-on
+      // lands, the clip is set to an inline "none", which also beats the CSS
+      // pre-hide rule (r7.2.1).
+      const WIPE_FROM = "inset(-40% 100% -40% -20%)";
+      const WIPE_TO = "inset(-40% -20% -40% -20%)";
+      function unclip(this: gsap.core.Tween) {
+        gsap.set(this.targets(), { clipPath: "none" });
+      }
       intro.fromTo(
         handFix,
-        { clipPath: "inset(0% 100% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.out" },
+        { clipPath: WIPE_FROM },
+        { clipPath: WIPE_TO, duration: 1.1, ease: "power2.out", onComplete: unclip },
         0.35,
       );
       intro.fromTo(
         nouns[0],
-        { clipPath: "inset(0% 100% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.out" },
+        { clipPath: WIPE_FROM },
+        { clipPath: WIPE_TO, duration: 1.1, ease: "power2.out", onComplete: unclip },
         0.6,
       );
 
