@@ -93,6 +93,9 @@ const ALT =
  * The clip runs tStart..end over 0..CLIP_END of the intro scroll.
  */
 const CLIP_END = 0.92;
+/** r7.9: intro-scroll window in which she fades in as the walk-in starts
+    (clip 0.75 s = p 0.021 on the r7.8 clip; seq frame 1 = p 0.016). */
+const ENTER: [number, number] = [0.015, 0.05];
 /** Caption fade window, in intro-scroll progress: she is in frame from ~0.18
     (clip ~1.9 s, mid walk-in; the poster is at 0.6 opacity) and lands ~0.36. */
 const CAP_FADE = [0.2, 0.32] as const;
@@ -472,6 +475,13 @@ export function Story() {
         },
       });
       tl.fromTo(gw, { x: 0 }, { x: DRIFT, duration: 1 }, 0);
+      // r7.9 (QA): she stays fully off-stage, at opacity 0, until the walk-in
+      // actually starts (clip ~0.75 s, seq frame 1), so no stray fragment of
+      // the first frames shows at 0%. Opacity only: no layout moves.
+      const mavyEl = q(".cgr-mavy")[0] as HTMLElement | undefined;
+      if (mavyEl) {
+        tl.fromTo(mavyEl, { autoAlpha: 0 }, { autoAlpha: 1, duration: ENTER[1] - ENTER[0] }, ENTER[0]);
+      }
       if (poster) tl.fromTo(poster, { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.3 }, 0);
       // Caption "i. On Mavy": waits at 0 until she is in frame (clip ~2.6 s of
       // the walk-in, or the poster's fade), then fades in on the same scroll.

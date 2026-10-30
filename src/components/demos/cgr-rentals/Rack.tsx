@@ -70,23 +70,10 @@ const TOC = [
   { n: "05", name: "Barong and suits", href: "#suits" },
 ];
 
-/** One shop photo in a box: framed, matted, or a detail crop of the photo. */
-function Ph({
-  p,
-  className,
-  pos,
-  alt,
-  zoom,
-}: {
-  p: ShopPhoto;
-  className: string;
-  pos?: string;
-  alt?: string;
-  zoom?: { z: number; o: string };
-}) {
-  const style = zoom ? ({ "--z": zoom.z, "--o": zoom.o } as React.CSSProperties) : undefined;
+/** One shop photo in a box, framed or matted. r7.9: no detail crops; mats show the whole photo. */
+function Ph({ p, className, pos, alt }: { p: ShopPhoto; className: string; pos?: string; alt?: string }) {
   return (
-    <figure className={`ph ${className}${zoom ? " ph-detail" : ""}`} style={style}>
+    <figure className={`ph ${className}`}>
       <div className="ph-crop">
         <picture>
           <source srcSet={`${CGR_PHOTOS}/${p.file}.avif`} type="image/avif" />
@@ -310,7 +297,7 @@ export function Rack() {
           </nav>
         </section>
 
-        {/* 03 · Filipiniana (one photo; the two small mats are detail crops of it) */}
+        {/* 03 · Filipiniana (one photo, shown whole; r7.9 dropped the two detail crops) */}
         <section
           className="cgr-rk cgr-sp cgr-sp-03 creamy tulle"
           id="filipiniana"
@@ -322,18 +309,6 @@ export function Rack() {
             <div className="cgr-sp-art">
               <Num n="03" />
               <Ph p={SHOP_PHOTOS.filipiniana} className="frame ph-a" pos="50% 18%" />
-              <Ph
-                p={SHOP_PHOTOS.filipiniana}
-                className="mat ph-b"
-                alt="Detail of the black Filipiniana gown: the gold appliqué bodice and puff sleeves."
-                zoom={{ z: 2.2, o: "50% 34%" }}
-              />
-              <Ph
-                p={SHOP_PHOTOS.filipiniana}
-                className="mat ph-c"
-                alt="Detail of the black Filipiniana gown: the long pleated train."
-                zoom={{ z: 1.8, o: "50% 92%" }}
-              />
               <Sw w="Filipiniana" />
             </div>
             <div className="cgr-sp-text">
@@ -345,7 +320,7 @@ export function Rack() {
                 keep it for your date.
               </p>
               <p className="cgr-sp-pull" data-rv>
-                One gown, seen up close.
+                One gown, shown in full.
               </p>
               <div className="cgr-sp-ctas" data-rv>
                 <a href="#rail" className="btn btn-line">
@@ -358,16 +333,6 @@ export function Rack() {
                 <i>i.</i>
                 <b>Black beaded Filipiniana</b>
                 Filipiniana · ask the shop
-              </li>
-              <li>
-                <i>ii.</i>
-                <b>The bodice and sleeves</b>
-                Detail of the same gown
-              </li>
-              <li>
-                <i>iii.</i>
-                <b>The pleated train</b>
-                Detail of the same gown
               </li>
             </ol>
           </div>

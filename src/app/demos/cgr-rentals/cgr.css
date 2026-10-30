@@ -817,6 +817,15 @@ html:has(.cgr) {
   visibility: hidden;
 }
 
+/* r7.9 (QA): the cutout frames clip her cape at x 504 and her walk-in at
+   x 44 of 540 (93% / 8%). Feather both edges (an eased falloff of about 40-70px at 1366, 26-45px
+   at 390) so neither reads as a hard vertical cut, on the seq-2d, video-gl and
+   video-2d canvases alike (the poster has its own feather, above). */
+.cgr .cgr-intro-canvas {
+  -webkit-mask-image: linear-gradient(90deg, transparent 8%, rgb(0 0 0 / 0.5) 12%, #000 17%, #000 76%, rgb(0 0 0 / 0.62) 84%, rgb(0 0 0 / 0.22) 89%, transparent 93%);
+  mask-image: linear-gradient(90deg, transparent 8%, rgb(0 0 0 / 0.5) 12%, #000 17%, #000 76%, rgb(0 0 0 / 0.62) 84%, rgb(0 0 0 / 0.22) 89%, transparent 93%);
+}
+
 .cgr-intro-alphasrc {
   position: absolute;
   left: 0;
@@ -1308,10 +1317,15 @@ html:has(.cgr) {
   box-shadow: 0 30px 60px -30px rgb(61 15 27 / 0.35), 0 0 0 1px rgb(91 26 42 / 0.08);
 }
 
-/* Detail crops: one photo, scaled inside its mat (Filipiniana). */
-.cgr .cgr-sp .ph-detail img {
-  transform: scale(var(--z, 2));
-  transform-origin: var(--o, 50% 50%);
+/* r7.9: no crops. Every rack photo shows whole inside its frame or mount. */
+.cgr .cgr-sp .ph img {
+  object-fit: contain;
+}
+
+/* r7.9: a gown photo not on the server yet shows the box's plain backdrop,
+   never a broken image and never one of the retired crops. */
+.cgr img[data-missing="true"] {
+  visibility: hidden;
 }
 
 .cgr .cgr-sp-num {
@@ -1499,7 +1513,7 @@ html:has(.cgr) {
 
   .cgr .cgr-sp-01 .cgr-sp-num { left: calc(40 * var(--u)); top: calc(28 * var(--u)); }
   .cgr .cgr-sp-01 .ph-a { left: calc(250 * var(--u)); top: calc(70 * var(--u)); width: calc(430 * var(--u)); height: calc(740 * var(--u)); }
-  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(600 * var(--u)); top: calc(600 * var(--u)); width: calc(176 * var(--u)); height: calc(250 * var(--u)); }
+  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(616 * var(--u)); top: calc(520 * var(--u)); width: calc(140 * var(--u)); height: calc(320 * var(--u)); }
   .cgr .cgr-sp-01 .sw { left: calc(470 * var(--u)); top: calc(96 * var(--u)); font-size: calc(250 * var(--u)); }
   .cgr .cgr-sp-01 .cgr-sp-caps { left: calc(72 * var(--u)); top: calc(520 * var(--u)); width: 150px; }
   .cgr .cgr-sp-01 .cgr-sp-text { margin-left: calc(790 * var(--u)); width: calc(504 * var(--u)); padding: calc(372 * var(--u)) 0 56px; }
@@ -1510,13 +1524,11 @@ html:has(.cgr) {
   }
 
   .cgr .cgr-sp-03 .cgr-sp-num { left: calc(1120 * var(--u)); top: calc(28 * var(--u)); }
-  .cgr .cgr-sp-03 .ph-a { left: calc(760 * var(--u)); top: calc(90 * var(--u)); width: calc(330 * var(--u)); height: calc(640 * var(--u)); }
-  .cgr .cgr-sp-03 .ph-b { z-index: 2; left: calc(1130 * var(--u)); top: calc(250 * var(--u)); width: calc(170 * var(--u)); height: calc(200 * var(--u)); }
-  .cgr .cgr-sp-03 .ph-c { z-index: 2; left: calc(1130 * var(--u)); top: calc(480 * var(--u)); width: calc(170 * var(--u)); height: calc(220 * var(--u)); }
+  .cgr .cgr-sp-03 .ph-a { left: calc(820 * var(--u)); top: calc(70 * var(--u)); width: calc(330 * var(--u)); height: calc(672 * var(--u)); }
   /* The script word sits under the black gown, not on it, so it stays legible. */
   .cgr .cgr-sp-03 .sw { left: calc(600 * var(--u)); top: calc(722 * var(--u)); font-size: calc(140 * var(--u)); }
   /* Captions sit in a row under the text so they stay inside the spread. */
-  .cgr .cgr-sp-03 .cgr-sp-caps { left: calc(120 * var(--u)); top: calc(640 * var(--u)); width: calc(420 * var(--u)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 calc(20 * var(--u)); }
+  .cgr .cgr-sp-03 .cgr-sp-caps { left: calc(120 * var(--u)); top: calc(640 * var(--u)); width: calc(420 * var(--u)); }
   .cgr .cgr-sp-03 .cgr-sp-caps li + li { margin-top: 0; }
   .cgr .cgr-sp-03 .cgr-sp-text { margin-left: calc(120 * var(--u)); width: calc(500 * var(--u)); padding: calc(170 * var(--u)) 0 64px; }
 
@@ -1621,13 +1633,11 @@ html:has(.cgr) {
 
   .cgr .cgr-sp-01 .cgr-sp-num { left: calc(276 * var(--p)); top: calc(24 * var(--p)); }
   .cgr .cgr-sp-01 .ph-a { left: calc(20 * var(--p)); top: calc(40 * var(--p)); width: calc(250 * var(--p)); height: calc(410 * var(--p)); }
-  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(236 * var(--p)); top: calc(300 * var(--p)); width: calc(134 * var(--p)); height: calc(184 * var(--p)); }
+  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(262 * var(--p)); top: calc(222 * var(--p)); width: calc(108 * var(--p)); height: calc(250 * var(--p)); }
   .cgr .cgr-sp-01 .sw { left: calc(110 * var(--p)); top: calc(150 * var(--p)); font-size: calc(104 * var(--p)); }
 
   .cgr .cgr-sp-03 .cgr-sp-num { left: calc(24 * var(--p)); top: calc(16 * var(--p)); }
-  .cgr .cgr-sp-03 .ph-a { left: calc(140 * var(--p)); top: calc(40 * var(--p)); width: calc(230 * var(--p)); height: calc(400 * var(--p)); }
-  .cgr .cgr-sp-03 .ph-b { z-index: 2; left: calc(20 * var(--p)); top: calc(126 * var(--p)); width: calc(136 * var(--p)); height: calc(160 * var(--p)); }
-  .cgr .cgr-sp-03 .ph-c { z-index: 2; left: calc(20 * var(--p)); top: calc(300 * var(--p)); width: calc(136 * var(--p)); height: calc(170 * var(--p)); }
+  .cgr .cgr-sp-03 .ph-a { left: calc(98 * var(--p)); top: calc(30 * var(--p)); width: calc(200 * var(--p)); height: calc(406 * var(--p)); }
   .cgr .cgr-sp-03 .cgr-sp-art { aspect-ratio: 390 / 540; }
   .cgr .cgr-sp-03 .sw { left: calc(128 * var(--p)); top: calc(440 * var(--p)); font-size: calc(54 * var(--p)); }
 
@@ -1925,8 +1935,9 @@ html:has(.cgr) {
   height: 100%;
 }
 
+/* r7.9: gown photos show whole (natural framing), on the card's ink. */
 .cgr-cf-media img {
-  object-fit: cover;
+  object-fit: contain;
   pointer-events: none;
   -webkit-user-drag: none;
 }
@@ -2127,8 +2138,9 @@ html:has(.cgr) {
 .cgr-dt-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
+  /* r7.9: the whole photo, never a crop (the lens maths assumes contain). */
+  object-fit: contain;
+  object-position: 50% 50%;
   animation: cgr-fade 0.6s var(--ease-out);
 }
 
@@ -2151,6 +2163,8 @@ html:has(.cgr) {
 .cgr-dt-name-in {
   z-index: 2;
   color: var(--cream);
+  /* r7.9: whole shop photos can be light (white lattice), so the cream copy gets an ink halo. */
+  text-shadow: 0 0 2px rgb(20 8 12 / 0.7), 0 2px 18px rgb(20 8 12 / 0.6);
 }
 
 .cgr-dt-lens {
@@ -2246,7 +2260,7 @@ html:has(.cgr) {
 .cgr-dt-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .cgr-dt-info {
@@ -3505,6 +3519,15 @@ tr[data-status="cancelled"] .cgr-ow-c {
   align-items: center;
   gap: var(--s-3) var(--s-5);
 }
+/* r7.9: the status text changes after hydration ("Checking…" to the date
+   line); a fixed first column keeps "Change" from sliding (CLS 0). */
+@media (min-width: 720px) {
+  .cgr-bk-okrow {
+    display: grid;
+    grid-template-columns: minmax(0, 27rem) auto;
+    justify-items: start;
+  }
+}
 
 .cgr .cgr-bk-ok {
   display: inline-flex;
@@ -3607,7 +3630,7 @@ tr[data-status="cancelled"] .cgr-ow-c {
 .cgr-bk-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -3664,6 +3687,12 @@ tr[data-status="cancelled"] .cgr-ow-c {
   margin: 0;
   font-weight: 500;
   text-align: right;
+}
+
+/* r7.9: values that only exist after hydration (today's date) stay
+   unpainted until then, so the "–" to date swap is not a layout shift. */
+.cgr .cgr-hold-dl dd[data-pending] {
+  visibility: hidden;
 }
 
 .cgr .cgr-hold-dl dd[data-total] {
