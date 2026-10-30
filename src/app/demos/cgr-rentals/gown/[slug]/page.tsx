@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { CGR_BASE, GOWNS, getGown } from "@/lib/cgr-rentals";
+import { CGR_BASE, GOWNS, RETIRED_SLUGS, getGown } from "@/lib/cgr-rentals";
 import { CgrShell } from "@/components/demos/cgr-rentals/Shell";
 import { GownDetail } from "@/components/demos/cgr-rentals/GownDetail";
 
@@ -16,6 +16,8 @@ export default async function GownPage({
 }) {
   const { slug } = await params;
   const sp = await searchParams;
+  // r7.9.1: a listing that was taken down goes back to the catalogue.
+  if (RETIRED_SLUGS.has(slug)) redirect(`${CGR_BASE}#gowns`);
   const gown = getGown(slug);
   if (!gown) notFound();
   // r7.9: an old slug (before the listings were renamed to match their

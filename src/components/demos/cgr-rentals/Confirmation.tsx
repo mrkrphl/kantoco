@@ -86,6 +86,11 @@ export function Confirmation({ refCode }: { refCode: string }) {
                     <dd>{booking.ref}</dd>
                   </div>
                 </dl>
+                {gown ? null : (
+                  <p className="cgr-hold-n" data-unlisted="">
+                    This gown is no longer listed. Your reference code still works; the shop can help you pick another.
+                  </p>
+                )}
                 <p className="cgr-hold-n">A reservation request, not a payment. Example rates.</p>
               </div>
             </aside>

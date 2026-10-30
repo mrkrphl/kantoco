@@ -193,44 +193,6 @@ export const GOWNS: Gown[] = [
     sample: true,
   },
   {
-    slug: "maroon-puff-sleeve-gown",
-    name: "Maroon puff sleeve gown",
-    category: "debut",
-    colors: ["red"],
-    sizes: ["XS", "S", "M"],
-    pricePerDay: 2800,
-    blurb:
-      "Off-shoulder maroon gown with big satin puff sleeves, a beaded corset bodice, a sequin mermaid skirt and a sheer tulle overskirt. Sample listing for debuts and grand entrances.",
-    images: [
-      {
-        file: "photos/cgr-gown-maroon-puff-01",
-        alt: "A woman wears the maroon off-shoulder gown with satin puff sleeves and a tulle overskirt, indoors at home.",
-        w: 900,
-        h: 1200,
-      },
-      {
-        file: "photos/cgr-gown-maroon-puff-02",
-        alt: "The maroon puff sleeve gown worn outdoors at night, the tulle overskirt spread on the ground.",
-        w: 825,
-        h: 1100,
-      },
-      {
-        file: "photos/cgr-gown-maroon-puff-03",
-        alt: "The maroon puff sleeve gown worn under a covered walkway at night, front view.",
-        w: 806,
-        h: 1200,
-      },
-      {
-        file: "photos/cgr-gown-maroon-puff-04",
-        alt: "The maroon puff sleeve gown worn under the covered walkway, a closer full-length view.",
-        w: 599,
-        h: 1200,
-      },
-    ],
-    bookedDates: ["2026-11-13", "2026-11-14", "2026-11-27"],
-    sample: true,
-  },
-  {
     slug: "teal-puff-sleeve-gown",
     name: "Teal puff sleeve gown",
     category: "pageant",
@@ -501,12 +463,22 @@ export const CATEGORY_LABEL: Record<GownCategory, string> = {
  * (and bookings saved under them) still resolve.
  */
 export const SLUG_ALIASES: Record<string, string> = {
-  "red-lace-corset": "maroon-puff-sleeve-gown",
   "red-sequin-column": "navy-gold-sequin-gown",
   "blue-ball-gown": "royal-blue-mermaid-gown",
   "blue-ruffle-debut": "powder-blue-tulle-gown",
   "blue-sash-cotillion": "periwinkle-cape-gown",
 };
+
+/**
+ * r7.9.1: listings taken down. maroon-puff-sleeve-gown (and red-lace-corset,
+ * its old slug) only had photos of a wearer whose age is not confirmed (no children), so the
+ * listing is gone until the shop confirms. Its pages redirect to the
+ * catalogue; bookings saved under it still open on confirmation.
+ */
+export const RETIRED_SLUGS: ReadonlySet<string> = new Set([
+  "maroon-puff-sleeve-gown",
+  "red-lace-corset",
+]);
 
 export function getGown(slug: string): Gown | undefined {
   const s = SLUG_ALIASES[slug] ?? slug;
