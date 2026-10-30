@@ -55,7 +55,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
       return;
     }
     if (past) {
-      setError("Pick a date from today onward.");
+      setError("The pickup date has to be today or later.");
       return;
     }
     if (!free) {
@@ -80,10 +80,10 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
       : !validDates
         ? "the return date must be on or after the pickup date."
         : past
-          ? "that date has passed. pick today or later."
+          ? "that date has passed. the earliest pickup is today."
           : free
             ? `open in the sample calendar, ${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()}.`
-            : `${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()} overlaps a hold. pick other dates.`;
+            : `${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()} overlaps a hold in the sample calendar.`;
 
   return (
     <div className="cgr-bk ox grain">

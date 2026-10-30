@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin, useGSAP);
  * piece is a `.win` OS-window card (30px ink title bar, 2px ink border, 10px
  * hard shadow) laid out like a fitting-room table. Desktop: GSAP Draggable
  * with inertia inside the section, double-click to open. Phone: a stacked
- * pile with a ghost "Tap to shuffle" button. Reduced motion: a static board
+ * pile with a ghost "Shuffle" button. Reduced motion: a static board
  * (desktop) / static pile (phone) with plain links.
  */
 
@@ -227,11 +227,11 @@ export function MoodBoard() {
 
       <div className="cgr-mb-text">
         <h2 className="cgr-mb-title ext" id="cgr-mb-title">
-          Every gown, on the table.
+          Debut, pageant and formal gowns, with tiaras.
         </h2>
         <p className="cgr-mb-copy">
-          Twelve pieces, laid out like a fitting-room mood board. Drag them around, stack the ones you like, and open one
-          to check its dates.
+          Twelve pieces on one board: six gowns and six accessories, from crowns to a crystal choker. Each one opens to
+          its own calendar.
         </p>
         <div className="cgr-mb-filters" role="group" aria-label="Filter pieces">
           {FILTERS.map((f) => (
@@ -286,7 +286,7 @@ export function MoodBoard() {
                 href={href}
                 className="win-ph"
                 draggable={false}
-                aria-label={`Open ${g.name}, ${formatPhp(g.pricePerDay)} a day (example), and check dates`}
+                aria-label={`${g.name}, ${formatPhp(g.pricePerDay)} a day (example). Opens its calendar.`}
                 onClick={(e) => {
                   // Desktop motion: single click is pick-up; double-click (or Enter) opens.
                   if (!phone && !reduced && e.detail > 0) e.preventDefault();
@@ -313,7 +313,7 @@ export function MoodBoard() {
 
       <div className="cgr-mb-shuffle">
         <button type="button" className="btn btn-ghost" onClick={shuffle} disabled={pile.length < 2}>
-          Tap to shuffle
+          Shuffle
         </button>
         <p className="mono" aria-live="polite">
           {topIdx + 1} of {items.length} on top

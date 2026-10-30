@@ -250,16 +250,16 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       </svg>
       <div className="cgr-wrap cgr-cf-head">
         <h2 className="cgr-cf-title ext" id="cgr-cf-title" data-rv>
-          Spin the rail.
+          Every piece on the rail
         </h2>
-        <p className="cgr-cf-hint mono">drag, swipe, scroll or use the arrow keys. {items.length} pieces.</p>
+        <p className="cgr-cf-hint mono">{items.length} pieces. drag, swipe, scroll or use the arrow keys.</p>
       </div>
       <div
         ref={viewRef}
         className="cgr-cf-view"
         tabIndex={0}
         role="group"
-        aria-label="Gown rail. Use left and right arrow keys."
+        aria-label="Gown rail, left and right arrow keys move it."
       >
         <div className="cgr-cf-tilt">
         <div className="cgr-cf-track">
@@ -274,7 +274,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
                 href={`${CGR_BASE}/gown/${it.slug}`}
                 className="cgr-cf-card"
                 draggable={false}
-                aria-label={`${it.name}, ${formatPhp(it.pricePerDay)} per day sample. View and check dates.`}
+                aria-label={`${it.name}, ${formatPhp(it.pricePerDay)} a day (example). Opens its calendar.`}
               >
                 <span className="cgr-cf-media">
                   <img

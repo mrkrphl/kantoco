@@ -342,7 +342,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
           <dt>rate</dt>
           <dd>{formatPhp(gown.pricePerDay)} a day, example rate</dd>
           <dt>hold</dt>
-          <dd>request a date, get a reference code</dd>
+          <dd>a date request with a CGR reference code</dd>
         </dl>
         <p className="cgr-dt-blurb">{gown.blurb}</p>
 
@@ -397,7 +397,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
               ? "checking the sample calendar…"
               : free
                 ? `${humanDate(date).toLowerCase()} is open in the sample calendar.`
-                : `${humanDate(date).toLowerCase()} is already held. pick another date.`}
+                : `${humanDate(date).toLowerCase()} is already held in the sample calendar.`}
           </p>
         </div>
 
