@@ -2,55 +2,58 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
-import { CGR_BASE, formatPhp, type Gown } from "@/lib/cgr-rentals";
-import { addBooking, isRangeFree, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
-import { StepHead } from "@/components/demos/cgr-rentals/Steps";
+import { useEffect, useRef, useState } from "react";
+import { CGR_BASE, SLUG_ALIASES, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import { addBooking, loadBookings, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
+import { Side, Steps, useStepFocus } from "@/components/demos/cgr-rentals/FlowBits";
 import {
-  addDaysIso,
   customerTotal,
   defaultReturn,
   humanDate,
   rangeLabel,
   rentalDays,
+  reserveState,
+  takenDays,
+  takenSentence,
 } from "@/components/demos/cgr-rentals/reserveMath";
-import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
-type Step = 1 | 2 | 3;
-type Fields = { name: string; contact: string; occasion: string; notes: string };
-const EMPTY: Fields = { name: "", contact: "", occasion: "", notes: "" };
-const KEY = (slug: string) => `cgr-reserve-v1:${slug}`;
-
-function parseStep(v: string | null): Step {
-  return v === "2" ? 2 : v === "3" ? 3 : 1;
-}
+type Fields = { name: string; contact: string; notes: string };
+const EMPTY: Fields = { name: "", contact: "", notes: "" };
+const KEY = (slug: string) => `cgr-reserve-v2:${slug}`;
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * r7.7 reserve flow (Design r7.7 spec §2, with Chip's calls): steps 01/02/03
- * with one question each. Step 01 shows and confirms the dates picked on the
- * gown page (no re-pick here; "Change" goes back to the gown's calendar).
- * The step lives in ?step= (browser back works) and the answers in
- * sessionStorage. Logic is unchanged from r7.6: the customer total is rate x
- * days, the commission never shows here, and the save mints a CGR code.
+ * r7.11 Reserve flow (spec §5): 01 Date · 02 Details · 03 Done.
+ * 01 shows the dates picked on the gown page and re-checks them on entry
+ * (states: free, taken, past, missing). 02 asks name, contact and an
+ * optional note (the occasion folds in here, CGR_FLAGS.occasionField off);
+ * example values are placeholders only. Errors show on submit, never on
+ * blur. The save re-checks the dates, writes a record (kind "reserve") and
+ * opens Done (/confirmation?ref=). Customer total = rate x days; the
+ * commission never shows here. The step lives in ?step= so Back works.
  */
-export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: string }) {
+export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: Gown; initialDate: string; initialReturn?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const step = parseStep(params.get("step"));
   const today = useToday();
-  const bookings = useBookings();
-  const uid = useId();
+  const rows = useBookings();
+  const noun = gown.category === "accessory" ? "piece" : "gown";
 
-  const eventDate = initialDate || (today ? addDaysIso(today, 7) : "");
-  const returnDate = defaultReturn(eventDate);
+  const from = ISO.test(initialDate) ? initialDate : "";
+  const to = from ? (ISO.test(initialReturn) && initialReturn >= from ? initialReturn : defaultReturn(from)) : "";
+  const ready = today !== null && rows !== null;
+  const taken = ready && from ? takenDays(gown.slug, from, to, gown.bookedDates, rows, SLUG_ALIASES) : [];
+  const state = ready ? reserveState(from, to, today, taken) : null;
+  const wantDetails = params.get("step") === "2";
+  const step: "date" | "details" = state === "ok" && wantDetails ? "details" : "date";
+
   const [f, setF] = useState<Fields>(EMPTY);
-  const [loaded, setLoaded] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<"dates" | "name" | "contact", string>>>({});
-  const headRef = useRef<HTMLHeadingElement>(null);
-  const lastStep = useRef<Step>(step);
+  const [errs, setErrs] = useState<Partial<Record<"name" | "contact", string>>>({});
+  const [tries, setTries] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const alertRef = useRef<HTMLDivElement>(null);
 
-  // Answers persist per gown for this tab (sessionStorage), read after hydration.
   useEffect(() => {
     try {
       const raw = window.sessionStorage.getItem(KEY(gown.slug));
@@ -59,342 +62,231 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
     } catch {
       /* ignore */
     }
-    setLoaded(true);
   }, [gown.slug]);
-  useEffect(() => {
-    if (!loaded) return;
+  const set = (k: keyof Fields, v: string) => {
+    const next = { ...f, [k]: v };
+    setF(next);
     try {
-      window.sessionStorage.setItem(KEY(gown.slug), JSON.stringify(f));
+      window.sessionStorage.setItem(KEY(gown.slug), JSON.stringify(next));
     } catch {
       /* ignore */
     }
-  }, [f, loaded, gown.slug]);
+  };
 
-  // Focus the step question on every step change (not on first paint).
+  const errCount = Object.keys(errs).length;
+  const stateKey = `${step}:${state ?? "load"}`;
+  const title =
+    step === "details" ? "Details · Reserve" : state === "taken" ? "Taken · Reserve" : state === "past" ? "Past date · Reserve" : "Date · Reserve";
+  const h1Ref = useStepFocus(stateKey, title);
+
   useEffect(() => {
-    if (lastStep.current !== step) {
-      lastStep.current = step;
-      headRef.current?.focus({ preventScroll: false });
-    }
-  }, [step]);
+    if (tries && errCount) alertRef.current?.focus();
+  }, [tries, errCount]);
 
-  const days = rentalDays(eventDate, returnDate);
-  const total = customerTotal(gown.pricePerDay, eventDate, returnDate);
-  const past = today !== null && eventDate !== "" && eventDate < today;
-  const checking = today === null || bookings === null;
-  const free =
-    !checking && days !== null && isRangeFree(gown.slug, eventDate, returnDate, gown.bookedDates, bookings ?? []);
-  const datesOk = free && !past;
-  const range = eventDate ? rangeLabel(eventDate, returnDate) : "";
-  const gownHref = `${CGR_BASE}/gown/${gown.slug}`;
-  // r7.8: "Change" reopens the gown's calendar on the dates already picked.
-  const changeHref = eventDate ? `${gownHref}?date=${encodeURIComponent(eventDate)}#dates` : `${gownHref}#dates`;
-  const img = gown.images[1] ?? gown.images[0];
+  const gownHref = `${CGR_BASE}/gown/${gown.slug}${from ? `?from=${from}&to=${to}` : ""}#dates`;
+  const qs = (s?: string) => {
+    const p = new URLSearchParams();
+    if (from) p.set("from", from);
+    if (to) p.set("to", to);
+    if (s) p.set("step", s);
+    return `${pathname}?${p.toString()}`;
+  };
 
-  const dateStatus = checking
-    ? "Checking the sample calendar…"
-    : days === null
-      ? "The return date must be on or after the pickup date."
-      : past
-        ? "That date has passed. Pick a new one on the gown page."
-        : free
-          ? `Open in the sample calendar, ${range}.`
-          : `${range} is already reserved in the sample calendar. Pick another day on the gown page.`;
+  const days = from ? rentalDays(from, to) : null;
+  const total = from ? customerTotal(gown.pricePerDay, from, to) : null;
+  // Rows come from the URL dates alone (not the async check), so the
+  // summary never grows after load (CLS 0).
+  const sideRows: [string, string][] =
+    from && total !== null
+      ? [
+          ["Event day", humanDate(from)],
+          ["Return", humanDate(to)],
+          [`${days} days at ${formatPhp(gown.pricePerDay)}`, total !== null ? formatPhp(total) : ""],
+        ]
+      : [];
+  const mob = from && total !== null ? `${rangeLabel(from, to)} · ${formatPhp(total)}` : `${formatPhp(gown.pricePerDay)} a day`;
 
-  function go(next: Step, clear = false) {
-    if (clear) setErrors({});
-    const q = new URLSearchParams(params.toString());
-    if (next === 1) q.delete("step");
-    else q.set("step", String(next));
-    const qs = q.toString();
-    window.history.pushState(null, "", qs ? `${pathname}?${qs}` : pathname);
-  }
-
-  function checkDates(): boolean {
-    if (datesOk) return true;
-    setErrors({ dates: checking ? "Still checking the sample calendar. Try again in a moment." : dateStatus });
-    return false;
-  }
-
-  function checkContact(): boolean {
-    const e: typeof errors = {};
-    if (!f.name.trim()) e.name = "Add your name.";
-    if (!f.contact.trim()) e.contact = "Add a mobile number or Messenger name.";
-    setErrors(e);
-    return !e.name && !e.contact;
-  }
-
-  function onSubmit(e: React.FormEvent) {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step === 1) {
-      if (checkDates()) go(2, true);
+    const next: typeof errs = {};
+    if (!f.name.trim()) next.name = "Please add your name.";
+    if (!f.contact.trim()) next.contact = "Please add a mobile number or Messenger name.";
+    setErrs(next);
+    setTries((t) => t + 1);
+    if (Object.keys(next).length) return;
+    // Re-check the dates against everything saved, right now.
+    const latest = loadBookings();
+    const t2 = takenDays(gown.slug, from, to, gown.bookedDates, latest, SLUG_ALIASES);
+    if (reserveState(from, to, today ?? "", t2) !== "ok") {
+      router.replace(qs());
       return;
     }
-    if (step === 2) {
-      if (checkContact()) go(3);
-      return;
-    }
-    if (!checkDates()) {
-      go(1);
-      return;
-    }
-    if (!checkContact()) {
-      go(2);
-      return;
-    }
-    const booking = addBooking({
+    setSaving(true);
+    const b = addBooking({
+      kind: "reserve",
       gownSlug: gown.slug,
       gownName: gown.name,
-      eventDate,
-      returnDate,
+      eventDate: from,
+      returnDate: to,
       customerName: f.name.trim(),
       customerContact: f.contact.trim(),
-      notes: [f.occasion.trim(), f.notes.trim()].filter(Boolean).join(" · "),
+      notes: f.notes.trim(),
     });
     try {
       window.sessionStorage.removeItem(KEY(gown.slug));
     } catch {
       /* ignore */
     }
-    router.push(`${CGR_BASE}/confirmation?ref=${encodeURIComponent(booking.ref)}`);
+    router.push(`${CGR_BASE}/confirmation?ref=${encodeURIComponent(b.ref)}`);
+  };
+
+  let main: React.ReactNode;
+  if (saving) {
+    main = (
+      <h1 ref={h1Ref} tabIndex={-1}>
+        Reserving…
+      </h1>
+    );
+  } else if (state === null) {
+    main = (
+      <h1 ref={h1Ref} tabIndex={-1}>
+        Checking your date…
+      </h1>
+    );
+  } else if (step === "details") {
+    const ids = { n: "r-name", c: "r-contact", o: "r-notes" };
+    main = (
+      <form onSubmit={submit} noValidate className="r11-main" style={{ maxWidth: "none", width: "100%" }}>
+        <h1 ref={h1Ref} tabIndex={-1}>
+          Who should the shop <em>message?</em>
+        </h1>
+        <p className="r11-sub">The shop messages you to confirm your {noun} and dates.</p>
+        {errCount ? (
+          <div ref={alertRef} className="r11-alert" role="alert" tabIndex={-1}>
+            {errCount === 2
+              ? "Two details are missing. Please check the fields marked below."
+              : "One detail is missing. Please check the field marked below."}
+          </div>
+        ) : null}
+        <div className="r11-row">
+          <div className="r11-field">
+            <label htmlFor={ids.n}>Your name</label>
+            <input
+              id={ids.n}
+              name="name"
+              autoComplete="name"
+              placeholder="Ana Santos"
+              value={f.name}
+              required
+              aria-invalid={errs.name ? true : undefined}
+              aria-describedby={errs.name ? `${ids.n}-e` : undefined}
+              onChange={(e) => set("name", e.target.value)}
+            />
+            {errs.name ? (
+              <p className="msg" id={`${ids.n}-e`}>
+                {errs.name}
+              </p>
+            ) : null}
+          </div>
+          <div className="r11-field">
+            <label htmlFor={ids.c}>Mobile or Messenger</label>
+            <input
+              id={ids.c}
+              name="contact"
+              autoComplete="tel"
+              placeholder="0917 000 0000"
+              value={f.contact}
+              required
+              aria-invalid={errs.contact ? true : undefined}
+              aria-describedby={`${ids.c}-h${errs.contact ? ` ${ids.c}-e` : ""}`}
+              onChange={(e) => set("contact", e.target.value)}
+            />
+            <p className="hint" id={`${ids.c}-h`}>
+              Only used to confirm this reservation.
+            </p>
+            {errs.contact ? (
+              <p className="msg" id={`${ids.c}-e`}>
+                {errs.contact}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <div className="r11-field">
+          <label htmlFor={ids.o}>
+            Anything the shop should know? <span>(optional)</span>
+          </label>
+          <textarea
+            id={ids.o}
+            name="notes"
+            placeholder="Debut, size M, I’d like it hemmed"
+            value={f.notes}
+            onChange={(e) => set("notes", e.target.value)}
+          />
+        </div>
+        <div className="r11-acts">
+          <button type="submit" className="r11-btn r11-wine">
+            Reserve your {noun}
+          </button>
+          <Link className="r11-link" href={qs()}>
+            Back
+          </Link>
+        </div>
+        <p className="r11-note">No payment now. Nothing is final until the shop messages you.</p>
+      </form>
+    );
+  } else if (state === "ok") {
+    main = (
+      <>
+        <h1 ref={h1Ref} tabIndex={-1}>
+          Your {noun} is <em>free</em> on your day.
+        </h1>
+        <dl className="r11-datecard">
+          <div>
+            <dt>Event day</dt>
+            <dd>{humanDate(from)}</dd>
+          </div>
+          <div>
+            <dt>Return</dt>
+            <dd>{humanDate(to)}</dd>
+          </div>
+          <Link className="r11-link" href={gownHref}>
+            Change dates
+          </Link>
+        </dl>
+        <Link className="r11-btn r11-wine" href={qs("2")}>
+          Continue
+        </Link>
+      </>
+    );
+  } else {
+    const copy =
+      state === "taken"
+        ? { h: `Sorry, this ${noun} is taken that day.`, p: takenSentence(from, to, taken) }
+        : state === "past"
+          ? { h: "That date has already passed.", p: `Pick a day from today onward on the ${noun}’s calendar.` }
+          : { h: "Pick your date first.", p: `Tap your event day on the ${noun}’s calendar.` };
+    main = (
+      <>
+        <h1 ref={h1Ref} tabIndex={-1} data-state={state}>
+          {copy.h}
+        </h1>
+        <p className="r11-sub" style={{ marginTop: 0 }}>
+          {copy.p}
+        </p>
+        <Link className="r11-btn r11-wine" href={gownHref}>
+          {state === "missing" ? "Pick your date" : "Pick another date"}
+        </Link>
+      </>
+    );
   }
 
-  const errList = Object.values(errors).filter(Boolean);
-  const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setF((p) => ({ ...p, [k]: v }));
-    if (k === "name" || k === "contact") setErrors((p) => ({ ...p, [k]: undefined }));
-  };
-
-  const heads: Record<Step, { t: React.ReactNode; s: string }> = {
-    1: {
-      t: (
-        <>
-          When is the <em>event?</em>
-        </>
-      ),
-      s: "Your dates came over from the gown page. To change them, pick again on the gown’s calendar.",
-    },
-    2: {
-      t: (
-        <>
-          Who should the shop <em>message?</em>
-        </>
-      ),
-      s: "A name and a number or Messenger is all the shop needs to confirm.",
-    },
-    3: {
-      t: (
-        <>
-          Tell us about the <em>occasion.</em>
-        </>
-      ),
-      s: "Optional, but it helps the shop prepare the fitting.",
-    },
-  };
-
   return (
-    <div className="cgr-bk ox grain">
-      <div className="cgr-bk-in">
-        <div className="cgr-bk-grid">
-          <aside className="cgr-bk-side" aria-label="Your reservation">
-            <div className="cgr-bk-photo dark">
-              <GownImg img={img} alt="" decoding="async" />
-            </div>
-            <div className="cgr-hold">
-              <div className="cgr-hold-top">
-                <p className="cgr-hold-t">Your reservation</p>
-                <p className="cgr-hold-s">{gown.name}</p>
-              </div>
-              <p className="cgr-hold-mini" data-pending={eventDate ? undefined : ""}>
-                <span>{range || "–"}</span>
-                <span className="cgr-hold-mini-t">{total !== null ? formatPhp(total) : "–"}</span>
-              </p>
-              <dl className="cgr-hold-dl">
-                <div>
-                  <dt>Pickup</dt>
-                  <dd data-pending={eventDate ? undefined : ""}>{eventDate ? humanDate(eventDate) : "–"}</dd>
-                </div>
-                <div>
-                  <dt>Return</dt>
-                  <dd data-pending={returnDate ? undefined : ""}>{returnDate ? humanDate(returnDate) : "–"}</dd>
-                </div>
-                <div>
-                  <dt>Example rate</dt>
-                  <dd>{formatPhp(gown.pricePerDay)} / day</dd>
-                </div>
-                <div>
-                  <dt>
-                    Total, {days ?? "–"} {days === 1 ? "day" : "days"}
-                  </dt>
-                  <dd data-total={total ?? ""} data-pending={eventDate ? undefined : ""}>
-                    {total !== null ? formatPhp(total) : "–"}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Reference</dt>
-                  <dd className="cgr-hold-pend">after step 03</dd>
-                </div>
-              </dl>
-              <p className="cgr-hold-n">A reservation request, not a payment. Example rates.</p>
-            </div>
-          </aside>
-
-          <form className="cgr-form" onSubmit={onSubmit} noValidate aria-label={`Reserve the ${gown.name}`}>
-            <div className="cgr-step-in" key={step}>
-              <StepHead n={step} title={heads[step].t} sub={heads[step].s} headRef={headRef} />
-
-              {step === 1 ? (
-                <fieldset className="cgr-fs">
-                  <legend className="sr-only">Your dates</legend>
-                  <div className="uf-row">
-                    <div className="uf uf-ro">
-                      <span className="uf-l">Pickup (event day)</span>
-                      <span className="uf-v">{eventDate ? `${humanDate(eventDate)} ${eventDate.slice(0, 4)}` : "–"}</span>
-                    </div>
-                    <div className="uf uf-ro">
-                      <span className="uf-l">Return</span>
-                      <span className="uf-v">{returnDate ? `${humanDate(returnDate)} ${returnDate.slice(0, 4)}` : "–"}</span>
-                    </div>
-                  </div>
-                  <div className="cgr-bk-okrow">
-                    <p className={datesOk ? "cgr-bk-ok" : "cgr-bk-ok is-no"} role="status" id={`${uid}-dates`}>
-                      {dateStatus}
-                    </p>
-                    <Link className="ulink" href={changeHref}>
-                      Change<span className="sr-only"> the dates on the gown page</span>
-                    </Link>
-                  </div>
-                </fieldset>
-              ) : null}
-
-              {step === 2 ? (
-                <fieldset className="cgr-fs">
-                  <legend className="sr-only">About you</legend>
-                  <label className="uf">
-                    <span className="uf-l">Your name</span>
-                    <input
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Mavy Dela Cruz"
-                      value={f.name}
-                      onChange={set("name")}
-                      aria-invalid={errors.name ? true : undefined}
-                      aria-describedby={errors.name ? `${uid}-en` : undefined}
-                      required
-                    />
-                    {errors.name ? (
-                      <span className="uf-err" id={`${uid}-en`}>
-                        {errors.name}
-                      </span>
-                    ) : null}
-                  </label>
-                  <label className="uf">
-                    <span className="uf-l">Mobile or Messenger</span>
-                    <input
-                      type="text"
-                      autoComplete="tel"
-                      inputMode="text"
-                      placeholder="0917 000 0000"
-                      value={f.contact}
-                      onChange={set("contact")}
-                      aria-invalid={errors.contact ? true : undefined}
-                      aria-describedby={`${uid}-hc${errors.contact ? ` ${uid}-ec` : ""}`}
-                      required
-                    />
-                    <span className="uf-h" id={`${uid}-hc`}>
-                      The shop texts or messages you here to confirm.
-                    </span>
-                    {errors.contact ? (
-                      <span className="uf-err" id={`${uid}-ec`}>
-                        {errors.contact}
-                      </span>
-                    ) : null}
-                  </label>
-                </fieldset>
-              ) : null}
-
-              {step === 3 ? (
-                <fieldset className="cgr-fs">
-                  <legend className="sr-only">The occasion</legend>
-                  <label className="uf">
-                    <span className="uf-l">The occasion</span>
-                    <input type="text" placeholder="Debut, 7 Nov in Imus" value={f.occasion} onChange={set("occasion")} aria-describedby={`${uid}-ho`} />
-                    <span className="uf-h" id={`${uid}-ho`}>
-                      Optional
-                    </span>
-                  </label>
-                  <label className="uf">
-                    <span className="uf-l">Anything the shop should know</span>
-                    <input type="text" placeholder="Needs hemming for 5′2″" value={f.notes} onChange={set("notes")} aria-describedby={`${uid}-hn`} />
-                    <span className="uf-h" id={`${uid}-hn`}>
-                      Optional
-                    </span>
-                  </label>
-                  <dl className="cgr-rev">
-                    <div>
-                      <dt>Dates</dt>
-                      <dd>{range || "–"}</dd>
-                      <Link className="ulink" href={changeHref}>
-                        Change<span className="sr-only"> the dates</span>
-                      </Link>
-                    </div>
-                    <div>
-                      <dt>Name</dt>
-                      <dd>{f.name.trim() || "–"}</dd>
-                      <button type="button" className="ulink" onClick={() => go(2, true)}>
-                        Change<span className="sr-only"> your name</span>
-                      </button>
-                    </div>
-                    <div>
-                      <dt>Contact</dt>
-                      <dd>{f.contact.trim() || "–"}</dd>
-                      <button type="button" className="ulink" onClick={() => go(2, true)}>
-                        Change<span className="sr-only"> your contact</span>
-                      </button>
-                    </div>
-                  </dl>
-                </fieldset>
-              ) : null}
-
-              {errList.length ? (
-                <div className="cgr-bk-err" role="alert">
-                  {errList.map((m) => (
-                    <p key={m}>{m}</p>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="cgr-bk-actions">
-                <button type="submit" className="btn btn-cream">
-                  {step === 3 ? (
-                    "Reserve your gown"
-                  ) : (
-                    <>
-                      Continue <span aria-hidden="true">→</span>
-                    </>
-                  )}
-                </button>
-                {step === 1 ? (
-                  <Link className="ulink" href={gownHref}>
-                    Back to the gown
-                  </Link>
-                ) : (
-                  <button type="button" className="ulink" onClick={() => go((step - 1) as Step, true)}>
-                    Back
-                  </button>
-                )}
-              </div>
-              {step === 3 ? (
-                <p className="cgr-bk-note">
-                  This sample saves the request in your browser with a CGR reference. Nothing is sent to the shop, and
-                  nothing is paid.
-                </p>
-              ) : null}
-            </div>
-          </form>
-        </div>
+    <section className="r11-fl" aria-label={`Reserve ${gown.name}`}>
+      <div className="r11-main">
+        <Steps labels={["Date", "Details", "Done"]} at={step === "details" ? 1 : 0} label="Reserve steps" />
+        {main}
       </div>
-    </div>
+      <Side gown={gown} rows={sideRows} mob={mob} note="Example rates. No payment now." />
+    </section>
   );
 }

@@ -1,146 +1,150 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import { CGR_BASE, cgr, formatPhp, getGown, type Booking } from "@/lib/cgr-rentals";
+import { useEffect } from "react";
+import { CGR_BASE, STATUS_LABEL, cgr, formatPhp, getGown, type Booking } from "@/lib/cgr-rentals";
 import { useBookings } from "@/components/demos/cgr-rentals/bookings";
-import { StepHead } from "@/components/demos/cgr-rentals/Steps";
-import { customerTotal, humanDate, rangeLabel, rentalDays } from "@/components/demos/cgr-rentals/reserveMath";
-import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
+import { Side, Steps } from "@/components/demos/cgr-rentals/FlowBits";
+import {
+  customerTotal,
+  gapPhrase,
+  humanDate,
+  isFitting,
+  rangeLabel,
+  rentalDays,
+  slotLabel,
+} from "@/components/demos/cgr-rentals/reserveMath";
+
+/** Record card used on Done (both flows). */
+export function RecordCard({ b, linkedTo }: { b: Booking; linkedTo?: string }) {
+  const fit = isFitting(b);
+  return (
+    <div className="r11-record" data-ref={b.ref}>
+      <span className={fit ? "r11-tag fit" : "r11-tag"}>{fit ? "Fitting" : "Reserve"}</span>
+      <span className="r">
+        {fit ? `${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")}` : b.gownName}
+      </span>
+      <span className="s">{STATUS_LABEL[b.status]}</span>
+      <span />
+      <span className="s" style={{ gridColumn: "2 / -1" }}>
+        {fit
+          ? linkedTo
+            ? `For reservation ${linkedTo} · ${b.gownName}`
+            : `${b.gownName} · ${b.customerName}`
+          : `${rangeLabel(b.eventDate, b.returnDate || b.eventDate)} · ${b.customerName}`}
+      </span>
+    </div>
+  );
+}
 
 /**
- * r7.7 confirmation (Design r7.7 spec §2): the CGR code large, what happens
- * next, and the same ticket. Warm Reserve wording; it never says the booking
- * is confirmed (the shop confirms by message).
+ * r7.11 Done (spec §5 03 Done and §6 f3). One page for both flows, by ref:
+ * old refs and old rows (no `kind`) open as reservations. The code is big
+ * and selectable; the record card mirrors what the owner sees.
  */
 export function Confirmation({ refCode }: { refCode: string }) {
-  const stored = useBookings();
-  const ready = stored !== null;
-  const booking: Booking | null = (refCode && stored?.find((b) => b.ref === refCode)) || null;
-  const gown = booking ? getGown(booking.gownSlug) : undefined;
-  const days = booking ? rentalDays(booking.eventDate, booking.returnDate) : null;
-  const total = gown && booking ? customerTotal(gown.pricePerDay, booking.eventDate, booking.returnDate) : null;
-  const headRef = useRef<HTMLHeadingElement>(null);
+  const rows = useBookings();
+  const b = rows?.find((x) => x.ref === refCode.trim().toUpperCase()) ?? null;
+  const fit = b ? isFitting(b) : false;
+  const gown = b ? getGown(b.gownSlug) : undefined;
+
   useEffect(() => {
-    if (booking) headRef.current?.focus();
-  }, [booking]);
-  const img = gown ? (gown.images[1] ?? gown.images[0]) : null;
+    if (!rows) return;
+    document.title = `${b ? (fit ? "Fitting booked" : "Reserved") : "Code not found"} · Cavite Gown Rentals`;
+  }, [rows, b, fit]);
+
+  if (!rows) {
+    return (
+      <section className="r11-fl">
+        <div className="r11-main">
+          <h1>Opening your booking…</h1>
+        </div>
+      </section>
+    );
+  }
+
+  if (!b) {
+    return (
+      <section className="r11-fl">
+        <div className="r11-main">
+          <h1 tabIndex={-1}>We can’t find that code.</h1>
+          <p className="r11-sub" style={{ marginTop: 0 }}>
+            {refCode ? `${refCode} is not saved in this browser.` : "No code was given."} Bookings in this sample are saved
+            in this browser only.
+          </p>
+          <Link className="r11-btn r11-wine" href={`${CGR_BASE}#rail`}>
+            Back to the gowns
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const linked = fit && b.linkedRef ? rows.find((x) => x.ref === b.linkedRef) : undefined;
+  const event = linked?.eventDate ?? (fit ? b.eventDate : "");
+  const days = !fit ? rentalDays(b.eventDate, b.returnDate || b.eventDate) : null;
+  const total = !fit && gown ? customerTotal(gown.pricePerDay, b.eventDate, b.returnDate || b.eventDate) : null;
+  const noun = gown?.category === "accessory" ? "piece" : "gown";
+
+  const sideRows: [string, string][] = fit
+    ? [
+        ["Fitting", `${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")}`],
+        ...(event ? ([["Event day", humanDate(event)]] as [string, string][]) : []),
+      ]
+    : [
+        ["Event day", humanDate(b.eventDate)],
+        ["Return", humanDate(b.returnDate || b.eventDate)],
+        ...(gown && total !== null ? ([[`${days} days at ${formatPhp(gown.pricePerDay)}`, formatPhp(total)]] as [string, string][]) : []),
+      ];
+  const gap = fit ? gapPhrase(b.fittingDate ?? "", event) : "";
 
   return (
-    <div className="cgr-bk ox grain">
-      <div className="cgr-bk-in">
-        {!ready ? (
-          <p className="cgr-cn-loading">Loading…</p>
-        ) : !booking ? (
-          <div className="cgr-cn">
-            <h1 className="cgr-steps-q">No reservation found</h1>
-            <p className="cgr-cn-lead">
-              Reference <code>{refCode || "none"}</code> is not in this browser&apos;s storage.
-            </p>
-            <Link className="ulink" href={CGR_BASE}>
-              Back to the gowns
-            </Link>
-          </div>
-        ) : (
-          <div className="cgr-bk-grid">
-            <aside className="cgr-bk-side" aria-label="Your reservation">
-              {img ? (
-                <div className="cgr-bk-photo dark">
-                  <GownImg img={img} alt="" decoding="async" />
-                </div>
-              ) : null}
-              <div className="cgr-hold">
-                <div className="cgr-hold-top">
-                  <p className="cgr-hold-t">Your reservation</p>
-                  <p className="cgr-hold-s">{booking.gownName}</p>
-                </div>
-                <p className="cgr-hold-mini">
-                  <span>{rangeLabel(booking.eventDate, booking.returnDate)}</span>
-                  <span className="cgr-hold-mini-t">{booking.ref}</span>
-                </p>
-                <dl className="cgr-hold-dl">
-                  <div>
-                    <dt>Pickup</dt>
-                    <dd>{humanDate(booking.eventDate)}</dd>
-                  </div>
-                  <div>
-                    <dt>Return</dt>
-                    <dd>{humanDate(booking.returnDate)}</dd>
-                  </div>
-                  {gown ? (
-                    <div>
-                      <dt>Example rate</dt>
-                      <dd>{formatPhp(gown.pricePerDay)} / day</dd>
-                    </div>
-                  ) : null}
-                  {total !== null ? (
-                    <div>
-                      <dt>
-                        Total, {days} {days === 1 ? "day" : "days"}
-                      </dt>
-                      <dd data-total={total}>{formatPhp(total)}</dd>
-                    </div>
-                  ) : null}
-                  <div>
-                    <dt>Reference</dt>
-                    <dd>{booking.ref}</dd>
-                  </div>
-                </dl>
-                {gown ? null : (
-                  <p className="cgr-hold-n" data-unlisted="">
-                    This gown is no longer listed. Your reference code still works; the shop can help you pick another.
-                  </p>
-                )}
-                <p className="cgr-hold-n">A reservation request, not a payment. Example rates.</p>
-              </div>
-            </aside>
-            <div className="cgr-cn cgr-step-in">
-              <StepHead
-                n={3}
-                complete
-                headRef={headRef}
-                title={
-                  <>
-                    Your reservation request <em>is in.</em>
-                  </>
-                }
-              />
-              <p className="cgr-cn-ref" aria-label={`Reference code ${booking.ref}`}>
-                {booking.ref}
-              </p>
-              <p className="cgr-cn-codel">Your reference code. Show it at the fitting and at pickup.</p>
-              <ol className="cgr-cn-next">
-                <li>
-                  <b aria-hidden="true">i.</b>
-                  The shop messages you on {booking.customerContact} to confirm the gown and the dates.
-                </li>
-                <li>
-                  <b aria-hidden="true">ii.</b>
-                  Come in for a fitting. Hemming and small changes are agreed there.
-                </li>
-                <li>
-                  <b aria-hidden="true">iii.</b>
-                  Pick up on {humanDate(booking.eventDate)} and return on {humanDate(booking.returnDate)}.
-                </li>
-              </ol>
-              <div className="cgr-bk-actions">
-                <Link className="btn btn-cream" href={`${CGR_BASE}#gowns`}>
-                  Back to the gowns
-                </Link>
-                <a className="ulink" href={cgr.messenger} target="_blank" rel="noopener noreferrer">
-                  Ask about a fitting
-                </a>
-              </div>
-              <p className="cgr-bk-note">
-                A sample reservation, saved in this browser. Nothing was sent to the shop.{" "}
-                <Link className="ulink" href={`${CGR_BASE}/owner`}>
-                  Owner view
-                </Link>
-              </p>
-            </div>
-          </div>
-        )}
+    <section className="r11-fl" aria-label={fit ? "Fitting booked" : "Reservation done"}>
+      <div className="r11-main r11-done">
+        <Steps labels={fit ? ["Day", "Time", "Done"] : ["Date", "Details", "Done"]} at={2} label={fit ? "Fitting steps" : "Reserve steps"} />
+        <p className="r11-script" aria-hidden="true">
+          {fit ? "See you soon" : "Thank you"}
+        </p>
+        <h1 tabIndex={-1}>{fit ? "Your fitting is booked." : `Your ${noun} is reserved.`}</h1>
+        <p className="r11-sub" style={{ marginTop: 0 }}>
+          {fit
+            ? `${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")} at the shop${gap ? `, ${gap}` : ""}. The shop will message you to confirm.`
+            : `The shop will message you on ${b.customerContact} to confirm. Keep this code for the fitting and pickup.`}
+        </p>
+        <p className="r11-ref" aria-label={`Your code: ${b.ref.split("").join(" ")}`}>
+          {b.ref}
+        </p>
+        <RecordCard b={b} linkedTo={fit ? b.linkedRef : undefined} />
+        <div className="r11-acts">
+          {fit ? (
+            <>
+              <Link className="r11-btn r11-wine" href={`${CGR_BASE}#rail`}>
+                Back to the gowns
+              </Link>
+              <a className="r11-link" href={cgr.maps} target="_blank" rel="noopener noreferrer">
+                Get directions
+              </a>
+            </>
+          ) : (
+            <>
+              <Link className="r11-btn r11-wine" href={`${CGR_BASE}/fitting?ref=${encodeURIComponent(b.ref)}`}>
+                Book your fitting
+              </Link>
+              <Link className="r11-link" href={`${CGR_BASE}#rail`}>
+                Back to the gowns
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {gown ? (
+        <Side
+          gown={gown}
+          rows={sideRows}
+          mob={fit ? `Fitting ${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")}` : rangeLabel(b.eventDate, b.returnDate || b.eventDate)}
+          note={fit ? "Example times. Sample only." : "Example rates. No payment now."}
+        />
+      ) : null}
+    </section>
   );
 }
