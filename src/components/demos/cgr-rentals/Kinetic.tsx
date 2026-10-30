@@ -1,138 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
+import gsap from "gsap";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 
-const WORDS = ["Debut", "Pageant", "Prom", "Wedding", "Formal", "Cavite"];
-
 /**
- * One slow Bodoni italic line (~90s per loop). CSS-driven (transform only),
- * paused on hover and whenever the band is off screen (IntersectionObserver).
- * Reduced motion: one static, centred line.
+ * Round 7 kinetic helpers (stamp §6). The r6 RingCursor and serif Marquee
+ * are retired. What stays: the line reveal and the magnet button.
  */
-export function Marquee() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { reduced } = useMotionReady();
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || reduced) return;
-    const io = new IntersectionObserver(
-      ([e]) => el.classList.toggle("is-live", e.isIntersecting),
-      { rootMargin: "80px 0px" },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      el.classList.remove("is-live");
-    };
-  }, [reduced]);
-
-  // Two identical halves; the row slides by exactly one half per loop.
-  const half = (key: string, hidden: boolean) => (
-    <span className="cgr-mq-set" key={key} aria-hidden={hidden || undefined}>
-      {[...WORDS, ...WORDS].map((w, i) => (
-        <span className="cgr-mq-w" key={i}>
-          {w}
-          <span className="cgr-mq-sep" aria-hidden="true">
-            ◆
-          </span>
-        </span>
-      ))}
-    </span>
-  );
-
-  return (
-    <div ref={ref} className="cgr-mq">
-      <p className="cgr-sr">Gowns for debut, pageant, prom, wedding and formal nights in Cavite.</p>
-      <div className="cgr-mq-row" aria-hidden="true">
-        {half("a", true)}
-        {half("b", true)}
-      </div>
-    </div>
-  );
-}
 
 /**
- * Fine champagne ring with a 3px dot that trails the pointer (lerp .12).
- * 20px at rest, 44px over links / buttons / cards, 36px while pressed.
- * Fine pointers only; hidden on touch and under reduced motion. The native
- * cursor stays visible.
- */
-export function RingCursor() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { ready, reduced } = useMotionReady();
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !ready || reduced) return;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    if (!mq.matches) return;
-    let x = -100;
-    let y = -100;
-    let cx = x;
-    let cy = y;
-    let raf = 0;
-    let shown = false;
-    let mode = "";
-    const loop = () => {
-      cx += (x - cx) * 0.12;
-      cy += (y - cy) * 0.12;
-      el.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
-      raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.2 ? requestAnimationFrame(loop) : 0;
-    };
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
-      x = e.clientX;
-      y = e.clientY;
-      if (!shown) {
-        shown = true;
-        cx = x;
-        cy = y;
-        el.classList.add("is-on");
-      }
-      const t = e.target as Element | null;
-      const next = t?.closest?.("a,button,select,input,textarea,label,[role=button],[data-cursor=link]")
-        ? "link"
-        : "";
-      if (next !== mode) {
-        mode = next;
-        el.dataset.mode = mode;
-      }
-      if (!raf) raf = requestAnimationFrame(loop);
-    };
-    const onLeave = () => {
-      shown = false;
-      el.classList.remove("is-on");
-    };
-    const onDown = () => el.classList.add("is-press");
-    const onUp = () => el.classList.remove("is-press");
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerleave", onLeave);
-    window.addEventListener("pointerdown", onDown, { passive: true });
-    window.addEventListener("pointerup", onUp, { passive: true });
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointerup", onUp);
-    };
-  }, [ready, reduced]);
-
-  return (
-    <div ref={ref} className="cgr-cursor" aria-hidden="true">
-      <span className="cgr-cursor-ring" />
-      <span className="cgr-cursor-dot" />
-    </div>
-  );
-}
-
-/**
- * Masked fade-up reveal (900ms, ease-out) for children marked [data-rv]
- * inside the ref'd container. 120ms stagger per parent, capped at 3 items.
+ * Line reveal for children marked [data-rv] inside the ref'd container:
+ * clip inset(100% 0 0 0) -> inset(0), 0.7s, 80ms stagger per parent (capped).
  * Only items below the fold at load are hidden first, so nothing on screen
- * ever blinks (CLS-safe: opacity / transform / clip-path only).
+ * blinks (CLS-safe: clip-path and transform only). Reduced motion: instant.
  */
 export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
   const ref = useRef<T>(null);
@@ -148,7 +29,7 @@ export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
       const parent = el.parentElement ?? root;
       const n = groups.get(parent) ?? 0;
       groups.set(parent, n + 1);
-      el.style.setProperty("--rv-d", `${Math.min(n, 2) * 120}ms`);
+      el.style.setProperty("--rv-d", `${Math.min(n, 4) * 80}ms`);
       el.classList.add("rv");
     });
     const io = new IntersectionObserver(
@@ -160,7 +41,7 @@ export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
           }
         });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.1 },
     );
     pending.forEach((el) => io.observe(el));
     return () => {
@@ -170,4 +51,87 @@ export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, reduced, ...deps]);
   return ref;
+}
+
+/**
+ * Magnet button (stamp §5/§6): a hot circle that pulls toward the pointer
+ * within 120px, max 18px (quickTo), its label moving 1.4x as far; snaps back
+ * with elastic.out(1, .4) over 0.8s. Fine pointers only; reduced motion and
+ * touch get a plain link.
+ */
+export function Magnet({
+  href,
+  children,
+  className = "",
+}: {
+  href: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const { ready, reduced } = useMotionReady();
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !ready || reduced) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const label = el.querySelector<HTMLElement>(".magnet-l");
+    const xTo = gsap.quickTo(el, "x", { duration: 0.35, ease: "power3.out" });
+    const yTo = gsap.quickTo(el, "y", { duration: 0.35, ease: "power3.out" });
+    const lxTo = label ? gsap.quickTo(label, "x", { duration: 0.35, ease: "power3.out" }) : null;
+    const lyTo = label ? gsap.quickTo(label, "y", { duration: 0.35, ease: "power3.out" }) : null;
+    let rect: DOMRect | null = null;
+    let near = false;
+    const MAX = 18;
+    const RANGE = 120;
+    // Rest rect (without the magnet offset), re-read after any scroll.
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      const ox = Number(gsap.getProperty(el, "x")) || 0;
+      const oy = Number(gsap.getProperty(el, "y")) || 0;
+      rect = new DOMRect(r.left - ox, r.top - oy, r.width, r.height);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!rect) return;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const d = Math.hypot(dx, dy);
+      const reach = rect.width / 2 + RANGE;
+      if (d < reach) {
+        near = true;
+        const k = (1 - d / reach) * 1.6;
+        const mx = gsap.utils.clamp(-MAX, MAX, dx * 0.25 * k);
+        const my = gsap.utils.clamp(-MAX, MAX, dy * 0.25 * k);
+        xTo(mx);
+        yTo(my);
+        lxTo?.(mx * 0.4);
+        lyTo?.(my * 0.4);
+      } else if (near) {
+        near = false;
+        gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)", overwrite: true });
+        if (label) gsap.to(label, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)", overwrite: true });
+      }
+    };
+    // Measure lazily on the next pointer move after a scroll.
+    const onScroll = () => {
+      rect = null;
+    };
+    const onAny = (e: PointerEvent) => {
+      if (!rect) measure();
+      onMove(e);
+    };
+    window.addEventListener("pointermove", onAny, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onAny);
+      window.removeEventListener("scroll", onScroll);
+      gsap.set([el, label].filter(Boolean), { x: 0, y: 0 });
+    };
+  }, [ready, reduced]);
+  return (
+    <a ref={ref} href={href} className={`magnet ${className}`.trim()}>
+      <span className="magnet-l">{children}</span>
+    </a>
+  );
 }
