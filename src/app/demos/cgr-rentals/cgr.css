@@ -3528,6 +3528,20 @@ tr[data-status="cancelled"] .cgr-ow-c {
     justify-items: start;
   }
 }
+/* Phones: "Change" gets its own line and the status keeps two lines of
+   room, so the date line arriving late (slow network) moves nothing. */
+@media (max-width: 719.98px) {
+  .cgr-bk-okrow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cgr .cgr-bk-ok {
+    min-height: calc(2.9em + 14px);
+    line-height: 1.45;
+    border-radius: 20px;
+  }
+}
 
 .cgr .cgr-bk-ok {
   display: inline-flex;
@@ -3691,7 +3705,8 @@ tr[data-status="cancelled"] .cgr-ow-c {
 
 /* r7.9: values that only exist after hydration (today's date) stay
    unpainted until then, so the "–" to date swap is not a layout shift. */
-.cgr .cgr-hold-dl dd[data-pending] {
+.cgr .cgr-hold-dl dd[data-pending],
+.cgr .cgr-hold-mini[data-pending] {
   visibility: hidden;
 }
 

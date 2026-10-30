@@ -206,7 +206,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
                 <p className="cgr-hold-t">Your reservation</p>
                 <p className="cgr-hold-s">{gown.name}</p>
               </div>
-              <p className="cgr-hold-mini">
+              <p className="cgr-hold-mini" data-pending={eventDate ? undefined : ""}>
                 <span>{range || "–"}</span>
                 <span className="cgr-hold-mini-t">{total !== null ? formatPhp(total) : "–"}</span>
               </p>
