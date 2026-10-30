@@ -6,7 +6,12 @@
  * as is and never turned into a calendar date. An empty list hides the
  * section (Testimonials.tsx).
  */
-export type TestimonialSource = "Google" | "Facebook" | "Instagram" | "TikTok";
+/**
+ * "Google" is the only source in use. "Facebook comment" is the optional
+ * r7.7 variant (Design r7.7 spec §1): typed here so real Facebook comments
+ * can be added later, but there is no Facebook data and none may be made up.
+ */
+export type TestimonialSource = "Google" | "Facebook comment";
 
 export type Testimonial = {
   id: number;
@@ -15,11 +20,27 @@ export type Testimonial = {
   source: TestimonialSource;
   /** Relative date label, exactly as the source shows it. */
   date: string;
-  /** Star rating, shown as text only. */
-  rating: number;
+  /** Star rating, shown as text only. Facebook comments may have none. */
+  rating?: number;
   /** The review body, verbatim. */
   quote: string;
 };
+
+/** Meta-line tag per source. */
+export const SOURCE_LABEL: Record<TestimonialSource, string> = {
+  Google: "Google review",
+  "Facebook comment": "Facebook comment",
+};
+
+/**
+ * Desktop spreads by id (Design r7.7 spec §1, 3/3/2): a feature quote plus
+ * two side quotes, then a duo. The phone shows the same order, one per slide.
+ */
+export const SPREADS: number[][] = [
+  [1, 7, 2], // ea · Hillary M. · Maria R.
+  [5, 8, 3], // Leira H. · Angela D. · Lexie C.
+  [6, 4], // Kletrysia F. · Yvelle P.
+];
 
 /** Where the full list lives (opens in a new tab). */
 export const REVIEWS_URL =

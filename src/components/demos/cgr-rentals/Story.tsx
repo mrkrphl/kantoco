@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
+import { HERO_SEQ, seqFile } from "./heroSeq.manifest";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 /** r7.6 tokens: --ease-veil (rotator crossfade). */
@@ -57,17 +58,17 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
 const HERO_ALPHA = true;
 export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
-/** Image sequence (r7.6.5): 36 colour WebP cutout frames (540x960, clip
-    T_START..end) drawn to a 2D canvas. Default hero path on desktop; phones
+/** Image sequence (r7.6.5; r7.7 reads heroSeq.manifest.ts): colour WebP
+    cutout frames (default 36 at 540x960, clip T_START..end) drawn to a 2D canvas. Default hero path on desktop; phones
     keep the stacked-alpha clip unless it fails to advance. ?cgrseq=1 forces
     the sequence, ?cgrseq=0 the clip. A missing landed frame (404) falls back
     to the clip, then the poster. */
-const SEQ_COUNT = 36;
+const SEQ_COUNT = HERO_SEQ.count;
 /** Landed frame wait before the sequence is given up for the clip. */
 const SEQ_WAIT_MS = 5000;
 /** Clip watchdog: a scroll that has not visibly moved the clip in this long switches to the sequence. */
 const ADVANCE_MS = 1000;
-const seqSrc = (i: number) => `${CGR_ASSET}/seq/mavy-${String(i).padStart(2, "0")}.webp`;
+const seqSrc = (i: number) => `${CGR_ASSET}/${HERO_SEQ.dir}/${seqFile(HERO_SEQ, i)}`;
 
 /** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
 const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
@@ -579,7 +580,7 @@ export function Story() {
     let dead = false;
     let raf = 0;
     let shown = -1;
-    const landIdx = Math.round(((LAND - T_START) / (CLIP_SECONDS - 0.05 - T_START)) * (SEQ_COUNT - 1));
+    const landIdx = Math.max(0, Math.min(SEQ_COUNT - 1, HERO_SEQ.landed));
     const imgs: (HTMLImageElement | null)[] = Array(SEQ_COUNT).fill(null);
     const ok: boolean[] = Array(SEQ_COUNT).fill(false);
     d.loaded = 0;
@@ -637,8 +638,8 @@ export function Story() {
       if (i < 0 || i === shown) return;
       const im = imgs[i]!;
       if (canvas.width !== im.naturalWidth) {
-        canvas.width = im.naturalWidth;
-        canvas.height = im.naturalHeight;
+        canvas.width = im.naturalWidth || HERO_SEQ.width;
+        canvas.height = im.naturalHeight || HERO_SEQ.height;
       }
       try {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
