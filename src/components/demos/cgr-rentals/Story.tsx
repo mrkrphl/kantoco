@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
+import { CGR_ASSET, CGR_FLAGS, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
 import { HERO_CLIPS, HERO_SEQ, frontAt, seqFile } from "./heroSeq.manifest";
@@ -701,13 +701,6 @@ export function Story() {
       <div className="cgr-intro-stage">
         <span className="cgr-intro-bloom" aria-hidden="true" />
 
-        <a className="cgr-mast" href={CGR_BASE} aria-label="Cavite Gown Rentals, home">
-          <span className="l1">
-            Cavite <em>Gown</em>
-          </span>{" "}
-          <span className="l2">Rentals</span>
-        </a>
-
         {/* The figure box is the landed cutout's bbox (112,134 to 492,906 of
             540x960); the full frame overflows it at the stamp's offsets. */}
         <div className="cgr-mavy">
@@ -756,54 +749,37 @@ export function Story() {
         <p className="cgr-gw" aria-hidden="true">
           Gowns
         </p>
-        <p className="cgr-rot hand cgr-intro-hand" aria-hidden="true">
-          {/* r7.10: "for" stays put; "your" and the words stack in one grid
-              cell each, so the box is the longest word and nothing moves. */}
-          <span className="cgr-rot-for">for</span>{" "}
-          <span ref={rotRef} className="cgr-rot-loop" data-run="on">
-            <span className="cgr-rot-your">your</span>
-            {WORDS.map((w, i) => (
-              <span key={w} className="cgr-rot-w" style={{ "--i": i } as React.CSSProperties}>
-                {w}
-              </span>
-            ))}
-            <span className="cgr-rot-w cgr-rot-any" style={{ "--i": WORDS.length } as React.CSSProperties}>
-              {WORD_ANY}
-            </span>
-          </span>
-        </p>
-
         <div className="cgr-intro-copy">
-          <h1 className="cgr-intro-h disp" id="cgr-hero-title">
-            Gown and suit rentals in <em>Dasmariñas,</em> Cavite.
+          <p className="cgr-rot" aria-hidden="true">
+            {/* r7.10: "for" stays put; "your" and the words stack in one grid
+                cell each, so the box is the longest word and nothing moves. */}
+            <span className="cgr-rot-for">for</span>{" "}
+            <span ref={rotRef} className="cgr-rot-loop" data-run="on">
+              <span className="cgr-rot-your">your</span>
+              {WORDS.map((w, i) => (
+                <span key={w} className="cgr-rot-w" style={{ "--i": i } as React.CSSProperties}>
+                  {w}
+                </span>
+              ))}
+              <span className="cgr-rot-w cgr-rot-any" style={{ "--i": WORDS.length } as React.CSSProperties}>
+                {WORD_ANY}
+              </span>
+            </span>
+          </p>
+          <h1 className="cgr-intro-h" id="cgr-hero-title">
+            Gown and suit rentals in Dasmariñas, Cavite.
           </h1>
-          <div className="cgr-intro-bottom">
-            <p className="cgr-intro-lead">
-              Gowns and suits for your debut, wedding, or prom.
-            </p>
+          {CGR_FLAGS.heroShowsRate ? (
             <p className="cgr-intro-rate">From {formatPhp(2200)} a day, example rate</p>
-            <div className="cgr-intro-cta">
-              <a className="btn btn-wine" href="#gowns">
-                See the gowns <span className="arrow" aria-hidden="true" />
-              </a>
-              <a className="cgr-intro-txt" href="#rail">
-                <span>Reserve your gown</span>
-              </a>
-            </div>
-          </div>
+          ) : null}
+          <a className="r11-btn r11-wine r11-sm" href="#gowns">
+            Reserve your gown
+          </a>
         </div>
-
-        <aside className="cgr-capcol" aria-label="On Mavy">
-          <span className="num" aria-hidden="true">
-            i.
-          </span>
-          <b>On Mavy</b>A deep red beaded gown with a sheer veil. Example styling.
-        </aside>
 
         <p className="sr-only">
           {WORDS_SR}
         </p>
-        <span className="cgr-scallop" aria-hidden="true" />
       </div>
       {debug ? (
         <div
