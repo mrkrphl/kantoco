@@ -7,6 +7,7 @@ import {
   type Booking,
 } from "@/lib/cgr-rentals";
 import { useBookings } from "@/components/demos/cgr-rentals/bookings";
+import { humanDate } from "@/components/demos/cgr-rentals/GownDetail";
 
 export function Confirmation({ refCode }: { refCode: string }) {
   const stored = useBookings();
@@ -25,12 +26,12 @@ export function Confirmation({ refCode }: { refCode: string }) {
   if (!booking) {
     return (
       <div className="cgr-wrap cgr-confirm">
-        <h1 className="cgr-h1 cgr-h1-sm">No booking found</h1>
+        <h1 className="cgr-h2">No booking found</h1>
         <p className="cgr-lead">
-          Reference <code>{refCode || "—"}</code> is not in this browser&apos;s
+          Reference <code>{refCode || "none"}</code> is not in this browser&apos;s
           localStorage.
         </p>
-        <Link className="cgr-btn cgr-btn-secondary" href={CGR_BASE}>
+        <Link className="cgr-link" href={CGR_BASE}>
           Back to catalogue
         </Link>
       </div>
@@ -39,46 +40,48 @@ export function Confirmation({ refCode }: { refCode: string }) {
 
   return (
     <div className="cgr-wrap cgr-confirm">
-      <p className="cgr-eyebrow">Reservation saved</p>
-      <h1 className="cgr-h1 cgr-h1-sm">Your reference code</h1>
+      <p className="cgr-micro">Hold request saved · Example</p>
+      <h1 className="cgr-h2">
+        Your reference <em>code</em>
+      </h1>
       <p className="cgr-ref" aria-label="Booking reference">
         {booking.ref}
       </p>
       <p className="cgr-lead">
-        Sample booking only — stored in this browser. The shop confirms your
+        Sample hold only, stored in this browser. The shop confirms your
         hold; bring this code when you fit or pick up.
       </p>
       <dl className="cgr-specs cgr-specs-wide">
         <div>
-          <dt>Item</dt>
+          <dt className="cgr-micro">Item</dt>
           <dd>{booking.gownName}</dd>
         </div>
         <div>
-          <dt>Event date</dt>
-          <dd>{booking.eventDate}</dd>
+          <dt className="cgr-micro">Event date</dt>
+          <dd>{humanDate(booking.eventDate)}</dd>
         </div>
         <div>
-          <dt>Return</dt>
-          <dd>{booking.returnDate}</dd>
+          <dt className="cgr-micro">Return</dt>
+          <dd>{humanDate(booking.returnDate)}</dd>
         </div>
         <div>
-          <dt>Name</dt>
+          <dt className="cgr-micro">Name</dt>
           <dd>{booking.customerName}</dd>
         </div>
         <div>
-          <dt>Contact</dt>
+          <dt className="cgr-micro">Contact</dt>
           <dd>{booking.customerContact}</dd>
         </div>
         <div>
-          <dt>Status</dt>
+          <dt className="cgr-micro">Status</dt>
           <dd>{STATUS_LABEL[booking.status]}</dd>
         </div>
       </dl>
       <div className="cgr-confirm-actions">
-        <Link className="cgr-btn cgr-btn-primary" href={`${CGR_BASE}/owner`}>
+        <Link className="cgr-btn" href={`${CGR_BASE}/owner`}>
           Open owner view
         </Link>
-        <Link className="cgr-btn cgr-btn-secondary" href={CGR_BASE}>
+        <Link className="cgr-link" href={CGR_BASE}>
           Back to catalogue
         </Link>
       </div>

@@ -24,6 +24,31 @@ function addDaysIso(iso: string, days: number): string {
   return `${y}-${m}-${day}`;
 }
 
+const WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "Fri 6 Nov" from an ISO date (fixed English, no locale drift). */
+export function humanDate(iso: string): string {
+  const d = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${WD[d.getDay()]} ${d.getDate()} ${MO[d.getMonth()]}`;
+}
+
+/** Bodoni name with the last word in italic. */
+export function ItalicLast({ text }: { text: string }) {
+  const i = text.lastIndexOf(" ");
+  if (i < 0) return <em>{text}</em>;
+  return (
+    <>
+      {text.slice(0, i + 1)}
+      <em>{text.slice(i + 1)}</em>
+    </>
+  );
+}
+
+const CAL_HEAD = ["M", "T", "W", "T", "F", "S", "S"];
+const CAL_CELLS = 35; // 5 rows always, so the grid never changes height (CLS 0)
+
 export function GownDetail({ gown }: { gown: Gown }) {
   const [active, setActive] = useState(0);
   // Today + localStorage are client-only: render a same-size placeholder on the
@@ -57,26 +82,30 @@ export function GownDetail({ gown }: { gown: Gown }) {
     }
     return days;
   }, [today, bookings, gown.slug, gown.bookedDates]);
+  // Monday-first pad so days sit under the right weekday.
+  const pad = today ? (new Date(`${today}T12:00:00`).getDay() + 6) % 7 : 0;
 
   return (
     <div className="cgr-wrap cgr-detail">
-      <p className="cgr-crumb">
-        <Link href={CGR_BASE}>Catalogue</Link>
+      <p className="cgr-crumb cgr-micro">
+        <Link href={CGR_BASE}>All gowns</Link>
         <span aria-hidden="true"> / </span>
         <span>{gown.name}</span>
       </p>
 
       <div className="cgr-detail-grid">
         <div className="cgr-detail-media">
-          <div className="cgr-detail-hero">
-            <img
-              src={`${CGR_ASSET}/${img.file}.webp`}
-              alt={img.alt}
-              width={img.w}
-              height={img.h}
-              decoding="async"
-              fetchPriority="high"
-            />
+          <div className="ff cgr-detail-hero">
+            <span className="ff-img">
+              <img
+                src={`${CGR_ASSET}/${img.file}.webp`}
+                alt={img.alt}
+                width={img.w}
+                height={img.h}
+                decoding="async"
+                fetchPriority="high"
+              />
+            </span>
           </div>
           {gown.images.length > 1 ? (
             <div className="cgr-thumbs" role="list">
@@ -84,19 +113,21 @@ export function GownDetail({ gown }: { gown: Gown }) {
                 <button
                   key={im.file}
                   type="button"
-                  className={i === active ? "is-on" : undefined}
+                  className={i === active ? "ff is-on" : "ff"}
                   aria-label={`Photo ${i + 1}`}
                   aria-pressed={i === active}
                   onClick={() => setActive(i)}
                 >
-                  <img
-                    src={`${CGR_ASSET}/${im.file}.webp`}
-                    alt=""
-                    width={im.w}
-                    height={im.h}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <span className="ff-img">
+                    <img
+                      src={`${CGR_ASSET}/${im.file}.webp`}
+                      alt=""
+                      width={im.w}
+                      height={im.h}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
                 </button>
               ))}
             </div>
@@ -104,28 +135,33 @@ export function GownDetail({ gown }: { gown: Gown }) {
         </div>
 
         <div className="cgr-detail-copy">
-          <p className="cgr-card-cat">{CATEGORY_LABEL[gown.category]}</p>
-          <h1 className="cgr-h1 cgr-h1-sm">{gown.name}</h1>
-          <p className="cgr-card-price">
-            {formatPhp(gown.pricePerDay)}
-            <span> / day · sample price</span>
+          <p className="cgr-micro">{CATEGORY_LABEL[gown.category]} · Example gown</p>
+          <h1 className="cgr-h2 cgr-detail-name">
+            <ItalicLast text={gown.name} />
+          </h1>
+          <p className="cgr-price">
+            {formatPhp(gown.pricePerDay)} a day <span className="cgr-micro">Example rate</span>
           </p>
           <p className="cgr-lead">{gown.blurb}</p>
           <dl className="cgr-specs">
             <div>
-              <dt>Sizes</dt>
+              <dt className="cgr-micro">Size</dt>
               <dd>{gown.sizes.join(", ")}</dd>
             </div>
             <div>
-              <dt>Colors</dt>
+              <dt className="cgr-micro">Colour</dt>
               <dd>{gown.colors.join(", ")}</dd>
+            </div>
+            <div>
+              <dt className="cgr-micro">Hold</dt>
+              <dd>Request a date, keep the CGR code, the shop confirms</dd>
             </div>
           </dl>
 
           <div className="cgr-avail" aria-label="Availability check">
             <h2 className="cgr-h3">Check a date</h2>
             <label className="cgr-field">
-              <span>Event / pickup date</span>
+              <span className="cgr-micro">Event or pickup date</span>
               <input
                 type="date"
                 value={date}
@@ -133,7 +169,48 @@ export function GownDetail({ gown }: { gown: Gown }) {
                 onChange={(e) => setDate(e.target.value)}
               />
             </label>
-            <p className={free ? "cgr-avail-ok" : "cgr-avail-no"} role="status">
+            <div className="cgr-cal" aria-label="Sample calendar, next 28 days">
+              {CAL_HEAD.map((h, i) => (
+                <span key={`h${i}`} className="cgr-cal-head cgr-micro" aria-hidden="true">
+                  {h}
+                </span>
+              ))}
+              {Array.from({ length: CAL_CELLS }, (_, i) => {
+                const d = upcoming && i >= pad ? upcoming[i - pad] : undefined;
+                if (!d) {
+                  return (
+                    <span key={i} className="cgr-cal-day is-pad" aria-hidden="true">
+                      <span>&nbsp;</span>
+                    </span>
+                  );
+                }
+                const cls = [
+                  "cgr-cal-day",
+                  d.iso === date ? "is-on" : "",
+                  d.free ? "" : "is-busy",
+                  d.iso === today ? "is-today" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+                return (
+                  <button
+                    key={d.iso}
+                    type="button"
+                    className={cls}
+                    aria-pressed={d.iso === date}
+                    aria-label={`${humanDate(d.iso)}${d.free ? " open" : " held"}`}
+                    onClick={() => setDate(d.iso)}
+                  >
+                    <span>{Number(d.iso.slice(8))}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="cgr-cal-legend cgr-micro" aria-hidden="true">
+              <span className="k-open">Open</span> · <span className="k-held">Held</span> ·{" "}
+              <span className="k-on">Chosen</span> · sample dates
+            </p>
+            <p className={free ? "cgr-status cgr-avail-ok" : "cgr-status cgr-avail-no"} role="status">
               {!ready
                 ? "Checking the sample calendar…"
                 : !date
@@ -141,55 +218,28 @@ export function GownDetail({ gown }: { gown: Gown }) {
                   : date < (today ?? "")
                     ? "That date has passed. Pick today or later."
                     : free
-                      ? `Available on ${date} (sample calendar).`
-                      : `Not available on ${date} — already held in the sample calendar.`}
+                      ? `${humanDate(date)} is open in the sample calendar.`
+                      : `${humanDate(date)} is already held in the sample calendar.`}
             </p>
-            <div className="cgr-cal" aria-label="Next 28 days">
-              {upcoming === null
-                ? Array.from({ length: 28 }, (_, i) => (
-                    <span key={i} className="cgr-cal-day" aria-hidden="true">
-                      <span>&nbsp;</span>
-                    </span>
-                  ))
-                : upcoming.map((d) => (
-                    <button
-                      key={d.iso}
-                      type="button"
-                      className={
-                        d.iso === date
-                          ? d.free
-                            ? "cgr-cal-day is-on"
-                            : "cgr-cal-day is-on is-busy"
-                          : d.free
-                            ? "cgr-cal-day"
-                            : "cgr-cal-day is-busy"
-                      }
-                      aria-pressed={d.iso === date}
-                      aria-label={`${d.iso}${d.free ? " available" : " booked"}`}
-                      onClick={() => setDate(d.iso)}
-                    >
-                      <span>{d.iso.slice(8)}</span>
-                    </button>
-                  ))}
+            <div className="cgr-actions">
+              <Link
+                className={free ? "cgr-btn" : "cgr-btn is-disabled"}
+                href={
+                  free
+                    ? `${CGR_BASE}/reserve/${gown.slug}?date=${encodeURIComponent(date)}`
+                    : `${CGR_BASE}/gown/${gown.slug}`
+                }
+                aria-disabled={!free}
+                onClick={(e) => {
+                  if (!free) e.preventDefault();
+                }}
+              >
+                Request a hold
+              </Link>
+              <Link className="cgr-link" href={`${CGR_BASE}#all-gowns`}>
+                Back to all gowns
+              </Link>
             </div>
-            <Link
-              className={
-                free
-                  ? "cgr-btn cgr-btn-primary"
-                  : "cgr-btn cgr-btn-primary is-disabled"
-              }
-              href={
-                free
-                  ? `${CGR_BASE}/reserve/${gown.slug}?date=${encodeURIComponent(date)}`
-                  : `${CGR_BASE}/gown/${gown.slug}`
-              }
-              aria-disabled={!free}
-              onClick={(e) => {
-                if (!free) e.preventDefault();
-              }}
-            >
-              Request reservation
-            </Link>
           </div>
         </div>
       </div>
