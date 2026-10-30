@@ -40,14 +40,14 @@ export function OwnerView() {
     <div className="cgr-wrap cgr-owner">
       <div className="cgr-owner-head">
         <div>
-          <p className="cgr-eyebrow">Owner</p>
-          <h1 className="cgr-h1 cgr-h1-sm">Reservations</h1>
+          <p className="cgr-micro">Owner</p>
+          <h1 className="cgr-h2">Reservations</h1>
           <p className="cgr-lead">
             Sample admin. Bookings live in localStorage on this device only.
           </p>
         </div>
         <div className="cgr-hero-stat" aria-label="Commission total">
-          <p className="cgr-stat-kicker">Commission</p>
+          <p className="cgr-stat-kicker cgr-micro">Commission</p>
           <p className="cgr-stat-num">{formatPhp(commission)}</p>
           <p className="cgr-stat-sub">
             {billable.length} confirmed booking
@@ -64,7 +64,7 @@ export function OwnerView() {
       ) : list.length === 0 ? (
         <div className="cgr-empty-box">
           <p className="cgr-empty">No reservations yet.</p>
-          <Link className="cgr-btn cgr-btn-secondary" href={CGR_BASE}>
+          <Link className="cgr-link" href={CGR_BASE}>
             Browse catalogue
           </Link>
         </div>
@@ -94,7 +94,7 @@ export function OwnerView() {
                   <td data-label="Date">
                     <span>
                       {b.eventDate}
-                      <span className="cgr-mute"> → {b.returnDate}</span>
+                      <span className="cgr-mute"> to {b.returnDate}</span>
                     </span>
                   </td>
                   <td data-label="Customer">

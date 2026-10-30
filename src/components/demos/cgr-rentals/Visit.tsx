@@ -8,14 +8,14 @@ export function VisitSection() {
       aria-labelledby="cgr-visit-h"
     >
       <div className="cgr-visit-head">
-        <p className="cgr-eyebrow">Visit</p>
+        <p className="cgr-micro">Visit</p>
         <h2 className="cgr-h2" id="cgr-visit-h">
-          Hours, location, message.
+          Hours, place, <em>message.</em>
         </h2>
       </div>
       <div className="cgr-visit-grid">
         <div className="cgr-visit-card">
-          <h3 className="cgr-visit-title">Hours</h3>
+          <h3 className="cgr-visit-title cgr-micro">Hours</h3>
           <ul className="cgr-hours">
             {cgr.hours.map((h) => (
               <li key={h.day}>
@@ -27,10 +27,10 @@ export function VisitSection() {
           <p className="cgr-mute">{cgr.hoursNote}</p>
         </div>
         <div className="cgr-visit-card">
-          <h3 className="cgr-visit-title">Location</h3>
+          <h3 className="cgr-visit-title cgr-micro">Location</h3>
           <p className="cgr-addr">{cgr.address}</p>
           <a
-            className="cgr-btn cgr-btn-secondary"
+            className="cgr-link"
             href={cgr.maps}
             target="_blank"
             rel="noopener noreferrer"
@@ -39,12 +39,12 @@ export function VisitSection() {
           </a>
         </div>
         <div className="cgr-visit-card">
-          <h3 className="cgr-visit-title">Messenger</h3>
+          <h3 className="cgr-visit-title cgr-micro">Messenger</h3>
           <p className="cgr-mute">
             Public Facebook Page link only. This sample never messages the shop.
           </p>
           <a
-            className="cgr-btn cgr-btn-primary"
+            className="cgr-btn"
             href={cgr.messenger}
             target="_blank"
             rel="noopener noreferrer"
@@ -52,7 +52,7 @@ export function VisitSection() {
             Message on Facebook
           </a>
           <a
-            className="cgr-text-link"
+            className="cgr-link"
             href={cgr.facebook}
             target="_blank"
             rel="noopener noreferrer"
