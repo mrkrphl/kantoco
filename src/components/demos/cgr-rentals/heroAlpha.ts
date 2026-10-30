@@ -3,9 +3,20 @@
  * The source mp4 carries colour in the top half and a greyscale matte in the
  * bottom half (white = opaque). Each new video frame is uploaded once and
  * drawn to a transparent WebGL canvas: rgb from the top half, alpha from the
- * bottom half's luma. Colour is shot on black, so it is treated as
- * premultiplied (clamped to alpha). Scrubbing stays in Story.tsx (the hidden
- * <video> is seeked exactly like the plain clip); this only paints frames.
+ * bottom half's luma. Scrubbing stays in Story.tsx (the hidden <video> is
+ * seeked exactly like the plain clip); this only paints frames.
+ *
+ * r7.1 (Paige QA): the alpha v2 colour plate is straight, not premultiplied
+ * (it keeps a grey haze where the matte is 0), so colour is multiplied by
+ * alpha instead of clamped to it. Clamping lifted the haze under the hem
+ * into a pink-grey smear. Three soft masks keep any edge from showing:
+ * - sides: alpha eases to 0 over the left 16% and right 9% (she walks in
+ *   from the left edge and the cape leaves the frame there in the spin,
+ *   which drew a hard vertical cut; the walk-in now emerges from dark);
+ * - top 3% and bottom 8%;
+ * - hem band (lower 30% of the frame): semi-opaque, desaturated pixels
+ *   (the floor haze) are dropped; opaque gown pixels and saturated veil
+ *   edges are kept, so sequins inside the gown stay.
  */
 
 const VERT = `
@@ -24,7 +35,14 @@ varying vec2 uv;
 void main() {
   vec3 c = texture2D(t, vec2(uv.x, min(uv.y * 0.5, 0.5 - seam))).rgb;
   float a = texture2D(t, vec2(uv.x, max(0.5 + uv.y * 0.5, 0.5 + seam))).r;
-  gl_FragColor = vec4(min(c, vec3(a)), a);
+  float edge = smoothstep(0.0, 0.16, uv.x) * smoothstep(0.0, 0.09, 1.0 - uv.x)
+    * smoothstep(0.0, 0.03, uv.y) * smoothstep(0.0, 0.08, 1.0 - uv.y);
+  float mx = max(c.r, max(c.g, c.b));
+  float sat = (mx - min(c.r, min(c.g, c.b))) / max(mx, 0.001);
+  float band = smoothstep(0.62, 0.72, uv.y);
+  float keep = mix(1.0, max(smoothstep(0.45, 0.62, sat), smoothstep(0.85, 0.97, a)), band);
+  a *= edge * keep;
+  gl_FragColor = vec4(c * a, a);
 }`;
 
 let support: boolean | null = null;

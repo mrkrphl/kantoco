@@ -82,7 +82,6 @@ export function Story() {
   const rootRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const clockRef = useRef<HTMLSpanElement>(null);
   const { ready, reduced } = useMotionReady();
   // The server can't know the motion preference or WebGL support, so the SSR
   // <video> has no <source>: nothing downloads until the client decides.
@@ -133,10 +132,10 @@ export function Story() {
       const mavy = q(".cgr-mavy")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
       const hand = q(".cgr-intro-hand")[0] as HTMLElement;
-      const copyItems = q(".cgr-intro-copy > *, .cgr-intro-meta") as HTMLElement[];
+      const copyItems = q(".cgr-intro-copy > *") as HTMLElement[];
       const fadeOut = q(".cgr-intro-copy, .cgr-intro-cue, .cgr-intro-hand") as HTMLElement[];
       const lines = q(".cgr-intro-h .ln > span") as HTMLElement[];
-      const after = q(".cgr-intro-sub, .cgr-intro-sub2") as HTMLElement[];
+      const after = q(".cgr-intro-sub") as HTMLElement[];
 
       // Load (time-based): the copy fades up, the hand accent writes on.
       const intro = gsap.timeline({ delay: 0.25 });
@@ -185,8 +184,6 @@ export function Story() {
               scrub: 0.5,
               invalidateOnRefresh: true,
               onUpdate: (self) => {
-                const t = Math.min(1, self.progress / CLIP_END) * CLIP_SECONDS;
-                if (clockRef.current) clockRef.current.textContent = `${t.toFixed(1)}s`;
                 if (self.progress > 0.995 && idle.paused()) idle.play();
               },
               onLeave: () => idle.play(),
@@ -226,8 +223,6 @@ export function Story() {
             { clipPath: "inset(0% 0% 0% 0%)", yPercent: 0, duration: 0.07, stagger: 0.02, ease: "power3.out" },
             0.88,
           );
-          // The clip meta clears as the curve rises (she lands under it).
-          tl.to(q(".cgr-intro-meta"), { autoAlpha: 0, duration: 0.06, ease: "power2.in" }, CURVE_FROM);
           tl.fromTo(after, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.05, ease: "power3.out" }, 0.93);
           tl.to({}, { duration: 0 }, 1);
           return () => {
@@ -299,12 +294,6 @@ export function Story() {
       data-alpha={alpha ? "on" : "off"}
     >
       <div className="cgr-intro-stage grain dark">
-        <p className="cgr-intro-meta mono" aria-hidden="true">
-          <span className="cgr-intro-meta-long">sample render, mavy in the red sequin evening gown </span>
-          <span className="cgr-intro-meta-short">sample render, </span>
-          <span ref={clockRef}>{reduced ? "7.4s" : "0.0s"}</span> / 8.0s
-        </p>
-
         <p className="cgr-intro-word ext" aria-hidden="true">
           {WORD}
         </p>
@@ -391,9 +380,6 @@ export function Story() {
           <p className="cgr-intro-sub">
             Pick a gown, choose your event date and request a hold. You get a reference code, and the shop confirms
             before you pay.
-          </p>
-          <p className="mono cgr-intro-sub2" aria-hidden="true">
-            8.0s / 8.0s, facing front. her hem and veil fall over the curve.
           </p>
         </div>
       </div>

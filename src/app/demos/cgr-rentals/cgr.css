@@ -1,9 +1,12 @@
 /* ==========================================================================
    CGR rentals (KantoCo sample) · Round 7 "loud editorial"
    Source of truth: Design stamp r7/direction.md + frames + src/tokens.css.
-   Black / oxblood / cream, one hot pink. Archivo 900 wide, Space Mono meta,
-   Mrs Saint Delafield twice. Square corners except the magnet, lens and disc.
-   Hot is never text on cream (2.52). Animate transform / opacity / clip only.
+   Black / oxblood / cream, one vermilion accent (r7.1: #e8452c replaces the
+   r7 hot pink #ff4f9e). Archivo 900 wide, Space Mono meta, Mrs Saint
+   Delafield twice. Square corners except the magnet, lens and disc.
+   The accent is never text on cream (3.25) and only large text on oxblood
+   (3.72); small text in it sits on black / ink only (5.32 / 4.96), and ink on
+   an accent fill is 4.96. Animate transform / opacity / clip only.
    ========================================================================== */
 
 .cgr {
@@ -14,7 +17,7 @@
   --ox-deep: #3a0a0f;
   --cream: #f2e8d8;
   --cream-2: #c9b8a4;
-  --hot: #ff4f9e;
+  --hot: #e8452c;
 
   --font-display: var(--nf-display), "Arial Black", sans-serif;
   --font-body: var(--nf-display), Arial, sans-serif;
@@ -37,7 +40,7 @@
   --ease-drift: cubic-bezier(0.45, 0, 0.55, 1);
   --shadow-hard: 10px 10px 0 var(--ink);
 
-  --bar-h: 30px;
+  --bar-h: 24px;
   --head-h: 84px;
 
   min-height: 100vh;
@@ -165,10 +168,13 @@ html:has(.cgr) {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
+/* Dark surfaces: the same tile with white grains (black grains vanish under
+   screen). One static SVG background, no binary, no animation. */
 .cgr .grain.dark::after,
 .cgr .grain.ox::after {
   mix-blend-mode: screen;
-  opacity: 0.1;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
 /* ---------- Buttons + links ---------- */
@@ -302,8 +308,9 @@ html:has(.cgr) {
   align-items: center;
   justify-content: center;
   padding: 0 var(--gut);
-  background: var(--hot);
-  color: var(--ink);
+  background: var(--black);
+  border-bottom: 1px solid rgb(242 232 216 / 0.14);
+  color: var(--cream-2);
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1;
@@ -317,7 +324,8 @@ html:has(.cgr) {
 }
 
 .cgr-bar b {
-  font-weight: 700;
+  font-weight: 400;
+  color: var(--cream);
   text-transform: uppercase;
   margin-right: 8px;
 }
@@ -666,19 +674,7 @@ html:has(.cgr) {
   color: var(--cream-2);
 }
 
-.cgr .cgr-intro-meta {
-  position: absolute;
-  right: var(--gut);
-  top: calc(var(--head-h) + 36px);
-  z-index: 8;
-  max-width: 230px;
-  text-align: right;
-  color: var(--cream-2);
-}
 
-.cgr-intro-meta-short {
-  display: none;
-}
 
 .cgr .cgr-intro-cue {
   position: absolute;
@@ -742,8 +738,7 @@ html:has(.cgr) {
 
 /* Before GSAP takes over: hide what the load / scrub timelines reveal. */
 @media (scripting: enabled) {
-  .cgr-intro[data-motion="on"] .cgr-intro-copy > *,
-  .cgr-intro[data-motion="on"] .cgr-intro-meta {
+  .cgr-intro[data-motion="on"] .cgr-intro-copy > * {
     opacity: 0;
   }
 
@@ -755,8 +750,7 @@ html:has(.cgr) {
     clip-path: inset(100% 0 0 0);
   }
 
-  .cgr-intro[data-motion="on"] .cgr-intro-sub,
-  .cgr-intro[data-motion="on"] .cgr-intro-sub2 {
+  .cgr-intro[data-motion="on"] .cgr-intro-sub {
     opacity: 0;
   }
 }
@@ -798,8 +792,12 @@ html:has(.cgr) {
     display: block;
   }
 
+  /* r7.1: box centred at 43% (its width is 0.44 x stage height) so she
+     lands at ~56% after the 13vw glide, fully in frame at 360-430 (was
+     left 30.8vw: half off the right edge). No CSS translate: GSAP owns
+     transform and clears it. */
   .cgr-mavy {
-    left: 30.8vw;
+    left: calc(43% - 0.22 * max(560px, 100svh - var(--bar-h)));
     bottom: -4px;
     height: 78.2%;
   }
@@ -843,20 +841,8 @@ html:has(.cgr) {
     display: none;
   }
 
-  .cgr .cgr-intro-meta {
-    left: 20px;
-    right: auto;
-    top: calc(var(--head-h) + 2px);
-    text-align: left;
-  }
 
-  .cgr-intro-meta-long {
-    display: none;
-  }
 
-  .cgr-intro-meta-short {
-    display: inline;
-  }
 
   .cgr-intro-h {
     left: 20px;
@@ -2088,7 +2074,7 @@ html:has(.cgr) {
 }
 
 .uf:focus-within .uf-h {
-  color: var(--hot);
+  color: var(--cream);
 }
 
 .uf-row {
@@ -2103,7 +2089,9 @@ html:has(.cgr) {
 }
 
 .cgr .cgr-bk-status.is-no {
-  color: var(--hot);
+  color: var(--cream);
+  text-decoration: underline 2px var(--hot);
+  text-underline-offset: 4px;
 }
 
 .cgr-bk-err {
@@ -2722,7 +2710,3 @@ tr[data-status="cancelled"] .cgr-ow-c {
   }
 }
 
-/* Static intro: the clip meta would sit on her veil in the landed layout. */
-.cgr-intro[data-motion="static"] .cgr-intro-meta {
-  visibility: hidden;
-}
