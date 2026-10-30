@@ -6,12 +6,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   CATEGORY_LABEL,
-  CGR_ASSET,
   CGR_BASE,
   formatPhp,
   type Gown,
 } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
+import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -276,15 +276,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
                 aria-label={`${it.name}, ${formatPhp(it.pricePerDay)} a day (example). Opens its calendar.`}
               >
                 <span className="cgr-cf-media">
-                  <img
-                    src={`${CGR_ASSET}/${img.file}.webp`}
-                    alt=""
-                    width={img.w}
-                    height={img.h}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                  />
+                  <GownImg img={img} alt="" loading="lazy" decoding="async" draggable={false} />
                 </span>
               </Link>
             );

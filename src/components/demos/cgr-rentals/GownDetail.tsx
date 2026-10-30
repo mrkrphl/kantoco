@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
-import { CATEGORY_LABEL, CGR_ASSET, CGR_BASE, GOWNS, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import { CATEGORY_LABEL, CGR_BASE, GOWNS, formatPhp, type Gown } from "@/lib/cgr-rentals";
 import { isDateFree, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { useMotionReady } from "@/components/motion/useMotionReady";
+import { GownImg, useGownSrc } from "@/components/demos/cgr-rentals/GownImg";
 
 export function addDaysIso(iso: string, days: number): string {
   const d = new Date(`${iso}T12:00:00`);
@@ -82,6 +83,7 @@ export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate
   const [picked, setPicked] = useState<string | null>(initialDate || null);
   const [view, setView] = useState<{ y: number; m: number } | null>(null);
   const img = gown.images[active] ?? gown.images[0];
+  const { src, onError: onImgError, ref: imgCheck, missing: imgMissing } = useGownSrc(img);
   const words = displayWords(gown.name);
   const len = Math.max(...words.map((w) => w.length));
   const no = String(GOWNS.indexOf(gown) + 1).padStart(2, "0");
@@ -137,11 +139,11 @@ export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate
       const H = panel.clientHeight;
       const iw = im.naturalWidth || Number(im.getAttribute("width")) || 1;
       const ih = im.naturalHeight || Number(im.getAttribute("height")) || 1;
-      const s = Math.max(W / iw, H / ih);
+      // r7.9: the photo is shown whole (object-fit: contain, centred).
+      const s = Math.min(W / iw, H / ih);
       const dw = iw * s;
       const dh = ih * s;
-      // object-position: 50% 20%
-      geo = { W, H, dw, dh, ox: (W - dw) * 0.5, oy: (H - dh) * 0.2 };
+      geo = { W, H, dw, dh, ox: (W - dw) * 0.5, oy: (H - dh) * 0.5 };
       lens.style.backgroundSize = `${(dw * 2).toFixed(1)}px ${(dh * 2).toFixed(1)}px`;
     };
     const paint = () => {
@@ -256,9 +258,8 @@ export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate
       im.removeEventListener("load", onResize);
       gsap.killTweensOf(lens);
     };
-  }, [reduced, img.file]);
+  }, [reduced, src]);
 
-  const src = `${CGR_ASSET}/${img.file}.webp`;
   const nameStyle = { "--len": len } as React.CSSProperties;
   const ctaLabel = date ? shortDate(date) : "your date";
 
@@ -276,7 +277,12 @@ export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate
 
       <div ref={panelRef} className="cgr-dt-photo dark">
         <img
-          ref={imgRef}
+          ref={(el) => {
+            imgRef.current = el;
+            imgCheck(el);
+          }}
+          onError={onImgError}
+          data-missing={imgMissing ? "true" : undefined}
           className="cgr-dt-img"
           src={src}
           alt={img.alt}
@@ -321,7 +327,7 @@ export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate
               aria-pressed={i === active}
               onClick={() => setActive(i)}
             >
-              <img src={`${CGR_ASSET}/${im.file}.webp`} alt="" width={im.w} height={im.h} loading="lazy" decoding="async" />
+              <GownImg img={im} alt="" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>

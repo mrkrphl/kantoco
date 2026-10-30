@@ -34,9 +34,9 @@ export const cgr = {
     "Sample hours from the shop's public listing. Confirm on Facebook before you go.",
   hours: [{ day: "Mon–Sun", time: "9:00 AM – 8:00 PM" }] as const,
   sampleNote:
-    "Sample data only. Prices, sizes and booked dates are mocked for this KantoCo preview. Photos are face-free crops from the shop's public Facebook / Maps listings.",
+    "Sample data only. Prices, sizes and booked dates are mocked for this KantoCo preview. Photos are from the shop's public Facebook page and listings; some show customers wearing the gowns.",
   credit:
-    "Photos: face-free crops from Cavite Gown Rentals' public Facebook page (facebook.com/CaviteGownRentals) and related public listing stills. Used for this private KantoCo sample only. No shop contact.",
+    "Photos: Cavite Gown Rentals' public Facebook page (facebook.com/CaviteGownRentals) and related public listing stills, some showing customers in the gowns. Used for this private KantoCo sample only. No shop contact.",
   asset: CGR_ASSET,
 } as const;
 
@@ -111,9 +111,11 @@ export const SHOP_PHOTOS = {
 export type GownCategory =
   "debut" | "pageant" | "filipiniana" | "formal" | "accessory";
 
-export type GownColor = "red" | "blue" | "silver" | "gold" | "mixed";
+export type GownColor = "red" | "blue" | "purple" | "green" | "silver" | "gold" | "mixed";
 
 export type GownSize = "XS" | "S" | "M" | "L" | "XL" | "One size";
+
+export type GownImage = { file: string; alt: string; w: number; h: number };
 
 export type Gown = {
   slug: string;
@@ -124,7 +126,11 @@ export type Gown = {
   /** Sample rental rate in PHP per day. Not from the shop. */
   pricePerDay: number;
   blurb: string;
-  images: { file: string; alt: string; w: number; h: number }[];
+  /**
+   * file: path under CGR_ASSET, without ".webp". r7.9: always a whole shop
+   * photo (photos/cgr-gown-*), shown with object-fit: contain; never a crop.
+   */
+  images: GownImage[];
   /** Mock ISO dates already held for this item. */
   bookedDates: string[];
   sample: true;
@@ -142,6 +148,8 @@ export const COLORS: { id: GownColor | "all"; label: string }[] = [
   { id: "all", label: "All colors" },
   { id: "red", label: "Red" },
   { id: "blue", label: "Blue" },
+  { id: "purple", label: "Purple" },
+  { id: "green", label: "Green" },
   { id: "silver", label: "Silver" },
   { id: "gold", label: "Gold" },
   { id: "mixed", label: "Mixed" },
@@ -158,111 +166,226 @@ export const SIZES: { id: GownSize | "all"; label: string }[] = [
 
 /**
  * Catalogue. Prices, sizes, booked dates and listing names are SAMPLE DATA.
- * Public refs did not list rental rates. Photos are face-free crops from
- * public FB/Maps; some crops back more than one mock listing.
+ * Public refs did not list rental rates. r7.9: gown photos are the shop's own
+ * public Facebook photos at natural framing (no detail crops), one gown per
+ * listing; names and blurbs describe the gown in the photo. Sources:
+ * photos/SOURCES.md.
  */
 export const GOWNS: Gown[] = [
   {
     slug: "red-sequin-evening",
-    name: "Red sequin evening gown",
+    name: "Wine sequin slit gown",
     category: "pageant",
     colors: ["red"],
     sizes: ["S", "M", "L", "XL"],
     pricePerDay: 2500,
     blurb:
-      "Strapless corset bodice with illusion midriff, sequin column skirt and side slit. Sample listing for debut or pageant nights.",
+      "Wine-red sequin gown with a deep V neckline, red beaded appliqué down the bodice, sheer long sleeves and a high side slit. Sample listing for pageant and gala nights.",
     images: [
-      { file: "gown-red-full", alt: "Deep red sequin evening gown, full length, on a dark ground. Face-free cutout.", w: 1024, h: 2048 },
-      { file: "gown-red-bodice", alt: "Red gown bodice with lace and sequin detail, face-free cutout.", w: 1024, h: 1024 },
-      { file: "gown-red-detail", alt: "Close-up of the red gown's beaded lace bodice.", w: 570, h: 1280 },
-      { file: "gown-red-skirt", alt: "Close-up of the red gown's sequin skirt.", w: 300, h: 910 },
+      {
+        file: "photos/cgr-gown-wine-sequin-01",
+        alt: "Wine-red sequin gown with a deep V neckline, red beaded appliqué, sheer long sleeves and a high side slit, on a mannequin in the shop.",
+        w: 640,
+        h: 1426,
+      },
     ],
     bookedDates: ["2026-11-08", "2026-11-09", "2026-11-15", "2026-11-22", "2026-12-06"],
     sample: true,
   },
   {
-    slug: "red-lace-corset",
-    name: "Red lace corset gown",
-    category: "pageant",
+    slug: "maroon-puff-sleeve-gown",
+    name: "Maroon puff sleeve gown",
+    category: "debut",
     colors: ["red"],
     sizes: ["XS", "S", "M"],
     pricePerDay: 2800,
     blurb:
-      "Beaded red lace sweetheart bodice with boning and crystal swirls. Sample listing for pageant and gala looks.",
+      "Off-shoulder maroon gown with big satin puff sleeves, a beaded corset bodice, a sequin mermaid skirt and a sheer tulle overskirt. Sample listing for debuts and grand entrances.",
     images: [
-      { file: "gown-red-bodice", alt: "Red gown bodice with lace and sequin detail, face-free cutout.", w: 1024, h: 1024 },
-      { file: "gown-red-detail", alt: "Close-up of the red gown's beaded lace bodice.", w: 570, h: 1280 },
-      { file: "gown-red-full", alt: "Deep red sequin evening gown, full length, on a dark ground. Face-free cutout.", w: 1024, h: 2048 },
+      {
+        file: "photos/cgr-gown-maroon-puff-01",
+        alt: "A woman wears the maroon off-shoulder gown with satin puff sleeves and a tulle overskirt, indoors at home.",
+        w: 900,
+        h: 1200,
+      },
+      {
+        file: "photos/cgr-gown-maroon-puff-02",
+        alt: "The maroon puff sleeve gown worn outdoors at night, the tulle overskirt spread on the ground.",
+        w: 825,
+        h: 1100,
+      },
+      {
+        file: "photos/cgr-gown-maroon-puff-03",
+        alt: "The maroon puff sleeve gown worn under a covered walkway at night, front view.",
+        w: 806,
+        h: 1200,
+      },
+      {
+        file: "photos/cgr-gown-maroon-puff-04",
+        alt: "The maroon puff sleeve gown worn under the covered walkway, a closer full-length view.",
+        w: 599,
+        h: 1200,
+      },
     ],
     bookedDates: ["2026-11-13", "2026-11-14", "2026-11-27"],
     sample: true,
   },
   {
-    slug: "red-sequin-column",
-    name: "Red sequin column gown",
+    slug: "teal-puff-sleeve-gown",
+    name: "Teal puff sleeve gown",
+    category: "pageant",
+    colors: ["green"],
+    sizes: ["S", "M", "L"],
+    pricePerDay: 3200,
+    blurb:
+      "Deep teal off-shoulder gown with satin puff sleeves, silver-green embroidery down the bodice and a long satin train. Sample listing for pageants and pictorials.",
+    images: [
+      {
+        file: "photos/cgr-gown-teal-puff-03",
+        alt: "A woman wears the teal puff sleeve gown with its long satin train, beside a red brick wall.",
+        w: 750,
+        h: 1000,
+      },
+      {
+        file: "photos/cgr-gown-teal-puff-01",
+        alt: "The teal gown worn in a garden of large green leaves, showing the embroidered bodice.",
+        w: 1200,
+        h: 800,
+      },
+      {
+        file: "photos/cgr-gown-teal-puff-02",
+        alt: "The teal gown worn in a garden beside a flowering bonsai, full length with the train.",
+        w: 1200,
+        h: 800,
+      },
+    ],
+    bookedDates: ["2026-11-06", "2026-11-28"],
+    sample: true,
+  },
+  {
+    slug: "navy-gold-sequin-gown",
+    name: "Navy gold sequin gown",
     category: "formal",
-    colors: ["red"],
+    colors: ["blue", "gold"],
     sizes: ["M", "L", "XL"],
     pricePerDay: 2200,
     blurb:
-      "Wine-red sequin column with a draped side panel. Sample listing for formal dinners and proms.",
+      "Navy off-shoulder gown with satin puff sleeves, gold and copper sequin swirls and a sheer navy train. Sample listing for formal dinners and proms.",
     images: [
-      { file: "gown-red-skirt", alt: "Close-up of the red gown's sequin skirt.", w: 300, h: 910 },
-      { file: "gown-red-detail", alt: "Close-up of the red gown's beaded lace bodice.", w: 570, h: 1280 },
-      { file: "gown-red-full", alt: "Deep red sequin evening gown, full length, on a dark ground. Face-free cutout.", w: 1024, h: 2048 },
+      {
+        file: "photos/cgr-gown-navy-gold-01",
+        alt: "Navy off-shoulder gown with puff sleeves, gold sequin swirls and a sheer train, on a mannequin in the shop.",
+        w: 864,
+        h: 1200,
+      },
     ],
     bookedDates: ["2026-11-07", "2026-11-21"],
     sample: true,
   },
   {
-    slug: "blue-ball-gown",
-    name: "Icy blue ball gown",
-    category: "debut",
-    colors: ["blue", "silver"],
+    slug: "royal-blue-mermaid-gown",
+    name: "Royal blue mermaid gown",
+    category: "pageant",
+    colors: ["blue"],
     sizes: ["XS", "S", "M", "L"],
     pricePerDay: 3000,
     blurb:
-      "Voluminous icy-blue ball gown with sculptural shoulder ruffles and a full debut skirt. Sample listing.",
+      "Royal blue sequin mermaid gown with sweeping silver swirls, a sweetheart bodice and sheer puff sleeves. Sample listing for pageant nights.",
     images: [
-      { file: "gown-blue-1", alt: "Icy blue ball gown on a headless mannequin, front view.", w: 896, h: 912 },
-      { file: "gown-blue-2", alt: "Icy blue ball gown on a mannequin, angled view of the skirt layers.", w: 896, h: 912 },
-      { file: "gown-blue-3", alt: "Icy blue ball gown on a mannequin, sash and ruffle detail.", w: 896, h: 912 },
+      {
+        file: "photos/cgr-gown-royal-blue-01",
+        alt: "Royal blue sequin mermaid gown with silver swirls and sheer puff sleeves, on a mannequin in the shop.",
+        w: 675,
+        h: 900,
+      },
     ],
     bookedDates: ["2026-11-01", "2026-11-14", "2026-11-15", "2026-11-28"],
     sample: true,
   },
   {
-    slug: "blue-ruffle-debut",
-    name: "Blue ruffle debut gown",
+    slug: "powder-blue-tulle-gown",
+    name: "Powder blue tulle gown",
     category: "debut",
     colors: ["blue"],
     sizes: ["S", "M", "L"],
     pricePerDay: 3200,
     blurb:
-      "Layered ruffle skirt and pleated off-shoulder wrap in powder blue. Sample listing for 18th birthdays.",
+      "Powder blue off-shoulder tulle gown with feather-trimmed straps, a corset bodice, 3D floral appliqué and a front slit. Sample listing for 18th birthdays.",
     images: [
-      { file: "gown-blue-2", alt: "Icy blue ball gown on a mannequin, angled view of the skirt layers.", w: 896, h: 912 },
-      { file: "gown-blue-1", alt: "Icy blue ball gown on a headless mannequin, front view.", w: 896, h: 912 },
-      { file: "gown-blue-3", alt: "Icy blue ball gown on a mannequin, sash and ruffle detail.", w: 896, h: 912 },
+      {
+        file: "photos/cgr-gown-powder-blue-01",
+        alt: "Powder blue off-shoulder tulle gown with feather trim and floral appliqué, on a mannequin, angled view.",
+        w: 761,
+        h: 1200,
+      },
+      {
+        file: "photos/cgr-gown-powder-blue-02",
+        alt: "The same powder blue tulle gown, front view, showing the corset bodice and the front slit.",
+        w: 963,
+        h: 1200,
+      },
     ],
     bookedDates: ["2026-11-06", "2026-11-20"],
     sample: true,
   },
   {
-    slug: "blue-sash-cotillion",
-    name: "Blue sash cotillion gown",
+    slug: "periwinkle-cape-gown",
+    name: "Periwinkle beaded cape gown",
     category: "formal",
     colors: ["blue", "silver"],
     sizes: ["XS", "S", "M", "L", "XL"],
     pricePerDay: 2600,
     blurb:
-      "Crossed pleated sash over a beaded tulle skirt. Sample listing for cotillion and grand-entrance looks.",
+      "Periwinkle gown covered in silver beading, with a deep V neckline, a waist cut-out and a sheer floor-length cape. Sample listing for galas and grand entrances.",
     images: [
-      { file: "gown-blue-3", alt: "Icy blue ball gown on a mannequin, sash and ruffle detail.", w: 896, h: 912 },
-      { file: "gown-blue-2", alt: "Icy blue ball gown on a mannequin, angled view of the skirt layers.", w: 896, h: 912 },
-      { file: "gown-blue-1", alt: "Icy blue ball gown on a headless mannequin, front view.", w: 896, h: 912 },
+      {
+        file: "photos/cgr-gown-periwinkle-cape-01",
+        alt: "Periwinkle beaded gown with a deep V neckline and a sheer cape, on a mannequin in the shop.",
+        w: 807,
+        h: 1100,
+      },
     ],
     bookedDates: ["2026-11-12", "2026-11-29"],
+    sample: true,
+  },
+  {
+    slug: "violet-gold-beaded-gown",
+    name: "Violet gold beaded gown",
+    category: "pageant",
+    colors: ["purple", "gold"],
+    sizes: ["S", "M"],
+    pricePerDay: 2700,
+    blurb:
+      "Violet beaded bodice with a feathered neckline, a gold-beaded skirt and a sheer violet overskirt. Sample listing for pageant and gala looks.",
+    images: [
+      {
+        file: "photos/cgr-gown-violet-gold-01",
+        alt: "Violet and gold beaded gown with a sheer violet overskirt, on a mannequin in the shop.",
+        w: 737,
+        h: 1200,
+      },
+    ],
+    bookedDates: ["2026-11-20", "2026-12-05"],
+    sample: true,
+  },
+  {
+    slug: "lilac-floral-tulle-gown",
+    name: "Lilac floral tulle gown",
+    category: "debut",
+    colors: ["purple"],
+    sizes: ["XS", "S", "M", "L"],
+    pricePerDay: 2400,
+    blurb:
+      "Lilac off-shoulder tulle gown with a beaded floral bodice and a full, soft skirt. Sample listing for debuts and cotillions.",
+    images: [
+      {
+        file: "photos/cgr-gown-lilac-tulle-01",
+        alt: "Lilac off-shoulder tulle gown with a floral beaded bodice, on a mannequin in the shop.",
+        w: 645,
+        h: 1100,
+      },
+    ],
+    bookedDates: ["2026-11-19", "2026-11-26"],
     sample: true,
   },
   {
@@ -373,8 +496,21 @@ export const CATEGORY_LABEL: Record<GownCategory, string> = {
   accessory: "Accessory",
 };
 
+/**
+ * r7.9: slugs renamed so each listing matches the gown in its photo. Old links
+ * (and bookings saved under them) still resolve.
+ */
+export const SLUG_ALIASES: Record<string, string> = {
+  "red-lace-corset": "maroon-puff-sleeve-gown",
+  "red-sequin-column": "navy-gold-sequin-gown",
+  "blue-ball-gown": "royal-blue-mermaid-gown",
+  "blue-ruffle-debut": "powder-blue-tulle-gown",
+  "blue-sash-cotillion": "periwinkle-cape-gown",
+};
+
 export function getGown(slug: string): Gown | undefined {
-  return GOWNS.find((g) => g.slug === slug);
+  const s = SLUG_ALIASES[slug] ?? slug;
+  return GOWNS.find((g) => g.slug === s);
 }
 
 export function formatPhp(n: number): string {
