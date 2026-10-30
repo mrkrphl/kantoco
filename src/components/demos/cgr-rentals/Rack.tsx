@@ -1,25 +1,28 @@
 "use client";
 
 /**
- * Round 7.5 (Design stamp r7.5: sections.html / sections.css / spec.md): two
- * rooms after the intro, on ivory and cream with a faint wine tulle net.
+ * Round 7.6 (Design stamp r7.6: sections.html / sections.css / spec.md): the
+ * rooms after the cover are lookbook spreads on ivory and cream with a faint
+ * wine tulle net. Each spread has a blush numeral, one framed photo with an
+ * offset hairline, an ivory-matted photo, a Pinyon Script word over the
+ * photos, a text column with a floated mat and a pull quote, and numbered
+ * captions.
  *
- * 1 Catalogue (#gowns, ivory): the h2, lede, rack rows and CTAs on the left;
- *   a strip of five gowns on blush mats tilted in 3D on the right (desktop),
- *   with a magnifier that follows a fine pointer over a gown; a blush band of
- *   accessories (#accessories) closes it.
- * 2 Men's (#suits, cream): two barong mats bleed off the left, the h2, lede
- *   and CTA on the right with the two suits below, and the KantoCo pitch.
+ * 01 Bridal (#gowns, ivory) with the contents band; 03 Filipiniana
+ * (#filipiniana, cream), whose two small mats are CSS detail crops of its
+ * one photo, entering with a page turn; the r7.5 blush accessories band
+ * (#accessories); 05 Barong (#suits, cream) with the two suits and the
+ * KantoCo pitch. 02 and 04 are not drawn in the stamp, so their contents
+ * links go to the catalogue (#rail).
  *
- * Phones (and up to 899px): no tilt. Every photo sits in a staggered
- * two-column grid, so none starts off screen (the r7.4 strips hid the first
- * card at 390). Desktop motion: the strip drifts 24px along its axis with
- * the scroll (--parallax), cards lift 6px on hover. Reduced motion: static.
+ * Desktop (1024+): the stamp's 1366 composition in container units; motion
+ * on, the script words drift 48px and the framed photos 24px with the
+ * scroll, and spread 03 wipes in over 01 (clip-path, ~70vh). Below 1024 each
+ * spread stacks as the stamp's phone page. Reduced motion: still.
  *
  * Shop photos (photos/SOURCES.md) are photo-only: no listing, rate, size or
- * calendar is invented for them, so their captions say "ask the shop". Only
- * the blue ball gown and the accessories are listings (example rates).
- * Fixed card boxes (no CLS), lazy-loaded.
+ * calendar is invented for them, so their captions say "ask the shop".
+ * Fixed photo boxes (no CLS), lazy-loaded.
  *
  * A condensed 64px nav slides in under the sample bar while a room is on
  * screen. It is fixed, moves by transform only and is not focusable when hidden.
@@ -47,20 +50,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 const bySlug = (s: string) => GOWNS.find((g) => g.slug === s) as Gown;
 
-/** A card: a listing (links to its page, example rate) or a shop photo. */
-type Card =
-  | { kind: "gown"; g: Gown; name: string; cat: string; pos?: string; floor?: boolean }
-  | { kind: "photo"; p: ShopPhoto; name: string; cat: string; pos?: string };
-
-/** Far to near, the stamp's order: the nearest (ivory veil) is the largest. */
-const GOWN_CARDS: Card[] = [
-  { kind: "gown", g: bySlug("blue-ball-gown"), name: "Blue ball gown", cat: "Debut and ball", floor: true },
-  { kind: "photo", p: SHOP_PHOTOS.filipiniana, name: "Black beaded Filipiniana", cat: "Filipiniana" },
-  { kind: "photo", p: SHOP_PHOTOS.goldCape, name: "Gold beaded cape gown", cat: "Evening and gala" },
-  { kind: "photo", p: SHOP_PHOTOS.ivoryBall, name: "Ivory ball gown", cat: "Bridal and ivory", pos: "50% 30%" },
-  { kind: "photo", p: SHOP_PHOTOS.ivoryVeil, name: "Ivory gown with veil", cat: "Bridal and ivory", pos: "50% 12%" },
-];
-
 const ACC = ["ruby-pageant-crown", "rose-stone-tiara", "crystal-choker", "gold-crystal-tiaras"].map(bySlug);
 const ACC_FROM = Math.min(...GOWNS.filter((g) => g.category === "accessory").map((g) => g.pricePerDay));
 
@@ -72,147 +61,64 @@ const SN_LINKS = [
 
 const SN_MENU = [...SN_LINKS, ["Owner view", `${CGR_BASE}/owner`]] as const;
 
-type Row = { name: string; note?: string; href: string; on?: boolean };
-const RACKS: Row[] = [
-  { name: "Bridal and ivory", note: "3 shown", href: "#gowns-strip", on: true },
-  { name: "Debut and ball gowns", href: "#rail" },
-  { name: "Filipiniana", href: "#gowns-strip" },
-  { name: "Evening and gala", href: "#rail" },
-  { name: "Suits and barong", href: "#suits" },
+/** The catalogue's contents band (spread 01). */
+const TOC = [
+  { n: "01", name: "Bridal", href: "#gowns", on: true },
+  { n: "02", name: "Debut and ball", href: "#rail" },
+  { n: "03", name: "Filipiniana", href: "#filipiniana" },
+  { n: "04", name: "Evening and gala", href: "#rail" },
+  { n: "05", name: "Barong and suits", href: "#suits" },
 ];
 
-function Img({ c }: { c: Card }) {
-  if (c.kind === "gown") {
-    const img = c.g.images[0];
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- fixed-size cards, local webp
-      <img
-        src={`${CGR_ASSET}/${img.file}.webp`}
-        alt={img.alt}
-        width={img.w}
-        height={img.h}
-        loading="lazy"
-        decoding="async"
-        className={c.floor ? "is-floorcrop" : undefined}
-        style={c.pos ? { objectPosition: c.pos } : undefined}
-      />
-    );
-  }
+/** One shop photo in a box: framed, matted, or a detail crop of the photo. */
+function Ph({
+  p,
+  className,
+  pos,
+  alt,
+  zoom,
+}: {
+  p: ShopPhoto;
+  className: string;
+  pos?: string;
+  alt?: string;
+  zoom?: { z: number; o: string };
+}) {
+  const style = zoom ? ({ "--z": zoom.z, "--o": zoom.o } as React.CSSProperties) : undefined;
   return (
-    <picture>
-      <source srcSet={`${CGR_PHOTOS}/${c.p.file}.avif`} type="image/avif" />
-      <img
-        src={`${CGR_PHOTOS}/${c.p.file}.webp`}
-        alt={c.p.alt}
-        width={c.p.w}
-        height={c.p.h}
-        loading="lazy"
-        decoding="async"
-        style={c.pos ? { objectPosition: c.pos } : undefined}
-      />
-    </picture>
+    <figure className={`ph ${className}${zoom ? " ph-detail" : ""}`} style={style}>
+      <div className="ph-crop">
+        <picture>
+          <source srcSet={`${CGR_PHOTOS}/${p.file}.avif`} type="image/avif" />
+          <img
+            src={`${CGR_PHOTOS}/${p.file}.webp`}
+            alt={alt ?? p.alt}
+            width={p.w}
+            height={p.h}
+            loading="lazy"
+            decoding="async"
+            style={pos ? { objectPosition: pos } : undefined}
+          />
+        </picture>
+      </div>
+    </figure>
   );
 }
 
-function GownCard({ c }: { c: Card }) {
-  const inner = (
-    <>
-      <span className="cgr-rk-im">
-        <Img c={c} />
-      </span>
-      <span className="cgr-rk-cap">
-        <b>{c.name}</b>
-        {c.kind === "gown" ? `${c.cat} · ${formatPhp(c.g.pricePerDay)} a day, example rate` : `${c.cat} · ask the shop`}
-      </span>
-    </>
-  );
-  return c.kind === "gown" ? (
-    <Link href={`${CGR_BASE}/gown/${c.g.slug}`} className="cgr-rk-card">
-      {inner}
-    </Link>
-  ) : (
-    <div className="cgr-rk-card is-shop">{inner}</div>
-  );
-}
-
-function Mat({ p, className, pos }: { p: ShopPhoto; className: string; pos?: string }) {
+function Num({ n }: { n: string }) {
   return (
-    <div className={`cgr-mat ${className}`}>
-      <picture>
-        <source srcSet={`${CGR_PHOTOS}/${p.file}.avif`} type="image/avif" />
-        <img
-          src={`${CGR_PHOTOS}/${p.file}.webp`}
-          alt={p.alt}
-          width={p.w}
-          height={p.h}
-          loading="lazy"
-          decoding="async"
-          style={pos ? { objectPosition: pos } : undefined}
-        />
-      </picture>
-    </div>
+    <span className="cgr-sp-num" aria-hidden="true">
+      {n}
+    </span>
   );
 }
 
-/**
- * Magnifier (spec.md): a round ivory-rimmed lens that follows a fine pointer
- * over a gown with a 450 ms silk lag and fades in over 900 ms. Hover-capable
- * fine pointers at 900px+ only; touch never sees it. Decorative (aria-hidden):
- * the photo itself keeps its alt text.
- */
-const LENS = 200;
-const ZOOM = 2.4;
-function useLens(stage: React.RefObject<HTMLDivElement | null>, lens: React.RefObject<HTMLDivElement | null>, reduced: boolean) {
-  useEffect(() => {
-    const st = stage.current;
-    const ln = lens.current;
-    if (!st || !ln) return;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 900px)");
-    const dur = reduced ? 0 : 0.45;
-    const ease = "power3.out";
-    const toX = gsap.quickTo(ln, "x", { duration: dur, ease });
-    const toY = gsap.quickTo(ln, "y", { duration: dur, ease });
-    let shown = false;
-    const hide = () => {
-      shown = false;
-      ln.dataset.on = "false";
-    };
-    const move = (e: PointerEvent) => {
-      if (!mq.matches || e.pointerType !== "mouse") return hide();
-      const img = (e.target as Element | null)?.closest(".cgr-rk-card")?.querySelector("img");
-      if (!img || !img.complete || !img.naturalWidth) return hide();
-      const r = img.getBoundingClientRect();
-      const nw = img.naturalWidth;
-      const nh = img.naturalHeight;
-      // object-fit: cover, so map the pointer through the cover scale and crop.
-      const cs = Math.max(r.width / nw, r.height / nh);
-      const pos = getComputedStyle(img).objectPosition.split(" ").map((v) => parseFloat(v) / 100);
-      const ox = (nw * cs - r.width) * (pos[0] ?? 0.5);
-      const oy = (nh * cs - r.height) * (pos[1] ?? 0.5);
-      const px = (e.clientX - r.left + ox) * ZOOM;
-      const py = (e.clientY - r.top + oy) * ZOOM;
-      ln.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
-      ln.style.backgroundSize = `${nw * cs * ZOOM}px ${nh * cs * ZOOM}px`;
-      ln.style.backgroundPosition = `${LENS / 2 - px}px ${LENS / 2 - py}px`;
-      const x = e.clientX - LENS / 2;
-      const y = e.clientY - LENS / 2;
-      if (!shown) {
-        gsap.set(ln, { x, y });
-        shown = true;
-        ln.dataset.on = "true";
-      }
-      toX(x);
-      toY(y);
-    };
-    st.addEventListener("pointermove", move);
-    st.addEventListener("pointerleave", hide);
-    window.addEventListener("wheel", hide, { passive: true });
-    return () => {
-      st.removeEventListener("pointermove", move);
-      st.removeEventListener("pointerleave", hide);
-      window.removeEventListener("wheel", hide);
-    };
-  }, [stage, lens, reduced]);
+function Sw({ w }: { w: string }) {
+  return (
+    <span className="sw" aria-hidden="true">
+      {w}
+    </span>
+  );
 }
 
 type Tone = "light" | "dark";
@@ -253,8 +159,6 @@ function RackNav({ on, tone, active }: { on: boolean; tone: Tone; active: Active
 
 export function Rack() {
   const ref = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const lensRef = useRef<HTMLDivElement>(null);
   const { ready, reduced } = useMotionReady();
   const [nav, setNav] = useState<{ on: boolean; tone: Tone; active: Active }>({
     on: false,
@@ -262,7 +166,7 @@ export function Rack() {
     active: "",
   });
 
-  // Condensed nav: on while any rack sits under the sample bar.
+  // Condensed nav: on while any room sits under the sample bar.
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
@@ -280,7 +184,7 @@ export function Rack() {
         ? {
             on: true,
             tone: (hit.dataset.rack === "dark" ? "dark" : "light") as Tone,
-            active: (hit.id === "gowns" ? "Gowns" : hit.id === "accessories" ? "Accessories" : "") as Active,
+            active: (hit.dataset.nav ?? "") as Active,
           }
         : { on: false, tone: "light" as Tone, active: "" as Active };
       setNav((p) => (p.on === next.on && p.tone === next.tone && p.active === next.active ? p : next));
@@ -298,29 +202,32 @@ export function Rack() {
     };
   }, []);
 
-  useLens(stageRef, lensRef, reduced);
-
-  // Desktop: the strip and the woven barong drift 24px (--parallax) with the
-  // scroll, passing through the stamp's composition when the room fills the screen.
+  // Desktop motion: script words drift 48px (x) and framed photos 24px (y)
+  // across their spread; spread 03 wipes in from the right over ~70vh while
+  // 01 steps back 24px at .85.
   useEffect(() => {
     const root = ref.current;
     if (!root || !ready || reduced) return;
     const mm = gsap.matchMedia();
-    mm.add("(min-width: 900px)", () => {
-      const drift = (el: Element | null, sec: Element | null, prop: "x" | "y") => {
-        if (!el || !sec) return;
+    mm.add("(min-width: 1024px)", () => {
+      root.querySelectorAll<HTMLElement>(".cgr-sp").forEach((sp) => {
+        const st = { trigger: sp, start: "top bottom", end: "bottom top", scrub: 0.8 };
+        const sw = sp.querySelector(".sw");
+        const ph = sp.querySelector(".ph-a");
+        if (sw) gsap.fromTo(sw, { x: 24 }, { x: -24, ease: "none", scrollTrigger: st });
+        if (ph) gsap.fromTo(ph, { y: 12 }, { y: -12, ease: "none", scrollTrigger: { ...st } });
+      });
+      const turn = root.querySelector(".cgr-sp-03");
+      const out = root.querySelector(".cgr-sp-01 .cgr-sp-body");
+      if (turn) {
+        const st = { trigger: turn, start: "top bottom", end: "top 30%", scrub: 0.6 };
         gsap.fromTo(
-          el,
-          { [prop]: -24 },
-          {
-            [prop]: 24,
-            ease: "none",
-            scrollTrigger: { trigger: sec, start: "top bottom", end: "bottom top", scrub: 0.8 },
-          },
+          turn,
+          { clipPath: "inset(0 0 0 100%)" },
+          { clipPath: "inset(0 0 0 0%)", ease: "none", scrollTrigger: st },
         );
-      };
-      drift(root.querySelector(".cgr-rk-track"), root.querySelector("#gowns"), "x");
-      drift(root.querySelector(".cgr-mat-b"), root.querySelector("#suits"), "y");
+        if (out) gsap.fromTo(out, { y: 0, opacity: 1 }, { y: -24, opacity: 0.85, ease: "none", scrollTrigger: { ...st } });
+      }
     });
     return () => mm.revert();
   }, [ready, reduced]);
@@ -329,49 +236,143 @@ export function Rack() {
     <div ref={ref} className="cgr-rk-wrap" data-motion={reduced ? "static" : "on"}>
       <RackNav {...nav} />
 
-      {/* 1 · Catalogue */}
-      <section className="cgr-rk cgr-rk-cat ivory tulle" id="gowns" data-rack="light" aria-labelledby="cgr-rk-cat-t">
-        <div className="cgr-rk-text">
-          <h2 className="cgr-rk-h disp" id="cgr-rk-cat-t">
-            Ivory, beaded <br />
-            and <em>ball gowns</em>
-          </h2>
-          <p className="cgr-rk-lede">
-            Open a gown to see the dates it is free, then ask to hold the day you need. The shop replies to confirm
-            before anything is paid.
-          </p>
-          <ul className="cgr-rk-racks">
-            {RACKS.map((r) => (
-              <li key={r.name} className={r.on ? "is-on" : undefined}>
-                <a href={r.href} aria-current={r.on ? "true" : undefined}>
-                  <span>{r.name}</span>
-                  {r.note ? <span className="n">{r.note}</span> : <span className="arrow" aria-hidden="true" />}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="cgr-rk-ctas">
-            <a href="#rail" className="btn btn-wine">
-              See all gowns <span className="arrow" aria-hidden="true" />
-            </a>
-            <a href="#rail" className="btn btn-line">
-              Hold a gown
-            </a>
-          </div>
-        </div>
-        <div className="cgr-rk-stage" id="gowns-strip" ref={stageRef} role="group" aria-label="Gowns">
-          <div className="cgr-rk-strip">
-            <div className="cgr-rk-track">
-              {GOWN_CARDS.map((c) => (
-                <GownCard key={c.name} c={c} />
-              ))}
+      <div className="cgr-sps">
+        {/* 01 · Bridal */}
+        <section
+          className="cgr-rk cgr-sp cgr-sp-01 ivory tulle"
+          id="gowns"
+          data-rack="light"
+          data-nav="Gowns"
+          aria-labelledby="cgr-sp-01-t"
+        >
+          <div className="cgr-sp-body">
+            <div className="cgr-sp-art">
+              <Num n="01" />
+              <Ph p={SHOP_PHOTOS.ivoryVeil} className="frame ph-a" pos="50% 14%" />
+              <Ph p={SHOP_PHOTOS.goldCape} className="mat ph-b" pos="50% 22%" />
+              <Sw w="Bridal" />
             </div>
+            <div className="cgr-sp-text">
+              <h2 className="cgr-sp-h disp" id="cgr-sp-01-t" data-rv>
+                Ivory, beaded and <em>ball gowns</em>
+              </h2>
+              <Ph p={SHOP_PHOTOS.ivoryBall} className="mat ph-f" pos="50% 28%" />
+              <p className="cgr-sp-lede" data-rv>
+                Open a gown to see the dates it is free, then ask to hold the day you need. The shop replies to confirm
+                before anything is paid.
+              </p>
+              <p className="cgr-sp-pull" data-rv>
+                Each gown keeps its own calendar.
+              </p>
+              <div className="cgr-sp-ctas" data-rv>
+                <a href="#rail" className="btn btn-wine">
+                  See bridal gowns <span className="arrow" aria-hidden="true" />
+                </a>
+                <a href="#rail" className="btn btn-line">
+                  Hold a gown
+                </a>
+              </div>
+            </div>
+            <ol className="cgr-sp-caps" data-rv>
+              <li>
+                <i>i.</i>
+                <b>Ivory gown with veil</b>
+                Bridal and ivory · ask the shop
+              </li>
+              <li>
+                <i>ii.</i>
+                <b>Ivory ball gown</b>
+                Bridal and ivory · ask the shop
+              </li>
+              <li>
+                <i>iii.</i>
+                <b>Gold beaded cape gown</b>
+                Evening and gala · ask the shop
+              </li>
+            </ol>
           </div>
-        </div>
-        <p className="cgr-rk-note">Hover a gown to see the lace and beadwork up close.</p>
-        <div className="cgr-lens" ref={lensRef} data-on="false" aria-hidden="true" />
+          <nav className="cgr-sp-toc" aria-label="In the catalogue">
+            <span className="lab">In the catalogue</span>
+            <ol>
+              {TOC.map((t) => (
+                <li key={t.n}>
+                  <a href={t.href} aria-current={t.on ? "true" : undefined}>
+                    <i>{t.n}</i>
+                    <span>{t.name}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </section>
 
-        <div className="cgr-rk-band" id="accessories">
+        {/* 03 · Filipiniana (one photo; the two small mats are detail crops of it) */}
+        <section
+          className="cgr-rk cgr-sp cgr-sp-03 creamy tulle"
+          id="filipiniana"
+          data-rack="light"
+          data-nav="Gowns"
+          aria-labelledby="cgr-sp-03-t"
+        >
+          <div className="cgr-sp-body">
+            <div className="cgr-sp-art">
+              <Num n="03" />
+              <Ph p={SHOP_PHOTOS.filipiniana} className="frame ph-a" pos="50% 18%" />
+              <Ph
+                p={SHOP_PHOTOS.filipiniana}
+                className="mat ph-b"
+                alt="Detail of the black Filipiniana gown: the gold appliqué bodice and puff sleeves."
+                zoom={{ z: 2.2, o: "50% 34%" }}
+              />
+              <Ph
+                p={SHOP_PHOTOS.filipiniana}
+                className="mat ph-c"
+                alt="Detail of the black Filipiniana gown: the long pleated train."
+                zoom={{ z: 1.8, o: "50% 92%" }}
+              />
+              <Sw w="Filipiniana" />
+            </div>
+            <div className="cgr-sp-text">
+              <h2 className="cgr-sp-h disp" id="cgr-sp-03-t" data-rv>
+                Black, beaded <em>Filipiniana</em>
+              </h2>
+              <p className="cgr-sp-lede" data-rv>
+                Structured puff sleeves, a gold appliqué bodice and a long pleated train. Ask the shop for its sizes,
+                then hold the date you need.
+              </p>
+              <p className="cgr-sp-pull" data-rv>
+                One gown, seen up close.
+              </p>
+              <div className="cgr-sp-ctas" data-rv>
+                <a href="#rail" className="btn btn-line">
+                  Hold a gown <span className="arrow" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+            <ol className="cgr-sp-caps" data-rv>
+              <li>
+                <i>i.</i>
+                <b>Black beaded Filipiniana</b>
+                Filipiniana · ask the shop
+              </li>
+              <li>
+                <i>ii.</i>
+                <b>The bodice and sleeves</b>
+                Detail of the same gown
+              </li>
+              <li>
+                <i>iii.</i>
+                <b>The pleated train</b>
+                Detail of the same gown
+              </li>
+            </ol>
+          </div>
+        </section>
+      </div>
+
+      {/* Accessories (r7.5 band) */}
+      <section className="cgr-rk cgr-acc" id="accessories" data-rack="light" data-nav="Accessories" aria-label="Accessories">
+        <div className="cgr-rk-band">
           <div className="cgr-rk-band-t">
             <h3 className="disp">
               Tiaras, crowns and <em>crystal sets</em>
@@ -401,52 +402,70 @@ export function Rack() {
         </div>
       </section>
 
-      {/* 2 · Men's */}
-      <section className="cgr-rk cgr-rk-men creamy tulle" id="suits" data-rack="light" aria-labelledby="cgr-rk-men-t">
-        <div className="cgr-men-pics">
-          <Mat p={SHOP_PHOTOS.barongEmbroidery} className="cgr-mat-a" pos="50% 30%" />
-          <Mat p={SHOP_PHOTOS.barongWoven} className="cgr-mat-b" pos="50% 20%" />
-          <p className="cgr-cap cgr-men-cap1">
-            <b>Cream barong</b>
-            Black embroidery, or a woven panel · ask the shop
-          </p>
-        </div>
-        <div className="cgr-men-text">
-          <h2 className="cgr-rk-h disp" id="cgr-rk-men-t">
-            Suits and <em>barong</em>
-          </h2>
-          <p className="cgr-rk-lede">
-            Cream barong with black embroidery or a woven front panel, and suits with beaded shoulders in royal blue and
-            turquoise. For grooms, fathers, escorts and the men of the entourage.
-          </p>
-          <div className="cgr-rk-ctas">
-            <a href={cgr.facebook} className="btn btn-line" target="_blank" rel="noopener noreferrer">
-              See suits and barong <span className="arrow" aria-hidden="true" />
-            </a>
+      {/* 05 · Barong and suits */}
+      <section
+        className="cgr-rk cgr-sp cgr-sp-05 creamy tulle"
+        id="suits"
+        data-rack="light"
+        aria-labelledby="cgr-sp-05-t"
+      >
+        <div className="cgr-sp-body">
+          <div className="cgr-sp-art">
+            <Num n="05" />
+            <Ph p={SHOP_PHOTOS.barongEmbroidery} className="frame ph-a" pos="50% 30%" />
+            <Ph p={SHOP_PHOTOS.barongWoven} className="mat ph-b" pos="50% 20%" />
+            <Sw w="Barong" />
           </div>
-          <div className="cgr-men-suits">
-            <figure>
-              <Mat p={SHOP_PHOTOS.suitBlue} className="cgr-mat-s" pos="50% 20%" />
-              <figcaption className="cgr-cap">
+          <div className="cgr-sp-text">
+            <h2 className="cgr-sp-h disp" id="cgr-sp-05-t" data-rv>
+              Suits and <em>barong</em>
+            </h2>
+            <Ph p={SHOP_PHOTOS.suitBlue} className="mat ph-f" pos="50% 20%" />
+            <p className="cgr-sp-lede" data-rv>
+              Cream barong with black embroidery or a woven front panel, and suits with beaded shoulders in royal blue
+              and turquoise.
+            </p>
+            <p className="cgr-sp-pull" data-rv>
+              For grooms, fathers, escorts and the men of the entourage.
+            </p>
+            <div className="cgr-sp-ctas" data-rv>
+              <a href={cgr.facebook} className="btn btn-line" target="_blank" rel="noopener noreferrer">
+                See suits and barong <span className="arrow" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+          <div className="cgr-sp-row">
+            <Ph p={SHOP_PHOTOS.suitTurquoise} className="mat ph-d" pos="50% 15%" />
+            <ol className="cgr-sp-caps" data-rv>
+              <li>
+                <i>i.</i>
+                <b>Cream barong</b>
+                Black embroidery · ask the shop
+              </li>
+              <li>
+                <i>ii.</i>
+                <b>Woven barong</b>
+                Woven front panel · ask the shop
+              </li>
+              <li>
+                <i>iii.</i>
                 <b>Royal-blue beaded suit</b>
                 Suits · ask the shop
-              </figcaption>
-            </figure>
-            <figure>
-              <Mat p={SHOP_PHOTOS.suitTurquoise} className="cgr-mat-s" pos="50% 15%" />
-              <figcaption className="cgr-cap">
+              </li>
+              <li>
+                <i>iv.</i>
                 <b>Turquoise three-piece suit</b>
                 Suits · ask the shop
-              </figcaption>
-            </figure>
+              </li>
+            </ol>
           </div>
+          <p className="cgr-pitch">
+            A sample site by KantoCo. Want one for your shop?{" "}
+            <a href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
+              m.me/kantocoph
+            </a>
+          </p>
         </div>
-        <p className="cgr-pitch">
-          A sample site by KantoCo. Want one for your shop?{" "}
-          <a href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
-            m.me/kantocoph
-          </a>
-        </p>
       </section>
     </div>
   );

@@ -5,32 +5,35 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
 import { useGSAP } from "@gsap/react";
-import { CGR_ASSET, formatPhp } from "@/lib/cgr-rentals";
+import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas } from "./heroAlpha";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
-/** r7.5 tokens: --ease-veil (rotator crossfade) and --ease-silk (long ease-out). */
+/** r7.6 tokens: --ease-veil (rotator crossfade). */
 const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
-const SILK = CustomEase.create("cgrSilk", "0.16,0.84,0.3,1");
 
 /**
- * Round 7.5 intro (Design stamp r7.5: spec.md, frames/hero-*). Black stage
- * with a faint cream tulle net, a wine bloom behind Mavy and a ghost "gowns"
- * in Cormorant italic at 7% cream; an ivory lace scallop closes it.
- * The settled composition is on screen from the first frame: the h1 (four
- * lines on desktop, two on phones), the script rotator beside "Cavite.", the
- * lead, the example rate and the two CTAs on the left; Mavy on the right.
- * The r7.1 story stays: the stacked-alpha cutout (heroAlpha.ts, transparent
- * WebGL canvas) scrubs with scroll inside her own column: she stands in
- * frame at scroll 0, turns once and faces front without ever crossing the
- * text. Only the ghost
- * word moves with the scroll (24px parallax).
+ * Round 7.6 intro (Design stamp r7.6: spec.md, frames/hero-*): a magazine
+ * cover. Black stage with a faint cream tulle net and a wine bloom; the
+ * masthead "Cavite Gown Rentals" in Cormorant Light across the top; Mavy (the
+ * stacked-alpha cutout, heroAlpha.ts) stands in front of it; the giant
+ * Pinyon Script "Gowns" and the "for your ___" rotator cross her skirt; the
+ * h1, lead, rate and CTAs sit in the left column under the masthead and a
+ * small caption column on the right. An ivory lace scallop closes it.
  *
- * Reduced motion: the same composition as a still, with the script showing
- * "for your debut". The alpha clip is loaded with preload="metadata" and
- * seeked once to the landed frame, so the cutout stays a cutout; without
- * WebGL the poster jpg is used.
+ * Load timeline (time-based, not scroll): black at 0 s; the clip plays from
+ * 0 s at 1x (her real walk-in, 0.75-3.4 s) and holds at 3.5 s, the first
+ * frame with her whole figure in frame, facing front. From 3.2 s the
+ * masthead, h1, lead block, giant word, rotator and caption fade in by
+ * opacity only (600 ms each, 140 ms stagger, done about 4.1 s). A 5 s cap
+ * shows everything if the clip is slow or fails (and a CSS failsafe at 6 s
+ * if the script never runs). After she lands, scroll drives the spin
+ * (3.5 s to the end of the clip). Every box is laid out from the first
+ * frame, so nothing moves: CLS 0.
+ *
+ * Reduced motion: one seek to the landed frame (3.5 s) and the content is
+ * shown at once; without WebGL the poster jpg is used.
  */
 
 /** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
@@ -40,35 +43,31 @@ export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 const HERO_PLAIN_SRC = `${CGR_ASSET}/mavy-side-spin-web.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 
-const WORD = "gowns";
-/** Rotator nouns (stamp r7.5/spec.md), in order; one pass ends back on debut. */
+/** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
 const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
 /** Hold, crossfade (s) and blur for each swap (--rot-hold, --rot-fade, --rot-blur). */
 const ROT_HOLD = 2.2;
 const ROT_FADE = 1.2;
 const ROT_BLUR = 2;
-/** --parallax: the ghost word's travel over the intro scroll (px). */
-const PARALLAX = 24;
+/** --script-drift: the giant word's x travel over the intro scroll (px). */
+const DRIFT = 48;
 const ALT =
-  "Sample render: Mavy in a deep red sequin gown with a sheer red veil turns once and faces front.";
+  "Sample render: Mavy in a deep red sequin gown with a sheer red veil walks in, then turns once as you scroll.";
 
 /**
  * Clip timeline (8 s): 0-0.7 s empty, 0.75-3.4 s she walks in from the left
- * edge, 3.5-6 s she spins, 6 s+ facing front.
- * r7.5.1: the scrub starts at CLIP_START, the first frame with her whole
- * figure inside the frame, so she is on screen at scroll 0. Starting at 0 s
- * left the column empty (black frames, then a sliver under the left fade)
- * until the reader had scrolled about a third of the intro. The spin then
- * runs CLIP_START..end over 0..CLIP_END of the intro scroll.
+ * edge, 3.5 s whole figure in frame facing front, 3.5-6 s she spins, 6 s+
+ * facing front.
  */
+const LAND = 3.5;
+/** Content starts to fade in a little before she stops, so it is done ~4.1 s. */
+const REVEAL_AT = 3.2;
+/** --intro-cap: everything is on screen by then whatever the clip does. */
+const CAP_MS = 5000;
 const CLIP_SECONDS = 8;
-const CLIP_START = 3.5;
+/** The spin runs LAND..end over 0..CLIP_END of the intro scroll. */
 const CLIP_END = 0.92;
-const at = (sec: number) => ((sec - CLIP_START) / (CLIP_SECONDS - CLIP_START)) * CLIP_END;
-const CLIP_BEATS = {
-  front: at(6),
-  clipEnd: CLIP_END,
-};
+const FRONT = ((6 - LAND) / (CLIP_SECONDS - LAND)) * CLIP_END;
 const noopSubscribe = () => () => {};
 
 function armInline(video: HTMLVideoElement) {
@@ -80,11 +79,16 @@ function armInline(video: HTMLVideoElement) {
   video.setAttribute("webkit-playsinline", "true");
 }
 
+type FrameVideo = HTMLVideoElement & {
+  requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime: number }) => void) => number;
+  cancelVideoFrameCallback?: (h: number) => void;
+};
+
 export function Story() {
   const rootRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { ready, reduced } = useMotionReady();
+  const { reduced } = useMotionReady();
   // The server can't know the motion preference or WebGL support, so the SSR
   // <video> has no <source>: nothing downloads until the client decides.
   const onClient = useSyncExternalStore(noopSubscribe, () => true, () => false);
@@ -108,7 +112,7 @@ export function Story() {
     return () => r.destroy();
   }, [alpha, clipSrc]);
 
-  // Reduced motion: one seek to the landed (front-facing) frame, no scrub.
+  // Reduced motion: one seek to the landed (front-facing) frame, no playback.
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !clipSrc || !reduced) return;
@@ -116,7 +120,7 @@ export function Story() {
     video.pause();
     const land = () => {
       if (!video.duration) return;
-      video.currentTime = Math.max(0, video.duration * CLIP_END - 0.05);
+      video.currentTime = Math.min(LAND, video.duration - 0.05);
     };
     if (video.readyState >= 1) land();
     video.addEventListener("loadedmetadata", land);
@@ -126,28 +130,16 @@ export function Story() {
   useGSAP(
     () => {
       const root = rootRef.current;
-      const video = videoRef.current;
-      if (!root || !ready || reduced) return;
+      if (!root || !onClient || reduced) return;
+      const video = videoRef.current as FrameVideo | null;
       const q = gsap.utils.selector(root);
       const stage = q(".cgr-intro-stage")[0] as HTMLElement;
-      const word = q(".cgr-intro-word")[0] as HTMLElement;
+      const gw = q(".cgr-gw")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
       const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
-      const rise = q(".cgr-intro-h .l, .cgr-intro-hand, .cgr-intro-bottom > *") as HTMLElement[];
 
-      // Load (time-based): the h1 lines, the script and the lead block fade
-      // up 14px on the long silk ease-out (--dur-reveal 1.4s, --stagger 140ms).
-      const intro = gsap.timeline({ delay: 0.25 });
-      intro.fromTo(
-        rise,
-        { autoAlpha: 0, y: 14 },
-        { autoAlpha: 1, y: 0, duration: 1.4, ease: SILK, stagger: 0.14 },
-        0,
-      );
-
-      // Rotator (spec.md): one pass from ~1.7 s, back to debut at ~28.9 s.
-      // Each swap holds 2.2 s, then the outgoing and incoming nouns crossfade
-      // over the same 1.2 s with a 2 px blur on the veil ease. No travel.
+      // ---- Rotator (spec.md): starts once the content is in. Each swap
+      // holds 2.2 s, then the nouns crossfade over 1.2 s with a 2 px blur.
       const rot = gsap.timeline({ paused: true });
       const order = [...NOUNS.keys(), 0];
       for (let k = 1; k < order.length; k++) {
@@ -163,24 +155,9 @@ export function Story() {
         );
       }
       rot.eventCallback("onComplete", () => detach());
-
-      // The first scroll, key or pointer input ends it: a 1.2 s fade to debut.
       let stopped = false;
-      const stop = () => {
-        if (stopped) return;
-        stopped = true;
-        detach();
-        const live = rot.isActive() || rot.progress() < 1;
-        rot.pause();
-        if (!live) return;
-        const showing = nouns.filter((n, i) => i !== 0 && Number(gsap.getProperty(n, "autoAlpha")) > 0);
-        gsap.to(showing, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL });
-        gsap.to(nouns[0], { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL });
-      };
-      const STOP_ON = ["wheel", "touchstart", "keydown", "pointerdown", "scroll"] as const;
-      // Pause while the hero is off screen or the tab is hidden; resume after.
-      let onScreen = true;
       let started = false;
+      let onScreen = true;
       const sync = () => {
         if (stopped || !started) return;
         if (onScreen && document.visibilityState === "visible") rot.resume();
@@ -191,21 +168,48 @@ export function Story() {
         sync();
       });
       io.observe(stage);
+      const STOP_ON = ["wheel", "touchstart", "keydown", "pointerdown", "scroll"] as const;
+      const stop = () => {
+        if (stopped) return;
+        stopped = true;
+        detach();
+        const live = rot.progress() > 0 && rot.progress() < 1;
+        rot.pause();
+        if (!live) return;
+        const showing = nouns.filter((n, i) => i !== 0 && Number(gsap.getProperty(n, "autoAlpha")) > 0);
+        gsap.to(showing, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL });
+        gsap.to(nouns[0], { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL });
+      };
       const detach = () => {
         STOP_ON.forEach((ev) => window.removeEventListener(ev, stop, true));
         document.removeEventListener("visibilitychange", sync);
         io.disconnect();
       };
       document.addEventListener("visibilitychange", sync);
-      intro.add(() => {
-        if (stopped) return;
-        started = true;
-        STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
-        sync();
-      }, 1.45);
 
-      // Idle on the wrapper, never the canvas: a slow breath once she has
-      // landed (front-facing), paused again if the reader scrolls back up.
+      // ---- Reveal: one attribute flip; cgr.css fades each [data-intro]
+      // node in by opacity (600 ms, 140 ms stagger). Nothing is re-laid out.
+      let revealed = false;
+      let rotTimer = 0;
+      const reveal = () => {
+        if (revealed) return;
+        revealed = true;
+        root.dataset.reveal = "on";
+        rotTimer = window.setTimeout(() => {
+          if (stopped) return;
+          started = true;
+          STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
+          sync();
+        }, 900);
+      };
+      const capTimer = window.setTimeout(reveal, Math.max(0, CAP_MS - performance.now()));
+      // A reader who scrolls, taps or presses a key during the walk-in gets the page at once.
+      const early = () => reveal();
+      const EARLY_ON = ["wheel", "touchstart", "keydown"] as const;
+      EARLY_ON.forEach((ev) => window.addEventListener(ev, early, { capture: true, passive: true, once: true }));
+
+      let landed = false;
+      // ---- Idle breath on the wrapper once she faces front after the spin.
       const idle = gsap.to(idleEl, {
         scale: 1.008,
         y: -3,
@@ -216,7 +220,7 @@ export function Story() {
         paused: true,
       });
 
-      // The ghost word drifts up 24px over the intro scroll (never fades).
+      // ---- Giant word: drifts 48px on x over the intro scroll (never fades).
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -225,69 +229,105 @@ export function Story() {
           end: "bottom bottom",
           scrub: 0.8,
           onUpdate: (self) => {
-            if (self.progress >= CLIP_BEATS.front && idle.paused()) idle.play();
-            else if (self.progress < CLIP_BEATS.front && !idle.paused()) idle.pause();
+            if (!landed) return;
+            if (self.progress >= FRONT && idle.paused()) idle.play();
+            else if (self.progress < FRONT && !idle.paused()) idle.pause();
           },
         },
       });
-      tl.fromTo(word, { y: 0 }, { y: -PARALLAX, duration: 1 }, 0);
+      tl.fromTo(gw, { x: 0 }, { x: -DRIFT, duration: 1 }, 0);
 
-      // Clip scrub: the whole clip maps to 0..CLIP_END of the intro scroll.
-      // rAF-throttled, one seek in flight, 250 ms stuck-seek replacement.
+      // ---- Clip: play 0..LAND on load, then scroll scrubs LAND..end.
       let cleanupVideo = () => {};
       if (video && clipSrc) {
         armInline(video);
         video.loop = false;
-        video.pause();
         let target = 0;
         let raf = 0;
         let seekAt = 0;
+        let vfc = 0;
+        let poll = 0;
         const apply = () => {
           raf = 0;
-          if (!video.duration) return;
+          if (!landed || !video.duration) return;
           if (video.seeking && performance.now() - seekAt < 250) return;
-          const from = Math.min(CLIP_START, video.duration * 0.5);
+          const from = Math.min(LAND, video.duration * 0.5);
           const t = from + target * (video.duration - 0.05 - from);
           if (Math.abs(video.currentTime - t) > 0.02) {
             seekAt = performance.now();
             video.currentTime = t;
           }
         };
-        const onSeeked = () => {
+        const land = () => {
+          if (landed) return;
+          landed = true;
+          video.pause();
+          if (Math.abs(video.currentTime - LAND) > 0.01) video.currentTime = LAND;
+          reveal();
+          root.dataset.landed = "on";
           if (!raf) raf = requestAnimationFrame(apply);
         };
+        const check = (t: number) => {
+          if (t >= REVEAL_AT) reveal();
+          if (t >= LAND - 1 / 48) land();
+        };
+        const onFrame = (_now: number, meta: { mediaTime: number }) => {
+          vfc = 0;
+          check(meta.mediaTime);
+          if (!landed && video.requestVideoFrameCallback) vfc = video.requestVideoFrameCallback(onFrame);
+        };
+        const tick = () => {
+          poll = 0;
+          check(video.currentTime);
+          if (!landed) poll = requestAnimationFrame(tick);
+        };
+        if (video.requestVideoFrameCallback) vfc = video.requestVideoFrameCallback(onFrame);
+        else poll = requestAnimationFrame(tick);
+        const onEnded = () => land();
+        video.addEventListener("ended", onEnded);
+        const onSeeked = () => {
+          if (landed && !raf) raf = requestAnimationFrame(apply);
+        };
         video.addEventListener("seeked", onSeeked);
-        video.addEventListener("loadedmetadata", onSeeked);
-        // iOS needs a play() unlock before seeks paint.
-        void video.play().then(() => video.pause()).catch(() => {});
+        video.currentTime = 0;
+        void video.play().catch(() => {
+          // Autoplay refused: show the landed frame and the content.
+          land();
+        });
         const st = ScrollTrigger.create({
           trigger: root,
           start: "top top+=30",
           end: "bottom bottom",
           onUpdate: (self) => {
-            target = Math.min(1, self.progress / CLIP_BEATS.clipEnd);
-            if (!raf) raf = requestAnimationFrame(apply);
+            target = Math.min(1, self.progress / CLIP_END);
+            if (landed && !raf) raf = requestAnimationFrame(apply);
           },
         });
         cleanupVideo = () => {
           st.kill();
           video.removeEventListener("seeked", onSeeked);
-          video.removeEventListener("loadedmetadata", onSeeked);
+          video.removeEventListener("ended", onEnded);
+          if (vfc && video.cancelVideoFrameCallback) video.cancelVideoFrameCallback(vfc);
+          if (poll) cancelAnimationFrame(poll);
           if (raf) cancelAnimationFrame(raf);
         };
+      } else {
+        landed = true;
       }
 
       return () => {
         cleanupVideo();
         detach();
+        window.clearTimeout(capTimer);
+        window.clearTimeout(rotTimer);
+        EARLY_ON.forEach((ev) => window.removeEventListener(ev, early, true));
         rot.kill();
-        intro.kill();
         idle.kill();
         tl.scrollTrigger?.kill();
         tl.kill();
       };
     },
-    { scope: rootRef, dependencies: [ready, reduced, clipSrc] },
+    { scope: rootRef, dependencies: [onClient, reduced, clipSrc] },
   );
 
   return (
@@ -300,10 +340,16 @@ export function Story() {
     >
       <div className="cgr-intro-stage">
         <span className="cgr-intro-bloom" aria-hidden="true" />
-        <p className="cgr-intro-word" aria-hidden="true">
-          {WORD}
-        </p>
 
+        <a className="cgr-mast" href={CGR_BASE} aria-label="Cavite Gown Rentals, home" data-intro="0">
+          <span className="l1">
+            Cavite <em>Gown</em>
+          </span>{" "}
+          <span className="l2">Rentals</span>
+        </a>
+
+        {/* The figure box is the landed cutout's bbox (112,134 to 492,906 of
+            540x960); the full frame overflows it at the stamp's offsets. */}
         <div className="cgr-mavy">
           <div className="cgr-mavy-idle">
             {usePoster ? (
@@ -336,28 +382,26 @@ export function Story() {
           </div>
         </div>
 
+        <p className="cgr-gw" aria-hidden="true" data-intro="1">
+          Gowns
+        </p>
+        <p className="cgr-rot hand cgr-intro-hand" aria-hidden="true" data-intro="2">
+          {/* Each line carries the whole phrase, right-aligned in one grid
+              cell, so "for your" sits beside every noun and nothing moves. */}
+          <span className="cgr-hand-stack">
+            {NOUNS.map((n, i) => (
+              <span key={n} data-i={i}>
+                for your {n}
+              </span>
+            ))}
+          </span>
+        </p>
+
         <div className="cgr-intro-copy">
-          <div className="cgr-intro-top">
-            <h1 className="cgr-intro-h disp" id="cgr-hero-title">
-              <span className="l">Gown and suit </span>
-              <span className="l">rentals in </span>
-              <span className="l">
-                <em>Dasmariñas,</em>{" "}
-              </span>
-              <span className="l">Cavite.</span>
-            </h1>
-            <p className="hand cgr-intro-hand" aria-hidden="true">
-              <span className="cgr-hand-fix">for your</span>{" "}
-              <span className="cgr-hand-stack">
-                {NOUNS.map((n, i) => (
-                  <span key={n} data-i={i}>
-                    {n}
-                  </span>
-                ))}
-              </span>
-            </p>
-          </div>
-          <div className="cgr-intro-bottom">
+          <h1 className="cgr-intro-h disp" id="cgr-hero-title" data-intro="0">
+            Gown and suit rentals in <em>Dasmariñas,</em> Cavite.
+          </h1>
+          <div className="cgr-intro-bottom" data-intro="1">
             <p className="cgr-intro-lead">
               Each gown keeps its own calendar. When you ask to hold a date, you receive a CGR reference code, and the
               shop confirms with you before any payment.
@@ -373,6 +417,14 @@ export function Story() {
             </div>
           </div>
         </div>
+
+        <aside className="cgr-capcol" aria-label="On Mavy" data-intro="2">
+          <span className="num" aria-hidden="true">
+            i.
+          </span>
+          <b>On Mavy</b>A deep red beaded gown with a sheer veil. Example styling.
+        </aside>
+
         <p className="sr-only">
           Gowns for your debut, pageant, wedding, prom, JS prom, ball, photoshoot or graduation ball.
         </p>
