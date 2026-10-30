@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
 
 /**
- * Round 7.6 intro (Design stamp r7.6: spec.md, frames/hero-*): a magazine
+ * Round 7.6.1 intro (Design stamp r7.6: spec.md, frames/hero-*): a magazine
  * cover. Black stage with a faint cream tulle net and a wine bloom; the
  * masthead "Cavite Gown Rentals" in Cormorant Light across the top; Mavy (the
  * stacked-alpha cutout, heroAlpha.ts) stands in front of it; the giant
@@ -22,25 +22,21 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
  * h1, lead, rate and CTAs sit in the left column under the masthead and a
  * small caption column on the right. An ivory lace scallop closes it.
  *
- * Load timeline (time-based, not scroll): black at 0 s; the clip plays from
- * 0 s at 1x (her real walk-in, 0.75-3.4 s) and holds at 3.5 s, the first
- * frame with her whole figure in frame, facing front. From 3.2 s the
- * masthead, h1, lead block, giant word, rotator and caption fade in by
- * opacity only (600 ms each, 140 ms stagger, done about 4.1 s). A 5 s cap
- * shows everything if the clip is slow or fails (and a CSS failsafe at 6 s
- * if the script never runs). After she lands, scroll drives the spin
- * (3.5 s to the end of the clip). Every box is laid out from the first
- * frame, so nothing moves: CLS 0.
+ * r7.6.1: the text is on screen from the first paint (no reveal, no timers)
+ * and Mavy is not: the clip never autoplays. Scroll alone drives it: at the
+ * top the clip sits on its empty opening frame (she is off-frame), then the
+ * intro scroll scrubs her walk-in from the left (0.75-3.4 s), the landing
+ * (3.5 s) and the spin (3.5-6 s); the text never moves or fades. Every box is
+ * laid out from the first frame: CLS 0.
  *
- * Reduced motion: one seek to the landed frame (3.5 s) and the content is
- * shown at once; without WebGL the poster jpg is used.
+ * Reduced motion: one seek to the landed frame (3.5 s), shown with the text
+ * at once, no scrub. If WebGL is missing, or the clip errors or never loads,
+ * the poster jpg stands in (scroll fades it in; reduced motion shows it at once).
  */
 
 /** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
 const HERO_ALPHA = true;
 export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
-/** Plain clip on black: the no-WebGL fallback only. */
-const HERO_PLAIN_SRC = `${CGR_ASSET}/mavy-side-spin-web.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 
 /** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
@@ -49,7 +45,7 @@ const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photos
 const ROT_HOLD = 2.2;
 const ROT_FADE = 1.2;
 const ROT_BLUR = 2;
-/** --script-drift: the giant word's x travel over the intro scroll (px). */
+/** --script-drift: the giant word's x travel over the intro scroll (px), to the right, away from the lead. */
 const DRIFT = 48;
 const ALT =
   "Sample render: Mavy in a deep red sequin gown with a sheer red veil walks in, then turns once as you scroll.";
@@ -60,14 +56,16 @@ const ALT =
  * facing front.
  */
 const LAND = 3.5;
-/** Content starts to fade in a little before she stops, so it is done ~4.1 s. */
-const REVEAL_AT = 3.2;
-/** --intro-cap: everything is on screen by then whatever the clip does. */
-const CAP_MS = 5000;
+/** The scrub starts on this empty frame, so she is off-frame at the top. */
+const T_START = 0.6;
 const CLIP_SECONDS = 8;
-/** The spin runs LAND..end over 0..CLIP_END of the intro scroll. */
+/** The clip runs T_START..end over 0..CLIP_END of the intro scroll. */
 const CLIP_END = 0.92;
-const FRONT = ((6 - LAND) / (CLIP_SECONDS - LAND)) * CLIP_END;
+const FRONT = ((6 - T_START) / (CLIP_SECONDS - T_START)) * CLIP_END;
+/** No metadata by then (stalled or blocked clip): use the poster. */
+const CLIP_WAIT_MS = 8000;
+/** The rotator's first swap waits this long after the page opens. */
+const ROT_DELAY_MS = 1200;
 const noopSubscribe = () => () => {};
 
 function armInline(video: HTMLVideoElement) {
@@ -79,15 +77,11 @@ function armInline(video: HTMLVideoElement) {
   video.setAttribute("webkit-playsinline", "true");
 }
 
-type FrameVideo = HTMLVideoElement & {
-  requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime: number }) => void) => number;
-  cancelVideoFrameCallback?: (h: number) => void;
-};
-
 export function Story() {
   const rootRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const posterRef = useRef<HTMLImageElement>(null);
   const { reduced } = useMotionReady();
   // The server can't know the motion preference or WebGL support, so the SSR
   // <video> has no <source>: nothing downloads until the client decides.
@@ -97,10 +91,11 @@ export function Story() {
     () => HERO_ALPHA && supportsAlphaCanvas(),
     () => false,
   );
-  const alpha = onClient && alphaOk;
-  // Reduced motion without WebGL: the poster jpg only (no mp4 request).
-  const usePoster = onClient && reduced && !alpha;
-  const clipSrc = !onClient || usePoster ? null : alpha ? HERO_ALPHA_SRC : HERO_PLAIN_SRC;
+  // The clip errored, or never loaded its metadata: the poster stands in.
+  const [clipFailed, setClipFailed] = useState(false);
+  const alpha = onClient && alphaOk && !clipFailed;
+  const usePoster = onClient && !alpha;
+  const clipSrc = alpha ? HERO_ALPHA_SRC : null;
 
   // Alpha: redraw the canvas whenever the hidden stacked video shows a new frame.
   useEffect(() => {
@@ -108,16 +103,42 @@ export function Story() {
     const canvas = canvasRef.current;
     if (!alpha || !video || !canvas) return;
     const r = createAlphaRenderer(canvas, video);
-    if (!r) return;
+    if (!r) {
+      setClipFailed(true);
+      return;
+    }
     return () => r.destroy();
   }, [alpha, clipSrc]);
+
+  // The clip never plays: it is only seeked (scroll, or one reduced-motion
+  // seek). A decode or network error, or no metadata in CLIP_WAIT_MS, falls
+  // back to the poster. A failed <source> does not set video.error, so its
+  // error event is caught on the way down (capture).
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !clipSrc) return;
+    armInline(video);
+    video.loop = false;
+    video.pause();
+    const fail = () => setClipFailed(true);
+    const timer = window.setTimeout(() => {
+      if (video.readyState < 1) fail();
+    }, CLIP_WAIT_MS);
+    const ok = () => window.clearTimeout(timer);
+    video.addEventListener("error", fail, true);
+    video.addEventListener("loadedmetadata", ok);
+    if (video.readyState >= 1) ok();
+    return () => {
+      window.clearTimeout(timer);
+      video.removeEventListener("error", fail, true);
+      video.removeEventListener("loadedmetadata", ok);
+    };
+  }, [clipSrc]);
 
   // Reduced motion: one seek to the landed (front-facing) frame, no playback.
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !clipSrc || !reduced) return;
-    armInline(video);
-    video.pause();
     const land = () => {
       if (!video.duration) return;
       video.currentTime = Math.min(LAND, video.duration - 0.05);
@@ -131,15 +152,16 @@ export function Story() {
     () => {
       const root = rootRef.current;
       if (!root || !onClient || reduced) return;
-      const video = videoRef.current as FrameVideo | null;
+      const video = videoRef.current;
+      const poster = posterRef.current;
       const q = gsap.utils.selector(root);
       const stage = q(".cgr-intro-stage")[0] as HTMLElement;
       const gw = q(".cgr-gw")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
       const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
 
-      // ---- Rotator (spec.md): starts once the content is in. Each swap
-      // holds 2.2 s, then the nouns crossfade over 1.2 s with a 2 px blur.
+      // ---- Rotator (spec.md): each swap holds 2.2 s, then the nouns
+      // crossfade over 1.2 s with a 2 px blur. Text only; any input stops it.
       const rot = gsap.timeline({ paused: true });
       const order = [...NOUNS.keys(), 0];
       for (let k = 1; k < order.length; k++) {
@@ -186,29 +208,13 @@ export function Story() {
         io.disconnect();
       };
       document.addEventListener("visibilitychange", sync);
+      STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
+      const rotTimer = window.setTimeout(() => {
+        if (stopped) return;
+        started = true;
+        sync();
+      }, ROT_DELAY_MS);
 
-      // ---- Reveal: one attribute flip; cgr.css fades each [data-intro]
-      // node in by opacity (600 ms, 140 ms stagger). Nothing is re-laid out.
-      let revealed = false;
-      let rotTimer = 0;
-      const reveal = () => {
-        if (revealed) return;
-        revealed = true;
-        root.dataset.reveal = "on";
-        rotTimer = window.setTimeout(() => {
-          if (stopped) return;
-          started = true;
-          STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
-          sync();
-        }, 900);
-      };
-      const capTimer = window.setTimeout(reveal, Math.max(0, CAP_MS - performance.now()));
-      // A reader who scrolls, taps or presses a key during the walk-in gets the page at once.
-      const early = () => reveal();
-      const EARLY_ON = ["wheel", "touchstart", "keydown"] as const;
-      EARLY_ON.forEach((ev) => window.addEventListener(ev, early, { capture: true, passive: true, once: true }));
-
-      let landed = false;
       // ---- Idle breath on the wrapper once she faces front after the spin.
       const idle = gsap.to(idleEl, {
         scale: 1.008,
@@ -221,6 +227,7 @@ export function Story() {
       });
 
       // ---- Giant word: drifts 48px on x over the intro scroll (never fades).
+      // Poster fallback: the scroll fades the poster in as she would walk in.
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -229,105 +236,66 @@ export function Story() {
           end: "bottom bottom",
           scrub: 0.8,
           onUpdate: (self) => {
-            if (!landed) return;
             if (self.progress >= FRONT && idle.paused()) idle.play();
             else if (self.progress < FRONT && !idle.paused()) idle.pause();
           },
         },
       });
-      tl.fromTo(gw, { x: 0 }, { x: -DRIFT, duration: 1 }, 0);
+      tl.fromTo(gw, { x: 0 }, { x: DRIFT, duration: 1 }, 0);
+      if (poster) tl.fromTo(poster, { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.3 }, 0);
 
-      // ---- Clip: play 0..LAND on load, then scroll scrubs LAND..end.
+      // ---- Clip: the intro scroll scrubs T_START..end (walk-in, landing,
+      // spin). At the top she is off-frame; nothing plays on its own.
       let cleanupVideo = () => {};
       if (video && clipSrc) {
-        armInline(video);
-        video.loop = false;
         let target = 0;
         let raf = 0;
         let seekAt = 0;
-        let vfc = 0;
-        let poll = 0;
         const apply = () => {
           raf = 0;
-          if (!landed || !video.duration) return;
+          if (!video.duration) return;
           if (video.seeking && performance.now() - seekAt < 250) return;
-          const from = Math.min(LAND, video.duration * 0.5);
-          const t = from + target * (video.duration - 0.05 - from);
+          const t = T_START + target * (video.duration - 0.05 - T_START);
           if (Math.abs(video.currentTime - t) > 0.02) {
             seekAt = performance.now();
             video.currentTime = t;
           }
         };
-        const land = () => {
-          if (landed) return;
-          landed = true;
-          video.pause();
-          if (Math.abs(video.currentTime - LAND) > 0.01) video.currentTime = LAND;
-          reveal();
-          root.dataset.landed = "on";
+        const kick = () => {
           if (!raf) raf = requestAnimationFrame(apply);
         };
-        const check = (t: number) => {
-          if (t >= REVEAL_AT) reveal();
-          if (t >= LAND - 1 / 48) land();
-        };
-        const onFrame = (_now: number, meta: { mediaTime: number }) => {
-          vfc = 0;
-          check(meta.mediaTime);
-          if (!landed && video.requestVideoFrameCallback) vfc = video.requestVideoFrameCallback(onFrame);
-        };
-        const tick = () => {
-          poll = 0;
-          check(video.currentTime);
-          if (!landed) poll = requestAnimationFrame(tick);
-        };
-        if (video.requestVideoFrameCallback) vfc = video.requestVideoFrameCallback(onFrame);
-        else poll = requestAnimationFrame(tick);
-        const onEnded = () => land();
-        video.addEventListener("ended", onEnded);
-        const onSeeked = () => {
-          if (landed && !raf) raf = requestAnimationFrame(apply);
-        };
-        video.addEventListener("seeked", onSeeked);
-        video.currentTime = 0;
-        void video.play().catch(() => {
-          // Autoplay refused: show the landed frame and the content.
-          land();
-        });
+        video.addEventListener("loadedmetadata", kick);
+        video.addEventListener("seeked", kick);
         const st = ScrollTrigger.create({
           trigger: root,
           start: "top top+=30",
           end: "bottom bottom",
           onUpdate: (self) => {
             target = Math.min(1, self.progress / CLIP_END);
-            if (landed && !raf) raf = requestAnimationFrame(apply);
+            kick();
           },
         });
+        target = Math.min(1, st.progress / CLIP_END);
+        kick();
         cleanupVideo = () => {
           st.kill();
-          video.removeEventListener("seeked", onSeeked);
-          video.removeEventListener("ended", onEnded);
-          if (vfc && video.cancelVideoFrameCallback) video.cancelVideoFrameCallback(vfc);
-          if (poll) cancelAnimationFrame(poll);
+          video.removeEventListener("loadedmetadata", kick);
+          video.removeEventListener("seeked", kick);
           if (raf) cancelAnimationFrame(raf);
         };
-      } else {
-        landed = true;
       }
 
       return () => {
         cleanupVideo();
         detach();
-        window.clearTimeout(capTimer);
         window.clearTimeout(rotTimer);
-        EARLY_ON.forEach((ev) => window.removeEventListener(ev, early, true));
         rot.kill();
         idle.kill();
         tl.scrollTrigger?.kill();
         tl.kill();
       };
     },
-    { scope: rootRef, dependencies: [onClient, reduced, clipSrc] },
+    { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster] },
   );
 
   return (
@@ -341,7 +309,7 @@ export function Story() {
       <div className="cgr-intro-stage">
         <span className="cgr-intro-bloom" aria-hidden="true" />
 
-        <a className="cgr-mast" href={CGR_BASE} aria-label="Cavite Gown Rentals, home" data-intro="0">
+        <a className="cgr-mast" href={CGR_BASE} aria-label="Cavite Gown Rentals, home">
           <span className="l1">
             Cavite <em>Gown</em>
           </span>{" "}
@@ -354,38 +322,36 @@ export function Story() {
           <div className="cgr-mavy-idle">
             {usePoster ? (
               <img
+                ref={posterRef}
                 className="cgr-mavy-poster"
                 src={HERO_POSTER}
                 alt="Mavy faces front in a deep red sequin gown with a sheer red veil."
                 width={720}
                 height={1280}
-                fetchPriority="high"
                 decoding="async"
               />
             ) : (
               <>
                 <video
                   ref={videoRef}
-                  key={alpha ? "alpha" : "plain"}
-                  className={alpha ? "cgr-intro-alphasrc" : "cgr-intro-video"}
+                  className="cgr-intro-alphasrc"
                   muted
                   playsInline
                   preload={reduced ? "metadata" : "auto"}
-                  aria-hidden={alpha ? true : undefined}
-                  aria-label={alpha ? undefined : ALT}
+                  aria-hidden={true}
                 >
                   {clipSrc ? <source src={clipSrc} type="video/mp4" /> : null}
                 </video>
-                {alpha ? <canvas ref={canvasRef} className="cgr-intro-canvas" role="img" aria-label={ALT} /> : null}
+                <canvas ref={canvasRef} className="cgr-intro-canvas" role="img" aria-label={ALT} />
               </>
             )}
           </div>
         </div>
 
-        <p className="cgr-gw" aria-hidden="true" data-intro="1">
+        <p className="cgr-gw" aria-hidden="true">
           Gowns
         </p>
-        <p className="cgr-rot hand cgr-intro-hand" aria-hidden="true" data-intro="2">
+        <p className="cgr-rot hand cgr-intro-hand" aria-hidden="true">
           {/* Each line carries the whole phrase, right-aligned in one grid
               cell, so "for your" sits beside every noun and nothing moves. */}
           <span className="cgr-hand-stack">
@@ -398,10 +364,10 @@ export function Story() {
         </p>
 
         <div className="cgr-intro-copy">
-          <h1 className="cgr-intro-h disp" id="cgr-hero-title" data-intro="0">
+          <h1 className="cgr-intro-h disp" id="cgr-hero-title">
             Gown and suit rentals in <em>Dasmariñas,</em> Cavite.
           </h1>
-          <div className="cgr-intro-bottom" data-intro="1">
+          <div className="cgr-intro-bottom">
             <p className="cgr-intro-lead">
               Each gown keeps its own calendar. When you ask to hold a date, you receive a CGR reference code, and the
               shop confirms with you before any payment.
@@ -418,7 +384,7 @@ export function Story() {
           </div>
         </div>
 
-        <aside className="cgr-capcol" aria-label="On Mavy" data-intro="2">
+        <aside className="cgr-capcol" aria-label="On Mavy">
           <span className="num" aria-hidden="true">
             i.
           </span>
