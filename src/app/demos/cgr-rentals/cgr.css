@@ -624,6 +624,13 @@ html:has(.cgr) {
   flex-direction: column;
 }
 
+/* Native scroll only on this page (r7.6.5): the site-wide smooth
+   scroll-behavior is turned off, so anchors jump and nothing animates the
+   scroll position. The hero scrub reads scrollY in rAF. */
+html:has(.cgr) {
+  scroll-behavior: auto;
+}
+
 /* Anchors clear the sticky bar. */
 .cgr [id] {
   scroll-margin-top: calc(var(--bar-h) + 8px);
@@ -1812,15 +1819,6 @@ html:has(.cgr) {
   z-index: 3;
   font-size: clamp(48px, 5.8vw, 84px);
   color: var(--cream);
-}
-
-.cgr .cgr-cf-hint {
-  grid-area: title;
-  align-self: start;
-  justify-self: end;
-  position: relative;
-  z-index: 3;
-  display: none;
 }
 
 .cgr-cf-view {

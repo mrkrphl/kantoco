@@ -57,10 +57,16 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
 const HERO_ALPHA = true;
 export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
-/** Optional image-sequence path (r7.6.3, off by default; ?cgrseq=1 to try).
-    Frames are not shipped yet: if any fails to load, the poster stands in. */
-const HERO_SEQ = false;
+/** Image sequence (r7.6.5): 36 colour WebP cutout frames (540x960, clip
+    T_START..end) drawn to a 2D canvas. Default hero path on desktop; phones
+    keep the stacked-alpha clip unless it fails to advance. ?cgrseq=1 forces
+    the sequence, ?cgrseq=0 the clip. A missing landed frame (404) falls back
+    to the clip, then the poster. */
 const SEQ_COUNT = 36;
+/** Landed frame wait before the sequence is given up for the clip. */
+const SEQ_WAIT_MS = 5000;
+/** Clip watchdog: a scroll that has not visibly moved the clip in this long switches to the sequence. */
+const ADVANCE_MS = 1000;
 const seqSrc = (i: number) => `${CGR_ASSET}/seq/mavy-${String(i).padStart(2, "0")}.webp`;
 
 /** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
@@ -97,6 +103,7 @@ const SEEK_STALL_MS = 700;
 const ROT_DELAY_MS = 1200;
 const noopSubscribe = () => () => {};
 const qsFlag = (k: string) => () => new URLSearchParams(window.location.search).get(k) === "1";
+const qsVal = (k: string) => new URLSearchParams(window.location.search).get(k);
 
 type Path =
   | "video-gl"
@@ -105,7 +112,8 @@ type Path =
   | "reduced-2d"
   | "reduced-poster"
   | "poster-fallback"
-  | "canvas-seq";
+  | "seq-2d"
+  | "reduced-seq";
 /** Desktop-class input: hover and a fine pointer (mouse or trackpad). */
 const isDesktop = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 const forcedMode = (): RenderMode | null => {
@@ -120,6 +128,10 @@ type Dbg = {
   seeks: number;
   primed: string;
   draws: number;
+  /** Scrub progress 0..1 and the frame shown (sequence path). */
+  p: number;
+  frame: number;
+  loaded: number;
 };
 
 function armInline(video: HTMLVideoElement) {
@@ -146,7 +158,15 @@ export function Story() {
     () => false,
   );
   const debug = useSyncExternalStore(noopSubscribe, qsFlag("cgrdebug"), () => false);
-  const seqOn = useSyncExternalStore(noopSubscribe, () => HERO_SEQ || qsFlag("cgrseq")(), () => false);
+  // Sequence first on desktop (or when forced); the clip first on phones.
+  const seqFirst = useSyncExternalStore(
+    noopSubscribe,
+    () => {
+      const f = qsVal("cgrseq");
+      return f === "1" ? true : f === "0" ? false : isDesktop();
+    },
+    () => false,
+  );
   // Preferred renderer: forced by ?cgrr, else 2D on desktop (or without WebGL), WebGL on phones.
   const firstMode = useSyncExternalStore<RenderMode | null>(
     noopSubscribe,
@@ -168,17 +188,34 @@ export function Story() {
   // No frame yet after CLIP_WAIT_MS: the poster stands in, the clip stays
   // mounted and takes over again at its first frame (late metadata on iOS).
   const [clipLate, setClipLate] = useState(false);
-  const [seqFailed, setSeqFailed] = useState(false);
-  const seq = onClient && seqOn && !seqFailed;
-  const alpha = onClient && !seq && mode !== null && !clipFailed;
+  // Sequence failed (missing frame or no landed frame in SEQ_WAIT_MS).
+  const [seqFailed, setSeqFailed] = useState<string | null>(null);
+  // The clip did not visibly advance on a scroll (watchdog): sequence for good.
+  const [clipStuck, setClipStuck] = useState<string | null>(null);
+  const clipDown = clipFailed || clipStuck !== null || (firstMode !== null && mode === null);
+  const seq = onClient && (seqFirst || clipDown) && !seqFailed;
+  const alpha = onClient && !seq && mode !== null && !clipFailed && clipStuck === null;
   const usePoster = onClient && !seq && (!alpha || clipLate);
   // Media fragment: iOS fetches and decodes that frame for a paused clip.
   const clipSrc = alpha ? `${HERO_ALPHA_SRC}#t=${reduced ? LAND : T_START}` : null;
   const framed = useRef(false);
-  const dbgRef = useRef<Dbg>({ rs: 0, t: 0, target: 0, lat: null, seeks: 0, primed: "no", draws: 0 });
+  const dbgRef = useRef<Dbg>({
+    rs: 0,
+    t: 0,
+    target: 0,
+    lat: null,
+    seeks: 0,
+    primed: "no",
+    draws: 0,
+    p: 0,
+    frame: -1,
+    loaded: 0,
+  });
   const seqRef = useRef<HTMLCanvasElement>(null);
   const path: Path = seq
-    ? "canvas-seq"
+    ? reduced
+      ? "reduced-seq"
+      : "seq-2d"
     : usePoster || !mode
       ? reduced
         ? "reduced-poster"
@@ -273,6 +310,44 @@ export function Story() {
       video.removeEventListener("error", fail, true);
     };
   }, [clipSrc]);
+
+  // Clip watchdog (r7.6.5): the clip is only kept once it has visibly
+  // advanced. From the first wheel / scroll / touch / key input, if the page
+  // has moved but no new frame was drawn within ADVANCE_MS, the sequence
+  // takes over. A pass proves the clip and the watch stops.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!alpha || reduced || !video) return;
+    const d = dbgRef.current;
+    let timer = 0;
+    let done = false;
+    // Resting scroll position before the input (a jump fires its scroll event after it moves).
+    let yRest = window.scrollY;
+    const ON = ["wheel", "scroll", "touchmove", "keydown"] as const;
+    const off = () => ON.forEach((ev) => window.removeEventListener(ev, arm, true));
+    function arm() {
+      if (done || timer) return;
+      const y0 = yRest;
+      const draws0 = d.draws;
+      const t0 = video!.currentTime;
+      timer = window.setTimeout(() => {
+        timer = 0;
+        if (done) return;
+        yRest = window.scrollY;
+        if (Math.abs(yRest - y0) < 24) return; // not a real move yet: re-arm on the next input
+        const advanced = d.draws > draws0 && Math.abs(video!.currentTime - t0) > 0.02;
+        done = true;
+        off();
+        if (!advanced) setClipStuck(`no-advance:${d.draws - draws0}d`);
+      }, ADVANCE_MS);
+    }
+    ON.forEach((ev) => window.addEventListener(ev, arm, { capture: true, passive: true }));
+    return () => {
+      done = true;
+      off();
+      window.clearTimeout(timer);
+    };
+  }, [alpha, reduced, mode]);
 
   // Reduced motion: one seek to the landed (front-facing) frame, no playback.
   useEffect(() => {
@@ -488,57 +563,121 @@ export function Story() {
     { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster] },
   );
 
-  // Image-sequence path (flag, off by default): SEQ_COUNT alpha WebP frames
-  // drawn to a 2D canvas from the same rAF/scrollY mapping. Any missing frame
-  // falls back to the poster.
+  // Image-sequence path: SEQ_COUNT colour WebP frames drawn to a 2D canvas.
+  // The landed frame loads first (it is the reduced-motion frame and proves
+  // the set is there), then the rest, four at a time. Each rAF reads scrollY
+  // against the section's own box (no cached trigger positions) and draws
+  // the nearest loaded frame. The landed frame failing (404) or not arriving
+  // in SEQ_WAIT_MS hands over to the clip; a later missing frame does too.
   useEffect(() => {
     const root = rootRef.current;
     const canvas = seqRef.current;
     if (!seq || !root || !canvas) return;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return setSeqFailed(true);
+    if (!ctx) return setSeqFailed("no-2d");
+    const d = dbgRef.current;
     let dead = false;
     let raf = 0;
     let shown = -1;
-    const imgs = Array.from({ length: SEQ_COUNT }, (_, i) => {
-      const im = new Image();
-      im.decoding = "async";
-      im.src = seqSrc(i);
-      im.onerror = () => !dead && setSeqFailed(true);
-      return im;
-    });
-    const st = ScrollTrigger.create({ trigger: root, start: "top top+=30", end: "bottom bottom" });
     const landIdx = Math.round(((LAND - T_START) / (CLIP_SECONDS - 0.05 - T_START)) * (SEQ_COUNT - 1));
+    const imgs: (HTMLImageElement | null)[] = Array(SEQ_COUNT).fill(null);
+    const ok: boolean[] = Array(SEQ_COUNT).fill(false);
+    d.loaded = 0;
+    const fail = (why: string) => {
+      if (dead) return;
+      dead = true;
+      setSeqFailed(why);
+    };
+    const load = (i: number) =>
+      new Promise<void>((res) => {
+        const im = new Image();
+        im.decoding = "async";
+        im.onload = () => {
+          const fin = () => {
+            ok[i] = true;
+            d.loaded++;
+            res();
+          };
+          if (typeof im.decode === "function") im.decode().then(fin, fin);
+          else fin();
+        };
+        im.onerror = () => {
+          fail(`404:${i}`);
+          res();
+        };
+        imgs[i] = im;
+        im.src = seqSrc(i);
+      });
+    const wait = window.setTimeout(() => {
+      if (!ok[landIdx]) fail("landed-timeout");
+    }, SEQ_WAIT_MS);
+    load(landIdx).then(async () => {
+      if (dead || reduced) return;
+      const rest = [...Array(SEQ_COUNT).keys()].filter((i) => i !== landIdx);
+      for (let k = 0; k < rest.length && !dead; k += 4) await Promise.all(rest.slice(k, k + 4).map(load));
+    });
+    const nearest = (i: number) => {
+      for (let r = 0; r < SEQ_COUNT; r++) {
+        if (i - r >= 0 && ok[i - r]) return i - r;
+        if (i + r < SEQ_COUNT && ok[i + r]) return i + r;
+      }
+      return -1;
+    };
     const tick = () => {
       if (dead) return;
-      raf = reduced ? 0 : requestAnimationFrame(tick);
-      const span = st.end - st.start;
-      const p = span > 0 ? Math.min(1, Math.max(0, (window.scrollY - st.start) / span)) : 0;
-      const i = reduced ? landIdx : Math.round(Math.min(1, p / CLIP_END) * (SEQ_COUNT - 1));
-      const im = imgs[i];
-      if (i === shown || !im.complete || !im.naturalWidth) {
-        if (reduced && !raf) raf = requestAnimationFrame(tick);
-        return;
-      }
+      raf = requestAnimationFrame(tick);
+      const r = root.getBoundingClientRect();
+      const start = window.scrollY + r.top - 30;
+      const end = window.scrollY + r.bottom - window.innerHeight;
+      const span = end - start;
+      const p = span > 0 ? Math.min(1, Math.max(0, (window.scrollY - start) / span)) : 0;
+      d.p = p;
+      const want = reduced ? landIdx : Math.round(Math.min(1, p / CLIP_END) * (SEQ_COUNT - 1));
+      const i = nearest(want);
+      if (i < 0 || i === shown) return;
+      const im = imgs[i]!;
       if (canvas.width !== im.naturalWidth) {
         canvas.width = im.naturalWidth;
         canvas.height = im.naturalHeight;
       }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(im, 0, 0);
+      try {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(im, 0, 0);
+      } catch {
+        return fail("draw");
+      }
       shown = i;
-      dbgRef.current.t = i;
-      if (reduced) raf = 0;
+      d.frame = i;
+      d.draws++;
+      // Reduced motion: the landed frame is final; stop the loop.
+      if (reduced && i === landIdx) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
     };
     raf = requestAnimationFrame(tick);
     return () => {
       dead = true;
-      st.kill();
+      window.clearTimeout(wait);
       cancelAnimationFrame(raf);
     };
   }, [seq, reduced]);
 
-  // ?cgrdebug=1: a small overlay with the path, readyState and last seek latency.
+  // ?cgrdebug=1: a wheel tally for the overlay (count, last deltaY and deltaMode).
+  const wheelRef = useRef({ n: 0, dy: 0, mode: 0 });
+  useEffect(() => {
+    if (!debug) return;
+    const w = wheelRef.current;
+    const on = (e: WheelEvent) => {
+      w.n++;
+      w.dy = e.deltaY;
+      w.mode = e.deltaMode;
+    };
+    window.addEventListener("wheel", on, { capture: true, passive: true });
+    return () => window.removeEventListener("wheel", on, true);
+  }, [debug]);
+
+  // ?cgrdebug=1: an overlay big enough to read in a phone photo of a screen.
   const dbgEl = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!debug) return;
@@ -547,14 +686,20 @@ export function Story() {
       const v = videoRef.current;
       const d = dbgRef.current;
       if (!el) return;
-      const rs = v ? v.readyState : d.rs;
+      const w = wheelRef.current;
+      const why = [failReason, seqFailed && `seq:${seqFailed}`, clipStuck && `clip:${clipStuck}`].filter(Boolean).join(",");
+      const media = seq
+        ? `frame ${d.frame}/${SEQ_COUNT - 1} | loaded ${d.loaded}/${SEQ_COUNT}`
+        : `t ${(v ? v.currentTime : d.t).toFixed(2)}/${d.target.toFixed(2)} | rs ${v ? v.readyState : d.rs} | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed}`;
       el.textContent =
-        `path ${path} | rs ${rs} | t ${(v ? v.currentTime : d.t).toFixed(2)}/${d.target.toFixed(2)}` +
-        ` | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed} | draws ${d.draws}` +
-        ` | rm ${reduced ? 1 : 0}${failReason ? ` | failed ${failReason}` : ""}`;
+        `path ${path} | draws ${d.draws}\n` +
+        `scrollY ${Math.round(window.scrollY)} | p ${(seq ? d.p : Math.min(1, Math.max(0, (d.target - T_START) / (CLIP_SECONDS - 0.05 - T_START)))).toFixed(3)}\n` +
+        `${media}\n` +
+        `wheel ${w.n} | dy ${Math.round(w.dy * 100) / 100} | dm ${w.mode} | dpr ${window.devicePixelRatio} | rm ${reduced ? 1 : 0}` +
+        (why ? `\nfailed ${why}` : "");
     }, 200);
     return () => window.clearInterval(id);
-  }, [debug, path, reduced, failReason]);
+  }, [debug, path, reduced, failReason, seq, seqFailed, clipStuck]);
 
   return (
     <section
@@ -640,7 +785,7 @@ export function Story() {
           </h1>
           <div className="cgr-intro-bottom">
             <p className="cgr-intro-lead">
-              Gowns and suits for your debut, wedding, or prom, right here in Dasmariñas.
+              Gowns and suits for your debut, wedding, or prom.
             </p>
             <p className="cgr-intro-rate">From {formatPhp(2200)} a day, example rate</p>
             <div className="cgr-intro-cta">
@@ -677,10 +822,12 @@ export function Story() {
             bottom: 8,
             zIndex: 99,
             maxWidth: "calc(100vw - 16px)",
-            padding: "4px 6px",
-            font: "11px/1.3 ui-monospace, monospace",
+            padding: "8px 12px",
+            font: "600 18px/1.4 ui-monospace, Menlo, Consolas, monospace",
+            whiteSpace: "pre-wrap",
             color: "#fff",
-            background: "rgba(0,0,0,.72)",
+            background: "rgba(0,0,0,.86)",
+            borderRadius: 4,
             pointerEvents: "none",
           }}
         >

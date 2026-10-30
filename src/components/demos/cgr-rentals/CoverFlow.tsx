@@ -252,14 +252,13 @@ export function CoverFlow({ items }: { items: Gown[] }) {
         <h2 className="cgr-cf-title disp" id="cgr-cf-title" data-rv>
           Every piece <em>on the rail</em>
         </h2>
-        <p className="cgr-cf-hint">{items.length} pieces. Drag, swipe, scroll or use the arrow keys.</p>
       </div>
       <div
         ref={viewRef}
         className="cgr-cf-view"
         tabIndex={0}
         role="group"
-        aria-label="Gown rail, left and right arrow keys move it."
+        aria-label={`Gown rail, ${items.length} pieces. Drag, swipe or scroll it, or use the left and right arrow keys.`}
       >
         <div className="cgr-cf-tilt">
         <div className="cgr-cf-track">
