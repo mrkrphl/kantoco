@@ -5,10 +5,6 @@ Whole photos from Cavite Gown Rentals' public Facebook page. Mark approved them 
 | File | Listing | Source (FB) | Original | Trim | Final px | WebP |
 |---|---|---|---|---|---|---|
 | cgr-gown-wine-sequin-01.webp | /gown/red-sequin-evening | [red-01](https://www.facebook.com/photo/?fbid=808052111871624) | 640x1426 | none (whole photo) | 640x1426 | 111,418 B |
-| cgr-gown-maroon-puff-01.webp | /gown/maroon-puff-sleeve-gown | [red-02](https://www.facebook.com/photo/?fbid=808076731869162) | 1536x2048 | none (whole photo) | 900x1200 | 119,250 B |
-| cgr-gown-maroon-puff-02.webp | /gown/maroon-puff-sleeve-gown | [red-03](https://www.facebook.com/photo/?fbid=808076788535823) | 1536x2048 | none (whole photo) | 825x1100 | 119,992 B |
-| cgr-gown-maroon-puff-03.webp | /gown/maroon-puff-sleeve-gown | [red-04](https://www.facebook.com/photo/?fbid=808076855202483) | 1536x2048 | left edge trimmed at x 160 (a bystander at the frame edge) | 806x1200 | 107,422 B |
-| cgr-gown-maroon-puff-04.webp | /gown/maroon-puff-sleeve-gown | [red-05](https://www.facebook.com/photo/?fbid=808076911869144) | 817x1656 | bottom 20 px trimmed (an app UI band) | 599x1200 | 80,892 B |
 | cgr-gown-violet-gold-01.webp | /gown/violet-gold-beaded-gown | [color-01](https://www.facebook.com/photo/?fbid=808051041871731) | 1258x2048 | none (whole photo) | 737x1200 | 117,682 B |
 | cgr-gown-royal-blue-01.webp | /gown/royal-blue-mermaid-gown | [color-02](https://www.facebook.com/photo/?fbid=808052148538287) | 1536x2048 | none (whole photo) | 675x900 | 119,692 B |
 | cgr-gown-powder-blue-01.webp | /gown/powder-blue-tulle-gown | [color-03](https://www.facebook.com/photo/?fbid=808051898538312) | 1298x2048 | none (whole photo) | 761x1200 | 116,148 B |
@@ -20,7 +16,9 @@ Whole photos from Cavite Gown Rentals' public Facebook page. Mark approved them 
 | cgr-gown-teal-puff-02.webp | /gown/teal-puff-sleeve-gown | [person-02](https://www.facebook.com/photo/?fbid=808060345204134) | 2048x1366 | none (whole photo) | 1200x800 | 110,912 B |
 | cgr-gown-teal-puff-03.webp | /gown/teal-puff-sleeve-gown | [person-03](https://www.facebook.com/photo/?fbid=808052398538262) | 1536x2048 | none (whole photo) | 750x1000 | 119,518 B |
 
-Retired in r7.9: `gown-red-full`, `gown-red-bodice`, `gown-red-skirt`, `gown-red-detail` and `gown-blue-1..3` (cutouts and zoomed crops). No code references them any more. Old listing slugs redirect to the real-photo listings: red-lace-corset to maroon-puff-sleeve-gown, red-sequin-column to navy-gold-sequin-gown, blue-ball-gown to royal-blue-mermaid-gown, blue-ruffle-debut to powder-blue-tulle-gown, blue-sash-cotillion to periwinkle-cape-gown.
+Retired in r7.9: `gown-red-full`, `gown-red-bodice`, `gown-red-skirt`, `gown-red-detail` and `gown-blue-1..3` (cutouts and zoomed crops). No code references them any more. Old listing slugs redirect to the real-photo listings: red-sequin-column to navy-gold-sequin-gown, blue-ball-gown to royal-blue-mermaid-gown, blue-ruffle-debut to powder-blue-tulle-gown, blue-sash-cotillion to periwinkle-cape-gown.
+
+Pulled in r7.9.1, pending an age check: red-02 to red-05 (FB fbids 808076731869162, 808076788535823, 808076855202483, 808076911869144). The wearer's age is not confirmed and the rule is no children, so these photos are not in the repo and the maroon-puff-sleeve-gown listing is gone. /gown/maroon-puff-sleeve-gown and /gown/red-lace-corset (and their /reserve/ pages) redirect to the catalogue (#gowns); bookings saved under them still open on confirmation, without a photo.
 
 # CGR rentals · shop photos (r7.4)
 

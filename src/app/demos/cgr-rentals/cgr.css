@@ -728,6 +728,18 @@ html:has(.cgr) {
   top: 0;
 }
 
+/* r7.9.1: reduced motion gets the static intro from the first paint, so a
+   link to #gowns (or a redirect there) lands on the rack and stays put. */
+@media (prefers-reduced-motion: reduce) {
+  .cgr-intro {
+    height: auto;
+  }
+  .cgr-intro .cgr-intro-stage {
+    position: relative;
+    top: 0;
+  }
+}
+
 .cgr-intro-bloom {
   position: absolute;
   z-index: -2;
