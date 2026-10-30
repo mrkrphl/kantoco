@@ -18,7 +18,7 @@ export const cgr = {
   shortName: "CGR",
   eyebrow: "Gown and suit rentals · Dasmariñas, Cavite",
   tagline:
-    "Gowns and suits for any formal occasion, plus tiaras, at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, each gown with its own sample calendar and a reference code for every hold.",
+    "Gowns and suits for any formal occasion, plus tiaras, at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, each gown with its own sample calendar and a reference code for every reservation.",
   facebook: "https://www.facebook.com/CaviteGownRentals",
   /** Public contact links from the shop's Facebook page. Links only; nothing is sent. */
   phones: [
