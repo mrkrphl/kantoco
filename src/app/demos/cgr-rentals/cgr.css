@@ -3259,8 +3259,10 @@ tr[data-status="cancelled"] .cgr-ow-c {
 
 .cgr-fonts:not([data-fonts="ready"]) :is(
     .cgr-bar-inner,
+    .cgr-wm,
     .cgr-head-nav,
     .cgr-head-mob,
+    .cgr-intro-word,
     .cgr-intro-copy,
     .cgr-intro-hand
   ) {
