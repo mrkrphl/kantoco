@@ -3,23 +3,21 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CustomEase } from "gsap/CustomEase";
 import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
 import { HERO_CLIPS, HERO_SEQ, frontAt, seqFile } from "./heroSeq.manifest";
 
-gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
-/** r7.6 tokens: --ease-veil (rotator crossfade). */
-const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
  * Round 7.6.1 intro (Design stamp r7.6: spec.md, frames/hero-*): a magazine
  * cover. Black stage with a faint cream tulle net and a wine bloom; the
  * masthead "Cavite Gown Rentals" in Cormorant Light across the top; Mavy (the
  * stacked-alpha cutout, heroAlpha.ts) stands in front of it; the giant
- * Pinyon Script "Gowns" and the "for your ___" rotator cross her skirt; the
+ * Pinyon Script "Gowns" and the "for your ___" line (r7.10: CSS-only word
+ * loop, see WORDS) cross her skirt; the
  * h1, lead, rate and CTAs sit in the left column under the masthead and a
  * small caption column on the right. An ivory lace scallop closes it.
  *
@@ -76,12 +74,21 @@ const SEQ_WAIT_MS = 5000;
 const ADVANCE_MS = 1000;
 const seqSrc = (i: number) => `${CGR_ASSET}/${HERO_SEQ.dir}/${seqFile(HERO_SEQ, i)}`;
 
-/** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
-const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
-/** Pause, crossfade (s) and blur for each swap (--rot-hold, --rot-fade, --rot-blur). */
-const ROT_HOLD = 2.2;
-const ROT_FADE = 1.2;
-const ROT_BLUR = 2;
+/**
+ * r7.10 (Mark): the script line under "Gowns" loops "for your debut /
+ * wedding / birthday / party", then "for any event", and starts over. It is
+ * CSS only (cgr.css, "r7.10 word loop"): one 11 s keyframe cycle, 2.2 s per
+ * word, a soft cross-fade with a 0.16em rise. No JS timer, no layout reads,
+ * nothing on the scroll/rAF path, so it never competes with Mavy's scrub;
+ * an IntersectionObserver and visibilitychange only flip
+ * animation-play-state. All words share one grid cell, so the line's box is
+ * the longest word from the first paint (CLS 0). "for" is fixed, "your" sits
+ * in its own cell and only steps aside for "any event". Reduced motion:
+ * a static "for any event". Screen readers get one static sentence (sr-only).
+ */
+const WORDS = ["debut", "wedding", "birthday", "party"] as const;
+const WORD_ANY = "any event";
+const WORDS_SR = "Gowns for your debut, wedding, birthday, party or any event.";
 /** --script-drift: the giant word's x travel over the intro scroll (px), to the right, away from the lead. */
 const DRIFT = 48;
 const ALT =
@@ -103,8 +110,6 @@ const CAP_FADE = [0.2, 0.32] as const;
 const CLIP_WAIT_MS = 8000;
 /** A seek that has not reported "seeked" by then is treated as dropped. */
 const SEEK_STALL_MS = 700;
-/** The rotator's first swap waits this long after the page opens. */
-const ROT_DELAY_MS = 1200;
 const noopSubscribe = () => () => {};
 const qsFlag = (k: string) => () => new URLSearchParams(window.location.search).get(k) === "1";
 const qsVal = (k: string) => new URLSearchParams(window.location.search).get(k);
@@ -152,6 +157,7 @@ export function Story() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const posterRef = useRef<HTMLImageElement>(null);
+  const rotRef = useRef<HTMLSpanElement>(null);
   const { reduced } = useMotionReady();
   // The server can't know the motion preference or WebGL support, so the SSR
   // <video> has no <source>: nothing downloads until the client decides.
@@ -162,6 +168,28 @@ export function Story() {
     () => false,
   );
   const debug = useSyncExternalStore(noopSubscribe, qsFlag("cgrdebug"), () => false);
+
+  // r7.10 word loop: pause the CSS cycle while the line is off screen or the
+  // tab is hidden (data-run only flips animation-play-state; no layout reads).
+  useEffect(() => {
+    const el = rotRef.current;
+    if (!el) return;
+    let onScreen = true;
+    const sync = () => {
+      el.dataset.run = onScreen && document.visibilityState === "visible" ? "on" : "off";
+    };
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      sync();
+    });
+    io.observe(el);
+    document.addEventListener("visibilitychange", sync);
+    sync();
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
   // Sequence first on desktop (or when forced); the clip first on phones.
   const seqFirst = useSyncExternalStore(
     noopSubscribe,
@@ -387,66 +415,9 @@ export function Story() {
       const video = videoRef.current;
       const poster = posterRef.current;
       const q = gsap.utils.selector(root);
-      const stage = q(".cgr-intro-stage")[0] as HTMLElement;
       const gw = q(".cgr-gw")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
       const cap = q(".cgr-capcol")[0] as HTMLElement | undefined;
-      const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
-
-      // ---- Rotator (spec.md): each swap holds 2.2 s, then the nouns
-      // crossfade over 1.2 s with a 2 px blur. Text only; any input stops it.
-      const rot = gsap.timeline({ paused: true });
-      const order = [...NOUNS.keys(), 0];
-      for (let k = 1; k < order.length; k++) {
-        const out = nouns[order[k - 1]];
-        const inn = nouns[order[k]];
-        const t = (k - 1) * (ROT_HOLD + ROT_FADE) + ROT_HOLD;
-        rot.to(out, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL }, t);
-        rot.fromTo(
-          inn,
-          { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)` },
-          { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL, immediateRender: false },
-          t,
-        );
-      }
-      rot.eventCallback("onComplete", () => detach());
-      let stopped = false;
-      let started = false;
-      let onScreen = true;
-      const sync = () => {
-        if (stopped || !started) return;
-        if (onScreen && document.visibilityState === "visible") rot.resume();
-        else rot.pause();
-      };
-      const io = new IntersectionObserver(([e]) => {
-        onScreen = e.isIntersecting;
-        sync();
-      });
-      io.observe(stage);
-      const STOP_ON = ["wheel", "touchstart", "keydown", "pointerdown", "scroll"] as const;
-      const stop = () => {
-        if (stopped) return;
-        stopped = true;
-        detach();
-        const live = rot.progress() > 0 && rot.progress() < 1;
-        rot.pause();
-        if (!live) return;
-        const showing = nouns.filter((n, i) => i !== 0 && Number(gsap.getProperty(n, "autoAlpha")) > 0);
-        gsap.to(showing, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL });
-        gsap.to(nouns[0], { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL });
-      };
-      const detach = () => {
-        STOP_ON.forEach((ev) => window.removeEventListener(ev, stop, true));
-        document.removeEventListener("visibilitychange", sync);
-        io.disconnect();
-      };
-      document.addEventListener("visibilitychange", sync);
-      STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
-      const rotTimer = window.setTimeout(() => {
-        if (stopped) return;
-        started = true;
-        sync();
-      }, ROT_DELAY_MS);
 
       // ---- Idle breath on the wrapper once she faces front after the spin.
       const idle = gsap.to(idleEl, {
@@ -568,9 +539,6 @@ export function Story() {
 
       return () => {
         cleanupVideo();
-        detach();
-        window.clearTimeout(rotTimer);
-        rot.kill();
         idle.kill();
         tl.scrollTrigger?.kill();
         tl.kill();
@@ -789,14 +757,19 @@ export function Story() {
           Gowns
         </p>
         <p className="cgr-rot hand cgr-intro-hand" aria-hidden="true">
-          {/* Each line carries the whole phrase, right-aligned in one grid
-              cell, so "for your" sits beside every noun and nothing moves. */}
-          <span className="cgr-hand-stack">
-            {NOUNS.map((n, i) => (
-              <span key={n} data-i={i}>
-                for your {n}
+          {/* r7.10: "for" stays put; "your" and the words stack in one grid
+              cell each, so the box is the longest word and nothing moves. */}
+          <span className="cgr-rot-for">for</span>{" "}
+          <span ref={rotRef} className="cgr-rot-loop" data-run="on">
+            <span className="cgr-rot-your">your</span>
+            {WORDS.map((w, i) => (
+              <span key={w} className="cgr-rot-w" style={{ "--i": i } as React.CSSProperties}>
+                {w}
               </span>
             ))}
+            <span className="cgr-rot-w cgr-rot-any" style={{ "--i": WORDS.length } as React.CSSProperties}>
+              {WORD_ANY}
+            </span>
           </span>
         </p>
 
@@ -828,7 +801,7 @@ export function Story() {
         </aside>
 
         <p className="sr-only">
-          Gowns for your debut, pageant, wedding, prom, JS prom, ball, photoshoot or graduation ball.
+          {WORDS_SR}
         </p>
         <span className="cgr-scallop" aria-hidden="true" />
       </div>

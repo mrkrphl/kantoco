@@ -882,23 +882,96 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
-.cgr-hand-stack {
+/* r7.10 word loop (Mark): "for" stays put; "your" and the words share one
+   grid row, every word in the same cell, so the box is the longest word from
+   the first paint (CLS 0) and "your" never moves. One 11 s cycle, 2.2 s per
+   word: a soft 0.8 s cross-fade with a 0.16em rise. Opacity and transform
+   only (compositor), paused off screen or in a hidden tab (data-run, set by
+   Story.tsx). Reduced motion: a static "for any event". */
+.cgr-rot-loop {
+  --rot-cycle: 11s;
+  --rot-step: 2.2s;
+  --rot-lead: -0.8s;
   display: inline-grid;
-  justify-items: end;
+  grid-template-columns: auto auto;
+  justify-items: start;
   align-items: end;
   vertical-align: bottom;
+  text-align: left;
 }
 
-.cgr-hand-stack > span {
-  grid-area: 1 / 1;
+.cgr-rot-loop > span {
+  grid-row: 1;
   white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
+  animation: cgr-rot-w var(--rot-cycle) linear infinite both;
+  animation-delay: calc(var(--i, 0) * var(--rot-step) + var(--rot-lead));
 }
 
-.cgr-hand-stack > span[data-i="0"] {
-  opacity: 1;
-  visibility: inherit;
+.cgr-rot-loop > .cgr-rot-your {
+  grid-column: 1;
+  padding-right: 0.26em;
+  animation-name: cgr-rot-your;
+  animation-delay: var(--rot-lead);
+}
+
+.cgr-rot-loop > .cgr-rot-w {
+  grid-column: 2;
+  opacity: 0;
+}
+
+.cgr-rot-loop > .cgr-rot-any {
+  grid-column: 1 / span 2;
+}
+
+.cgr-rot-loop[data-run="off"] > span {
+  animation-play-state: paused;
+}
+
+@keyframes cgr-rot-w {
+  0% {
+    opacity: 0;
+    transform: translateY(0.16em);
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 0.95);
+  }
+  7.27%,
+  20% {
+    opacity: 1;
+    transform: none;
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 0.95);
+  }
+  27.27%,
+  100% {
+    opacity: 0;
+    transform: translateY(-0.1em);
+  }
+}
+
+@keyframes cgr-rot-your {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 0.95);
+  }
+  7.27%,
+  80% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 0.95);
+  }
+  87.27%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cgr-rot-loop > span {
+    animation: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+  .cgr-rot-loop > .cgr-rot-any {
+    opacity: 1;
+    visibility: inherit;
+  }
 }
 
 /* Copy column under the masthead: h1 at the top, the lead block at the bottom. */
@@ -2225,9 +2298,14 @@ html:has(.cgr) {
   text-decoration: none;
 }
 
+/* r7.10 (Paige): the collage was pinned to the viewport's left (44.4vw) while
+   the calendar sits in the info column pinned to the right edge
+   (100% - gut - info-w), so below ~1500px its right edge ran into the
+   calendar. It is now anchored to the info column itself: its right edge
+   stays 36px (rotation room included) left of the column at every width. */
 .cgr-dt-thumbs {
   position: absolute;
-  left: 44.4vw;
+  right: calc(var(--gut) + var(--info-w) + 36px);
   top: 800px;
   z-index: 14;
   display: flex;
@@ -2529,6 +2607,7 @@ html:has(.cgr) {
   .cgr-dt-thumbs {
     position: relative;
     left: auto;
+    right: auto;
     top: auto;
     order: 2;
     padding: 40px 20px 48px;
