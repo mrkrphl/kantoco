@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { CGR_ASSET, CGR_BASE, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import { CGR_BASE, formatPhp, type Gown } from "@/lib/cgr-rentals";
 import { addBooking, isRangeFree, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { StepHead } from "@/components/demos/cgr-rentals/Steps";
 import {
@@ -14,6 +14,7 @@ import {
   rangeLabel,
   rentalDays,
 } from "@/components/demos/cgr-rentals/reserveMath";
+import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
 type Step = 1 | 2 | 3;
 type Fields = { name: string; contact: string; occasion: string; notes: string };
@@ -198,7 +199,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
         <div className="cgr-bk-grid">
           <aside className="cgr-bk-side" aria-label="Your reservation">
             <div className="cgr-bk-photo dark">
-              <img src={`${CGR_ASSET}/${img.file}.webp`} alt="" width={img.w} height={img.h} decoding="async" />
+              <GownImg img={img} alt="" decoding="async" />
             </div>
             <div className="cgr-hold">
               <div className="cgr-hold-top">
@@ -212,11 +213,11 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
               <dl className="cgr-hold-dl">
                 <div>
                   <dt>Pickup</dt>
-                  <dd>{eventDate ? humanDate(eventDate) : "–"}</dd>
+                  <dd data-pending={eventDate ? undefined : ""}>{eventDate ? humanDate(eventDate) : "–"}</dd>
                 </div>
                 <div>
                   <dt>Return</dt>
-                  <dd>{returnDate ? humanDate(returnDate) : "–"}</dd>
+                  <dd data-pending={returnDate ? undefined : ""}>{returnDate ? humanDate(returnDate) : "–"}</dd>
                 </div>
                 <div>
                   <dt>Example rate</dt>
@@ -226,7 +227,9 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
                   <dt>
                     Total, {days ?? "–"} {days === 1 ? "day" : "days"}
                   </dt>
-                  <dd data-total={total ?? ""}>{total !== null ? formatPhp(total) : "–"}</dd>
+                  <dd data-total={total ?? ""} data-pending={eventDate ? undefined : ""}>
+                    {total !== null ? formatPhp(total) : "–"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Reference</dt>

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { CGR_ASSET, CGR_BASE, cgr, formatPhp, getGown, type Booking } from "@/lib/cgr-rentals";
+import { CGR_BASE, cgr, formatPhp, getGown, type Booking } from "@/lib/cgr-rentals";
 import { useBookings } from "@/components/demos/cgr-rentals/bookings";
 import { StepHead } from "@/components/demos/cgr-rentals/Steps";
 import { customerTotal, humanDate, rangeLabel, rentalDays } from "@/components/demos/cgr-rentals/reserveMath";
+import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
 /**
  * r7.7 confirmation (Design r7.7 spec §2): the CGR code large, what happens
@@ -45,7 +46,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
             <aside className="cgr-bk-side" aria-label="Your reservation">
               {img ? (
                 <div className="cgr-bk-photo dark">
-                  <img src={`${CGR_ASSET}/${img.file}.webp`} alt="" width={img.w} height={img.h} decoding="async" />
+                  <GownImg img={img} alt="" decoding="async" />
                 </div>
               ) : null}
               <div className="cgr-hold">

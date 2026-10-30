@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import {
   BOOKINGS_KEY,
+  SLUG_ALIASES,
   type Booking,
   type BookingStatus,
 } from "@/lib/cgr-rentals";
@@ -153,7 +154,7 @@ export function isRangeFree(
   if (mockBooked.some((d) => d >= start && d <= end)) return false;
   return !bookings.some(
     (b) =>
-      b.gownSlug === gownSlug &&
+      (SLUG_ALIASES[b.gownSlug] ?? b.gownSlug) === gownSlug &&
       holds(b) &&
       b.eventDate <= end &&
       (b.returnDate || b.eventDate) >= start,

@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { GOWNS, getGown } from "@/lib/cgr-rentals";
+import { notFound, redirect } from "next/navigation";
+import { CGR_BASE, GOWNS, getGown } from "@/lib/cgr-rentals";
 import { CgrShell } from "@/components/demos/cgr-rentals/Shell";
 import { GownDetail } from "@/components/demos/cgr-rentals/GownDetail";
 
@@ -18,6 +18,12 @@ export default async function GownPage({
   const sp = await searchParams;
   const gown = getGown(slug);
   if (!gown) notFound();
+  // r7.9: an old slug (before the listings were renamed to match their
+  // photos) goes to the gown's current page.
+  if (gown.slug !== slug) {
+    const q = typeof sp.date === "string" ? `?date=${encodeURIComponent(sp.date)}` : "";
+    redirect(`${CGR_BASE}/gown/${gown.slug}${q}`);
+  }
   // r7.8: "Change" on the reserve page comes back with ?date= so the
   // calendar opens on the dates already picked.
   const initialDate =
