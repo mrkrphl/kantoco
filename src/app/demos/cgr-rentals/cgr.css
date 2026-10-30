@@ -1,9 +1,10 @@
 /* ==========================================================================
-   CGR rentals (KantoCo sample) · Round 7.5 "ivory and wine"
-   Source of truth: Design stamp r7.5 (spec.md, direction.md, tokens.css,
-   src/r75.css, src/sections.css). A black intro, then ivory, cream and blush
-   rooms in wine. Cormorant Garamond Light display (italic 400 accents),
-   Figtree body, Great Vibes for the hero rotator only. The r7 hot accent is gone.
+   CGR rentals (KantoCo sample) · Round 7.6 "the cover"
+   Source of truth: Design stamp r7.6 (spec.md, direction.md, tokens.css,
+   src/r76.css, src/sections.css) over r7.5. A black magazine-cover intro,
+   then ivory, cream and blush lookbook spreads in wine. Cormorant Garamond
+   Light display (italic 400 accents), Figtree body, Pinyon Script the only
+   script (hero, rotator and spread words). The r7 hot accent is gone.
    Textures are drawn in CSS / inline SVG (a tulle net and a lace scallop),
    nothing generated. Contrast (stamp contrast.md, all AA): wine on ivory
    11.49, on cream 10.65, on blush 9.19; wine-ink on ivory 12.91; mute on
@@ -635,18 +636,27 @@ html:has(.cgr) {
 }
 
 /* ==========================================================================
-   01  Intro (r7.5 stamp r75.css .hero): black stage, tulle net, wine bloom,
-   ghost "gowns", Mavy in her own column, h1 + rotator + lead + CTAs on the
-   left, an ivory lace scallop along the bottom. The r7.1 scroll story stays:
-   the sticky stage scrubs the alpha clip over 400svh; nothing else moves
-   except the ghost word (24px), so the text never meets the figure.
-   The stage is the stamp's 100svh hero less the 24px sample bar; the header
-   (64px, 56px on phones) is laid over its top, as in the stamp.
+   01  Intro (r7.6 stamp r76.css .hero): a magazine cover. Black stage, tulle
+   net, wine bloom; the masthead "Cavite Gown Rentals" in Cormorant Light
+   across the top (z 1); Mavy in front of it (z 2), her head allowed over the
+   lower part of "Rentals"; the giant Pinyon Script "Gowns" and the rotator
+   across her skirt (z 3, aria-hidden); the h1 + lead block in the left
+   column and a caption column on the right (z 4); the ivory lace scallop
+   (z 6). The header (z 80) is laid over the stage's top from 0 s.
+   Load timeline (Story.tsx): every box is laid out from the first frame and
+   the content waits at opacity 0, then fades in by opacity only once Mavy
+   lands (3.5 s), with a 5 s cap. After that the sticky stage scrubs her
+   spin with the scroll.
    ========================================================================== */
 .cgr-intro {
-  --t-hero: clamp(2.5rem, min(7.2vw, 10.6vh), 7rem);
+  --t-mast: min(11.2vw, 19vh);
+  --t-mast-m: min(16.6vw, 9vh);
+  --t-hero: clamp(2.1rem, min(5vw, 8.4vh), 4.6rem);
+  --t-script-hero: min(21vw, 39vh);
+  --gw-top: max(calc(var(--head-h) + var(--t-mast) + 16vh), 43vh);
+  --copy-top: calc(var(--head-h) + 1vh + var(--t-mast) * 0.98 + 3.2vh);
   position: relative;
-  height: 400svh;
+  height: 240svh;
   background: var(--black);
 }
 
@@ -673,47 +683,47 @@ html:has(.cgr) {
 
 .cgr-intro-bloom {
   position: absolute;
-  z-index: -1;
-  right: -6vw;
-  top: 8vh;
-  width: 62vw;
+  z-index: -2;
+  left: 44vw;
+  top: 6vh;
+  width: 60vw;
   height: 110vh;
-  background: radial-gradient(closest-side, rgb(91 26 42 / 0.55), rgb(61 15 27 / 0.25) 55%, transparent);
+  background: radial-gradient(closest-side, rgb(91 26 42 / 0.55), rgb(61 15 27 / 0.22) 55%, transparent);
   pointer-events: none;
 }
 
-/* Ghost word: Cormorant italic at 7% cream, behind Mavy. Same place in both
-   motion modes (sized by the viewport, never by data-motion), so the
-   hydration pass moves nothing. */
-.cgr-intro-word {
-  position: absolute;
-  z-index: 0;
-  right: -3vw;
-  top: calc(var(--head-h) + 9vh);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: min(27vw, 50vh);
-  line-height: 0.8;
-  letter-spacing: -0.03em;
-  color: rgb(242 232 216 / 0.07);
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-  will-change: transform;
-}
-
-/* Mavy: the stamp's .hero-figure box (540/960), right column, standing on
-   the scallop, in front of the ghost word (z 1 over 0). r7.5.1: no CSS mask;
-   the alpha shader already softens the frame edges, and the extra 16% mask
-   (made for the old walk-in) dimmed her left side once she is in frame. */
-.cgr-mavy {
+/* Masthead: the shop's name as the cover title (a home link; the real name
+   also stays as text in the nav). */
+.cgr .cgr-mast {
   position: absolute;
   z-index: 1;
-  right: calc(var(--gut) + 4vw);
+  left: calc(var(--gut) - 0.04em);
+  top: calc(var(--head-h) + 1vh);
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--t-mast);
+  line-height: 0.86;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.cgr .cgr-mast em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Mavy: the box is the landed cutout's bbox (112,134 to 492,906 of the
+   540x960 frame, aspect 380/772); the frame overflows it at the stamp's
+   offsets. She stands on the scallop. */
+.cgr-mavy {
+  position: absolute;
+  z-index: 2;
+  left: 58vw;
   bottom: 0;
-  height: calc(100% - var(--head-h) - 10px);
-  aspect-ratio: 540 / 960;
+  top: calc(var(--head-h) + 1vh + var(--t-mast) * 0.6);
+  aspect-ratio: 380 / 772;
   pointer-events: none;
 }
 
@@ -727,11 +737,17 @@ html:has(.cgr) {
 .cgr-mavy-poster,
 .cgr-intro-video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: -29.47%;
+  top: -17.36%;
+  width: 142.1%;
+  height: 124.35%;
+  max-width: none;
   object-fit: contain;
   object-position: bottom;
+}
+
+.cgr .cgr-mavy-poster {
+  max-width: none;
 }
 
 .cgr-intro-video {
@@ -748,55 +764,41 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
-/* Copy column: h1 + rotator at the top, lead + rate + CTAs at the bottom. */
-.cgr-intro-copy {
+/* Giant script "Gowns" (decorative, aria-hidden) across her skirt. */
+.cgr .cgr-gw {
   position: absolute;
-  z-index: 2;
-  left: var(--gut);
-  top: calc(var(--head-h) + 5.5vh);
-  bottom: 6vh;
-  width: min(54vw, 760px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  z-index: 3;
+  left: 44vw;
+  top: var(--gw-top);
+  font-family: var(--font-hand);
+  font-weight: 400;
+  font-size: var(--t-script-hero);
+  line-height: 1;
+  color: rgb(242 232 216 / 0.92);
+  text-shadow: 0 2px 30px rgb(11 7 8 / 0.35);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
 
-.cgr-intro-top {
-  position: relative;
-}
-
-.cgr .cgr-intro-h {
-  font-size: var(--t-hero);
-  color: var(--cream);
-  /* Room for the ñ tilde and the italic overhang at lh .98. */
-  padding-top: 0.06em;
-}
-
-.cgr-intro-h .l {
-  display: block;
-}
-
-/* Rotator: Great Vibes "for your ___" beside "Cavite." The noun swaps in a
-   one-cell grid, so the box never changes size (no layout shift). */
-.cgr .cgr-intro-hand {
+/* Rotator: Pinyon "for your ___", right-aligned under "Gowns". The phrases
+   swap in a one-cell grid anchored right, so the box never moves. */
+.cgr .cgr-rot {
   position: absolute;
-  left: calc(var(--t-hero) * 3.55 + 28px);
-  bottom: 0.05em;
-  font-size: min(3.8vw, 7.6vh);
-  line-height: 1.05;
+  z-index: 3;
+  right: var(--gut);
+  top: calc(var(--gw-top) + var(--t-script-hero) * 0.98);
+  font-size: min(3vw, 5.6vh);
+  line-height: 1.1;
+  text-align: right;
   white-space: nowrap;
   color: var(--cream);
-  opacity: 0.92;
   pointer-events: none;
-}
-
-.cgr-hand-fix {
-  display: inline;
 }
 
 .cgr-hand-stack {
   display: inline-grid;
-  justify-items: start;
+  justify-items: end;
   align-items: end;
   vertical-align: bottom;
 }
@@ -813,6 +815,26 @@ html:has(.cgr) {
   visibility: inherit;
 }
 
+/* Copy column under the masthead: h1 at the top, the lead block at the bottom. */
+.cgr-intro-copy {
+  position: absolute;
+  z-index: 4;
+  left: var(--gut);
+  top: var(--copy-top);
+  bottom: 6vh;
+  width: min(36vw, 520px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cgr .cgr-intro-h {
+  font-size: var(--t-hero);
+  color: var(--cream);
+  /* Room for the ñ tilde and the italic overhang at lh .98. */
+  padding-top: 0.06em;
+}
+
 .cgr-intro-bottom {
   display: flex;
   flex-direction: column;
@@ -827,7 +849,7 @@ html:has(.cgr) {
 }
 
 .cgr-intro-rate {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 13px;
   color: var(--cream-3);
 }
@@ -837,7 +859,12 @@ html:has(.cgr) {
   flex-wrap: wrap;
   align-items: center;
   gap: 22px;
-  margin-top: 22px;
+  margin-top: 20px;
+}
+
+.cgr-intro-cta .btn-wine {
+  color: var(--cream);
+  box-shadow: inset 0 0 0 1px rgb(242 232 216 / 0.18);
 }
 
 .cgr-intro-txt {
@@ -860,10 +887,45 @@ html:has(.cgr) {
   border-color: var(--cream);
 }
 
+/* Caption column (right): "i. On Mavy". */
+.cgr .cgr-capcol {
+  position: absolute;
+  z-index: 4;
+  right: var(--gut);
+  top: var(--copy-top);
+  width: 150px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cream-3);
+}
+
+.cgr .cgr-capcol .num {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 64px;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: rgb(242 232 216 / 0.5);
+}
+
+.cgr .cgr-capcol b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--cream);
+}
+
 /* Ivory lace scallop with pin holes: the edge where the intro meets the page. */
 .cgr-scallop {
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   left: 0;
   right: 0;
   bottom: 0;
@@ -873,84 +935,105 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
-/* Motion on: the copy waits for the load timeline (fade + 14px rise). The
-   stage keeps its geometry; only opacity / transform change. */
-.cgr-intro[data-motion="on"] :is(.cgr-intro-h .l, .cgr-intro-hand, .cgr-intro-bottom > *) {
-  opacity: 0;
-  visibility: hidden;
+/* Load timeline: [data-intro] nodes wait at opacity 0 (laid out, never
+   moved), then fade in by opacity when Story sets data-reveal: 600 ms on
+   --ease-fade, 140 ms stagger by group. A CSS failsafe shows them at 6 s if
+   the script never runs; a focused link shows at once. */
+@keyframes cgr-intro-cap {
+  to {
+    opacity: 1;
+  }
 }
 
-/* Phones (stamp r75.css <=640): Mavy top right under the nav, the copy
-   block at the bottom, the rotator above the h1. */
+.cgr-intro[data-motion="on"] [data-intro] {
+  opacity: 0;
+  transition: opacity 600ms var(--ease-fade);
+  animation: cgr-intro-cap 600ms var(--ease-fade) 6s forwards;
+}
+
+.cgr-intro[data-motion="on"] [data-intro="1"] {
+  transition-delay: 140ms;
+}
+
+.cgr-intro[data-motion="on"] [data-intro="2"] {
+  transition-delay: 280ms;
+}
+
+.cgr-intro[data-motion="on"][data-reveal="on"] [data-intro],
+.cgr-intro[data-motion="on"] [data-intro]:focus-within,
+.cgr-intro[data-motion="on"] a[data-intro]:focus-visible {
+  opacity: 1;
+}
+
+/* Tablets: the caption column steps aside once it would meet the script. */
+@media (max-width: 1100px) {
+  .cgr .cgr-capcol {
+    display: none;
+  }
+}
+
+/* Phones (stamp r76.css <=640): the masthead on two lines, Mavy under it on
+   the right, "Gowns" across her skirt, the copy block at the bottom. */
 @media (max-width: 640px) {
+  .cgr-intro {
+    --copy-h: 262px;
+    /* r7.6: her head meets only the lower part of "Rentals" (line 2). */
+    --mast-b: calc(var(--head-h) + 8px + var(--t-mast-m) * 1.38);
+  }
+
   .cgr-intro-bloom {
-    right: -30vw;
+    left: -10vw;
     top: 0;
-    width: 110vw;
+    width: 120vw;
     height: 70vh;
   }
 
-  .cgr-intro-word {
-    right: -4vw;
-    top: calc(var(--head-h) + 2px);
-    font-size: min(44vw, 24vh);
+  .cgr .cgr-mast {
+    top: calc(var(--head-h) + 8px);
+    font-size: var(--t-mast-m);
+    line-height: 0.88;
   }
 
-  /* r7.5.1: flush right (was -9vw), so the veil never leaves the screen. */
+  .cgr .cgr-mast .l2 {
+    display: block;
+  }
+
   .cgr-mavy {
-    right: 0;
-    top: calc(var(--head-h) + 6px);
+    left: 31vw;
+    top: var(--mast-b);
     bottom: auto;
-    height: calc(100% - var(--head-h) - 318px);
+    height: calc(100% - var(--mast-b) - var(--copy-h) - 20px);
+  }
+
+  .cgr .cgr-gw {
+    left: -1vw;
+    top: auto;
+    bottom: calc(var(--copy-h) + 34px + 3.8vh);
+    font-size: min(34vw, 15.5vh);
+  }
+
+  .cgr .cgr-rot {
+    top: auto;
+    bottom: calc(var(--copy-h) + 34px);
+    font-size: min(7.6vw, 3.6vh);
   }
 
   .cgr-intro-copy {
     top: auto;
-    bottom: 28px;
+    bottom: 26px;
     left: var(--gut);
     right: var(--gut);
     width: auto;
-    height: 300px;
+    height: var(--copy-h);
     justify-content: flex-end;
   }
 
   .cgr .cgr-intro-h {
-    font-size: clamp(2.1rem, 10vw, 2.6rem);
-  }
-
-  .cgr-intro-h .l {
-    display: inline;
-  }
-
-  .cgr .cgr-intro-hand {
-    left: 0;
-    bottom: calc(100% + 36px);
-    width: 36vw;
-    font-size: 40px;
-    white-space: normal;
-  }
-
-  /* Each noun carries its own "for your" on phones, so the phrase wraps as
-     one and sits on the h1 whatever the noun's length (graduation ball takes
-     three lines, debut two). The cell is bottom-aligned. */
-  .cgr-hand-fix {
-    display: none;
-  }
-
-  .cgr-hand-stack {
-    display: grid;
-  }
-
-  .cgr-hand-stack > span {
-    white-space: normal;
-  }
-
-  .cgr-hand-stack > span::before {
-    content: "for your ";
+    font-size: clamp(2rem, 9.4vw, 2.45rem);
   }
 
   .cgr-intro-lead {
-    margin-top: 14px;
+    margin-top: 12px;
     font-size: 15px;
     line-height: 1.5;
   }
@@ -961,20 +1044,28 @@ html:has(.cgr) {
 
   .cgr-intro-cta {
     gap: 18px;
-    margin-top: 18px;
+    margin-top: 16px;
   }
 
   .cgr-intro-cta .btn {
     min-height: 44px;
+    padding: 0 18px;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 700px) {
+  .cgr-intro {
+    --copy-h: 250px;
+  }
+
+  .cgr-intro-lead {
+    font-size: 14.5px;
+    line-height: 1.45;
   }
 }
 
 /* ==========================================================================
-   02  Racks (r7.5 stamp sections.css): the ivory catalogue with its tilted
-   strip, rack list, lens and blush accessories band; then the cream men's
-   room with ivory-matted photos. Phones and tablets (<=899) get a staggered
-   two-column grid, so every photo is on screen (the r7.4 phone fan pushed the
-   first gown and the first suit off the left edge).
+   02  Rooms (r7.6): the condensed nav, then the lookbook spreads below.
    ========================================================================== */
 .cgr {
   --sn-h: 64px;
@@ -1108,236 +1199,442 @@ html:has(.cgr) {
   color: var(--wine-ink);
 }
 
-.cgr .cgr-rk-h {
-  font-size: var(--t-h2);
+/* ==========================================================================
+   02  Lookbook spreads (r7.6 stamp sections.css): each room is a magazine
+   spread: a big blush numeral, one framed photo with an offset hairline, an
+   ivory-matted second photo, a Pinyon Script word laid over the photos, the
+   text column with a floated mat and a pull quote, and numbered captions.
+   Desktop (1024+) is the stamp's 1366 composition in container units
+   (--u = 1/1366 of the spread); below that each spread stacks as the
+   stamp's phone page (--p = 1/390 of the art box, max 560 wide).
+   ========================================================================== */
+.cgr .cgr-sp {
+  --u: calc(100cqw / 1366);
+  --frame-offset: 18px;
+  container-type: inline-size;
+}
+
+.cgr .cgr-sp-body {
+  position: relative;
+}
+
+.cgr .cgr-sp-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cgr .cgr-sp .ph {
+  position: absolute;
+  margin: 0;
+  pointer-events: auto;
+}
+
+.cgr .cgr-sp .ph picture,
+.cgr .cgr-sp .ph img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cgr .cgr-sp .ph img {
+  object-fit: cover;
+}
+
+.cgr .cgr-sp .ph-crop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The framed photo: an offset hairline behind it. */
+.cgr .cgr-sp .ph.frame::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  transform: translate(var(--frame-offset), var(--frame-offset));
+  border: 1px solid rgb(91 26 42 / 0.28);
+  pointer-events: none;
+}
+
+/* The matted photo: an ivory mount with a soft drop. */
+.cgr .cgr-sp .ph.mat {
+  padding: 9px;
+  background: var(--ivory);
+  box-shadow: 0 30px 60px -30px rgb(61 15 27 / 0.35), 0 0 0 1px rgb(91 26 42 / 0.08);
+}
+
+/* Detail crops: one photo, scaled inside its mat (Filipiniana). */
+.cgr .cgr-sp .ph-detail img {
+  transform: scale(var(--z, 2));
+  transform-origin: var(--o, 50% 50%);
+}
+
+.cgr .cgr-sp-num {
+  position: absolute;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(7rem, 17vw, 16rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: var(--blush-2);
+  pointer-events: none;
+  user-select: none;
+}
+
+.cgr .cgr-sp .sw {
+  position: absolute;
+  z-index: 3;
+  font-family: var(--font-hand);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--wine);
+  text-shadow: 0 0 18px rgb(247 241 230 / 0.55);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cgr .cgr-sp-text {
+  position: relative;
+  z-index: 3;
+}
+
+.cgr .cgr-sp-h {
+  font-size: clamp(2.6rem, 5vw, 4.75rem);
   color: var(--wine);
 }
 
-.cgr .cgr-rk-lede {
-  max-width: 28em;
-  margin-top: 20px;
+.cgr .cgr-sp-text > .ph {
+  position: relative;
+  float: right;
+  shape-outside: margin-box;
+}
+
+.cgr .cgr-sp-lede {
+  margin-top: 22px;
   font-size: var(--t-body);
   line-height: 1.6;
   color: var(--wine-ink);
 }
 
-.cgr .cgr-rk-ctas {
+.cgr .cgr-sp-pull {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.3vw, 2.125rem);
+  line-height: 1.15;
+  color: var(--wine);
+}
+
+.cgr .cgr-sp-pull::before {
+  content: "\201C";
+  display: block;
+  height: 0.5em;
+  margin-bottom: 6px;
+  font-size: 72px;
+  line-height: 1;
+  color: var(--blush-2);
+}
+
+.cgr .cgr-sp-ctas {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   align-items: center;
   margin-top: 28px;
+  clear: both;
 }
 
-/* ---------- Catalogue ---------- */
-.cgr .cgr-rk-cat {
-  min-height: 900px;
-  padding: 84px var(--gut) calc(170px + 56px);
-}
-
-.cgr .cgr-rk-text {
-  position: relative;
-  z-index: 2;
-  width: min(460px, 35vw);
-}
-
-.cgr .cgr-rk-racks {
-  margin-top: 28px;
-  border-top: 1px solid var(--line);
-}
-
-.cgr .cgr-rk-racks li {
-  border-bottom: 1px solid var(--line);
-}
-
-.cgr .cgr-rk-racks a {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  min-height: 44px;
-  padding: 11px 16px;
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: 27px;
-  line-height: 1.1;
-  color: var(--wine);
-  text-decoration: none;
-  transition: background-color var(--dur-hover) var(--ease-silk);
-}
-
-.cgr .cgr-rk-racks a:hover {
-  background-color: rgb(235 213 206 / 0.55);
-}
-
-.cgr .cgr-rk-racks li.is-on a {
-  margin-left: calc(-1 * var(--gut));
-  padding-left: calc(var(--gut) + 16px);
-  background-color: var(--blush);
-  font-style: italic;
-  font-weight: 400;
-}
-
-.cgr .cgr-rk-racks .n {
-  font-family: var(--font-body);
-  font-style: normal;
-  font-size: 13px;
-  line-height: 1;
-  color: var(--mute);
-}
-
-.cgr .cgr-rk-racks .arrow {
-  flex: none;
-  width: 14px;
-  opacity: 0.55;
-}
-
-/* Tilted strip (r7.3 geometry, softened): -40deg about the right edge,
-   faded in from the left. */
-.cgr .cgr-rk-stage {
-  position: absolute;
-  z-index: 1;
-  left: calc(var(--gut) + min(460px, 35vw) + 8px);
-  right: 0;
-  top: 56px;
-  height: 640px;
-  perspective: 1500px;
-  perspective-origin: 10% 46%;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70px);
-  mask-image: linear-gradient(90deg, transparent 0, #000 70px);
-}
-
-/* r7.5: the strip is sized to the stage so all five gowns stay in view at
-   every desktop width (the stamp's 270px cards at -40deg put the first gown
-   behind the fade and the last past the right edge at 1366). */
-.cgr .cgr-rk-strip {
-  position: absolute;
-  top: 40px;
-  right: 16px;
-  transform: rotateY(-34deg);
-  transform-origin: 100% 50%;
-}
-
-.cgr .cgr-rk-track {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  will-change: transform;
-}
-
-.cgr .cgr-rk-card {
-  flex: none;
-  display: block;
-  width: clamp(110px, 12.4vw, 220px);
-  padding: 8px 8px 0;
-  background: var(--blush);
-  box-shadow: var(--shadow-mat);
-  color: var(--wine-ink);
-  text-decoration: none;
-  transition: transform var(--dur-fade) var(--ease-silk), box-shadow var(--dur-fade) var(--ease-silk);
-}
-
-.cgr .cgr-rk-card:last-child {
-  width: clamp(124px, 14vw, 250px);
-}
-
-.cgr .cgr-rk-im {
-  position: relative;
-  display: block;
-  aspect-ratio: 27 / 47;
-  overflow: hidden;
-  background: var(--ivory);
-}
-
-.cgr .cgr-rk-card:last-child .cgr-rk-im {
-  aspect-ratio: 30 / 52;
-}
-
-.cgr .cgr-rk-im img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
-}
-
-/* r7.5.1: the blue ball gown photo ends in ~8% white studio floor. The img
-   box runs 12% taller than the card from the top, so cover scales the photo
-   to it and the card's overflow clips the floor (no new file). */
-.cgr .cgr-rk-im img.is-floorcrop {
-  height: 112%;
-}
-
-.cgr .cgr-rk-cap {
-  display: block;
-  padding: 10px 4px 12px;
-  font-size: 13px;
-  line-height: 1.35;
-  color: var(--mute);
-}
-
-.cgr .cgr-rk-cap b {
-  display: block;
-  margin-bottom: 2px;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 19px;
-  line-height: 1.15;
-  color: var(--wine);
-}
-
-.cgr a.cgr-rk-card:hover,
-.cgr a.cgr-rk-card:focus-visible {
-  transform: translateY(-6px);
-  box-shadow: 0 40px 70px -30px rgb(61 15 27 / 0.45);
-}
-
-.cgr .cgr-rk-note {
-  position: absolute;
-  z-index: 4;
-  right: var(--gut);
-  top: 724px;
-  max-width: 14em;
-  font-size: 13px;
-  line-height: 1.35;
-  color: var(--mute);
-}
-
-/* The lens follows the pointer in viewport space (GSAP x / y). */
-.cgr .cgr-lens {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 60;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  border: 1px solid rgb(247 241 230 / 0.9);
-  box-shadow: 0 0 0 1px rgb(91 26 42 / 0.25), 0 24px 50px -18px rgb(61 15 27 / 0.55);
-  background-color: var(--ivory);
-  background-repeat: no-repeat;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity var(--dur-fade) var(--ease-silk), visibility 0s linear var(--dur-fade);
-}
-
-.cgr .cgr-lens[data-on="true"] {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity var(--dur-fade) var(--ease-silk), visibility 0s;
-}
-
-/* Blush accessories band along the bottom of the catalogue. */
-.cgr .cgr-rk-band {
+.cgr .cgr-sp-caps {
   position: absolute;
   z-index: 3;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--mute);
+}
+
+.cgr .cgr-sp-caps li + li {
+  margin-top: 18px;
+}
+
+.cgr .cgr-sp-caps i {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--wine);
+}
+
+.cgr .cgr-sp-caps b {
+  display: block;
+  margin: 4px 0 2px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.2;
+  color: var(--wine);
+}
+
+/* Contents band (spread 01): the catalogue's table of contents. */
+.cgr .cgr-sp-toc {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 34px;
+  min-height: 84px;
+  padding: 12px var(--gut);
+  background: var(--blush);
+}
+
+.cgr .cgr-sp-toc .lab {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--wine);
+}
+
+.cgr .cgr-sp-toc ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 30px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cgr .cgr-sp-toc a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  padding-top: 10px;
+  font-size: 14px;
+  color: var(--wine-ink);
+  text-decoration: none;
+}
+
+.cgr .cgr-sp-toc a i {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--wine);
+}
+
+.cgr .cgr-sp-toc a[aria-current="true"] span,
+.cgr .cgr-sp-toc a:hover span {
+  text-decoration: underline;
+  text-decoration-color: rgb(91 26 42 / 0.5);
+  text-underline-offset: 5px;
+}
+
+/* Spreads 01 -> 03: the page turn. The spreads share a cream sheet, so the
+   incoming page wipes in from the right edge over it (clip-path, scrubbed
+   over ~70vh in Rack.tsx); the outgoing page steps back 24px at .85. */
+.cgr .cgr-sps {
+  background: var(--cream);
+}
+
+/* ---------- Desktop compositions (stamp 1366) ---------- */
+@media (min-width: 1024px) {
+  .cgr .cgr-sp-01 .cgr-sp-body {
+    min-height: calc(916 * var(--u));
+  }
+
+  .cgr .cgr-sp-01 .cgr-sp-num { left: calc(40 * var(--u)); top: calc(28 * var(--u)); }
+  .cgr .cgr-sp-01 .ph-a { left: calc(250 * var(--u)); top: calc(70 * var(--u)); width: calc(430 * var(--u)); height: calc(740 * var(--u)); }
+  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(600 * var(--u)); top: calc(600 * var(--u)); width: calc(176 * var(--u)); height: calc(250 * var(--u)); }
+  .cgr .cgr-sp-01 .sw { left: calc(470 * var(--u)); top: calc(96 * var(--u)); font-size: calc(250 * var(--u)); }
+  .cgr .cgr-sp-01 .cgr-sp-caps { left: calc(72 * var(--u)); top: calc(520 * var(--u)); width: 150px; }
+  .cgr .cgr-sp-01 .cgr-sp-text { margin-left: calc(790 * var(--u)); width: calc(504 * var(--u)); padding: calc(372 * var(--u)) 0 56px; }
+  .cgr .cgr-sp-01 .cgr-sp-text > .ph { width: calc(210 * var(--u)); height: calc(290 * var(--u)); margin: 6px 0 14px 26px; }
+
+  .cgr .cgr-sp-03 .cgr-sp-body {
+    min-height: calc(920 * var(--u));
+  }
+
+  .cgr .cgr-sp-03 .cgr-sp-num { left: calc(1120 * var(--u)); top: calc(28 * var(--u)); }
+  .cgr .cgr-sp-03 .ph-a { left: calc(760 * var(--u)); top: calc(90 * var(--u)); width: calc(330 * var(--u)); height: calc(640 * var(--u)); }
+  .cgr .cgr-sp-03 .ph-b { z-index: 2; left: calc(1130 * var(--u)); top: calc(250 * var(--u)); width: calc(170 * var(--u)); height: calc(200 * var(--u)); }
+  .cgr .cgr-sp-03 .ph-c { z-index: 2; left: calc(1130 * var(--u)); top: calc(480 * var(--u)); width: calc(170 * var(--u)); height: calc(220 * var(--u)); }
+  /* The script word sits under the black gown, not on it, so it stays legible. */
+  .cgr .cgr-sp-03 .sw { left: calc(600 * var(--u)); top: calc(722 * var(--u)); font-size: calc(140 * var(--u)); }
+  /* Captions sit in a row under the text so they stay inside the spread. */
+  .cgr .cgr-sp-03 .cgr-sp-caps { left: calc(120 * var(--u)); top: calc(640 * var(--u)); width: calc(420 * var(--u)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 calc(20 * var(--u)); }
+  .cgr .cgr-sp-03 .cgr-sp-caps li + li { margin-top: 0; }
+  .cgr .cgr-sp-03 .cgr-sp-text { margin-left: calc(120 * var(--u)); width: calc(500 * var(--u)); padding: calc(170 * var(--u)) 0 64px; }
+
+  .cgr .cgr-sp-05 .cgr-sp-body {
+    min-height: calc(980 * var(--u));
+  }
+
+  .cgr .cgr-sp-05 .cgr-sp-num { left: calc(1040 * var(--u)); top: calc(20 * var(--u)); }
+  .cgr .cgr-sp-05 .ph-a { left: calc(-30 * var(--u)); top: calc(72 * var(--u)); width: calc(520 * var(--u)); height: calc(700 * var(--u)); }
+  .cgr .cgr-sp-05 .ph-b { z-index: 2; left: calc(340 * var(--u)); top: calc(612 * var(--u)); width: calc(230 * var(--u)); height: calc(222 * var(--u)); }
+  .cgr .cgr-sp-05 .sw { left: calc(300 * var(--u)); top: calc(110 * var(--u)); font-size: calc(250 * var(--u)); }
+  .cgr .cgr-sp-05 .cgr-sp-text { position: static; margin-left: calc(620 * var(--u)); width: calc(380 * var(--u)); padding: calc(392 * var(--u)) 0 96px; }
+  .cgr .cgr-sp-05 .cgr-sp-text > :not(.ph) { position: relative; z-index: 3; }
+  .cgr .cgr-sp-05 .cgr-sp-text > .ph { position: absolute; float: none; z-index: 2; left: calc(1104 * var(--u)); top: calc(640 * var(--u)); width: calc(190 * var(--u)); height: calc(250 * var(--u)); }
+  .cgr .cgr-sp-05 .cgr-sp-row { display: contents; }
+  .cgr .cgr-sp-05 .ph-d { z-index: 4; left: calc(1010 * var(--u)); top: calc(700 * var(--u)); width: calc(146 * var(--u)); height: calc(194 * var(--u)); }
+  .cgr .cgr-sp-05 .cgr-sp-caps { left: calc(1180 * var(--u)); top: calc(200 * var(--u)); width: calc(130 * var(--u)); }
+  .cgr .cgr-sp-05 .cgr-pitch { right: calc(72 * var(--u)); bottom: 18px; }
+}
+
+/* ---------- Tablets + phones: the stamp's stacked pages ---------- */
+@media (max-width: 1023px) {
+  .cgr .cgr-sp {
+    --frame-offset: 10px;
+    padding-bottom: 48px;
+  }
+
+  .cgr .cgr-sp-art {
+    --p: calc(100cqw / 390);
+    position: relative;
+    inset: auto;
+    max-width: 560px;
+    margin: 0 auto;
+    container-type: inline-size;
+    aspect-ratio: 390 / 490;
+  }
+
+  .cgr .cgr-sp-num {
+    font-size: calc(120 * var(--p));
+  }
+
+  .cgr .cgr-sp-text,
+  .cgr .cgr-sp-caps,
+  .cgr .cgr-sp-row,
+  .cgr .cgr-sp .cgr-pitch {
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--gut);
+    padding-right: var(--gut);
+  }
+
+  .cgr .cgr-sp-text {
+    padding-top: 20px;
+  }
+
+  .cgr .cgr-sp-h {
+    font-size: 46px;
+  }
+
+  .cgr .cgr-sp-lede {
+    font-size: 15.5px;
+  }
+
+  .cgr .cgr-sp-pull {
+    font-size: 26px;
+  }
+
+  .cgr .cgr-sp-text > .ph {
+    width: 116px;
+    height: 166px;
+    margin: 6px 0 10px 16px;
+  }
+
+  .cgr .cgr-sp-caps {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+    margin-top: 32px;
+  }
+
+  .cgr .cgr-sp-caps li + li {
+    margin-top: 0;
+  }
+
+  .cgr .cgr-sp-ctas .btn {
+    min-height: 44px;
+    padding: 0 18px;
+  }
+
+  .cgr .cgr-sp-toc {
+    margin-top: 40px;
+    margin-bottom: -48px;
+    gap: 0 24px;
+    padding: 16px var(--gut);
+  }
+
+  .cgr .cgr-sp-toc ol {
+    gap: 0 22px;
+  }
+
+  .cgr .cgr-sp-01 .cgr-sp-num { left: calc(276 * var(--p)); top: calc(24 * var(--p)); }
+  .cgr .cgr-sp-01 .ph-a { left: calc(20 * var(--p)); top: calc(40 * var(--p)); width: calc(250 * var(--p)); height: calc(410 * var(--p)); }
+  .cgr .cgr-sp-01 .ph-b { z-index: 2; left: calc(236 * var(--p)); top: calc(300 * var(--p)); width: calc(134 * var(--p)); height: calc(184 * var(--p)); }
+  .cgr .cgr-sp-01 .sw { left: calc(110 * var(--p)); top: calc(150 * var(--p)); font-size: calc(104 * var(--p)); }
+
+  .cgr .cgr-sp-03 .cgr-sp-num { left: calc(24 * var(--p)); top: calc(16 * var(--p)); }
+  .cgr .cgr-sp-03 .ph-a { left: calc(140 * var(--p)); top: calc(40 * var(--p)); width: calc(230 * var(--p)); height: calc(400 * var(--p)); }
+  .cgr .cgr-sp-03 .ph-b { z-index: 2; left: calc(20 * var(--p)); top: calc(126 * var(--p)); width: calc(136 * var(--p)); height: calc(160 * var(--p)); }
+  .cgr .cgr-sp-03 .ph-c { z-index: 2; left: calc(20 * var(--p)); top: calc(300 * var(--p)); width: calc(136 * var(--p)); height: calc(170 * var(--p)); }
+  .cgr .cgr-sp-03 .cgr-sp-art { aspect-ratio: 390 / 540; }
+  .cgr .cgr-sp-03 .sw { left: calc(128 * var(--p)); top: calc(440 * var(--p)); font-size: calc(54 * var(--p)); }
+
+  .cgr .cgr-sp-05 .cgr-sp-art { aspect-ratio: 390 / 450; }
+  .cgr .cgr-sp-05 .cgr-sp-num { left: calc(282 * var(--p)); top: calc(24 * var(--p)); }
+  .cgr .cgr-sp-05 .ph-a { left: calc(-16 * var(--p)); top: calc(40 * var(--p)); width: calc(290 * var(--p)); height: calc(400 * var(--p)); }
+  .cgr .cgr-sp-05 .ph-b { z-index: 2; left: calc(226 * var(--p)); top: calc(300 * var(--p)); width: calc(144 * var(--p)); height: calc(140 * var(--p)); }
+  .cgr .cgr-sp-05 .sw { left: calc(86 * var(--p)); top: calc(142 * var(--p)); font-size: calc(100 * var(--p)); }
+  .cgr .cgr-sp-05 .cgr-sp-h { font-size: 50px; }
+  .cgr .cgr-sp-05 .cgr-sp-text > .ph { width: 126px; height: 168px; }
+
+  .cgr .cgr-sp-05 .cgr-sp-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 32px;
+  }
+
+  .cgr .cgr-sp-05 .ph-d {
+    position: relative;
+    flex: none;
+    width: 136px;
+    height: 180px;
+  }
+
+  .cgr .cgr-sp-05 .cgr-sp-row .cgr-sp-caps {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cgr .cgr-sp-05 .cgr-sp-row .cgr-sp-caps li + li {
+    margin-top: 14px;
+  }
+
+  .cgr .cgr-sp .cgr-pitch {
+    position: static;
+    margin-top: 32px;
+  }
+}
+
+/* ---------- Accessories band (r7.5, now its own blush band) ---------- */
+.cgr .cgr-acc {
+  background: var(--blush);
+}
+
+.cgr .cgr-rk-band {
+  position: relative;
+  z-index: 3;
   min-height: 170px;
   display: flex;
   align-items: center;
@@ -1391,101 +1688,15 @@ html:has(.cgr) {
   color: var(--wine);
   text-decoration: none;
   white-space: nowrap;
-}
-
-.cgr .cgr-more {
   background-image: linear-gradient(rgb(91 26 42 / 0.4), rgb(91 26 42 / 0.4));
   background-repeat: no-repeat;
   background-position: 0 calc(50% + 12px);
   background-size: 100% 1px;
 }
 
-/* ---------- Men's ---------- */
-.cgr .cgr-rk-men {
-  min-height: max(860px, 62.96vw);
-  padding: 92px var(--gut) 120px;
-}
-
-.cgr .cgr-men-pics {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.cgr .cgr-mat {
-  padding: 10px;
-  background: var(--ivory);
-  box-shadow: var(--shadow-mat);
-}
-
-.cgr .cgr-mat picture,
-.cgr .cgr-mat img {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.cgr .cgr-mat img {
-  object-fit: cover;
-}
-
-.cgr .cgr-mat-a {
-  position: absolute;
-  left: -2.93vw;
-  top: 80px;
-  width: 38.07vw;
-  height: min(640px, 46.85vw);
-}
-
-.cgr .cgr-mat-b {
-  position: absolute;
-  left: 28.55vw;
-  top: calc(80px + min(390px, 28.55vw));
-  width: 19.77vw;
-  height: 21.23vw;
-  will-change: transform;
-}
-
-.cgr .cgr-men-cap1 {
-  position: absolute;
-  left: var(--gut);
-  top: calc(80px + min(640px, 46.85vw) + 22px);
-  max-width: 24vw;
-}
-
-.cgr .cgr-men-text {
-  position: relative;
-  z-index: 2;
-  margin-left: calc(54.17vw - var(--gut));
-  width: min(560px, 41vw);
-}
-
-.cgr .cgr-men-text .cgr-rk-h {
-  font-size: clamp(56px, 7vw, 96px);
-}
-
-.cgr .cgr-men-suits {
-  display: flex;
-  gap: 2.93vw;
-  margin-top: 44px;
-}
-
-.cgr .cgr-men-suits figure {
-  width: min(230px, 16.84vw);
-}
-
-.cgr .cgr-mat-s {
-  aspect-ratio: 230 / 300;
-}
-
-.cgr .cgr-men-suits figcaption {
-  margin-top: 12px;
-}
-
 .cgr .cgr-pitch {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   right: var(--gut);
   bottom: 32px;
   font-size: 14px;
@@ -1503,89 +1714,8 @@ html:has(.cgr) {
   text-underline-offset: 4px;
 }
 
-/* ---------- Tablets + phones: staggered two-column grids ---------- */
 @media (max-width: 899px) {
-  .cgr .cgr-rk-cat {
-    min-height: 0;
-    padding: 64px var(--gut) 0;
-  }
-
-  .cgr .cgr-rk-text {
-    width: auto;
-  }
-
-  .cgr .cgr-rk-racks a {
-    font-size: 24px;
-  }
-
-  .cgr .cgr-rk-stage {
-    position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    height: auto;
-    margin-top: 40px;
-    padding-bottom: 40px;
-    perspective: none;
-    overflow: visible;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  .cgr .cgr-rk-strip {
-    position: static;
-    transform: none;
-  }
-
-  .cgr .cgr-rk-track {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    will-change: auto;
-  }
-
-  .cgr .cgr-rk-card,
-  .cgr .cgr-rk-card:last-child {
-    width: auto;
-    padding: 6px 6px 0;
-  }
-
-  /* Second column sits a little lower: the stagger. */
-  .cgr .cgr-rk-card:nth-child(even) {
-    transform: translateY(36px);
-  }
-
-  .cgr .cgr-rk-card:last-child .cgr-rk-im {
-    aspect-ratio: 27 / 47;
-  }
-
-  .cgr a.cgr-rk-card:hover,
-  .cgr a.cgr-rk-card:focus-visible {
-    transform: none;
-  }
-
-  .cgr a.cgr-rk-card:nth-child(even):hover,
-  .cgr a.cgr-rk-card:nth-child(even):focus-visible {
-    transform: translateY(36px);
-  }
-
-  .cgr .cgr-rk-cap {
-    padding: 8px 2px 10px;
-    font-size: 12px;
-  }
-
-  .cgr .cgr-rk-cap b {
-    font-size: 17px;
-  }
-
-  .cgr .cgr-rk-note,
-  .cgr .cgr-lens {
-    display: none;
-  }
-
   .cgr .cgr-rk-band {
-    position: relative;
-    margin: 0 calc(-1 * var(--gut));
     flex-direction: column;
     align-items: flex-start;
     gap: 18px;
@@ -1612,110 +1742,18 @@ html:has(.cgr) {
   .cgr .cgr-more {
     margin-left: 0;
   }
-
-  .cgr .cgr-rk-men {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 64px var(--gut) 40px;
-  }
-
-  .cgr .cgr-men-pics {
-    position: relative;
-    inset: auto;
-    order: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 40px;
-    pointer-events: auto;
-  }
-
-  .cgr .cgr-mat-a,
-  .cgr .cgr-mat-b {
-    position: relative;
-    left: auto;
-    top: auto;
-    width: auto;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    will-change: auto;
-  }
-
-  .cgr .cgr-mat-b {
-    transform: translateY(36px);
-  }
-
-  .cgr .cgr-men-cap1 {
-    position: static;
-    grid-column: 1 / -1;
-    max-width: none;
-    margin-top: 44px;
-  }
-
-  .cgr .cgr-men-text {
-    order: 1;
-    margin-left: 0;
-    width: auto;
-  }
-
-  .cgr .cgr-men-text .cgr-rk-h {
-    font-size: var(--t-h2);
-  }
-
-  .cgr .cgr-men-suits {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 36px;
-  }
-
-  .cgr .cgr-men-suits figure {
-    width: auto;
-  }
-
-  .cgr .cgr-men-suits figure:nth-child(even) {
-    transform: translateY(36px);
-  }
-
-  .cgr .cgr-men-suits figure:nth-child(even) figcaption {
-    margin-bottom: 36px;
-  }
-
-  .cgr .cgr-pitch {
-    position: static;
-    order: 3;
-    margin-top: 36px;
-  }
 }
 
-@media (max-width: 640px) {
-  .cgr .cgr-rk-ctas .btn {
-    padding: 0 18px;
-  }
-}
-
-/* Reduced motion: static strips, no hover travel, instant nav. */
+/* Reduced motion: no hover travel, instant nav, the spreads sit still. */
 @media (prefers-reduced-motion: reduce) {
-  .cgr .cgr-rk-card,
   .cgr .cgr-rk-thumbs img,
-  .cgr .cgr-lens,
   .cgr-sn,
   .cgr-sn[data-on="true"] {
     transition: none;
   }
 
-  .cgr a.cgr-rk-card:hover,
-  .cgr a.cgr-rk-card:focus-visible,
   .cgr .cgr-rk-thumbs a:hover img {
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) and (max-width: 899px) {
-  .cgr a.cgr-rk-card:nth-child(even):hover,
-  .cgr a.cgr-rk-card:nth-child(even):focus-visible {
-    transform: translateY(36px);
   }
 }
 
@@ -3253,8 +3291,8 @@ tr[data-status="cancelled"] .cgr-ow-c {
 }
 
 
-/* r7.3.1 Font gate (FontGate.tsx), r7.5 list. Until the next/font faces load
-   (Cormorant Garamond, Figtree, Great Vibes), the first-screen nodes whose
+/* r7.3.1 Font gate (FontGate.tsx), r7.6 list. Until the next/font faces load
+   (Cormorant Garamond, Figtree, Pinyon Script), the first-screen nodes whose
    position depends on a text width stay visibility hidden (their text is
    invisible in the block period anyway), so the swap moves nothing visible:
    CLS 0. The animation is a failsafe that shows them after 3s if a font
@@ -3270,9 +3308,11 @@ tr[data-status="cancelled"] .cgr-ow-c {
     .cgr-wm,
     .cgr-head-nav,
     .cgr-head-mob,
-    .cgr-intro-word,
+    .cgr-mast,
+    .cgr-gw,
+    .cgr-rot,
     .cgr-intro-copy,
-    .cgr-intro-hand
+    .cgr-capcol
   ) {
   visibility: hidden;
   animation: cgr-fontgate 0s linear 3s forwards;
