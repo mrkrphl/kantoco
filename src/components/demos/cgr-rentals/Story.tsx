@@ -61,6 +61,9 @@ const T_START = 0.6;
 const CLIP_SECONDS = 8;
 /** The clip runs T_START..end over 0..CLIP_END of the intro scroll. */
 const CLIP_END = 0.92;
+/** Caption fade window, in intro-scroll progress: she is in frame from ~0.18
+    (clip ~1.9 s, mid walk-in; the poster is at 0.6 opacity) and lands ~0.36. */
+const CAP_FADE = [0.2, 0.32] as const;
 const FRONT = ((6 - T_START) / (CLIP_SECONDS - T_START)) * CLIP_END;
 /** No metadata by then (stalled or blocked clip): use the poster. */
 const CLIP_WAIT_MS = 8000;
@@ -158,6 +161,7 @@ export function Story() {
       const stage = q(".cgr-intro-stage")[0] as HTMLElement;
       const gw = q(".cgr-gw")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
+      const cap = q(".cgr-capcol")[0] as HTMLElement | undefined;
       const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
 
       // ---- Rotator (spec.md): each swap holds 2.2 s, then the nouns
@@ -243,6 +247,24 @@ export function Story() {
       });
       tl.fromTo(gw, { x: 0 }, { x: DRIFT, duration: 1 }, 0);
       if (poster) tl.fromTo(poster, { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.3 }, 0);
+      // Caption "i. On Mavy": waits at 0 until she is in frame (clip ~2.6 s of
+      // the walk-in, or the poster's fade), then fades in on the same scroll.
+      // Opacity/visibility only, so no layout moves; hidden = out of the a11y
+      // tree, and aria-hidden mirrors it.
+      if (cap) {
+        const syncAria = () => {
+          const on = Number(gsap.getProperty(cap, "opacity")) > 0.05;
+          if (on) cap.removeAttribute("aria-hidden");
+          else cap.setAttribute("aria-hidden", "true");
+        };
+        tl.fromTo(
+          cap,
+          { autoAlpha: 0 },
+          { autoAlpha: 1, duration: CAP_FADE[1] - CAP_FADE[0], onUpdate: syncAria, onComplete: syncAria, onReverseComplete: syncAria },
+          CAP_FADE[0],
+        );
+        syncAria();
+      }
 
       // ---- Clip: the intro scroll scrubs T_START..end (walk-in, landing,
       // spin). At the top she is off-frame; nothing plays on its own.
@@ -293,6 +315,10 @@ export function Story() {
         idle.kill();
         tl.scrollTrigger?.kill();
         tl.kill();
+        if (cap) {
+          gsap.set(cap, { clearProps: "opacity,visibility" });
+          cap.removeAttribute("aria-hidden");
+        }
       };
     },
     { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster] },

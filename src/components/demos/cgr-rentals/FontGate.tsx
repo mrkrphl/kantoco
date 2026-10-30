@@ -17,7 +17,7 @@ const LIMIT_MS = 3000;
 // Without JS the gate never opens, and reduced motion strips the CSS failsafe
 // animation, so noscript shows the gated nodes straight away.
 const NOSCRIPT_CSS =
-  ".cgr-fonts :is(.cgr-bar-inner,.cgr-wm,.cgr-head-nav,.cgr-head-mob,.cgr-mast,.cgr-gw,.cgr-rot,.cgr-intro-copy,.cgr-capcol){visibility:visible!important}";
+  ".cgr-fonts :is(.cgr-bar-inner,.cgr-wm,.cgr-head-nav,.cgr-head-mob,.cgr-mast,.cgr-gw,.cgr-rot,.cgr-intro-copy,.cgr-capcol){visibility:visible!important}.cgr-fonts .cgr-capcol{opacity:1!important}";
 
 export function FontGate({
   className,

@@ -950,6 +950,13 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
+/* With motion on the caption waits hidden until Mavy is in frame; the intro
+   scroll fades it in (Story.tsx). Reduced motion keeps it visible. */
+.cgr .cgr-intro[data-motion="on"] .cgr-capcol {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Tablets: the caption column steps aside once it would meet the script. */
 @media (max-width: 1100px) {
   .cgr .cgr-capcol {
