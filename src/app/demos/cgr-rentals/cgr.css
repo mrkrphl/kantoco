@@ -3861,6 +3861,14 @@ tr[data-status="cancelled"] .cgr-ow-c {
     display: none;
   }
 
+  /* r7.9.1: an old booking for a gown that is no longer listed keeps its
+     note on phones, across the full width under the mini summary. */
+  .cgr .cgr-hold-n[data-unlisted] {
+    display: block;
+    grid-column: 1 / -1;
+    margin: 6px 0 0;
+  }
+
   .cgr-form {
     min-height: 0;
   }
