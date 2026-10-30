@@ -704,7 +704,9 @@ html:has(.cgr) {
 }
 
 /* Mavy: the stamp's .hero-figure box (540/960), right column, standing on
-   the scallop. Soft left edge so the walk-in fades in instead of being cut. */
+   the scallop, in front of the ghost word (z 1 over 0). r7.5.1: no CSS mask;
+   the alpha shader already softens the frame edges, and the extra 16% mask
+   (made for the old walk-in) dimmed her left side once she is in frame. */
 .cgr-mavy {
   position: absolute;
   z-index: 1;
@@ -713,8 +715,6 @@ html:has(.cgr) {
   height: calc(100% - var(--head-h) - 10px);
   aspect-ratio: 540 / 960;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 100%);
 }
 
 .cgr-mavy-idle {
@@ -896,8 +896,9 @@ html:has(.cgr) {
     font-size: min(44vw, 24vh);
   }
 
+  /* r7.5.1: flush right (was -9vw), so the veil never leaves the screen. */
   .cgr-mavy {
-    right: -9vw;
+    right: 0;
     top: calc(var(--head-h) + 6px);
     bottom: auto;
     height: calc(100% - var(--head-h) - 318px);
@@ -1260,6 +1261,13 @@ html:has(.cgr) {
   height: 100%;
   object-fit: cover;
   object-position: 50% 20%;
+}
+
+/* r7.5.1: the blue ball gown photo ends in ~8% white studio floor. The img
+   box runs 12% taller than the card from the top, so cover scales the photo
+   to it and the card's overflow clips the floor (no new file). */
+.cgr .cgr-rk-im img.is-floorcrop {
+  height: 112%;
 }
 
 .cgr .cgr-rk-cap {

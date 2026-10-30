@@ -22,8 +22,9 @@ const SILK = CustomEase.create("cgrSilk", "0.16,0.84,0.3,1");
  * lines on desktop, two on phones), the script rotator beside "Cavite.", the
  * lead, the example rate and the two CTAs on the left; Mavy on the right.
  * The r7.1 story stays: the stacked-alpha cutout (heroAlpha.ts, transparent
- * WebGL canvas) scrubs with scroll inside her own column, so she walks in,
- * turns once and faces front without ever crossing the text. Only the ghost
+ * WebGL canvas) scrubs with scroll inside her own column: she stands in
+ * frame at scroll 0, turns once and faces front without ever crossing the
+ * text. Only the ghost
  * word moves with the scroll (24px parallax).
  *
  * Reduced motion: the same composition as a still, with the script showing
@@ -49,15 +50,21 @@ const ROT_BLUR = 2;
 /** --parallax: the ghost word's travel over the intro scroll (px). */
 const PARALLAX = 24;
 const ALT =
-  "Sample render: Mavy walks in from the left in a deep red sequin gown with a sheer red veil, turns once and faces front.";
+  "Sample render: Mavy in a deep red sequin gown with a sheer red veil turns once and faces front.";
 
 /**
- * Clip timeline (8 s) over 0..CLIP_END of the intro scroll: 0-1 s black,
- * 1-3 s she walks in, 3-5 s she spins, 6 s+ facing front.
+ * Clip timeline (8 s): 0-0.7 s empty, 0.75-3.4 s she walks in from the left
+ * edge, 3.5-6 s she spins, 6 s+ facing front.
+ * r7.5.1: the scrub starts at CLIP_START, the first frame with her whole
+ * figure inside the frame, so she is on screen at scroll 0. Starting at 0 s
+ * left the column empty (black frames, then a sliver under the left fade)
+ * until the reader had scrolled about a third of the intro. The spin then
+ * runs CLIP_START..end over 0..CLIP_END of the intro scroll.
  */
 const CLIP_SECONDS = 8;
+const CLIP_START = 3.5;
 const CLIP_END = 0.92;
-const at = (sec: number) => (sec / CLIP_SECONDS) * CLIP_END;
+const at = (sec: number) => ((sec - CLIP_START) / (CLIP_SECONDS - CLIP_START)) * CLIP_END;
 const CLIP_BEATS = {
   front: at(6),
   clipEnd: CLIP_END,
@@ -239,7 +246,8 @@ export function Story() {
           raf = 0;
           if (!video.duration) return;
           if (video.seeking && performance.now() - seekAt < 250) return;
-          const t = target * (video.duration - 0.05);
+          const from = Math.min(CLIP_START, video.duration * 0.5);
+          const t = from + target * (video.duration - 0.05 - from);
           if (Math.abs(video.currentTime - t) > 0.02) {
             seekAt = performance.now();
             video.currentTime = t;

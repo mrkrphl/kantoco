@@ -49,12 +49,12 @@ const bySlug = (s: string) => GOWNS.find((g) => g.slug === s) as Gown;
 
 /** A card: a listing (links to its page, example rate) or a shop photo. */
 type Card =
-  | { kind: "gown"; g: Gown; name: string; cat: string; pos?: string }
+  | { kind: "gown"; g: Gown; name: string; cat: string; pos?: string; floor?: boolean }
   | { kind: "photo"; p: ShopPhoto; name: string; cat: string; pos?: string };
 
 /** Far to near, the stamp's order: the nearest (ivory veil) is the largest. */
 const GOWN_CARDS: Card[] = [
-  { kind: "gown", g: bySlug("blue-ball-gown"), name: "Blue ball gown", cat: "Debut and ball" },
+  { kind: "gown", g: bySlug("blue-ball-gown"), name: "Blue ball gown", cat: "Debut and ball", floor: true },
   { kind: "photo", p: SHOP_PHOTOS.filipiniana, name: "Black beaded Filipiniana", cat: "Filipiniana" },
   { kind: "photo", p: SHOP_PHOTOS.goldCape, name: "Gold beaded cape gown", cat: "Evening and gala" },
   { kind: "photo", p: SHOP_PHOTOS.ivoryBall, name: "Ivory ball gown", cat: "Bridal and ivory", pos: "50% 30%" },
@@ -93,6 +93,7 @@ function Img({ c }: { c: Card }) {
         height={img.h}
         loading="lazy"
         decoding="async"
+        className={c.floor ? "is-floorcrop" : undefined}
         style={c.pos ? { objectPosition: c.pos } : undefined}
       />
     );
