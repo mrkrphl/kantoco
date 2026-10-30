@@ -18,11 +18,12 @@ gsap.registerPlugin(ScrollTrigger);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 /**
- * 3D cover-flow rail (a24-style). CSS 3D transforms on real photos, no models.
- * Inputs: drag / swipe, horizontal wheel or shift+wheel, page scroll (the rail
- * advances as the section passes), arrow keys and the two buttons.
- * Couture pass (r6): 24° tilt, shallow depth, 900ms ease-out snap.
- * Reduced motion: a flat, swipeable row with no 3D.
+ * Round 7 cover flow (stamp §4 Cover flow): an angled oxblood band, a rail
+ * rotated about -5deg, active card scale 1 vs .71 at the sides, rotateY ±24,
+ * opacity .8 / .55, hot hard shadow on the front card, 0.55s power3.out step.
+ * CSS 3D transforms on the existing photos only.
+ * Inputs: drag / swipe, horizontal wheel or shift+wheel, page scroll, arrow
+ * keys and the two buttons. Reduced motion: a flat, swipeable row.
  */
 export function CoverFlow({ items }: { items: Gown[] }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -46,20 +47,21 @@ export function CoverFlow({ items }: { items: Gown[] }) {
     const render = () => {
       raf = 0;
       const p = st.pos;
-      const step1 = cardW * 0.62;
-      const stepN = cardW * 0.3;
+      const step1 = cardW * 0.78;
+      const stepN = cardW * 0.5;
       cards.forEach((c, i) => {
         const o = i - p;
         const a = Math.abs(o);
         const sgn = Math.sign(o);
         const x = sgn * (Math.min(a, 1) * step1 + Math.max(a - 1, 0) * stepN);
         const ry = -clamp(o, -1, 1) * 24;
-        const z = -Math.min(a, 3.2) * cardW * 0.25;
-        c.style.transform = `translate3d(${x.toFixed(1)}px,0,${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`;
+        const sc = 1 - Math.min(a, 1) * 0.29;
+        const z = -Math.min(a, 3) * 40;
+        c.style.transform = `translate3d(${x.toFixed(1)}px,0,${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
         c.style.zIndex = String(100 - Math.round(a * 10));
-        const op = a <= 1 ? 1 - a * 0.5 : a <= 2 ? 0.5 - (a - 1) * 0.28 : 0.22;
-        c.style.opacity = a > 3.4 ? "0" : op.toFixed(3);
-        c.style.visibility = a > 3.4 ? "hidden" : "visible";
+        const op = a <= 1 ? 1 - a * 0.2 : a <= 2 ? 0.8 - (a - 1) * 0.25 : 0.55 - (a - 2) * 0.55;
+        c.style.opacity = a > 3 ? "0" : op.toFixed(3);
+        c.style.visibility = a > 3 ? "hidden" : "visible";
         c.classList.toggle("is-front", a < 0.5);
       });
       const ai = clamp(Math.round(p), 0, n - 1);
@@ -74,7 +76,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
 
     let tween: gsap.core.Tween | null = null;
     let snapTimer = 0;
-    const to = (target: number, dur = 0.9) => {
+    const to = (target: number, dur = 0.55) => {
       tween?.kill();
       tween = gsap.to(st, {
         pos: clamp(target, 0, n - 1),
@@ -85,7 +87,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
     };
     const snapSoon = (ms = 160) => {
       window.clearTimeout(snapTimer);
-      snapTimer = window.setTimeout(() => to(Math.round(st.pos), 0.9), ms);
+      snapTimer = window.setTimeout(() => to(Math.round(st.pos)), ms);
     };
     const nudge = (d: number) => {
       tween?.kill();
@@ -131,7 +133,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       vel = (e.clientX - lastX) / dt;
       lastX = e.clientX;
       lastT = now;
-      st.pos = clamp(sp - dx / (cardW * 0.62), -0.4, n - 1 + 0.4);
+      st.pos = clamp(sp - dx / (cardW * 0.78), -0.4, n - 1 + 0.4);
       kick();
     };
     const onUp = () => {
@@ -235,17 +237,22 @@ export function CoverFlow({ items }: { items: Gown[] }) {
   return (
     <section
       ref={rootRef}
-      className="cgr-cf"
-      id="gowns"
+      className="cgr-cf dark"
+      id="rail"
       aria-roledescription="carousel"
       aria-labelledby="cgr-cf-title"
     >
+      <svg className="cgr-cf-band cgr-cf-band-desk" viewBox="0 0 1440 840" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 120 L1440 0 V840 H0 Z" />
+      </svg>
+      <svg className="cgr-cf-band cgr-cf-band-phone" viewBox="0 0 390 600" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 80 L390 20 V600 H0 Z" />
+      </svg>
       <div className="cgr-wrap cgr-cf-head">
-        <p className="cgr-micro">The rail · {items.length} example gowns</p>
-        <h2 className="cgr-h2 cgr-cf-title" id="cgr-cf-title">
-          Spin the <em>rail.</em>
+        <h2 className="cgr-cf-title ext" id="cgr-cf-title" data-rv>
+          Spin the rail.
         </h2>
-        <p className="cgr-cf-hint cgr-micro">Drag, swipe, scroll or use the arrow keys</p>
+        <p className="cgr-cf-hint mono">drag, swipe, scroll or use the arrow keys. {items.length} pieces.</p>
       </div>
       <div
         ref={viewRef}
@@ -254,6 +261,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
         role="group"
         aria-label="Gown rail. Use left and right arrow keys."
       >
+        <div className="cgr-cf-tilt">
         <div className="cgr-cf-track">
           {items.map((it, i) => {
             const img = it.images[0];
@@ -265,7 +273,6 @@ export function CoverFlow({ items }: { items: Gown[] }) {
                 }}
                 href={`${CGR_BASE}/gown/${it.slug}`}
                 className="cgr-cf-card"
-                data-cursor="link"
                 draggable={false}
                 aria-label={`${it.name}, ${formatPhp(it.pricePerDay)} per day sample. View and check dates.`}
               >
@@ -284,38 +291,41 @@ export function CoverFlow({ items }: { items: Gown[] }) {
             );
           })}
         </div>
+        </div>
       </div>
       <div className="cgr-wrap cgr-cf-foot">
         <div className="cgr-cf-caption" aria-live="polite">
           {/* Keyed so a new name mounts fresh (fades in) instead of shifting text. */}
           <div key={g.slug} className="cgr-cf-cap-in">
-            <p className="cgr-micro cgr-cf-cat">No. {String(active + 1).padStart(2, "0")} · {CATEGORY_LABEL[g.category]}</p>
             <p className="cgr-cf-name">{g.name}</p>
-            <p className="cgr-price cgr-cf-price">{formatPhp(g.pricePerDay)} a day</p>
+            <p className="mono cgr-cf-cat">
+              no.{String(active + 1).padStart(2, "0")}, {CATEGORY_LABEL[g.category].toLowerCase()},{" "}
+              {formatPhp(g.pricePerDay)} a day (example)
+            </p>
           </div>
         </div>
         <div className="cgr-cf-bar">
-          <p className="cgr-cf-count cgr-micro" aria-hidden="true">
+          <p className="cgr-cf-count mono" aria-hidden="true">
             {String(active + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
           </p>
           <div className="cgr-cf-ctrls">
             <button
               type="button"
-              className="cgr-cf-arrow cgr-textbtn"
-              aria-label="Previous gown"
+              className="cgr-cf-arrow"
+              aria-label="Previous piece"
               onClick={() => goRef.current(active - 1)}
               disabled={active === 0}
             >
-              Previous
+              previous
             </button>
             <button
               type="button"
-              className="cgr-cf-arrow cgr-textbtn"
-              aria-label="Next gown"
+              className="cgr-cf-arrow"
+              aria-label="Next piece"
               onClick={() => goRef.current(active + 1)}
               disabled={active === items.length - 1}
             >
-              Next
+              next
             </button>
           </div>
         </div>
