@@ -1115,27 +1115,15 @@ html:has(.cgr) {
   width: min(580px, 41vw);
 }
 
-.cgr .cgr-rk-eye {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-}
-
-.cgr-rk-men .cgr-rk-eye {
-  color: var(--cream-2);
-}
-
+/* r7.3.1: the small uppercase eyebrows above these headings are removed, so
+   the heading now opens the text column with no top margin. */
 .cgr .cgr-rk-h {
-  margin-top: 22px;
+  margin-top: 0;
   font-size: var(--fs-sec);
   line-height: 0.9;
 }
 
 .cgr .cgr-rk-fil .cgr-rk-h {
-  margin-top: 20px;
   font-size: clamp(64px, 8.06vw, 116px);
 }
 
@@ -1523,7 +1511,7 @@ html:has(.cgr) {
 
   .cgr .cgr-rk-h,
   .cgr .cgr-rk-fil .cgr-rk-h {
-    margin-top: 16px;
+    margin-top: 0;
     font-size: clamp(60px, 19.5vw, 76px);
   }
 
@@ -3205,3 +3193,27 @@ tr[data-status="cancelled"] .cgr-ow-c {
   }
 }
 
+
+/* r7.3.1 Font gate (FontGate.tsx). Until the next/font faces load, the
+   first-screen nodes whose position depends on a text width stay visibility
+   hidden (their text is invisible in the block period anyway), so the swap to
+   Anton, Space Mono and Great Vibes moves nothing visible: CLS 0. The
+   animation is a failsafe that shows them after 3s if a font never arrives. */
+@keyframes cgr-fontgate {
+  to {
+    visibility: visible;
+  }
+}
+
+.cgr-fonts:not([data-fonts="ready"]) :is(
+    .cgr-bar-inner,
+    .cgr-head-nav,
+    .cgr-head-mob,
+    .cgr-intro-h,
+    .magnet-l,
+    .cgr-hand-fix,
+    .cgr-hand-stack
+  ) {
+  visibility: hidden;
+  animation: cgr-fontgate 0s linear 3s forwards;
+}

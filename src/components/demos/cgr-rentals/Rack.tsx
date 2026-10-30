@@ -246,7 +246,6 @@ export function Rack() {
       {/* 1 · Catalogue */}
       <section className="cgr-rk cgr-rk-cat ivory grain" id="gowns" data-rack="light" aria-labelledby="cgr-rk-cat-t">
         <div className="cgr-rk-text">
-          <p className="cgr-rk-eye">Rent by the day · Dasmariñas, Cavite</p>
           <h2 className="cgr-rk-h ext" id="cgr-rk-cat-t">
             What&rsquo;s on <br />
             the rack
@@ -277,7 +276,6 @@ export function Rack() {
       {/* 2 · Filipiniana and sagala (band) */}
       <section className="cgr-rk cgr-rk-fil cream grain" id="filipiniana" data-rack="light" aria-labelledby="cgr-rk-fil-t">
         <div className="cgr-rk-text">
-          <p className="cgr-rk-eye">02 · Filipiniana and sagala</p>
           <h2 className="cgr-rk-h ext" id="cgr-rk-fil-t">
             Filipiniana <br />
             and sagala
@@ -302,7 +300,6 @@ export function Rack() {
       {/* 3 · Men's formal */}
       <section className="cgr-rk cgr-rk-men dark grain" id="suits" data-rack="dark" aria-labelledby="cgr-rk-men-t">
         <div className="cgr-rk-text">
-          <p className="cgr-rk-eye">03 · Men&rsquo;s formal wear</p>
           <h2 className="cgr-rk-h ext" id="cgr-rk-men-t">
             Suits and <br />
             barong
@@ -322,8 +319,8 @@ export function Rack() {
             <EmptyCard key={i} word={w} />
           ))}
         </Strip>
-        <div className="cgr-rk-other">
-          <span className="cgr-rk-eye">Other racks</span>
+        {/* r7.3.1: the "Other racks" kicker is gone; the label lives on as the nav name. */}
+        <nav className="cgr-rk-other" aria-label="Other racks">
           <a href="#gowns">
             01 Gowns <small>{GOWN_COUNT} pieces</small>
           </a>
@@ -333,13 +330,12 @@ export function Rack() {
           <a href="#accessories">
             04 Accessories <small>{ACC_COUNT} pieces</small>
           </a>
-        </div>
+        </nav>
       </section>
 
       {/* 4 · Accessories */}
       <section className="cgr-rk cgr-rk-acc ivory grain" id="accessories" data-rack="light" aria-labelledby="cgr-rk-acc-t">
         <div className="cgr-rk-text">
-          <p className="cgr-rk-eye">04 · Accessories</p>
           <h2 className="cgr-rk-h ext" id="cgr-rk-acc-t">
             Tiaras and <br />
             crystals

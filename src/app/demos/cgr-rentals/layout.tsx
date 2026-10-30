@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Archivo, Great_Vibes, Space_Mono } from "next/font/google";
 import { cgr } from "@/lib/cgr-rentals";
+import { FontGate } from "@/components/demos/cgr-rentals/FontGate";
 import "./cgr.css";
 
 // Round 7.2 type (Design stamp r7.2/font.md). Self-hosted by next/font at
@@ -15,6 +16,9 @@ import "./cgr.css";
 // Anton's metrics, so a late swap would move GOWNS and the nav (r7 measured
 // CLS ~0.005 with swap). next/font preloads them, so the block period is
 // short. The script accent is absolutely placed, so it keeps swap.
+// r7.3.1: block alone still lays the invisible text out with fallback metrics,
+// so FontGate keeps the few width-dependent first-screen nodes hidden until
+// these faces load (no layout shift at 1440 or 390).
 const display = Anton({
   subsets: ["latin", "latin-ext"],
   weight: "400",
@@ -42,6 +46,8 @@ const hand = Great_Vibes({
   variable: "--nf-hand",
 });
 
+const FAMILIES = [display.style.fontFamily, body.style.fontFamily, mono.style.fontFamily, hand.style.fontFamily];
+
 export const metadata: Metadata = {
   title: cgr.title,
   description: cgr.description,
@@ -64,8 +70,11 @@ export default function CgrRentalsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`cgr-fonts ${display.variable} ${body.variable} ${mono.variable} ${hand.variable}`}>
+    <FontGate
+      className={`cgr-fonts ${display.variable} ${body.variable} ${mono.variable} ${hand.variable}`}
+      families={FAMILIES}
+    >
       {children}
-    </div>
+    </FontGate>
   );
 }
