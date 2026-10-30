@@ -143,7 +143,7 @@ function RackNav({ on, tone, active }: { on: boolean; tone: Tone; active: Active
           </Link>
         ))}
         <Link href={`${CGR_BASE}#rail`} className="btn btn-wine btn-nav" tabIndex={on ? undefined : -1}>
-          Hold a gown
+          Reserve your gown
         </Link>
       </nav>
       <div className="cgr-sn-mob">
@@ -258,18 +258,17 @@ export function Rack() {
               </h2>
               <Ph p={SHOP_PHOTOS.ivoryBall} className="mat ph-f" pos="50% 28%" />
               <p className="cgr-sp-lede" data-rv>
-                Open a gown to see the dates it is free, then ask to hold the day you need. The shop replies to confirm
-                before anything is paid.
+                Ivory lace, soft veils and full skirts, ready for your wedding, your debut or a grand evening.
               </p>
               <p className="cgr-sp-pull" data-rv>
-                Each gown keeps its own calendar.
+                Made for the day you will remember.
               </p>
               <div className="cgr-sp-ctas" data-rv>
                 <a href="#rail" className="btn btn-wine">
                   See bridal gowns <span className="arrow" aria-hidden="true" />
                 </a>
                 <a href="#rail" className="btn btn-line">
-                  Hold a gown
+                  Reserve your gown
                 </a>
               </div>
             </div>
@@ -337,15 +336,15 @@ export function Rack() {
                 Black, beaded <em>Filipiniana</em>
               </h2>
               <p className="cgr-sp-lede" data-rv>
-                Structured puff sleeves, a gold appliqué bodice and a long pleated train. Ask the shop for its sizes,
-                then hold the date you need.
+                Structured puff sleeves, a gold appliqué bodice and a long pleated train. Ask us about sizes, and we will
+                keep it for your date.
               </p>
               <p className="cgr-sp-pull" data-rv>
                 One gown, seen up close.
               </p>
               <div className="cgr-sp-ctas" data-rv>
                 <a href="#rail" className="btn btn-line">
-                  Hold a gown <span className="arrow" aria-hidden="true" />
+                  Reserve your gown <span className="arrow" aria-hidden="true" />
                 </a>
               </div>
             </div>

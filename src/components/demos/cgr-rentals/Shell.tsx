@@ -14,7 +14,7 @@ const NAV = [
 
 export const CGR_NAV = [...NAV, ["Owner view", `${CGR_BASE}/owner`, "Owner"]] as const;
 
-const HOLD_HREF = `${CGR_BASE}#gowns`;
+const RESERVE_HREF = `${CGR_BASE}#gowns`;
 
 export function CgrShell({
   children,
@@ -53,8 +53,8 @@ export function CgrShell({
               </li>
             ))}
           </ul>
-          <Link href={HOLD_HREF} className="btn btn-line-cream btn-nav">
-            Hold a gown
+          <Link href={RESERVE_HREF} className="btn btn-line-cream btn-nav">
+            Reserve your gown
           </Link>
         </nav>
         <div className="cgr-head-mob">

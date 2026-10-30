@@ -7,7 +7,7 @@ import { CustomEase } from "gsap/CustomEase";
 import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
-import { createAlphaRenderer, supportsAlphaCanvas } from "./heroAlpha";
+import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 /** r7.6 tokens: --ease-veil (rotator crossfade). */
@@ -44,6 +44,13 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
  * and the poster stands in only until the first real frame, so late
  * metadata on iOS brings her back. ?cgrdebug=1 shows the path, readyState
  * and the last seek latency.
+ *
+ * r7.6.4 (desktop): the same clip, two renderers (heroAlpha.ts). Desktop
+ * (hover + fine pointer) paints with the 2D canvas, phones with WebGL. A
+ * lost WebGL context, a draw error or a blank frame where she must be in
+ * view swaps to the other renderer on a fresh canvas, then to the poster;
+ * the poster also stands in while nothing has drawn after CLIP_WAIT_MS.
+ * ?cgrr=gl or ?cgrr=2d forces one; ?cgrdebug=1 shows the renderer and why.
  */
 
 /** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
@@ -58,7 +65,7 @@ const seqSrc = (i: number) => `${CGR_ASSET}/seq/mavy-${String(i).padStart(2, "0"
 
 /** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
 const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
-/** Hold, crossfade (s) and blur for each swap (--rot-hold, --rot-fade, --rot-blur). */
+/** Pause, crossfade (s) and blur for each swap (--rot-hold, --rot-fade, --rot-blur). */
 const ROT_HOLD = 2.2;
 const ROT_FADE = 1.2;
 const ROT_BLUR = 2;
@@ -91,8 +98,29 @@ const ROT_DELAY_MS = 1200;
 const noopSubscribe = () => () => {};
 const qsFlag = (k: string) => () => new URLSearchParams(window.location.search).get(k) === "1";
 
-type Path = "video-scrub" | "poster-fallback" | "reduced" | "canvas-seq";
-type Dbg = { rs: number; t: number; target: number; lat: number | null; seeks: number; primed: string };
+type Path =
+  | "video-gl"
+  | "video-2d"
+  | "reduced-gl"
+  | "reduced-2d"
+  | "reduced-poster"
+  | "poster-fallback"
+  | "canvas-seq";
+/** Desktop-class input: hover and a fine pointer (mouse or trackpad). */
+const isDesktop = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const forcedMode = (): RenderMode | null => {
+  const v = new URLSearchParams(window.location.search).get("cgrr");
+  return v === "gl" || v === "2d" ? v : null;
+};
+type Dbg = {
+  rs: number;
+  t: number;
+  target: number;
+  lat: number | null;
+  seeks: number;
+  primed: string;
+  draws: number;
+};
 
 function armInline(video: HTMLVideoElement) {
   video.muted = true;
@@ -119,38 +147,74 @@ export function Story() {
   );
   const debug = useSyncExternalStore(noopSubscribe, qsFlag("cgrdebug"), () => false);
   const seqOn = useSyncExternalStore(noopSubscribe, () => HERO_SEQ || qsFlag("cgrseq")(), () => false);
-  // The clip errored (or WebGL failed): the poster stands in for good.
+  // Preferred renderer: forced by ?cgrr, else 2D on desktop (or without WebGL), WebGL on phones.
+  const firstMode = useSyncExternalStore<RenderMode | null>(
+    noopSubscribe,
+    () => (HERO_ALPHA ? (forcedMode() ?? (isDesktop() || !supportsAlphaCanvas() ? "2d" : "gl")) : null),
+    () => null,
+  );
+  // Renderers that failed, with the reason (shown by ?cgrdebug=1).
+  const [failed, setFailed] = useState<Partial<Record<RenderMode, string>>>({});
+  const mode: RenderMode | null = (() => {
+    if (!firstMode) return null;
+    const order: RenderMode[] = firstMode === "gl" ? ["gl", "2d"] : ["2d", "gl"];
+    return order.find((m) => !failed[m] && (m === "2d" || alphaOk)) ?? null;
+  })();
+  const failReason = Object.entries(failed)
+    .map(([m, r]) => `${m}:${r}`)
+    .join(",");
+  // The clip errored: the poster stands in for good.
   const [clipFailed, setClipFailed] = useState(false);
   // No frame yet after CLIP_WAIT_MS: the poster stands in, the clip stays
   // mounted and takes over again at its first frame (late metadata on iOS).
   const [clipLate, setClipLate] = useState(false);
   const [seqFailed, setSeqFailed] = useState(false);
   const seq = onClient && seqOn && !seqFailed;
-  const alpha = onClient && !seq && alphaOk && !clipFailed;
+  const alpha = onClient && !seq && mode !== null && !clipFailed;
   const usePoster = onClient && !seq && (!alpha || clipLate);
   // Media fragment: iOS fetches and decodes that frame for a paused clip.
   const clipSrc = alpha ? `${HERO_ALPHA_SRC}#t=${reduced ? LAND : T_START}` : null;
   const framed = useRef(false);
-  const dbgRef = useRef<Dbg>({ rs: 0, t: 0, target: 0, lat: null, seeks: 0, primed: "no" });
+  const dbgRef = useRef<Dbg>({ rs: 0, t: 0, target: 0, lat: null, seeks: 0, primed: "no", draws: 0 });
   const seqRef = useRef<HTMLCanvasElement>(null);
-  const path: Path = seq ? "canvas-seq" : reduced ? "reduced" : usePoster ? "poster-fallback" : "video-scrub";
+  const path: Path = seq
+    ? "canvas-seq"
+    : usePoster || !mode
+      ? reduced
+        ? "reduced-poster"
+        : "poster-fallback"
+      : `${reduced ? "reduced" : "video"}-${mode}`;
 
-  // Alpha: redraw the canvas whenever the hidden stacked video shows a new frame.
+  // Alpha: redraw the canvas whenever the hidden stacked video shows a new
+  // frame. Each renderer gets its own canvas (keyed by mode) and its own
+  // CLIP_WAIT_MS: no frame by then shows the poster until one arrives.
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!alpha || !video || !canvas) return;
-    const r = createAlphaRenderer(canvas, video, () => {
-      if (framed.current) return;
-      framed.current = true;
-      setClipLate(false);
+    if (!alpha || !mode || !video || !canvas) return;
+    framed.current = false;
+    const timer = window.setTimeout(() => {
+      if (!framed.current) setClipLate(true);
+    }, CLIP_WAIT_MS);
+    const r = createAlphaRenderer(canvas, video, mode, {
+      onDraw: () => {
+        dbgRef.current.draws++;
+        if (framed.current) return;
+        framed.current = true;
+        setClipLate(false);
+      },
+      onFail: (reason) => setFailed((f) => ({ ...f, [mode]: reason })),
     });
     if (!r) {
-      setClipFailed(true);
+      window.clearTimeout(timer);
+      setFailed((f) => ({ ...f, [mode]: "no-context" }));
       return;
     }
-    return () => r.destroy();
-  }, [alpha, clipSrc]);
+    return () => {
+      window.clearTimeout(timer);
+      r.destroy();
+    };
+  }, [alpha, clipSrc, mode]);
 
   // The clip never plays on its own: it is only seeked (scroll, or one
   // reduced-motion seek). A decode or network error falls back to the
@@ -170,9 +234,6 @@ export function Story() {
     video.preload = "auto";
     video.pause();
     const fail = () => setClipFailed(true);
-    const timer = window.setTimeout(() => {
-      if (!framed.current) setClipLate(true);
-    }, CLIP_WAIT_MS);
     video.addEventListener("error", fail, true);
 
     let primed = false;
@@ -208,7 +269,6 @@ export function Story() {
     PRIME_ON.forEach((ev) => window.addEventListener(ev, prime, { capture: true, passive: true }));
     prime();
     return () => {
-      window.clearTimeout(timer);
       unhook();
       video.removeEventListener("error", fail, true);
     };
@@ -490,10 +550,11 @@ export function Story() {
       const rs = v ? v.readyState : d.rs;
       el.textContent =
         `path ${path} | rs ${rs} | t ${(v ? v.currentTime : d.t).toFixed(2)}/${d.target.toFixed(2)}` +
-        ` | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed} | rm ${reduced ? 1 : 0}`;
+        ` | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed} | draws ${d.draws}` +
+        ` | rm ${reduced ? 1 : 0}${failReason ? ` | failed ${failReason}` : ""}`;
     }, 200);
     return () => window.clearInterval(id);
-  }, [debug, path, reduced]);
+  }, [debug, path, reduced, failReason]);
 
   return (
     <section
@@ -546,6 +607,7 @@ export function Story() {
                   {clipSrc ? <source src={clipSrc} type="video/mp4" /> : null}
                 </video>
                 <canvas
+                  key={mode ?? "none"}
                   ref={canvasRef}
                   className="cgr-intro-canvas"
                   role={usePoster ? undefined : "img"}
@@ -578,8 +640,7 @@ export function Story() {
           </h1>
           <div className="cgr-intro-bottom">
             <p className="cgr-intro-lead">
-              Each gown keeps its own calendar. When you ask to hold a date, you receive a CGR reference code, and the
-              shop confirms with you before any payment.
+              Gowns and suits for your debut, wedding, or prom, right here in Dasmariñas.
             </p>
             <p className="cgr-intro-rate">From {formatPhp(2200)} a day, example rate</p>
             <div className="cgr-intro-cta">
@@ -587,7 +648,7 @@ export function Story() {
                 See the gowns <span className="arrow" aria-hidden="true" />
               </a>
               <a className="cgr-intro-txt" href="#rail">
-                <span>Hold a gown</span>
+                <span>Reserve your gown</span>
               </a>
             </div>
           </div>

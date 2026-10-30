@@ -17,6 +17,18 @@
  * - hem band (lower 30% of the frame): semi-opaque, desaturated pixels
  *   (the floor haze) are dropped; opaque gown pixels and saturated veil
  *   edges are kept, so sequins inside the gown stay.
+ *
+ * r7.6.4 (desktop): two backends share the same frame scheduling.
+ * - "gl": the WebGL shader above (phones; iPhone confirmed).
+ * - "2d": the same maths on the CPU (drawImage + getImageData +
+ *   putImageData), no WebGL at all. Desktop uses it by default: it does not
+ *   depend on the GPU's video-texture upload (a black or empty upload, or a
+ *   blocklisted GPU, left a blank stage with no fallback) and cannot lose a
+ *   context.
+ * Each backend checks its own output: a lost WebGL context, a draw error,
+ * or two blank reads of a frame where she must be in view (clip 3.0-7.9 s)
+ * reports onFail(reason), and Story.tsx swaps to the other backend, then to
+ * the poster.
  */
 
 const VERT = `
@@ -61,18 +73,40 @@ export function supportsAlphaCanvas(): boolean {
   return support;
 }
 
+export type RenderMode = "gl" | "2d";
 export type AlphaRenderer = { draw: () => void; destroy: () => void };
+export type RenderHooks = { onDraw?: () => void; onFail?: (reason: string) => void };
 
 type VideoWithRvfc = HTMLVideoElement & {
   requestVideoFrameCallback?: (cb: () => void) => number;
   cancelVideoFrameCallback?: (id: number) => void;
 };
 
-export function createAlphaRenderer(
-  canvas: HTMLCanvasElement,
-  video: HTMLVideoElement,
-  onDraw?: () => void,
-): AlphaRenderer | null {
+/** She is whole and in frame for this part of the clip, so a read must find her. */
+const CHECK_FROM = 3.0;
+const CHECK_TO = 7.9;
+
+/** One row of RGBA (straight or premultiplied): is a lit figure in it? */
+function rowHasFigure(px: Uint8Array | Uint8ClampedArray): boolean {
+  let n = 0;
+  let lum = 0;
+  for (let i = 0; i < px.length; i += 4) {
+    if (px[i + 3] > 24) {
+      n++;
+      lum += px[i] + px[i + 1] + px[i + 2];
+    }
+  }
+  return n >= 6 && lum / n > 12;
+}
+
+const smooth = (e0: number, e1: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+  return t * t * (3 - 2 * t);
+};
+
+type Backend = { paint: () => Uint8Array | Uint8ClampedArray | null; free: () => void };
+
+function glBackend(canvas: HTMLCanvasElement, video: HTMLVideoElement): Backend | null {
   const gl = canvas.getContext("webgl", {
     alpha: true,
     premultipliedAlpha: true,
@@ -111,26 +145,154 @@ export function createAlphaRenderer(
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   const seamLoc = gl.getUniformLocation(prog, "seam");
   gl.clearColor(0, 0, 0, 0);
-
-  const size = () => {
-    const w = video.videoWidth;
-    const h = Math.round(video.videoHeight / 2);
-    if (!w || !h) return false;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-      gl.uniform1f(seamLoc, 0.5 / video.videoHeight);
-    }
-    return true;
+  let row = new Uint8Array(0);
+  return {
+    paint: () => {
+      const w = video.videoWidth;
+      const h = Math.round(video.videoHeight / 2);
+      if (!w || !h || gl.isContextLost()) return null;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+        gl.uniform1f(seamLoc, 0.5 / video.videoHeight);
+        row = new Uint8Array(w * 4);
+      }
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      // Mid-height row (GL rows run bottom-up; the middle is the middle).
+      gl.readPixels(0, Math.floor(h / 2), w, 1, gl.RGBA, gl.UNSIGNED_BYTE, row);
+      return row;
+    },
+    free: () => {
+      if (gl.isContextLost()) return;
+      gl.deleteTexture(tex);
+      gl.deleteBuffer(buf);
+      gl.deleteProgram(prog);
+    },
   };
+}
+
+function cpuBackend(canvas: HTMLCanvasElement, video: HTMLVideoElement): Backend | null {
+  const ctx = canvas.getContext("2d");
+  const scratch = document.createElement("canvas");
+  const sctx = scratch.getContext("2d", { willReadFrequently: true });
+  if (!ctx || !sctx) return null;
+  let w = 0;
+  let h = 0;
+  let edge = new Float32Array(0);
+  let band = new Float32Array(0);
+  let out: ImageData | null = null;
+  return {
+    paint: () => {
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (!vw || !vh) return null;
+      if (vw !== w || Math.round(vh / 2) !== h) {
+        w = vw;
+        h = Math.round(vh / 2);
+        canvas.width = w;
+        canvas.height = h;
+        scratch.width = w;
+        scratch.height = h * 2;
+        out = ctx.createImageData(w, h);
+        // The shader's soft masks, precomputed (uv sampled at pixel centres).
+        edge = new Float32Array(w * h);
+        band = new Float32Array(h);
+        const ex = new Float32Array(w);
+        for (let x = 0; x < w; x++) {
+          const u = (x + 0.5) / w;
+          ex[x] = smooth(0, 0.16, u) * smooth(0, 0.09, 1 - u);
+        }
+        for (let y = 0; y < h; y++) {
+          const v = (y + 0.5) / h;
+          const ey = smooth(0, 0.03, v) * smooth(0, 0.08, 1 - v);
+          band[y] = smooth(0.62, 0.72, v);
+          for (let x = 0; x < w; x++) edge[y * w + x] = ex[x] * ey;
+        }
+      }
+      sctx.clearRect(0, 0, w, h * 2);
+      sctx.drawImage(video, 0, 0, w, h * 2);
+      const src = sctx.getImageData(0, 0, w, h * 2).data;
+      const o = out!.data;
+      const off = w * h * 4;
+      for (let y = 0; y < h; y++) {
+        const b = band[y];
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const r = src[i];
+          const g = src[i + 1];
+          const bl = src[i + 2];
+          let a = src[off + i] / 255;
+          let k = 1;
+          if (b > 0) {
+            const mx = Math.max(r, g, bl);
+            const sat = (mx - Math.min(r, g, bl)) / Math.max(mx, 0.255);
+            k = 1 + (Math.max(smooth(0.45, 0.62, sat), smooth(0.85, 0.97, a)) - 1) * b;
+          }
+          a *= edge[y * w + x] * k;
+          o[i] = r;
+          o[i + 1] = g;
+          o[i + 2] = bl;
+          o[i + 3] = a * 255;
+        }
+      }
+      ctx.putImageData(out!, 0, 0);
+      const mid = Math.floor(h / 2) * w * 4;
+      return o.subarray(mid, mid + w * 4);
+    },
+    free: () => {
+      scratch.width = 0;
+      scratch.height = 0;
+    },
+  };
+}
+
+export function createAlphaRenderer(
+  canvas: HTMLCanvasElement,
+  video: HTMLVideoElement,
+  mode: RenderMode,
+  hooks: RenderHooks = {},
+): AlphaRenderer | null {
+  let be: Backend | null = null;
+  try {
+    be = mode === "gl" ? glBackend(canvas, video) : cpuBackend(canvas, video);
+  } catch {
+    be = null;
+  }
+  if (!be) return null;
+  const backend = be;
   let dead = false;
+  let blank = 0;
+  let lastCheck = -1;
+  const fail = (reason: string) => {
+    if (dead) return;
+    dead = true;
+    hooks.onFail?.(reason);
+  };
+  const onLost = (e: Event) => {
+    e.preventDefault();
+    fail("gl-context-lost");
+  };
+  if (mode === "gl") canvas.addEventListener("webglcontextlost", onLost);
+
   const draw = () => {
-    if (dead || video.readyState < 2 || !size()) return;
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    onDraw?.();
+    if (dead || video.readyState < 2) return;
+    let row: Uint8Array | Uint8ClampedArray | null;
+    try {
+      row = backend.paint();
+    } catch {
+      return fail(`${mode}-draw-error`);
+    }
+    if (!row) return;
+    hooks.onDraw?.();
+    // Blank check, once per distinct frame time where she must be in view.
+    const t = video.currentTime;
+    if (t < CHECK_FROM || t > CHECK_TO || Math.abs(t - lastCheck) < 0.03) return;
+    lastCheck = t;
+    if (rowHasFigure(row)) blank = 0;
+    else if (++blank >= 2) fail(`${mode}-blank`);
   };
 
   // New frames: requestVideoFrameCallback where available, plus the media
@@ -164,9 +326,8 @@ export function createAlphaRenderer(
       cancelAnimationFrame(late);
       if (rvfc && v.cancelVideoFrameCallback) v.cancelVideoFrameCallback(rvfc);
       evs.forEach((e) => video.removeEventListener(e, onEvent));
-      gl.deleteTexture(tex);
-      gl.deleteBuffer(buf);
-      gl.deleteProgram(prog);
+      canvas.removeEventListener("webglcontextlost", onLost);
+      backend.free();
     },
   };
 }
