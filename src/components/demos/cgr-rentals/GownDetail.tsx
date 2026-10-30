@@ -71,14 +71,15 @@ function PhotoClips({ id }: { id: string }) {
   );
 }
 
-export function GownDetail({ gown }: { gown: Gown }) {
+export function GownDetail({ gown, initialDate = "" }: { gown: Gown; initialDate?: string }) {
   const { reduced } = useMotionReady();
   const [active, setActive] = useState(0);
   // Today + localStorage are client-only: same-size placeholders on the server.
   const today = useToday();
   const bookings = useBookings();
   const ready = today !== null && bookings !== null;
-  const [picked, setPicked] = useState<string | null>(null);
+  // ?date= (from "Change" on the reserve page) is the starting pick.
+  const [picked, setPicked] = useState<string | null>(initialDate || null);
   const [view, setView] = useState<{ y: number; m: number } | null>(null);
   const img = gown.images[active] ?? gown.images[0];
   const words = displayWords(gown.name);
@@ -346,7 +347,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
         </dl>
         <p className="cgr-dt-blurb">{gown.blurb}</p>
 
-        <div className="cgr-cal" aria-label="Sample calendar">
+        <div className="cgr-cal" id="dates" aria-label="Sample calendar">
           <div className="cgr-cal-top">
             <p className="cgr-cal-month" aria-live="polite">
               {MONTH[vm]} {vy}

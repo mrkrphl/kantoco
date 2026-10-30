@@ -9,15 +9,22 @@ export function generateStaticParams() {
 
 export default async function GownPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ date?: string }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const gown = getGown(slug);
   if (!gown) notFound();
+  // r7.8: "Change" on the reserve page comes back with ?date= so the
+  // calendar opens on the dates already picked.
+  const initialDate =
+    typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
   return (
     <CgrShell current="Detail">
-      <GownDetail gown={gown} />
+      <GownDetail gown={gown} initialDate={initialDate} />
     </CgrShell>
   );
 }

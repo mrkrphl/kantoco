@@ -86,6 +86,8 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
   const datesOk = free && !past;
   const range = eventDate ? rangeLabel(eventDate, returnDate) : "";
   const gownHref = `${CGR_BASE}/gown/${gown.slug}`;
+  // r7.8: "Change" reopens the gown's calendar on the dates already picked.
+  const changeHref = eventDate ? `${gownHref}?date=${encodeURIComponent(eventDate)}#dates` : `${gownHref}#dates`;
   const img = gown.images[1] ?? gown.images[0];
 
   const dateStatus = checking
@@ -256,7 +258,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
                     <p className={datesOk ? "cgr-bk-ok" : "cgr-bk-ok is-no"} role="status" id={`${uid}-dates`}>
                       {dateStatus}
                     </p>
-                    <Link className="ulink" href={gownHref}>
+                    <Link className="ulink" href={changeHref}>
                       Change<span className="sr-only"> the dates on the gown page</span>
                     </Link>
                   </div>
@@ -330,7 +332,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
                     <div>
                       <dt>Dates</dt>
                       <dd>{range || "–"}</dd>
-                      <Link className="ulink" href={gownHref}>
+                      <Link className="ulink" href={changeHref}>
                         Change<span className="sr-only"> the dates</span>
                       </Link>
                     </div>
