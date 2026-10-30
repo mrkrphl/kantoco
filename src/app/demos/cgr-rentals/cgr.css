@@ -234,7 +234,7 @@ html:has(.cgr) {
 
 .cgr .cgr-cap b {
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: var(--s-1);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -914,7 +914,7 @@ html:has(.cgr) {
 }
 
 .cgr-intro-rate {
-  margin-top: 8px;
+  margin-top: var(--s-2);
   font-size: 13px;
   color: var(--cream-3);
 }
@@ -923,8 +923,8 @@ html:has(.cgr) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 22px;
-  margin-top: 20px;
+  gap: var(--s-5);
+  margin-top: var(--s-4);
 }
 
 .cgr-intro-cta .btn-wine {
@@ -943,7 +943,7 @@ html:has(.cgr) {
 }
 
 .cgr-intro-txt span {
-  padding-bottom: 4px;
+  padding-bottom: var(--s-1);
   border-bottom: 1px solid rgb(242 232 216 / 0.4);
   transition: border-color var(--dur-hover) var(--ease-silk);
 }
@@ -966,7 +966,7 @@ html:has(.cgr) {
 
 .cgr .cgr-capcol .num {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: var(--s-2);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 300;
@@ -978,7 +978,7 @@ html:has(.cgr) {
 
 .cgr .cgr-capcol b {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: var(--s-1);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -1075,7 +1075,7 @@ html:has(.cgr) {
   }
 
   .cgr-intro-lead {
-    margin-top: 12px;
+    margin-top: var(--s-3);
     font-size: 15px;
     line-height: 1.5;
   }
@@ -1085,13 +1085,13 @@ html:has(.cgr) {
   }
 
   .cgr-intro-cta {
-    gap: 18px;
-    margin-top: 16px;
+    gap: var(--s-4);
+    margin-top: var(--s-4);
   }
 
   .cgr-intro-cta .btn {
     min-height: 44px;
-    padding: 0 18px;
+    padding: 0 var(--s-4);
   }
 }
 
@@ -1303,7 +1303,7 @@ html:has(.cgr) {
 
 /* The matted photo: an ivory mount with a soft drop. */
 .cgr .cgr-sp .ph.mat {
-  padding: 9px;
+  padding: var(--s-2);
   background: var(--ivory);
   box-shadow: 0 30px 60px -30px rgb(61 15 27 / 0.35), 0 0 0 1px rgb(91 26 42 / 0.08);
 }
@@ -1358,14 +1358,14 @@ html:has(.cgr) {
 }
 
 .cgr .cgr-sp-lede {
-  margin-top: 22px;
+  margin-top: var(--s-5);
   font-size: var(--t-body);
   line-height: 1.6;
   color: var(--wine-ink);
 }
 
 .cgr .cgr-sp-pull {
-  margin-top: 22px;
+  margin-top: var(--s-5);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -1378,7 +1378,7 @@ html:has(.cgr) {
   content: "\201C";
   display: block;
   height: 0.5em;
-  margin-bottom: 6px;
+  margin-bottom: var(--s-1);
   font-size: 72px;
   line-height: 1;
   color: var(--blush-2);
@@ -1387,9 +1387,9 @@ html:has(.cgr) {
 .cgr .cgr-sp-ctas {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--s-4);
   align-items: center;
-  margin-top: 28px;
+  margin-top: var(--s-5);
   clear: both;
 }
 
@@ -1405,7 +1405,7 @@ html:has(.cgr) {
 }
 
 .cgr .cgr-sp-caps li + li {
-  margin-top: 18px;
+  margin-top: var(--s-4);
 }
 
 .cgr .cgr-sp-caps i {
@@ -1420,7 +1420,7 @@ html:has(.cgr) {
 
 .cgr .cgr-sp-caps b {
   display: block;
-  margin: 4px 0 2px;
+  margin: var(--s-1) 0 var(--s-1);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
@@ -1436,7 +1436,7 @@ html:has(.cgr) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 34px;
+  gap: var(--s-1) var(--s-6);
   min-height: 84px;
   padding: 12px var(--gut);
   background: var(--blush);
@@ -1452,7 +1452,7 @@ html:has(.cgr) {
 .cgr .cgr-sp-toc ol {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 30px;
+  gap: 0 var(--s-6);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1461,9 +1461,9 @@ html:has(.cgr) {
 .cgr .cgr-sp-toc a {
   display: inline-flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--s-2);
   min-height: 44px;
-  padding-top: 10px;
+  padding-top: var(--s-2);
   font-size: 14px;
   color: var(--wine-ink);
   text-decoration: none;
@@ -1503,7 +1503,7 @@ html:has(.cgr) {
   .cgr .cgr-sp-01 .sw { left: calc(470 * var(--u)); top: calc(96 * var(--u)); font-size: calc(250 * var(--u)); }
   .cgr .cgr-sp-01 .cgr-sp-caps { left: calc(72 * var(--u)); top: calc(520 * var(--u)); width: 150px; }
   .cgr .cgr-sp-01 .cgr-sp-text { margin-left: calc(790 * var(--u)); width: calc(504 * var(--u)); padding: calc(372 * var(--u)) 0 56px; }
-  .cgr .cgr-sp-01 .cgr-sp-text > .ph { width: calc(210 * var(--u)); height: calc(290 * var(--u)); margin: 6px 0 14px 26px; }
+  .cgr .cgr-sp-01 .cgr-sp-text > .ph { width: calc(210 * var(--u)); height: calc(290 * var(--u)); margin: var(--s-1) 0 var(--s-3) var(--s-5); }
 
   .cgr .cgr-sp-03 .cgr-sp-body {
     min-height: calc(920 * var(--u));
@@ -1541,7 +1541,7 @@ html:has(.cgr) {
 @media (max-width: 1023px) {
   .cgr .cgr-sp {
     --frame-offset: 10px;
-    padding-bottom: 48px;
+    padding-bottom: var(--s-7);
   }
 
   .cgr .cgr-sp-art {
@@ -1570,7 +1570,7 @@ html:has(.cgr) {
   }
 
   .cgr .cgr-sp-text {
-    padding-top: 20px;
+    padding-top: var(--s-4);
   }
 
   .cgr .cgr-sp-h {
@@ -1588,15 +1588,15 @@ html:has(.cgr) {
   .cgr .cgr-sp-text > .ph {
     width: 116px;
     height: 166px;
-    margin: 6px 0 10px 16px;
+    margin: var(--s-1) 0 var(--s-2) var(--s-4);
   }
 
   .cgr .cgr-sp-caps {
     position: static;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px 20px;
-    margin-top: 32px;
+    gap: var(--s-4) var(--s-4);
+    margin-top: var(--s-6);
   }
 
   .cgr .cgr-sp-caps li + li {
@@ -1605,18 +1605,18 @@ html:has(.cgr) {
 
   .cgr .cgr-sp-ctas .btn {
     min-height: 44px;
-    padding: 0 18px;
+    padding: 0 var(--s-4);
   }
 
   .cgr .cgr-sp-toc {
-    margin-top: 40px;
+    margin-top: var(--s-6);
     margin-bottom: -48px;
-    gap: 0 24px;
+    gap: 0 var(--s-5);
     padding: 16px var(--gut);
   }
 
   .cgr .cgr-sp-toc ol {
-    gap: 0 22px;
+    gap: 0 var(--s-5);
   }
 
   .cgr .cgr-sp-01 .cgr-sp-num { left: calc(276 * var(--p)); top: calc(24 * var(--p)); }
@@ -1641,9 +1641,9 @@ html:has(.cgr) {
 
   .cgr .cgr-sp-05 .cgr-sp-row {
     display: flex;
-    gap: 20px;
+    gap: var(--s-4);
     align-items: flex-start;
-    margin-top: 32px;
+    margin-top: var(--s-6);
   }
 
   .cgr .cgr-sp-05 .ph-d {
@@ -1660,12 +1660,12 @@ html:has(.cgr) {
   }
 
   .cgr .cgr-sp-05 .cgr-sp-row .cgr-sp-caps li + li {
-    margin-top: 14px;
+    margin-top: var(--s-3);
   }
 
   .cgr .cgr-sp .cgr-pitch {
     position: static;
-    margin-top: 32px;
+    margin-top: var(--s-6);
   }
 }
 
@@ -1680,7 +1680,7 @@ html:has(.cgr) {
   min-height: 170px;
   display: flex;
   align-items: center;
-  gap: 56px;
+  gap: var(--s-7);
   padding: 24px var(--gut);
   background: var(--blush);
 }
@@ -1695,12 +1695,12 @@ html:has(.cgr) {
 }
 
 .cgr .cgr-rk-band .cgr-cap {
-  margin-top: 8px;
+  margin-top: var(--s-2);
 }
 
 .cgr .cgr-rk-thumbs {
   display: flex;
-  gap: 14px;
+  gap: var(--s-3);
 }
 
 .cgr .cgr-rk-thumbs a {
@@ -1760,7 +1760,7 @@ html:has(.cgr) {
   .cgr .cgr-rk-band {
     flex-direction: column;
     align-items: flex-start;
-    gap: 18px;
+    gap: var(--s-4);
     padding: 36px var(--gut) 28px;
   }
 
@@ -1771,7 +1771,7 @@ html:has(.cgr) {
   .cgr .cgr-rk-thumbs {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: var(--s-2);
     width: 100%;
   }
 
@@ -1890,7 +1890,7 @@ html:has(.cgr) {
   width: 100%;
   height: var(--card-h);
   display: flex;
-  gap: 24px;
+  gap: var(--s-5);
   padding: 0 calc(50% - var(--card-w) / 2);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -1979,7 +1979,7 @@ html:has(.cgr) {
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: var(--s-5);
 }
 
 .cgr-cf-ctrls {
@@ -2031,7 +2031,7 @@ html:has(.cgr) {
       "title"
       "cap"
       "bar";
-    padding: 0 20px 48px;
+    padding: 0 var(--s-4) var(--s-7);
   }
 
   .cgr-cf::after {
@@ -2062,7 +2062,7 @@ html:has(.cgr) {
   }
 
   .cgr-cf-track {
-    gap: 14px;
+    gap: var(--s-3);
   }
 
   .cgr-cf-card.is-front {
@@ -2074,12 +2074,12 @@ html:has(.cgr) {
   }
 
   .cgr-cf-title {
-    margin-top: 8px;
+    margin-top: var(--s-2);
     font-size: 48px;
   }
 
   .cgr-cf-caption {
-    margin-top: 18px;
+    margin-top: var(--s-4);
     text-align: left;
   }
 
@@ -2089,7 +2089,7 @@ html:has(.cgr) {
 
   .cgr-cf-bar {
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: var(--s-2);
   }
 }
 
