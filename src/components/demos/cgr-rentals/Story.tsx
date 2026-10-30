@@ -266,7 +266,15 @@ export function Story() {
           const path = q(desk ? ".cgr-curve-desk path" : ".cgr-curve-phone path")[0] as unknown as SVGPathElement;
           const svg = path.ownerSVGElement as SVGSVGElement;
           const H = () => stage.clientHeight;
-          const W = () => stage.clientWidth;
+          // r7.4.1: desktop x moves use the composition frame width (cgr.css
+          // --fw: the width, capped by the stage height).
+          const W = () => {
+            const w = stage.clientWidth;
+            if (!desk) return w;
+            const h = stage.clientHeight;
+            const top = Math.max(0.082 * h, 72); // cgr.css --wt
+            return Math.min(w, h * 1.644, (h - 240 - top) / 0.348);
+          };
 
           const tl = gsap.timeline({
             defaults: { ease: "none" },

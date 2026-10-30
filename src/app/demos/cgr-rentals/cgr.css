@@ -843,6 +843,96 @@ html:has(.cgr) {
   clip-path: none;
 }
 
+/* r7.4.1: desktop composition frame. The hero was drawn at 1440x900 (stage
+   1440x876, 1.644:1) with sizes and x offsets in vw but the h1, lead and
+   Mavy placed by stage height, so a wide, short window (1366x620, 2.2:1)
+   stacked the h1 and lead on GOWNS and the script. --fw is the frame width
+   (100vw, capped at 1.644 x the stage height, and so GOWNS, 0.348 x --fw
+   tall, ends 240px above the stage bottom for the lead and CTA) and --fx
+   centres it; at 1440x900
+   and taller --fw is 100vw, so nothing moves there. Story.tsx uses the same
+   frame width for the scrubbed x moves. */
+.cgr-intro {
+  --fh: max(560px, calc(100svh - var(--bar-h)));
+  --fw: 100vw;
+  --fx: 0px;
+}
+
+@media (min-width: 900px) {
+  .cgr-intro {
+    /* GOWNS top: 8.2% of the stage, but never inside the header text
+       (72px is its 1440x900 top) */
+    --wt: max(calc(0.082 * var(--fh)), calc(var(--head-h) - 12px));
+    --fw: min(100vw, calc(var(--fh) * 1.644), calc((var(--fh) - 240px - var(--wt)) / 0.348));
+    --fx: calc((100vw - var(--fw)) / 2);
+  }
+
+  .cgr .cgr-intro .cgr-intro-word {
+    top: var(--wt);
+    left: calc(var(--fx) - 0.0306 * var(--fw));
+    font-size: calc(0.396 * var(--fw));
+  }
+
+  .cgr .cgr-intro .cgr-mavy {
+    left: calc(var(--fx) + 0.174 * var(--fw));
+  }
+
+  .cgr .cgr-intro .cgr-intro-hand {
+    left: calc(var(--fx) + 0.361 * var(--fw));
+    font-size: clamp(64px, calc(0.104 * var(--fw)), 150px);
+  }
+
+  .cgr .cgr-intro .cgr-intro-copy {
+    left: calc(var(--fx) + 0.528 * var(--fw));
+    /* the lead runs to the window edge, not the frame edge, so it stays a
+       few lines tall when the frame is narrower than the window */
+    right: calc(0.0333 * var(--fw));
+  }
+
+  .cgr .cgr-intro .cgr-intro-lead {
+    font-size: clamp(18px, calc(0.016 * var(--fw)), 24px);
+  }
+
+  .cgr .cgr-intro .cgr-intro-cue {
+    left: calc(var(--fx) + var(--gut));
+  }
+
+  .cgr .cgr-intro .cgr-intro-h {
+    left: calc(var(--fx) + var(--gut));
+    font-size: clamp(40px, calc(0.0667 * var(--fw)), 112px);
+  }
+
+  /* The lead keeps three lines (420px floor) and its top is capped so those
+     three lines always end inside the stage. */
+  .cgr .cgr-intro .cgr-intro-sub {
+    left: calc(var(--fx) + var(--gut));
+    top: min(88.1%, calc(100% - 4.05em - 10px));
+    width: min(560px, max(calc(0.389 * var(--fw)), 420px));
+    font-size: clamp(15px, calc(0.0139 * var(--fw)), 20px);
+  }
+
+  /* Reduced motion shows the landed frame while the header is still on
+     screen (in motion it has scrolled away by then), so the lifted cream
+     GOWNS sat under the cream logo and nav. Static GOWNS starts below the
+     header and is capped to end above the h1 (Anton caps fill ~0.88em). */
+  .cgr .cgr-intro[data-motion="static"] .cgr-intro-word {
+    transform: translate(calc(-0.08 * var(--fw)), calc(var(--head-h) + 8px - var(--wt)));
+  }
+
+  /* The size cap keys off the media query, not data-motion: SSR renders
+     data-motion="on", so a size change at hydration would be a layout
+     shift. Transforms (above) don't count toward CLS. */
+  @media (prefers-reduced-motion: reduce) {
+    .cgr .cgr-intro .cgr-intro-word {
+      font-size: min(calc(0.396 * var(--fw)), calc((0.612 * var(--fh) - var(--head-h) - 26px) / 0.88));
+    }
+  }
+
+  .cgr .cgr-intro[data-motion="static"] .cgr-mavy {
+    transform: translateX(calc(0.41 * var(--fw))) scale(0.943);
+  }
+}
+
 @media (max-width: 899px) {
   .cgr-intro-stage {
     background:
