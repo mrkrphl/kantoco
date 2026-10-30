@@ -10,7 +10,7 @@ import { Steps, rentalDays } from "@/components/demos/cgr-rentals/Steps";
 
 /**
  * Round 7 booking (stamp §4 Booking, d05/m05): oxblood, steps 01 02 03 with
- * 02 in hot, underline fields, and a "Your hold" summary card (+2.5deg, ink
+ * 02 in hot, underline fields, and a "Your reservation" summary card (+2.5deg, ink
  * hard shadow) over a rotated photo. The customer total is rate x days only.
  */
 export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: string }) {
@@ -59,7 +59,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
       return;
     }
     if (!free) {
-      setError("Those dates overlap a hold on the sample calendar.");
+      setError("Those dates are already reserved on the sample calendar.");
       return;
     }
     const booking = addBooking({
@@ -83,7 +83,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
           ? "that date has passed. the earliest pickup is today."
           : free
             ? `open in the sample calendar, ${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()}.`
-            : `${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()} overlaps a hold in the sample calendar.`;
+            : `${humanDate(eventDate).toLowerCase()} to ${humanDate(returnDate).toLowerCase()} is already reserved in the sample calendar.`;
 
   return (
     <div className="cgr-bk ox grain">
@@ -93,7 +93,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
         <div className="cgr-bk-grid">
           <form className="cgr-form" onSubmit={onSubmit} noValidate aria-labelledby="cgr-bk-h">
             <h1 className="sr-only" id="cgr-bk-h">
-              Request a hold for the {gown.name}
+              Reserve the {gown.name}
             </h1>
             <label className="uf">
               <span className="uf-l mono">your name</span>
@@ -177,23 +177,23 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
             ) : null}
             <div className="cgr-bk-actions">
               <button type="submit" className="btn btn-wine" disabled={!canSave}>
-                Save hold request
+                Reserve your gown
               </button>
               <Link className="ulink" href={`${CGR_BASE}/gown/${gown.slug}`}>
                 back to the gown
               </Link>
             </div>
             <p className="mono cgr-bk-note">
-              saves a sample hold in this browser with a CGR-XXXX reference. nothing is sent to the shop.
+              saves a sample reservation in this browser with a CGR-XXXX reference. nothing is sent to the shop.
             </p>
           </form>
 
-          <aside className="cgr-bk-side" aria-label="Your hold">
+          <aside className="cgr-bk-side" aria-label="Your reservation">
             <div className="cgr-bk-photo dark">
               <img src={`${CGR_ASSET}/${img.file}.webp`} alt="" width={img.w} height={img.h} decoding="async" />
             </div>
             <div className="cgr-hold">
-              <p className="cgr-hold-t ext">Your hold</p>
+              <p className="cgr-hold-t ext">Your reservation</p>
               <p className="mono cgr-hold-s">
                 {gown.name.toLowerCase()}, no.{no}
               </p>
@@ -219,7 +219,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
                   {total !== null ? formatPhp(total) : "–"}
                 </b>
               </p>
-              <p className="mono cgr-hold-n">a hold request, not a payment. example rates.</p>
+              <p className="mono cgr-hold-n">a reservation request, not a payment. example rates.</p>
             </div>
           </aside>
         </div>

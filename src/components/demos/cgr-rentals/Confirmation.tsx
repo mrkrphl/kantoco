@@ -22,7 +22,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
           <p className="mono cgr-cn-loading">loading…</p>
         ) : !booking ? (
           <div className="cgr-cn">
-            <h1 className="cgr-cn-h ext">No hold found</h1>
+            <h1 className="cgr-cn-h ext">No reservation found</h1>
             <p className="cgr-cn-lead">
               Reference <code>{refCode || "none"}</code> is not in this browser&apos;s storage.
             </p>
@@ -32,13 +32,13 @@ export function Confirmation({ refCode }: { refCode: string }) {
           </div>
         ) : (
           <div className="cgr-cn">
-            <h1 className="cgr-cn-h ext">Hold request saved.</h1>
+            <h1 className="cgr-cn-h ext">Your reservation request is in.</h1>
             <p className="cgr-cn-ref ext" aria-label="Booking reference">
               {booking.ref}
             </p>
             <p className="cgr-cn-lead">
-              Sample hold only, stored in this browser. The shop confirms the hold, and this code is what you show at the
-              fitting and at pickup.
+              A sample reservation, saved in this browser. The shop will message you to confirm, and this code is
+              what you show at the fitting and at pickup.
             </p>
             <dl className="cgr-cn-dl">
               <div>

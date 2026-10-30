@@ -112,7 +112,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
   const todayMonth = today ? Number(today.slice(0, 4)) * 12 + Number(today.slice(5, 7)) - 1 : 0;
   const canPrev = !today || vy * 12 + vm > todayMonth;
 
-  const holdHref = free ? `${CGR_BASE}/reserve/${gown.slug}?date=${encodeURIComponent(date)}` : undefined;
+  const reserveHref = free ? `${CGR_BASE}/reserve/${gown.slug}?date=${encodeURIComponent(date)}` : undefined;
   const sizes = gown.sizes.length > 1 ? `size ${gown.sizes[0]} to ${gown.sizes[gown.sizes.length - 1]}` : gown.sizes[0]?.toLowerCase();
 
   /* ---- lens (desktop cursor / phone press-and-hold) ---- */
@@ -341,8 +341,8 @@ export function GownDetail({ gown }: { gown: Gown }) {
           <dd>{gown.colors.join(", ")}</dd>
           <dt>rate</dt>
           <dd>{formatPhp(gown.pricePerDay)} a day, example rate</dd>
-          <dt>hold</dt>
-          <dd>a date request with a CGR reference code</dd>
+          <dt>reserve</dt>
+          <dd>your date, with a CGR reference code</dd>
         </dl>
         <p className="cgr-dt-blurb">{gown.blurb}</p>
 
@@ -351,7 +351,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
             <p className="cgr-cal-month" aria-live="polite">
               {MONTH[vm]} {vy}
             </p>
-            <p className="mono cgr-cal-key">struck = already held</p>
+            <p className="mono cgr-cal-key">struck = already reserved</p>
             <div className="cgr-cal-nav">
               <button type="button" className="cgr-cal-arrow" onClick={() => shift(-1)} disabled={!canPrev} aria-label="Previous month">
                 ←
@@ -384,7 +384,7 @@ export function GownDetail({ gown }: { gown: Gown }) {
                   className={cls}
                   disabled={past || held}
                   aria-pressed={on}
-                  aria-label={`${humanDate(di)}${held ? ", already held" : past ? ", past" : ", open"}`}
+                  aria-label={`${humanDate(di)}${held ? ", already reserved" : past ? ", past" : ", open"}`}
                   onClick={() => setPicked(di)}
                 >
                   <span>{d}</span>
@@ -397,14 +397,14 @@ export function GownDetail({ gown }: { gown: Gown }) {
               ? "checking the sample calendar…"
               : free
                 ? `${humanDate(date).toLowerCase()} is open in the sample calendar.`
-                : `${humanDate(date).toLowerCase()} is already held in the sample calendar.`}
+                : `${humanDate(date).toLowerCase()} is already reserved in the sample calendar.`}
           </p>
         </div>
 
         <div className="cgr-dt-cta">
-          {holdHref ? (
-            <Link className="btn btn-ox" href={holdHref}>
-              Hold this gown for {ctaLabel}
+          {reserveHref ? (
+            <Link className="btn btn-ox" href={reserveHref}>
+              Reserve this gown for {ctaLabel}
             </Link>
           ) : (
             <span className="btn btn-ox is-disabled" aria-disabled="true">
@@ -418,9 +418,9 @@ export function GownDetail({ gown }: { gown: Gown }) {
       </div>
 
       <div className="cgr-dt-bar dark">
-        {holdHref ? (
-          <Link className="btn btn-wine" href={holdHref}>
-            Hold for {ctaLabel}
+        {reserveHref ? (
+          <Link className="btn btn-wine" href={reserveHref}>
+            Reserve for {ctaLabel}
           </Link>
         ) : (
           <span className="btn btn-wine is-disabled" aria-disabled="true">

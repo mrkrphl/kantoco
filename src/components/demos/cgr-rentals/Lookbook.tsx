@@ -264,9 +264,9 @@ function BackCover() {
   return (
     <div className="cgr-lb-cover cgr-lb-backcover">
       <p className="cgr-lb-ctitle">
-        Accessories for a gown hold
+        Accessories to go with your gown
       </p>
-      <p className="cgr-lb-csub">Any of these can be added to a gown hold.</p>
+      <p className="cgr-lb-csub">Any of these can be added when you reserve a gown.</p>
       <a className="cgr-btn" href="#cgr-acc-grid">
         See all accessories
       </a>
