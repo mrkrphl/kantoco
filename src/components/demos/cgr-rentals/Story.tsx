@@ -8,27 +8,28 @@ import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas } from "./heroAlpha";
-import { Magnet } from "./Kinetic";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
-/** rotator.md §3: cubic-bezier(.45,0,.55,1), the --ease-drift token. */
-const DRIFT = CustomEase.create("cgrDrift", "0.45,0,0.55,1");
+/** r7.5 tokens: --ease-veil (rotator crossfade) and --ease-silk (long ease-out). */
+const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
+const SILK = CustomEase.create("cgrSilk", "0.16,0.84,0.3,1");
 
 /**
- * Round 7 intro (Design stamp r7/direction.md §4 Intro, §6 motion).
- * Black stage. GOWNS (r7.2: Anton, 570px @1440 / 164px @390) bleeds off both
- * edges behind Mavy; the stacked-alpha cutout is drawn to a transparent
- * WebGL canvas in front of it (heroAlpha.ts). The clip scrubs with scroll.
- * Over the last 20% of the intro an oxblood S-curve rises from the bottom
- * edge and her hem and veil fall over it (canvas z 6, curve z 3), then the
- * landed headline "Gown and suit rentals in Dasmariñas, Cavite." reveals on the curve.
- * r7.2: the script accent is a one-pass rotator, "for your" + a noun
- * (stamp r7.2/rotator.md); screen readers get one sr-only sentence instead.
+ * Round 7.5 intro (Design stamp r7.5: spec.md, frames/hero-*). Black stage
+ * with a faint cream tulle net, a wine bloom behind Mavy and a ghost "gowns"
+ * in Cormorant italic at 7% cream; an ivory lace scallop closes it.
+ * The settled composition is on screen from the first frame: the h1 (four
+ * lines on desktop, two on phones), the script rotator beside "Cavite.", the
+ * lead, the example rate and the two CTAs on the left; Mavy on the right.
+ * The r7.1 story stays: the stacked-alpha cutout (heroAlpha.ts, transparent
+ * WebGL canvas) scrubs with scroll inside her own column, so she walks in,
+ * turns once and faces front without ever crossing the text. Only the ghost
+ * word moves with the scroll (24px parallax).
  *
- * Reduced motion: the landed composition (d02) as a still, with the hand
- * showing "for your / debut". The alpha clip is
- * loaded with preload="metadata" and seeked once to the landed frame, so the
- * cutout stays a cutout; without WebGL the poster jpg is used.
+ * Reduced motion: the same composition as a still, with the script showing
+ * "for your debut". The alpha clip is loaded with preload="metadata" and
+ * seeked once to the landed frame, so the cutout stays a cutout; without
+ * WebGL the poster jpg is used.
  */
 
 /** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
@@ -38,13 +39,15 @@ export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 const HERO_PLAIN_SRC = `${CGR_ASSET}/mavy-side-spin-web.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 
-const WORD = "GOWNS";
-/** Rotator nouns (stamp r7.2/rotator.md §1), in order; it ends back on debut. */
-const NOUNS = ["debut", "pageant", "filipiniana", "sagala", "gala night", "wedding", "prom", "formal night"];
-/** Hold, crossfade (s) and blur for each swap (rotator.md §3). */
-const ROT_HOLD = 1.9;
-const ROT_FADE = 0.6;
-const ROT_BLUR = 4;
+const WORD = "gowns";
+/** Rotator nouns (stamp r7.5/spec.md), in order; one pass ends back on debut. */
+const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
+/** Hold, crossfade (s) and blur for each swap (--rot-hold, --rot-fade, --rot-blur). */
+const ROT_HOLD = 2.2;
+const ROT_FADE = 1.2;
+const ROT_BLUR = 2;
+/** --parallax: the ghost word's travel over the intro scroll (px). */
+const PARALLAX = 24;
 const ALT =
   "Sample render: Mavy walks in from the left in a deep red sequin gown with a sheer red veil, turns once and faces front.";
 
@@ -56,29 +59,9 @@ const CLIP_SECONDS = 8;
 const CLIP_END = 0.92;
 const at = (sec: number) => (sec / CLIP_SECONDS) * CLIP_END;
 const CLIP_BEATS = {
-  black: at(0.6),
-  walk: at(3),
-  contentIn: at(5),
   front: at(6),
   clipEnd: CLIP_END,
 };
-/** Breakout: the curve morphs over the last 20% of the intro scroll. */
-const CURVE_FROM = 0.8;
-
-/** Equal-command paths so GSAP can tween attr d (flat -> S-curve). */
-const CURVE = {
-  desk: {
-    box: "0 0 1440 900",
-    flat: "M0 900 C 420 900 560 900 940 900 C 1180 900 1320 900 1440 900 V900 H0 Z",
-    s: "M0 560 C 420 560 560 700 940 700 C 1180 700 1320 630 1440 610 V900 H0 Z",
-  },
-  phone: {
-    box: "0 0 390 844",
-    flat: "M0 844 C 120 844 180 844 300 844 C 340 844 370 844 390 844 V844 H0 Z",
-    s: "M0 520 C 120 520 180 600 300 600 C 340 600 370 590 390 580 V844 H0 Z",
-  },
-};
-
 const noopSubscribe = () => () => {};
 
 function armInline(video: HTMLVideoElement) {
@@ -141,71 +124,40 @@ export function Story() {
       const q = gsap.utils.selector(root);
       const stage = q(".cgr-intro-stage")[0] as HTMLElement;
       const word = q(".cgr-intro-word")[0] as HTMLElement;
-      const mavy = q(".cgr-mavy")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
-      const hand = q(".cgr-intro-hand")[0] as HTMLElement;
-      const handFix = q(".cgr-hand-fix")[0] as HTMLElement;
       const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
-      const copyItems = q(".cgr-intro-copy > *") as HTMLElement[];
-      const fadeOut = q(".cgr-intro-copy, .cgr-intro-cue, .cgr-intro-hand") as HTMLElement[];
-      const lines = q(".cgr-intro-h .ln > span") as HTMLElement[];
-      const after = q(".cgr-intro-sub") as HTMLElement[];
+      const rise = q(".cgr-intro-h .l, .cgr-intro-hand, .cgr-intro-bottom > *") as HTMLElement[];
 
-      // Load (time-based): the copy fades up, the hand accent writes on.
+      // Load (time-based): the h1 lines, the script and the lead block fade
+      // up 14px on the long silk ease-out (--dur-reveal 1.4s, --stagger 140ms).
       const intro = gsap.timeline({ delay: 0.25 });
       intro.fromTo(
-        copyItems,
-        { autoAlpha: 0, y: 12 },
-        { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 },
+        rise,
+        { autoAlpha: 0, y: 14 },
+        { autoAlpha: 1, y: 0, duration: 1.4, ease: SILK, stagger: 0.14 },
         0,
       );
-      // The wipe box is padded past the glyphs (negative inset) so the soft
-      // text-shadow is never cut into a hard-edged plate. When the write-on
-      // lands, the clip is set to an inline "none", which also beats the CSS
-      // pre-hide rule (r7.2.1).
-      const WIPE_FROM = "inset(-40% 100% -40% -20%)";
-      const WIPE_TO = "inset(-40% -20% -40% -20%)";
-      function unclip(this: gsap.core.Tween) {
-        gsap.set(this.targets(), { clipPath: "none" });
-      }
-      intro.fromTo(
-        handFix,
-        { clipPath: WIPE_FROM },
-        { clipPath: WIPE_TO, duration: 1.1, ease: "power2.out", onComplete: unclip },
-        0.35,
-      );
-      intro.fromTo(
-        nouns[0],
-        { clipPath: WIPE_FROM },
-        { clipPath: WIPE_TO, duration: 1.1, ease: "power2.out", onComplete: unclip },
-        0.6,
-      );
 
-      // Rotator (rotator.md §3): once through the list from ~1.7 s, back to
-      // debut. Each swap holds 1.9 s, then the outgoing and incoming nouns
-      // crossfade over the same 0.6 s with a 4 px blur and a 0.05 em rise.
-      const em = () => parseFloat(getComputedStyle(hand).fontSize) * 0.05;
+      // Rotator (spec.md): one pass from ~1.7 s, back to debut at ~28.9 s.
+      // Each swap holds 2.2 s, then the outgoing and incoming nouns crossfade
+      // over the same 1.2 s with a 2 px blur on the veil ease. No travel.
       const rot = gsap.timeline({ paused: true });
       const order = [...NOUNS.keys(), 0];
       for (let k = 1; k < order.length; k++) {
         const out = nouns[order[k - 1]];
         const inn = nouns[order[k]];
         const t = (k - 1) * (ROT_HOLD + ROT_FADE) + ROT_HOLD;
-        rot.to(
-          out,
-          { autoAlpha: 0, y: () => -em(), filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: DRIFT },
-          t,
-        );
+        rot.to(out, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL }, t);
         rot.fromTo(
           inn,
-          { autoAlpha: 0, y: () => em(), filter: `blur(${ROT_BLUR}px)` },
-          { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: ROT_FADE, ease: DRIFT, immediateRender: false },
+          { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)` },
+          { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL, immediateRender: false },
           t,
         );
       }
       rot.eventCallback("onComplete", () => detach());
 
-      // Any scroll or input ends it: crossfade to debut, no more swaps.
+      // The first scroll, key or pointer input ends it: a 1.2 s fade to debut.
       let stopped = false;
       const stop = () => {
         if (stopped) return;
@@ -215,8 +167,8 @@ export function Story() {
         rot.pause();
         if (!live) return;
         const showing = nouns.filter((n, i) => i !== 0 && Number(gsap.getProperty(n, "autoAlpha")) > 0);
-        gsap.to(showing, { autoAlpha: 0, y: () => -em(), filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: DRIFT });
-        gsap.to(nouns[0], { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: ROT_FADE, ease: DRIFT });
+        gsap.to(showing, { autoAlpha: 0, filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: VEIL });
+        gsap.to(nouns[0], { autoAlpha: 1, filter: "blur(0px)", duration: ROT_FADE, ease: VEIL });
       };
       const STOP_ON = ["wheel", "touchstart", "keydown", "pointerdown", "scroll"] as const;
       // Pause while the hero is off screen or the tab is hidden; resume after.
@@ -245,11 +197,11 @@ export function Story() {
         sync();
       }, 1.45);
 
-      // Idle on the wrapper, never the canvas: plays once she has landed.
+      // Idle on the wrapper, never the canvas: a slow breath once she has
+      // landed (front-facing), paused again if the reader scrolls back up.
       const idle = gsap.to(idleEl, {
-        scale: 1.012,
-        y: -4,
-        rotation: 0.4,
+        scale: 1.008,
+        y: -3,
         duration: 7,
         ease: "sine.inOut",
         yoyo: true,
@@ -257,81 +209,21 @@ export function Story() {
         paused: true,
       });
 
-      const mm = gsap.matchMedia();
-      mm.add(
-        { desk: "(min-width: 900px)", phone: "(max-width: 899px)" },
-        (ctx) => {
-          const desk = Boolean(ctx.conditions?.desk);
-          const P = desk ? CURVE.desk : CURVE.phone;
-          const path = q(desk ? ".cgr-curve-desk path" : ".cgr-curve-phone path")[0] as unknown as SVGPathElement;
-          const svg = path.ownerSVGElement as SVGSVGElement;
-          const H = () => stage.clientHeight;
-          // r7.4.1: desktop x moves use the composition frame width (cgr.css
-          // --fw: the width, capped by the stage height).
-          const W = () => {
-            const w = stage.clientWidth;
-            if (!desk) return w;
-            const h = stage.clientHeight;
-            const top = Math.max(0.082 * h, 72); // cgr.css --wt
-            return Math.min(w, h * 1.644, (h - 240 - top) / 0.348);
-          };
-
-          const tl = gsap.timeline({
-            defaults: { ease: "none" },
-            scrollTrigger: {
-              trigger: root,
-              start: "top top+=30",
-              end: "bottom bottom",
-              scrub: 0.5,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                if (self.progress > 0.995 && idle.paused()) idle.play();
-              },
-              onLeave: () => idle.play(),
-              onEnterBack: () => idle.pause(),
-            },
-          });
-          // GOWNS drifts and crops (never fades).
-          tl.fromTo(word, { x: 0 }, { x: () => -0.08 * W(), duration: 1 }, 0);
-          tl.fromTo(
-            word,
-            { y: 0 },
-            // r7.2: Anton GOWNS sits higher, so it lifts less (stamp d2/m2; phone lifts half as far because the 28px sample bar pushes the wordmark down).
-            { y: () => -(desk ? 0.075 : 0.035) * H(), duration: 0.4, ease: "power1.inOut" },
-            0.6,
-          );
-          // The right-hand copy and the hand accent clear before she crosses.
-          tl.fromTo(fadeOut, { autoAlpha: 1 }, { autoAlpha: 0, duration: at(0.8), ease: "power2.in" }, at(desk ? 2.6 : 1.9));
-          // She glides from the left 60% to the right 40% while she turns.
-          tl.fromTo(
-            mavy,
-            { x: 0, y: 0, scale: 1 },
-            {
-              x: () => (desk ? 0.41 : 0.13) * W(),
-              y: () => (desk ? 0 : -0.2 * H()),
-              scale: desk ? 0.943 : 0.85,
-              duration: CLIP_BEATS.front - CLIP_BEATS.walk,
-              ease: "power2.inOut",
-            },
-            CLIP_BEATS.walk,
-          );
-          // Breakout: flat -> S-curve, rising 30vh -> 0 (last 20%).
-          tl.fromTo(path, { attr: { d: P.flat } }, { attr: { d: P.s }, duration: 1 - CURVE_FROM, ease: "power2.out" }, CURVE_FROM);
-          tl.fromTo(svg, { y: () => 0.3 * H() }, { y: 0, duration: 1 - CURVE_FROM, ease: "power2.out" }, CURVE_FROM);
-          // Landed headline: line reveals on the curve.
-          tl.fromTo(
-            lines,
-            { clipPath: "inset(100% 0% 0% 0%)", yPercent: 30 },
-            { clipPath: "inset(0% 0% 0% 0%)", yPercent: 0, duration: 0.07, stagger: 0.02, ease: "power3.out" },
-            0.88,
-          );
-          tl.fromTo(after, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.05, ease: "power3.out" }, 0.93);
-          tl.to({}, { duration: 0 }, 1);
-          return () => {
-            gsap.set([path], { attr: { d: P.flat } });
-          };
+      // The ghost word drifts up 24px over the intro scroll (never fades).
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: root,
+          start: "top top+=30",
+          end: "bottom bottom",
+          scrub: 0.8,
+          onUpdate: (self) => {
+            if (self.progress >= CLIP_BEATS.front && idle.paused()) idle.play();
+            else if (self.progress < CLIP_BEATS.front && !idle.paused()) idle.pause();
+          },
         },
-      );
+      });
+      tl.fromTo(word, { y: 0 }, { y: -PARALLAX, duration: 1 }, 0);
 
       // Clip scrub: the whole clip maps to 0..CLIP_END of the intro scroll.
       // rAF-throttled, one seek in flight, 250 ms stuck-seek replacement.
@@ -383,7 +275,8 @@ export function Story() {
         rot.kill();
         intro.kill();
         idle.kill();
-        mm.revert();
+        tl.scrollTrigger?.kill();
+        tl.kill();
       };
     },
     { scope: rootRef, dependencies: [ready, reduced, clipSrc] },
@@ -397,17 +290,11 @@ export function Story() {
       data-motion={reduced ? "static" : "on"}
       data-alpha={alpha ? "on" : "off"}
     >
-      <div className="cgr-intro-stage grain dark">
-        <p className="cgr-intro-word ext" aria-hidden="true">
+      <div className="cgr-intro-stage">
+        <span className="cgr-intro-bloom" aria-hidden="true" />
+        <p className="cgr-intro-word" aria-hidden="true">
           {WORD}
         </p>
-
-        <svg className="cgr-curve cgr-curve-desk" viewBox={CURVE.desk.box} preserveAspectRatio="none" aria-hidden="true">
-          <path d={reduced ? CURVE.desk.s : CURVE.desk.flat} />
-        </svg>
-        <svg className="cgr-curve cgr-curve-phone" viewBox={CURVE.phone.box} preserveAspectRatio="none" aria-hidden="true">
-          <path d={reduced ? CURVE.phone.s : CURVE.phone.flat} />
-        </svg>
 
         <div className="cgr-mavy">
           <div className="cgr-mavy-idle">
@@ -441,60 +328,47 @@ export function Story() {
           </div>
         </div>
 
-        <p className="hand cgr-intro-hand" aria-hidden="true">
-          <span className="cgr-hand-fix">for your</span>
-          <span className="cgr-hand-stack">
-            {NOUNS.map((n, i) => (
-              <span key={n} data-i={i}>
-                {n}
-              </span>
-            ))}
-          </span>
-        </p>
-
         <div className="cgr-intro-copy">
-          <div className="cgr-intro-text">
-            <p className="cgr-intro-lead">
-              Cavite Gown Rentals rents gowns and suits for any formal occasion in Dasmariñas, Cavite. Every gown shows its open dates
-              <span className="cgr-intro-lead-more">, and a hold is a request, not a payment</span>.
-            </p>
-            <p className="mono cgr-intro-rate">
-              from {formatPhp(2200)} a day · example rates · sample site by kantoco
+          <div className="cgr-intro-top">
+            <h1 className="cgr-intro-h disp" id="cgr-hero-title">
+              <span className="l">Gown and suit </span>
+              <span className="l">rentals in </span>
+              <span className="l">
+                <em>Dasmariñas,</em>{" "}
+              </span>
+              <span className="l">Cavite.</span>
+            </h1>
+            <p className="hand cgr-intro-hand" aria-hidden="true">
+              <span className="cgr-hand-fix">for your</span>{" "}
+              <span className="cgr-hand-stack">
+                {NOUNS.map((n, i) => (
+                  <span key={n} data-i={i}>
+                    {n}
+                  </span>
+                ))}
+              </span>
             </p>
           </div>
-          <Magnet href="#gowns">
-            see the
-            <br />
-            gowns
-          </Magnet>
+          <div className="cgr-intro-bottom">
+            <p className="cgr-intro-lead">
+              Each gown keeps its own calendar. When you ask to hold a date, you receive a CGR reference code, and the
+              shop confirms with you before any payment.
+            </p>
+            <p className="cgr-intro-rate">From {formatPhp(2200)} a day, example rate</p>
+            <div className="cgr-intro-cta">
+              <a className="btn btn-wine" href="#gowns">
+                See the gowns <span className="arrow" aria-hidden="true" />
+              </a>
+              <a className="cgr-intro-txt" href="#rail">
+                <span>Hold a gown</span>
+              </a>
+            </div>
+          </div>
         </div>
         <p className="sr-only">
-          Gowns for your debut, pageant, filipiniana, sagala, gala night, wedding, prom or formal night.
+          Gowns for your debut, pageant, wedding, prom, JS prom, ball, photoshoot or graduation ball.
         </p>
-
-        <p className="cgr-intro-cue mono" aria-hidden="true">
-          scroll to watch her turn
-        </p>
-
-        <div className="cgr-intro-end">
-          <h1 className="cgr-intro-h ext" id="cgr-hero-title">
-            <span className="ln">
-              <span>Gown and suit rentals</span>
-            </span>{" "}
-            <span className="ln ln-2">
-              <span>
-                in <em>Dasmariñas,</em>
-              </span>
-            </span>{" "}
-            <span className="ln ln-3">
-              <span>Cavite.</span>
-            </span>
-          </h1>
-          <p className="cgr-intro-sub">
-            Each gown has its own calendar. A hold request gets you a CGR reference code, and the shop confirms the
-            date before you pay.
-          </p>
-        </div>
+        <span className="cgr-scallop" aria-hidden="true" />
       </div>
     </section>
   );

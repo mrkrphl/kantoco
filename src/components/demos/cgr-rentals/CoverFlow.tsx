@@ -249,10 +249,10 @@ export function CoverFlow({ items }: { items: Gown[] }) {
         <path d="M0 80 L390 20 V600 H0 Z" />
       </svg>
       <div className="cgr-wrap cgr-cf-head">
-        <h2 className="cgr-cf-title ext" id="cgr-cf-title" data-rv>
-          Every piece on the rail
+        <h2 className="cgr-cf-title disp" id="cgr-cf-title" data-rv>
+          Every piece <em>on the rail</em>
         </h2>
-        <p className="cgr-cf-hint mono">{items.length} pieces. drag, swipe, scroll or use the arrow keys.</p>
+        <p className="cgr-cf-hint">{items.length} pieces. Drag, swipe, scroll or use the arrow keys.</p>
       </div>
       <div
         ref={viewRef}
@@ -298,14 +298,14 @@ export function CoverFlow({ items }: { items: Gown[] }) {
           {/* Keyed so a new name mounts fresh (fades in) instead of shifting text. */}
           <div key={g.slug} className="cgr-cf-cap-in">
             <p className="cgr-cf-name">{g.name}</p>
-            <p className="mono cgr-cf-cat">
-              no.{String(active + 1).padStart(2, "0")}, {CATEGORY_LABEL[g.category].toLowerCase()},{" "}
-              {formatPhp(g.pricePerDay)} a day (example)
+            <p className="cgr-cf-cat">
+              No. {String(active + 1).padStart(2, "0")}, {CATEGORY_LABEL[g.category]},{" "}
+              {formatPhp(g.pricePerDay)} a day, example rate
             </p>
           </div>
         </div>
         <div className="cgr-cf-bar">
-          <p className="cgr-cf-count mono" aria-hidden="true">
+          <p className="cgr-cf-count" aria-hidden="true">
             {String(active + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
           </p>
           <div className="cgr-cf-ctrls">
@@ -316,7 +316,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
               onClick={() => goRef.current(active - 1)}
               disabled={active === 0}
             >
-              previous
+              Previous
             </button>
             <button
               type="button"
@@ -325,7 +325,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
               onClick={() => goRef.current(active + 1)}
               disabled={active === items.length - 1}
             >
-              next
+              Next
             </button>
           </div>
         </div>

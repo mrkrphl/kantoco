@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 
 /**
- * Phone header: a mono "menu" link opens a full-width ink panel with the
+ * Phone header: a "Menu" button opens a full-width black panel with the
  * section links (overlay, so nothing below shifts). Escape closes it.
  */
 export function MobileMenu({
@@ -28,12 +28,12 @@ export function MobileMenu({
     <div className="cgr-menu">
       <button
         type="button"
-        className="cgr-menu-btn mono"
+        className="cgr-menu-btn"
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? "close" : "menu"}
+        {open ? "Close" : "Menu"}
       </button>
       <nav
         id={id}
