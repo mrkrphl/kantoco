@@ -1,33 +1,32 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Cormorant_Garamond, Jost } from "next/font/google";
+import { Archivo, Space_Mono, Mrs_Saint_Delafield } from "next/font/google";
 import { cgr } from "@/lib/cgr-rentals";
 import "./cgr.css";
 
-// Couture type (round 6). Self-hosted by next/font at build time: no font
-// files live in the repo. Cormorant carries latin-ext so ₱ (U+20B1) renders
-// in the text face; prices and arrows never use Bodoni or Jost.
-const display = Bodoni_Moda({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-  variable: "--nf-display",
-  display: "swap",
-});
-
-const text = Cormorant_Garamond({
+// Round 7 type (Design stamp r7/direction.md §1). Self-hosted by next/font at
+// build time: no font files live in the repo. Archivo is the variable font
+// (wght 100-900, wdth 62-125), so no weight option. Archivo and Space Mono
+// carry latin-ext, which has ₱ (U+20B1). Mrs Saint Delafield has no ₱, so
+// it never sets a price: it is used twice only ("for your debut", "see you").
+const display = Archivo({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
-  style: ["normal", "italic"],
-  variable: "--nf-text",
+  axes: ["wdth"],
   display: "swap",
+  variable: "--nf-display",
 });
 
-const label = Jost({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--nf-label",
+const mono = Space_Mono({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "700"],
   display: "swap",
+  variable: "--nf-mono",
+});
+
+const hand = Mrs_Saint_Delafield({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--nf-hand",
 });
 
 export const metadata: Metadata = {
@@ -52,7 +51,7 @@ export default function CgrRentalsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`cgr-fonts ${display.variable} ${text.variable} ${label.variable}`}>
+    <div className={`cgr-fonts ${display.variable} ${mono.variable} ${hand.variable}`}>
       {children}
     </div>
   );
