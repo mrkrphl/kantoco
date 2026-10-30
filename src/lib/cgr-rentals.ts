@@ -5,6 +5,38 @@ export const CGR_BASE = "/demos/cgr-rentals";
 export const COMMISSION_PHP = 200;
 export const BOOKINGS_KEY = "cgr-rentals-bookings-v1";
 
+/**
+ * r7.11 defaults (Design r7.11, Mark's brief). Each one is a single switch;
+ * PR #33's "Round 7.11" notes say how to flip it.
+ */
+export const CGR_FLAGS = {
+  /** Booking records: an unlisted, noindex page (robots in layout.tsx). */
+  recordsPath: "/owner",
+  /** null = no passcode. A string asks for it first (client-side only: a sample gate, not security). */
+  recordsPasscode: null as string | null,
+  /** false = a fitting can be booked with or without a reservation code. */
+  fittingCodeRequired: false,
+  /** Fitting times are example data (see FITTING_SLOTS). */
+  slotsAreExample: true,
+  /** The example rate stays out of the hero. */
+  heroShowsRate: false,
+  /** Reviews: one at a time (false = the r7.7 three-up spreads). */
+  reviewsOneAtATime: true,
+  /** Occasion: false = it goes in the optional note; true adds its own optional field. */
+  occasionField: false,
+} as const;
+
+/**
+ * Fitting times (r7.11). EXAMPLE DATA: the shop sets the real ones. On
+ * Saturdays the 1:00 PM slot shows as taken, so the sample has a taken state.
+ */
+export const FITTING_SLOTS = {
+  exampleData: true,
+  times: ["10:00", "13:00", "15:00", "17:00"],
+  /** Weekday (0 Sun..6 Sat) -> times already taken in the example. */
+  exampleTaken: { 6: ["13:00"] } as Record<number, string[]>,
+} as const;
+
 /** Public listing facts only. Never contact the shop. */
 export const cgr = {
   title: "Cavite Gown Rentals · KantoCo sample",
@@ -109,7 +141,7 @@ export const SHOP_PHOTOS = {
 } satisfies Record<string, ShopPhoto>;
 
 export type GownCategory =
-  "debut" | "pageant" | "filipiniana" | "formal" | "accessory";
+  "debut" | "pageant" | "bridal" | "filipiniana" | "formal" | "accessory";
 
 export type GownColor = "red" | "blue" | "purple" | "green" | "silver" | "gold" | "mixed";
 
@@ -351,6 +383,46 @@ export const GOWNS: Gown[] = [
     sample: true,
   },
   {
+    slug: "ivory-ball-gown",
+    name: "Ivory ball gown",
+    category: "bridal",
+    colors: ["silver"],
+    sizes: ["S", "M", "L", "XL"],
+    pricePerDay: 3500,
+    blurb:
+      "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt. Sample listing for weddings and debuts.",
+    images: [
+      {
+        file: "photos/cgr-ivory-ball",
+        alt: "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt, on a white mannequin with a tiara and bouquet.",
+        w: 738,
+        h: 960,
+      },
+    ],
+    bookedDates: ["2026-11-14", "2026-11-28", "2026-12-12"],
+    sample: true,
+  },
+  {
+    slug: "black-gold-filipiniana",
+    name: "Black and gold Filipiniana",
+    category: "filipiniana",
+    colors: ["gold"],
+    sizes: ["S", "M", "L"],
+    pricePerDay: 2800,
+    blurb:
+      "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train. Sample listing for galas and Filipiniana nights.",
+    images: [
+      {
+        file: "photos/cgr-filipiniana-black",
+        alt: "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train, on a white mannequin.",
+        w: 590,
+        h: 1200,
+      },
+    ],
+    bookedDates: ["2026-11-13", "2026-11-27"],
+    sample: true,
+  },
+  {
     slug: "gold-crystal-tiaras",
     name: "Gold crystal tiara",
     category: "accessory",
@@ -453,6 +525,7 @@ export const ACCESSORIES = GOWNS.filter((g) => g.category === "accessory");
 export const CATEGORY_LABEL: Record<GownCategory, string> = {
   debut: "Debut",
   pageant: "Pageant",
+  bridal: "Bridal",
   filipiniana: "Filipiniana",
   formal: "Formal",
   accessory: "Accessory",
@@ -492,8 +565,20 @@ export function formatPhp(n: number): string {
 export type BookingStatus =
   "pending" | "confirmed" | "out" | "returned" | "cancelled";
 
+export type BookingKind = "reserve" | "fitting";
+
+/**
+ * A booking record. r7.11 adds fittings: `kind` (missing = an older
+ * reservation), `fittingDate` + `slot` ("15:00"), and `linkedRef` (the
+ * reservation it is for, if any). A fitting keeps eventDate/returnDate as ""
+ * unless it is linked (then eventDate is the linked event day).
+ */
 export type Booking = {
   ref: string;
+  kind?: BookingKind;
+  fittingDate?: string;
+  slot?: string;
+  linkedRef?: string;
   gownSlug: string;
   gownName: string;
   eventDate: string;

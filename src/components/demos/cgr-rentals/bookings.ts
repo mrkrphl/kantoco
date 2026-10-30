@@ -7,6 +7,7 @@ import {
   type Booking,
   type BookingStatus,
 } from "@/lib/cgr-rentals";
+import { holdsGown, manilaToday } from "@/components/demos/cgr-rentals/reserveMath";
 
 function safeParse(raw: string | null): Booking[] {
   if (!raw) return [];
@@ -66,7 +67,7 @@ export function useBookings(): Booking[] | null {
 
 const noSubscribe = () => () => {};
 
-/** Today's local ISO date; null during SSR / hydration. */
+/** Today's ISO date in Asia/Manila; null during SSR / hydration. */
 export function useToday(): string | null {
   return useSyncExternalStore<string | null>(noSubscribe, todayIso, () => null);
 }
@@ -122,15 +123,14 @@ export function getBooking(ref: string): Booking | null {
   return loadBookings().find((b) => b.ref === ref) ?? null;
 }
 
+/** r7.11: "today" is the shop's day in Asia/Manila, wherever the browser is. */
 export function todayIso(): string {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
+  return manilaToday();
 }
 
+/** Fittings never hold a gown (r7.11); older rows without `kind` are reservations. */
 function holds(b: Booking): boolean {
-  return b.status !== "cancelled" && b.status !== "returned";
+  return holdsGown(b);
 }
 
 /** True if the gown is free on the given ISO date (mock calendar + local bookings, whole held range). */
