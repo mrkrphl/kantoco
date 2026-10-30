@@ -9,7 +9,7 @@ export const BOOKINGS_KEY = "cgr-rentals-bookings-v1";
 export const cgr = {
   title: "Cavite Gown Rentals · KantoCo sample",
   description:
-    "KantoCo sample for Cavite Gown Rentals on Jose Abad Santos Ave, Salawag, Dasmariñas. Flat catalogue + booking preview. Not the shop's official site.",
+    "KantoCo sample for Cavite Gown Rentals: debut, pageant and formal gowns for rent on Jose Abad Santos Ave, Salawag, Dasmariñas, with a booking preview. Not the shop's official site.",
   badge: DEMO_BADGE,
   barDesk:
     "A KantoCo sample for Cavite Gown Rentals. Not the shop's official site. Prices & sizes are sample data.",
@@ -18,7 +18,7 @@ export const cgr = {
   shortName: "CGR",
   eyebrow: "Gown rentals · Dasmariñas, Cavite",
   tagline:
-    "Debut, pageant and formal gowns plus tiaras, on Jose Abad Santos Ave. Check a date, request a hold, get a reference code.",
+    "Debut, pageant and formal gowns plus tiaras on Jose Abad Santos Ave, each with its own sample calendar and a reference code for every hold.",
   facebook: "https://www.facebook.com/CaviteGownRentals",
   messenger: "https://m.me/CaviteGownRentals",
   maps: "https://www.google.com/maps/search/?api=1&query=Cavite+Gown+Rentals+Jose+Abad+Santos+Ave+Salawag+Dasmarinas",
@@ -198,7 +198,7 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 500,
     blurb:
-      "Tall gold crystal tiaras for debut and pageant looks. Pair with any gown. Sample accessory listing.",
+      "Tall gold crystal tiaras for debut and pageant looks, to wear with any gown. Sample accessory listing.",
     images: [
       { file: "accessories-tiaras", alt: "Gold crystal tiaras on a display rack.", w: 490, h: 332 },
       { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },

@@ -2,8 +2,8 @@
    CGR rentals (KantoCo sample) · Round 7 "loud editorial"
    Source of truth: Design stamp r7/direction.md + frames + src/tokens.css.
    Black / oxblood / cream, one vermilion accent (r7.1: #e8452c replaces the
-   r7 hot pink #ff4f9e). Archivo 900 wide, Space Mono meta, Mrs Saint
-   Delafield twice. Square corners except the magnet, lens and disc.
+   r7 hot pink #ff4f9e). r7.2 type: Anton display, Archivo body (normal
+   width), Space Mono meta, Great Vibes script twice. Square corners except the magnet, lens and disc.
    The accent is never text on cream (3.25) and only large text on oxblood
    (3.72); small text in it sits on black / ink only (5.32 / 4.96), and ink on
    an accent fill is 4.96. Animate transform / opacity / clip only.
@@ -19,8 +19,8 @@
   --cream-2: #c9b8a4;
   --hot: #e8452c;
 
-  --font-display: var(--nf-display), "Arial Black", sans-serif;
-  --font-body: var(--nf-display), Arial, sans-serif;
+  --font-display: var(--nf-display), "Arial Narrow", sans-serif;
+  --font-body: var(--nf-body), Arial, sans-serif;
   --font-mono: var(--nf-mono), ui-monospace, monospace;
   --font-hand: var(--nf-hand), cursive;
 
@@ -53,6 +53,8 @@
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Anton and Great Vibes ship one weight: never fake bold or italic. */
+  font-synthesis: none;
   color-scheme: dark;
   overflow-x: clip;
 }
@@ -119,10 +121,10 @@ html:has(.cgr) {
 /* ---------- Type roles ---------- */
 .cgr .ext {
   font-family: var(--font-display);
-  font-weight: 900;
-  font-stretch: 125%;
-  letter-spacing: -0.045em;
-  line-height: 0.84;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 0.88;
+  text-transform: uppercase;
 }
 
 .cgr .mono {
@@ -189,15 +191,15 @@ html:has(.cgr) {
   background: var(--hot);
   color: var(--ink);
   font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 112%;
+  font-weight: 400;
   font-size: 17px;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.03em;
   line-height: 1.1;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+  text-transform: uppercase;
 }
 
 .cgr .btn:hover {
@@ -276,11 +278,11 @@ html:has(.cgr) {
   text-align: center;
   text-decoration: none;
   font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 112%;
+  font-weight: 400;
   font-size: 16px;
   line-height: 1.05;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .cgr .magnet-l {
@@ -378,11 +380,11 @@ html:has(.cgr) {
   display: block;
   max-width: 7.5em;
   font-family: var(--font-display);
-  font-weight: 900;
-  font-stretch: 125%;
+  font-weight: 400;
   font-size: 22px;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .cgr .cgr-wm-sub {
@@ -390,6 +392,7 @@ html:has(.cgr) {
   margin-top: 5px;
   font-size: 11px;
   color: var(--cream-2);
+  text-transform: uppercase;
 }
 
 .cgr-head-nav {
@@ -500,10 +503,9 @@ html:has(.cgr) {
   align-items: center;
   min-height: 56px;
   font-family: var(--font-display);
-  font-weight: 900;
-  font-stretch: 125%;
+  font-weight: 400;
   font-size: 40px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1;
   text-decoration: none;
   border-bottom: 2px solid var(--ox);
@@ -565,13 +567,14 @@ html:has(.cgr) {
   top: 0;
 }
 
+/* r7.2 (font.md): Anton GOWNS at 570px @1440 (39.6vw), left -44px, caps
+   filling the ~95-585px band behind Mavy. */
 .cgr-intro-word {
   position: absolute;
-  left: -2.1vw;
-  top: 19.8%;
+  left: -3.06vw;
+  top: 8.2%;
   z-index: 2;
-  font-size: var(--fs-word);
-  font-stretch: 112%;
+  font-size: 39.6vw;
   color: var(--cream);
   white-space: nowrap;
   will-change: transform;
@@ -635,42 +638,74 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
+/* r7.2 rotator (rotator.md): "for your" is fixed, the noun swaps in a
+   one-cell grid so the box is always as wide as the longest noun
+   ("graduation ball"): no layout shift. Hidden nouns are visibility hidden. */
 .cgr-intro-hand {
   position: absolute;
-  left: 38.9vw;
-  top: 52.2%;
+  left: 36.1vw;
+  top: 31.5%;
   z-index: 7;
   font-size: clamp(64px, 10.4vw, 150px);
+  line-height: 0.9;
   white-space: nowrap;
   transform: rotate(-9deg);
+  transform-origin: 0 50%;
   text-shadow: 0 2px 18px rgb(0 0 0 / 0.5);
   pointer-events: none;
 }
 
+.cgr-hand-fix {
+  display: block;
+  width: max-content;
+}
+
+.cgr-hand-stack {
+  display: inline-grid;
+  justify-items: start;
+  margin-left: 0.55em;
+}
+
+.cgr-hand-stack > span {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.cgr-hand-stack > span[data-i="0"] {
+  opacity: 1;
+  visibility: inherit;
+}
+
+/* r7.2 (font.md): one row, magnet beside the lead, mono note under it.
+   DOM order is lead then magnet; row-reverse puts the magnet on the left. */
 .cgr-intro-copy {
   position: absolute;
-  left: 62.5vw;
-  right: var(--gut);
-  bottom: 6.2%;
+  left: 52.8vw;
+  right: 3.33vw;
+  bottom: 48px;
   z-index: 8;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 30px;
+}
+
+.cgr-intro-text {
+  min-width: 0;
 }
 
 .cgr-intro-lead {
-  max-width: 440px;
-  font-size: clamp(18px, 1.67vw, 24px);
+  max-width: 520px;
+  font-size: clamp(18px, 1.6vw, 24px);
   font-weight: 500;
   line-height: 1.3;
 }
 
-.cgr-intro-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 28px;
-  margin-top: 30px;
-}
-
 .cgr .cgr-intro-rate {
-  padding-bottom: 10px;
+  margin-top: 14px;
   color: var(--cream-2);
 }
 
@@ -695,11 +730,14 @@ html:has(.cgr) {
   pointer-events: auto;
 }
 
-.cgr-intro-h {
+/* r7.2: Anton 96px @1440, line-height 1.14 so the tilde on the Ñ clears
+   the line above (DOM stays sentence case; CSS uppercases). */
+.cgr .cgr-intro-h {
   position: absolute;
   left: var(--gut);
-  top: 70.2%;
-  font-size: clamp(36px, 5.56vw, 80px);
+  top: 61.2%;
+  font-size: clamp(40px, 6.67vw, 112px);
+  line-height: 1.14;
   color: var(--cream);
   white-space: nowrap;
 }
@@ -708,6 +746,20 @@ html:has(.cgr) {
   display: block;
   overflow: hidden;
   padding-bottom: 0.04em;
+  /* The reveal clips each line; extend the clip box up so the Ñ tilde (ink
+     ~1.07em above the baseline in Anton) is never cut, without moving the
+     1.14 line spacing. */
+  padding-top: 0.14em;
+  margin-top: -0.14em;
+}
+
+/* Desktop: "Dasmariñas," and "Cavite." share line 2. */
+@media (min-width: 900px) {
+  .cgr-intro-h .ln-2,
+  .cgr-intro-h .ln-3 {
+    display: inline-block;
+    vertical-align: top;
+  }
 }
 
 .cgr-intro-h .ln > span {
@@ -722,19 +774,13 @@ html:has(.cgr) {
 .cgr-intro-sub {
   position: absolute;
   left: var(--gut);
-  top: 89.5%;
-  width: min(540px, 40vw);
-  font-size: 19px;
-  line-height: 1.4;
+  top: 88.1%;
+  width: min(560px, 40vw);
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 500;
 }
 
-.cgr .cgr-intro-sub2 {
-  position: absolute;
-  left: 44.4vw;
-  top: 90.2%;
-  width: 220px;
-  color: var(--cream-2);
-}
 
 /* Before GSAP takes over: hide what the load / scrub timelines reveal. */
 @media (scripting: enabled) {
@@ -742,7 +788,8 @@ html:has(.cgr) {
     opacity: 0;
   }
 
-  .cgr-intro[data-motion="on"] .cgr-intro-hand {
+  .cgr-intro[data-motion="on"] .cgr-hand-fix,
+  .cgr-intro[data-motion="on"] .cgr-hand-stack > span[data-i="0"] {
     clip-path: inset(0 100% 0 0);
   }
 
@@ -757,7 +804,7 @@ html:has(.cgr) {
 
 /* Reduced motion: the landed d02 composition, no scrub, no idle. */
 .cgr-intro[data-motion="static"] .cgr-intro-word {
-  transform: translate(-8vw, calc(-0.13 * (100svh - var(--bar-h))));
+  transform: translate(-8vw, calc(-0.075 * (100svh - var(--bar-h))));
 }
 
 .cgr-intro[data-motion="static"] .cgr-mavy {
@@ -765,9 +812,14 @@ html:has(.cgr) {
 }
 
 .cgr-intro[data-motion="static"] .cgr-intro-copy,
-.cgr-intro[data-motion="static"] .cgr-intro-cue,
-.cgr-intro[data-motion="static"] .cgr-intro-hand {
+.cgr-intro[data-motion="static"] .cgr-intro-cue {
   display: none;
+}
+
+/* r7.2: the hand stays as a still "for your / debut", full size, same spot. */
+.cgr-intro[data-motion="static"] .cgr-intro-hand {
+  display: block;
+  clip-path: none;
 }
 
 @media (max-width: 899px) {
@@ -777,11 +829,11 @@ html:has(.cgr) {
       var(--black);
   }
 
+  /* r7.2: 164px @390 (42vw), left -12px. */
   .cgr-intro-word {
-    left: -2.6vw;
-    top: 17.8%;
-    font-size: 46vw;
-    font-stretch: 78%;
+    left: -3.08vw;
+    top: 10.2%;
+    font-size: 42vw;
   }
 
   .cgr-curve-desk {
@@ -804,61 +856,62 @@ html:has(.cgr) {
 
   .cgr-intro-hand {
     left: 3.6vw;
-    top: 39%;
-    font-size: 62px;
+    top: 35.9%;
+    font-size: clamp(56px, 16.9vw, 80px);
   }
 
   .cgr-intro-copy {
     left: 20px;
     right: 18px;
     bottom: 30px;
-    display: flex;
-    align-items: flex-end;
+    flex-direction: row;
     justify-content: space-between;
     gap: 12px;
   }
 
   .cgr-intro-lead {
-    width: 230px;
-    font-size: 17px;
+    width: 236px;
+    font-size: 16px;
     line-height: 1.35;
     text-shadow: 0 1px 12px #000;
   }
 
-  .cgr-intro-row {
-    margin: 0;
+  /* Phone frame: the lead ends at "open dates." */
+  .cgr .cgr-intro-lead-more {
+    display: none;
   }
 
-  .cgr .cgr-intro-row .magnet {
+  .cgr .cgr-intro-copy .magnet {
     width: 104px;
     height: 104px;
     font-size: 14px;
   }
 
   .cgr .cgr-intro-rate,
-  .cgr .cgr-intro-cue,
-  .cgr .cgr-intro-sub2 {
+  .cgr .cgr-intro-cue {
     display: none;
   }
 
 
 
 
-  .cgr-intro-h {
+  /* r7.2: 48px @390 on three lines. */
+  .cgr .cgr-intro-h {
     left: 20px;
-    top: 73%;
-    font-size: clamp(30px, 9.2vw, 44px);
+    top: 64.4%;
+    font-size: clamp(36px, 12.3vw, 56px);
   }
 
   .cgr-intro-sub {
     left: 20px;
-    top: 83.6%;
-    width: min(250px, 64vw);
+    right: 20px;
+    top: 85.6%;
+    width: auto;
     font-size: 16px;
   }
 
   .cgr-intro[data-motion="static"] .cgr-intro-word {
-    transform: translate(-8vw, calc(-0.1 * (100svh - var(--bar-h))));
+    transform: translate(-8vw, calc(-0.035 * (100svh - var(--bar-h))));
   }
 
   .cgr-intro[data-motion="static"] .cgr-mavy {
@@ -943,11 +996,10 @@ html:has(.cgr) {
   border-radius: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-weight: 700;
-  font-stretch: 112%;
+  font-weight: 400;
   font-size: 24px;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   cursor: pointer;
   transition: background-color 0.25s var(--ease-punch), color 0.25s var(--ease-punch);
 }
@@ -1352,7 +1404,6 @@ html:has(.cgr) {
 
 .cgr-cf-name {
   font-weight: 800;
-  font-stretch: 112%;
   font-size: 30px;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -1653,9 +1704,8 @@ html:has(.cgr) {
 }
 
 .cgr-dt-price {
-  font-stretch: 112%;
   font-size: clamp(54px, 5.3vw, 76px);
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -1694,7 +1744,6 @@ html:has(.cgr) {
 .cgr-cal-month {
   white-space: nowrap;
   font-weight: 800;
-  font-stretch: 112%;
   font-size: 26px;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -1962,8 +2011,7 @@ html:has(.cgr) {
   display: flex;
   gap: 34px;
   font-size: clamp(72px, 10.4vw, 150px);
-  font-stretch: 125%;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
   line-height: 0.8;
 }
 
@@ -2042,7 +2090,6 @@ html:has(.cgr) {
   border-radius: 0;
   color: var(--cream);
   font-weight: 600;
-  font-stretch: 108%;
   font-size: clamp(24px, 2.4vw, 34px);
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -2158,8 +2205,7 @@ html:has(.cgr) {
 
 .cgr-hold-t {
   font-size: 30px;
-  font-stretch: 118%;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -2194,9 +2240,8 @@ html:has(.cgr) {
 }
 
 .cgr-hold-total b {
-  font-stretch: 112%;
   font-size: clamp(40px, 3.6vw, 52px);
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -2493,7 +2538,6 @@ html:has(.cgr) {
 
 .cgr-ow-c {
   font-weight: 800;
-  font-stretch: 112%;
   white-space: nowrap;
 }
 
@@ -2628,7 +2672,6 @@ tr[data-status="cancelled"] .cgr-ow-c {
 .cgr-foot-word {
   margin-left: -20px;
   font-size: clamp(110px, 16vw, 230px);
-  font-stretch: 118%;
   color: var(--cream);
   white-space: nowrap;
   transform: translateY(0.12em);

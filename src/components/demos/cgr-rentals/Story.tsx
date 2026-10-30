@@ -3,24 +3,30 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CustomEase } from "gsap/CustomEase";
 import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas } from "./heroAlpha";
 import { Magnet } from "./Kinetic";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
+/** rotator.md §3: cubic-bezier(.45,0,.55,1), the --ease-drift token. */
+const DRIFT = CustomEase.create("cgrDrift", "0.45,0,0.55,1");
 
 /**
  * Round 7 intro (Design stamp r7/direction.md §4 Intro, §6 motion).
- * Black stage. GOWNS (Archivo 900, wdth 112 desk / 78 phone) bleeds off both
+ * Black stage. GOWNS (r7.2: Anton, 570px @1440 / 164px @390) bleeds off both
  * edges behind Mavy; the stacked-alpha cutout is drawn to a transparent
  * WebGL canvas in front of it (heroAlpha.ts). The clip scrubs with scroll.
  * Over the last 20% of the intro an oxblood S-curve rises from the bottom
  * edge and her hem and veil fall over it (canvas z 6, curve z 3), then the
- * landed headline "Rent the gown. Keep the night." reveals on the curve.
+ * landed headline "Gown rentals in Dasmariñas, Cavite." reveals on the curve.
+ * r7.2: the script accent is a one-pass rotator, "for your" + a noun
+ * (stamp r7.2/rotator.md); screen readers get one sr-only sentence instead.
  *
- * Reduced motion: the landed composition (d02) as a still. The alpha clip is
+ * Reduced motion: the landed composition (d02) as a still, with the hand
+ * showing "for your / debut". The alpha clip is
  * loaded with preload="metadata" and seeked once to the landed frame, so the
  * cutout stays a cutout; without WebGL the poster jpg is used.
  */
@@ -33,6 +39,12 @@ const HERO_PLAIN_SRC = `${CGR_ASSET}/mavy-side-spin-web.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 
 const WORD = "GOWNS";
+/** Rotator nouns (stamp r7.2/rotator.md §1), in order; it ends back on debut. */
+const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
+/** Hold, crossfade (s) and blur for each swap (rotator.md §3). */
+const ROT_HOLD = 1.9;
+const ROT_FADE = 0.6;
+const ROT_BLUR = 4;
 const ALT =
   "Sample render: Mavy walks in from the left in a deep red sequin gown with a sheer red veil, turns once and faces front.";
 
@@ -132,6 +144,8 @@ export function Story() {
       const mavy = q(".cgr-mavy")[0] as HTMLElement;
       const idleEl = q(".cgr-mavy-idle")[0] as HTMLElement;
       const hand = q(".cgr-intro-hand")[0] as HTMLElement;
+      const handFix = q(".cgr-hand-fix")[0] as HTMLElement;
+      const nouns = q(".cgr-hand-stack > span") as HTMLElement[];
       const copyItems = q(".cgr-intro-copy > *") as HTMLElement[];
       const fadeOut = q(".cgr-intro-copy, .cgr-intro-cue, .cgr-intro-hand") as HTMLElement[];
       const lines = q(".cgr-intro-h .ln > span") as HTMLElement[];
@@ -146,11 +160,81 @@ export function Story() {
         0,
       );
       intro.fromTo(
-        hand,
+        handFix,
         { clipPath: "inset(0% 100% 0% 0%)" },
         { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.out" },
         0.35,
       );
+      intro.fromTo(
+        nouns[0],
+        { clipPath: "inset(0% 100% 0% 0%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.out" },
+        0.6,
+      );
+
+      // Rotator (rotator.md §3): once through the list from ~1.7 s, back to
+      // debut. Each swap holds 1.9 s, then the outgoing and incoming nouns
+      // crossfade over the same 0.6 s with a 4 px blur and a 0.05 em rise.
+      const em = () => parseFloat(getComputedStyle(hand).fontSize) * 0.05;
+      const rot = gsap.timeline({ paused: true });
+      const order = [...NOUNS.keys(), 0];
+      for (let k = 1; k < order.length; k++) {
+        const out = nouns[order[k - 1]];
+        const inn = nouns[order[k]];
+        const t = (k - 1) * (ROT_HOLD + ROT_FADE) + ROT_HOLD;
+        rot.to(
+          out,
+          { autoAlpha: 0, y: () => -em(), filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: DRIFT },
+          t,
+        );
+        rot.fromTo(
+          inn,
+          { autoAlpha: 0, y: () => em(), filter: `blur(${ROT_BLUR}px)` },
+          { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: ROT_FADE, ease: DRIFT, immediateRender: false },
+          t,
+        );
+      }
+      rot.eventCallback("onComplete", () => detach());
+
+      // Any scroll or input ends it: crossfade to debut, no more swaps.
+      let stopped = false;
+      const stop = () => {
+        if (stopped) return;
+        stopped = true;
+        detach();
+        const live = rot.isActive() || rot.progress() < 1;
+        rot.pause();
+        if (!live) return;
+        const showing = nouns.filter((n, i) => i !== 0 && Number(gsap.getProperty(n, "autoAlpha")) > 0);
+        gsap.to(showing, { autoAlpha: 0, y: () => -em(), filter: `blur(${ROT_BLUR}px)`, duration: ROT_FADE, ease: DRIFT });
+        gsap.to(nouns[0], { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: ROT_FADE, ease: DRIFT });
+      };
+      const STOP_ON = ["wheel", "touchstart", "keydown", "pointerdown", "scroll"] as const;
+      // Pause while the hero is off screen or the tab is hidden; resume after.
+      let onScreen = true;
+      let started = false;
+      const sync = () => {
+        if (stopped || !started) return;
+        if (onScreen && document.visibilityState === "visible") rot.resume();
+        else rot.pause();
+      };
+      const io = new IntersectionObserver(([e]) => {
+        onScreen = e.isIntersecting;
+        sync();
+      });
+      io.observe(stage);
+      const detach = () => {
+        STOP_ON.forEach((ev) => window.removeEventListener(ev, stop, true));
+        document.removeEventListener("visibilitychange", sync);
+        io.disconnect();
+      };
+      document.addEventListener("visibilitychange", sync);
+      intro.add(() => {
+        if (stopped) return;
+        started = true;
+        STOP_ON.forEach((ev) => window.addEventListener(ev, stop, { capture: true, passive: true }));
+        sync();
+      }, 1.45);
 
       // Idle on the wrapper, never the canvas: plays once she has landed.
       const idle = gsap.to(idleEl, {
@@ -195,7 +279,8 @@ export function Story() {
           tl.fromTo(
             word,
             { y: 0 },
-            { y: () => -(desk ? 0.13 : 0.1) * H(), duration: 0.4, ease: "power1.inOut" },
+            // r7.2: Anton GOWNS sits higher, so it lifts less (stamp d2/m2; phone lifts half as far because the 28px sample bar pushes the wordmark down).
+            { y: () => -(desk ? 0.075 : 0.035) * H(), duration: 0.4, ease: "power1.inOut" },
             0.6,
           );
           // The right-hand copy and the hand accent clear before she crosses.
@@ -277,6 +362,8 @@ export function Story() {
 
       return () => {
         cleanupVideo();
+        detach();
+        rot.kill();
         intro.kill();
         idle.kill();
         mm.revert();
@@ -338,29 +425,35 @@ export function Story() {
         </div>
 
         <p className="hand cgr-intro-hand" aria-hidden="true">
-          for your debut
+          <span className="cgr-hand-fix">for your</span>
+          <span className="cgr-hand-stack">
+            {NOUNS.map((n, i) => (
+              <span key={n} data-i={i}>
+                {n}
+              </span>
+            ))}
+          </span>
         </p>
 
         <div className="cgr-intro-copy">
-          <p className="cgr-intro-lead">
-            Debut, pageant and formal gowns for rent in Dasmariñas, Cavite. Check your date and hold one before you
-            pay.
-          </p>
-          <div className="cgr-intro-row">
-            <Magnet href="#gowns">
-              see the
-              <br />
-              gowns
-            </Magnet>
+          <div className="cgr-intro-text">
+            <p className="cgr-intro-lead">
+              Debut, pageant and formal gowns for rent in Dasmariñas, Cavite. Every gown shows its open dates
+              <span className="cgr-intro-lead-more">, and a hold is a request, not a payment</span>.
+            </p>
             <p className="mono cgr-intro-rate">
-              from {formatPhp(2200)} a day
-              <br />
-              example rates
-              <br />
-              sample site by kantoco · examples
+              from {formatPhp(2200)} a day · example rates · sample site by kantoco
             </p>
           </div>
+          <Magnet href="#gowns">
+            see the
+            <br />
+            gowns
+          </Magnet>
         </div>
+        <p className="sr-only">
+          Gowns for your debut, pageant, wedding, prom, JS prom, ball, photoshoot or graduation ball.
+        </p>
 
         <p className="cgr-intro-cue mono" aria-hidden="true">
           scroll to watch her turn
@@ -369,17 +462,20 @@ export function Story() {
         <div className="cgr-intro-end">
           <h1 className="cgr-intro-h ext" id="cgr-hero-title">
             <span className="ln">
-              <span>Rent the gown.</span>
-            </span>
-            <span className="ln">
+              <span>Gown rentals in</span>
+            </span>{" "}
+            <span className="ln ln-2">
               <span>
-                <em>Keep</em> the night.
+                <em>Dasmariñas,</em>
               </span>
+            </span>{" "}
+            <span className="ln ln-3">
+              <span>Cavite.</span>
             </span>
           </h1>
           <p className="cgr-intro-sub">
-            Pick a gown, choose your event date and request a hold. You get a reference code, and the shop confirms
-            before you pay.
+            Each gown has its own calendar. A hold request gets you a CGR reference code, and the shop confirms the
+            date before you pay.
           </p>
         </div>
       </div>
