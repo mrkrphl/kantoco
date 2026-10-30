@@ -68,7 +68,11 @@ type VideoWithRvfc = HTMLVideoElement & {
   cancelVideoFrameCallback?: (id: number) => void;
 };
 
-export function createAlphaRenderer(canvas: HTMLCanvasElement, video: HTMLVideoElement): AlphaRenderer | null {
+export function createAlphaRenderer(
+  canvas: HTMLCanvasElement,
+  video: HTMLVideoElement,
+  onDraw?: () => void,
+): AlphaRenderer | null {
   const gl = canvas.getContext("webgl", {
     alpha: true,
     premultipliedAlpha: true,
@@ -126,31 +130,40 @@ export function createAlphaRenderer(canvas: HTMLCanvasElement, video: HTMLVideoE
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    onDraw?.();
   };
 
-  // New frames: requestVideoFrameCallback where available, else seeked/timeupdate.
+  // New frames: requestVideoFrameCallback where available, plus the media
+  // events. r7.6.3: WebKit fires "seeked" (and rVFC skips paused seeks)
+  // before the new frame can be uploaded, so a lone seek left the canvas
+  // empty (reduced motion in Playwright WebKit). Each event also redraws two
+  // frames later, once the decoded frame is current.
   const v = video as VideoWithRvfc;
   let rvfc = 0;
+  let late = 0;
   const onFrame = () => {
     draw();
     if (!dead && v.requestVideoFrameCallback) rvfc = v.requestVideoFrameCallback(onFrame);
   };
-  const evs = ["loadeddata", "seeked", "timeupdate"] as const;
-  if (v.requestVideoFrameCallback) {
-    rvfc = v.requestVideoFrameCallback(onFrame);
-    video.addEventListener("loadeddata", draw);
-    video.addEventListener("seeked", draw);
-  } else {
-    evs.forEach((e) => video.addEventListener(e, draw));
-  }
-  draw();
+  const onEvent = () => {
+    draw();
+    cancelAnimationFrame(late);
+    late = requestAnimationFrame(() => {
+      late = requestAnimationFrame(draw);
+    });
+  };
+  const evs = ["loadeddata", "canplay", "seeked", "timeupdate", "playing"] as const;
+  if (v.requestVideoFrameCallback) rvfc = v.requestVideoFrameCallback(onFrame);
+  evs.forEach((e) => video.addEventListener(e, onEvent));
+  onEvent();
 
   return {
     draw,
     destroy: () => {
       dead = true;
+      cancelAnimationFrame(late);
       if (rvfc && v.cancelVideoFrameCallback) v.cancelVideoFrameCallback(rvfc);
-      evs.forEach((e) => video.removeEventListener(e, draw));
+      evs.forEach((e) => video.removeEventListener(e, onEvent));
       gl.deleteTexture(tex);
       gl.deleteBuffer(buf);
       gl.deleteProgram(prog);

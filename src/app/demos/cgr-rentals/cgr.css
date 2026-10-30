@@ -775,7 +775,9 @@ html:has(.cgr) {
   top: 0;
   width: 2px;
   height: 2px;
-  opacity: 0;
+  /* r7.6.3: not 0, so WebKit treats the source clip as rendered and keeps
+     decoding its frames (2px at 1% is invisible). */
+  opacity: 0.01;
   pointer-events: none;
 }
 

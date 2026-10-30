@@ -32,12 +32,29 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
  * Reduced motion: one seek to the landed frame (3.5 s), shown with the text
  * at once, no scrub. If WebGL is missing, or the clip errors or never loads,
  * the poster jpg stands in (scroll fades it in; reduced motion shows it at once).
+ *
+ * r7.6.3 (mobile): iOS Safari ignores preload="auto" on a paused video that
+ * has never played, so it stops at HAVE_METADATA: no frame is decoded, the
+ * WebGL draw (readyState >= 2) never runs and, as metadata did arrive, the
+ * no-metadata fallback never fired either: no Mavy on scroll. Now the src
+ * carries a media fragment (#t=), the muted clip is primed with
+ * play().then(pause) on load and on the first touch/scroll, a rAF loop (not
+ * scroll events) reads scrollY against the trigger's start/end and seeks one
+ * at a time (fastSeek while the target moves, an exact seek once it rests),
+ * and the poster stands in only until the first real frame, so late
+ * metadata on iOS brings her back. ?cgrdebug=1 shows the path, readyState
+ * and the last seek latency.
  */
 
 /** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
 const HERO_ALPHA = true;
 export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
+/** Optional image-sequence path (r7.6.3, off by default; ?cgrseq=1 to try).
+    Frames are not shipped yet: if any fails to load, the poster stands in. */
+const HERO_SEQ = false;
+const SEQ_COUNT = 36;
+const seqSrc = (i: number) => `${CGR_ASSET}/seq/mavy-${String(i).padStart(2, "0")}.webp`;
 
 /** Rotator nouns (kept from r7.5), in order; one pass ends back on debut. */
 const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
@@ -65,11 +82,17 @@ const CLIP_END = 0.92;
     (clip ~1.9 s, mid walk-in; the poster is at 0.6 opacity) and lands ~0.36. */
 const CAP_FADE = [0.2, 0.32] as const;
 const FRONT = ((6 - T_START) / (CLIP_SECONDS - T_START)) * CLIP_END;
-/** No metadata by then (stalled or blocked clip): use the poster. */
+/** No decoded frame by then (stalled or blocked clip): show the poster until one arrives. */
 const CLIP_WAIT_MS = 8000;
+/** A seek that has not reported "seeked" by then is treated as dropped. */
+const SEEK_STALL_MS = 700;
 /** The rotator's first swap waits this long after the page opens. */
 const ROT_DELAY_MS = 1200;
 const noopSubscribe = () => () => {};
+const qsFlag = (k: string) => () => new URLSearchParams(window.location.search).get(k) === "1";
+
+type Path = "video-scrub" | "poster-fallback" | "reduced" | "canvas-seq";
+type Dbg = { rs: number; t: number; target: number; lat: number | null; seeks: number; primed: string };
 
 function armInline(video: HTMLVideoElement) {
   video.muted = true;
@@ -94,18 +117,34 @@ export function Story() {
     () => HERO_ALPHA && supportsAlphaCanvas(),
     () => false,
   );
-  // The clip errored, or never loaded its metadata: the poster stands in.
+  const debug = useSyncExternalStore(noopSubscribe, qsFlag("cgrdebug"), () => false);
+  const seqOn = useSyncExternalStore(noopSubscribe, () => HERO_SEQ || qsFlag("cgrseq")(), () => false);
+  // The clip errored (or WebGL failed): the poster stands in for good.
   const [clipFailed, setClipFailed] = useState(false);
-  const alpha = onClient && alphaOk && !clipFailed;
-  const usePoster = onClient && !alpha;
-  const clipSrc = alpha ? HERO_ALPHA_SRC : null;
+  // No frame yet after CLIP_WAIT_MS: the poster stands in, the clip stays
+  // mounted and takes over again at its first frame (late metadata on iOS).
+  const [clipLate, setClipLate] = useState(false);
+  const [seqFailed, setSeqFailed] = useState(false);
+  const seq = onClient && seqOn && !seqFailed;
+  const alpha = onClient && !seq && alphaOk && !clipFailed;
+  const usePoster = onClient && !seq && (!alpha || clipLate);
+  // Media fragment: iOS fetches and decodes that frame for a paused clip.
+  const clipSrc = alpha ? `${HERO_ALPHA_SRC}#t=${reduced ? LAND : T_START}` : null;
+  const framed = useRef(false);
+  const dbgRef = useRef<Dbg>({ rs: 0, t: 0, target: 0, lat: null, seeks: 0, primed: "no" });
+  const seqRef = useRef<HTMLCanvasElement>(null);
+  const path: Path = seq ? "canvas-seq" : reduced ? "reduced" : usePoster ? "poster-fallback" : "video-scrub";
 
   // Alpha: redraw the canvas whenever the hidden stacked video shows a new frame.
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!alpha || !video || !canvas) return;
-    const r = createAlphaRenderer(canvas, video);
+    const r = createAlphaRenderer(canvas, video, () => {
+      if (framed.current) return;
+      framed.current = true;
+      setClipLate(false);
+    });
     if (!r) {
       setClipFailed(true);
       return;
@@ -113,28 +152,65 @@ export function Story() {
     return () => r.destroy();
   }, [alpha, clipSrc]);
 
-  // The clip never plays: it is only seeked (scroll, or one reduced-motion
-  // seek). A decode or network error, or no metadata in CLIP_WAIT_MS, falls
-  // back to the poster. A failed <source> does not set video.error, so its
-  // error event is caught on the way down (capture).
+  // The clip never plays on its own: it is only seeked (scroll, or one
+  // reduced-motion seek). A decode or network error falls back to the
+  // poster; a failed <source> does not set video.error, so its error event
+  // is caught on the way down (capture). No frame in CLIP_WAIT_MS shows the
+  // poster until one arrives.
+  //
+  // Priming (iOS): a muted inline clip may play() without a gesture (not in
+  // Low Power Mode); one play().then(pause) makes WebKit load and decode
+  // frames. Tried on load, then again on the first touch, click or scroll
+  // (touchend/click count as a gesture there) until it succeeds.
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !clipSrc) return;
     armInline(video);
     video.loop = false;
+    video.preload = "auto";
     video.pause();
     const fail = () => setClipFailed(true);
     const timer = window.setTimeout(() => {
-      if (video.readyState < 1) fail();
+      if (!framed.current) setClipLate(true);
     }, CLIP_WAIT_MS);
-    const ok = () => window.clearTimeout(timer);
     video.addEventListener("error", fail, true);
-    video.addEventListener("loadedmetadata", ok);
-    if (video.readyState >= 1) ok();
+
+    let primed = false;
+    let trying = false;
+    const PRIME_ON = ["touchstart", "touchend", "pointerdown", "click", "scroll", "keydown"] as const;
+    const unhook = () => PRIME_ON.forEach((ev) => window.removeEventListener(ev, prime, true));
+    function prime() {
+      if (primed || trying || !video) return;
+      trying = true;
+      let p: Promise<void> | undefined;
+      try {
+        p = video.play();
+      } catch {
+        p = undefined;
+      }
+      const done = (ok: boolean) => {
+        trying = false;
+        video.pause();
+        // The scrub loop / reduced land re-seek to their own target after this
+        // (restoring a pre-metadata currentTime would park the clip at 0).
+        video.dispatchEvent(new Event("cgr-primed"));
+        if (!ok) return;
+        primed = true;
+        dbgRef.current.primed = "yes";
+        unhook();
+      };
+      if (p && typeof p.then === "function") p.then(() => done(true), () => {
+        dbgRef.current.primed = "blocked";
+        done(false);
+      });
+      else done(true);
+    }
+    PRIME_ON.forEach((ev) => window.addEventListener(ev, prime, { capture: true, passive: true }));
+    prime();
     return () => {
       window.clearTimeout(timer);
+      unhook();
       video.removeEventListener("error", fail, true);
-      video.removeEventListener("loadedmetadata", ok);
     };
   }, [clipSrc]);
 
@@ -144,11 +220,16 @@ export function Story() {
     if (!video || !clipSrc || !reduced) return;
     const land = () => {
       if (!video.duration) return;
-      video.currentTime = Math.min(LAND, video.duration - 0.05);
+      const t = Math.min(LAND, video.duration - 0.05);
+      if (Math.abs(video.currentTime - t) > 0.02) video.currentTime = t;
     };
     if (video.readyState >= 1) land();
     video.addEventListener("loadedmetadata", land);
-    return () => video.removeEventListener("loadedmetadata", land);
+    video.addEventListener("cgr-primed", land);
+    return () => {
+      video.removeEventListener("loadedmetadata", land);
+      video.removeEventListener("cgr-primed", land);
+    };
   }, [clipSrc, reduced]);
 
   useGSAP(
@@ -268,41 +349,64 @@ export function Story() {
 
       // ---- Clip: the intro scroll scrubs T_START..end (walk-in, landing,
       // spin). At the top she is off-frame; nothing plays on its own.
+      // r7.6.3: a rAF loop reads scrollY against the trigger's start/end
+      // every frame (no wheel/scroll events, so iOS momentum scrolling
+      // counts), and only one seek is in flight: the next waits for
+      // "seeked". fastSeek (keyframes, 0.25 s apart) while the target
+      // moves, an exact seek once it rests.
       let cleanupVideo = () => {};
       if (video && clipSrc) {
-        let target = 0;
+        type FastSeek = HTMLVideoElement & { fastSeek?: (t: number) => void };
+        const fv = video as FastSeek;
+        const st = ScrollTrigger.create({ trigger: root, start: "top top+=30", end: "bottom bottom" });
         let raf = 0;
+        let inflight = false;
         let seekAt = 0;
-        const apply = () => {
-          raf = 0;
-          if (!video.duration) return;
-          if (video.seeking && performance.now() - seekAt < 250) return;
-          const t = T_START + target * (video.duration - 0.05 - T_START);
-          if (Math.abs(video.currentTime - t) > 0.02) {
-            seekAt = performance.now();
-            video.currentTime = t;
+        let lastTarget = -1;
+        let near = true;
+        const d = dbgRef.current;
+        const onSeeked = () => {
+          if (inflight) d.lat = Math.round(performance.now() - seekAt);
+          inflight = false;
+        };
+        const tick = () => {
+          raf = near ? requestAnimationFrame(tick) : 0;
+          const span = st.end - st.start;
+          const p = span > 0 ? Math.min(1, Math.max(0, (window.scrollY - st.start) / span)) : 0;
+          const dur = video.duration;
+          d.rs = video.readyState;
+          d.t = video.currentTime;
+          if (!dur || !Number.isFinite(dur)) return;
+          const t = T_START + Math.min(1, p / CLIP_END) * (dur - 0.05 - T_START);
+          d.target = t;
+          const moving = Math.abs(t - lastTarget) > 0.004;
+          lastTarget = t;
+          if (inflight) {
+            if (performance.now() - seekAt < SEEK_STALL_MS) return;
+            inflight = false;
           }
+          const gap = Math.abs(video.currentTime - t);
+          if (gap <= 0.02) return;
+          seekAt = performance.now();
+          inflight = true;
+          d.seeks++;
+          if (moving && gap > 0.3 && typeof fv.fastSeek === "function") fv.fastSeek(t);
+          else video.currentTime = t;
         };
-        const kick = () => {
-          if (!raf) raf = requestAnimationFrame(apply);
-        };
-        video.addEventListener("loadedmetadata", kick);
-        video.addEventListener("seeked", kick);
-        const st = ScrollTrigger.create({
-          trigger: root,
-          start: "top top+=30",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            target = Math.min(1, self.progress / CLIP_END);
-            kick();
+        const io = new IntersectionObserver(
+          ([e]) => {
+            near = e.isIntersecting;
+            if (near && !raf) raf = requestAnimationFrame(tick);
           },
-        });
-        target = Math.min(1, st.progress / CLIP_END);
-        kick();
+          { rootMargin: "200px 0px" },
+        );
+        io.observe(root);
+        video.addEventListener("seeked", onSeeked);
+        raf = requestAnimationFrame(tick);
         cleanupVideo = () => {
           st.kill();
-          video.removeEventListener("loadedmetadata", kick);
-          video.removeEventListener("seeked", kick);
+          io.disconnect();
+          video.removeEventListener("seeked", onSeeked);
           if (raf) cancelAnimationFrame(raf);
         };
       }
@@ -324,6 +428,73 @@ export function Story() {
     { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster] },
   );
 
+  // Image-sequence path (flag, off by default): SEQ_COUNT alpha WebP frames
+  // drawn to a 2D canvas from the same rAF/scrollY mapping. Any missing frame
+  // falls back to the poster.
+  useEffect(() => {
+    const root = rootRef.current;
+    const canvas = seqRef.current;
+    if (!seq || !root || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return setSeqFailed(true);
+    let dead = false;
+    let raf = 0;
+    let shown = -1;
+    const imgs = Array.from({ length: SEQ_COUNT }, (_, i) => {
+      const im = new Image();
+      im.decoding = "async";
+      im.src = seqSrc(i);
+      im.onerror = () => !dead && setSeqFailed(true);
+      return im;
+    });
+    const st = ScrollTrigger.create({ trigger: root, start: "top top+=30", end: "bottom bottom" });
+    const landIdx = Math.round(((LAND - T_START) / (CLIP_SECONDS - 0.05 - T_START)) * (SEQ_COUNT - 1));
+    const tick = () => {
+      if (dead) return;
+      raf = reduced ? 0 : requestAnimationFrame(tick);
+      const span = st.end - st.start;
+      const p = span > 0 ? Math.min(1, Math.max(0, (window.scrollY - st.start) / span)) : 0;
+      const i = reduced ? landIdx : Math.round(Math.min(1, p / CLIP_END) * (SEQ_COUNT - 1));
+      const im = imgs[i];
+      if (i === shown || !im.complete || !im.naturalWidth) {
+        if (reduced && !raf) raf = requestAnimationFrame(tick);
+        return;
+      }
+      if (canvas.width !== im.naturalWidth) {
+        canvas.width = im.naturalWidth;
+        canvas.height = im.naturalHeight;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(im, 0, 0);
+      shown = i;
+      dbgRef.current.t = i;
+      if (reduced) raf = 0;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      dead = true;
+      st.kill();
+      cancelAnimationFrame(raf);
+    };
+  }, [seq, reduced]);
+
+  // ?cgrdebug=1: a small overlay with the path, readyState and last seek latency.
+  const dbgEl = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!debug) return;
+    const id = window.setInterval(() => {
+      const el = dbgEl.current;
+      const v = videoRef.current;
+      const d = dbgRef.current;
+      if (!el) return;
+      const rs = v ? v.readyState : d.rs;
+      el.textContent =
+        `path ${path} | rs ${rs} | t ${(v ? v.currentTime : d.t).toFixed(2)}/${d.target.toFixed(2)}` +
+        ` | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed} | rm ${reduced ? 1 : 0}`;
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [debug, path, reduced]);
+
   return (
     <section
       ref={rootRef}
@@ -331,6 +502,7 @@ export function Story() {
       aria-labelledby="cgr-hero-title"
       data-motion={reduced ? "static" : "on"}
       data-alpha={alpha ? "on" : "off"}
+      data-path={onClient ? path : undefined}
     >
       <div className="cgr-intro-stage">
         <span className="cgr-intro-bloom" aria-hidden="true" />
@@ -356,21 +528,32 @@ export function Story() {
                 height={1280}
                 decoding="async"
               />
-            ) : (
+            ) : null}
+            {seq ? (
+              <canvas ref={seqRef} className="cgr-intro-canvas" role="img" aria-label={ALT} />
+            ) : null}
+            {!seq && (!onClient || alpha) ? (
               <>
                 <video
                   ref={videoRef}
                   className="cgr-intro-alphasrc"
                   muted
                   playsInline
-                  preload={reduced ? "metadata" : "auto"}
+                  webkit-playsinline="true"
+                  preload="auto"
                   aria-hidden={true}
                 >
                   {clipSrc ? <source src={clipSrc} type="video/mp4" /> : null}
                 </video>
-                <canvas ref={canvasRef} className="cgr-intro-canvas" role="img" aria-label={ALT} />
+                <canvas
+                  ref={canvasRef}
+                  className="cgr-intro-canvas"
+                  role={usePoster ? undefined : "img"}
+                  aria-label={usePoster ? undefined : ALT}
+                  aria-hidden={usePoster ? true : undefined}
+                />
               </>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -422,6 +605,27 @@ export function Story() {
         </p>
         <span className="cgr-scallop" aria-hidden="true" />
       </div>
+      {debug ? (
+        <div
+          ref={dbgEl}
+          className="cgr-debug"
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            left: 8,
+            bottom: 8,
+            zIndex: 99,
+            maxWidth: "calc(100vw - 16px)",
+            padding: "4px 6px",
+            font: "11px/1.3 ui-monospace, monospace",
+            color: "#fff",
+            background: "rgba(0,0,0,.72)",
+            pointerEvents: "none",
+          }}
+        >
+          path {path}
+        </div>
+      ) : null}
     </section>
   );
 }
