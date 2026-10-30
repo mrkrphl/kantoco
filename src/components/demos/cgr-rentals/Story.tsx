@@ -8,7 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { CGR_ASSET, CGR_BASE, formatPhp } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
-import { HERO_SEQ, seqFile } from "./heroSeq.manifest";
+import { HERO_CLIPS, HERO_SEQ, frontAt, seqFile } from "./heroSeq.manifest";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 /** r7.6 tokens: --ease-veil (rotator crossfade). */
@@ -46,6 +46,11 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
  * metadata on iOS brings her back. ?cgrdebug=1 shows the path, readyState
  * and the last seek latency.
  *
+ * r7.8: the clip and the frame set are the walk-in plus the 360 spin
+ * (heroSeq.manifest.ts). Each clip carries its own timings, and a clip
+ * that errors (the new file not in the repo yet) hands over to the r7.6
+ * clip, so the preview works before and after the binaries land.
+ *
  * r7.6.4 (desktop): the same clip, two renderers (heroAlpha.ts). Desktop
  * (hover + fine pointer) paints with the 2D canvas, phones with WebGL. A
  * lost WebGL context, a draw error or a blank frame where she must be in
@@ -54,12 +59,13 @@ const VEIL = CustomEase.create("cgrVeil", "0.45,0.05,0.35,0.95");
  * ?cgrr=gl or ?cgrr=2d forces one; ?cgrdebug=1 shows the renderer and why.
  */
 
-/** Stacked-alpha cutout (540x1920: colour top half, matte bottom half). */
+/** Stacked-alpha cutouts (540x1920: colour top half, matte bottom half), in order of preference. */
 const HERO_ALPHA = true;
-export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
+const clipUrl = (i: number) => `${CGR_ASSET}/${HERO_CLIPS[i].file}`;
+export const HERO_ALPHA_SRC = clipUrl(0);
 const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 /** Image sequence (r7.6.5; r7.7 reads heroSeq.manifest.ts): colour WebP
-    cutout frames (default 36 at 540x960, clip T_START..end) drawn to a 2D canvas. Default hero path on desktop; phones
+    cutout frames (r7.8: 30 at 540x960, clip tStart..end) drawn to a 2D canvas. Default hero path on desktop; phones
     keep the stacked-alpha clip unless it fails to advance. ?cgrseq=1 forces
     the sequence, ?cgrseq=0 the clip. A missing landed frame (404) falls back
     to the clip, then the poster. */
@@ -82,20 +88,14 @@ const ALT =
   "Sample render: Mavy in a deep red sequin gown with a sheer red veil walks in, then turns once as you scroll.";
 
 /**
- * Clip timeline (8 s): 0-0.7 s empty, 0.75-3.4 s she walks in from the left
- * edge, 3.5 s whole figure in frame facing front, 3.5-6 s she spins, 6 s+
- * facing front.
+ * Clip timelines (land, tStart, length, front) live in heroSeq.manifest.ts:
+ * the scrub starts on an empty frame (tStart), so she is off-frame at the top.
+ * The clip runs tStart..end over 0..CLIP_END of the intro scroll.
  */
-const LAND = 3.5;
-/** The scrub starts on this empty frame, so she is off-frame at the top. */
-const T_START = 0.6;
-const CLIP_SECONDS = 8;
-/** The clip runs T_START..end over 0..CLIP_END of the intro scroll. */
 const CLIP_END = 0.92;
 /** Caption fade window, in intro-scroll progress: she is in frame from ~0.18
     (clip ~1.9 s, mid walk-in; the poster is at 0.6 opacity) and lands ~0.36. */
 const CAP_FADE = [0.2, 0.32] as const;
-const FRONT = ((6 - T_START) / (CLIP_SECONDS - T_START)) * CLIP_END;
 /** No decoded frame by then (stalled or blocked clip): show the poster until one arrives. */
 const CLIP_WAIT_MS = 8000;
 /** A seek that has not reported "seeked" by then is treated as dropped. */
@@ -184,7 +184,9 @@ export function Story() {
   const failReason = Object.entries(failed)
     .map(([m, r]) => `${m}:${r}`)
     .join(",");
-  // The clip errored: the poster stands in for good.
+  // Clip in use (HERO_CLIPS index): an error moves to the next one.
+  const [clipIdx, setClipIdx] = useState(0);
+  // The last clip errored: the poster stands in for good.
   const [clipFailed, setClipFailed] = useState(false);
   // No frame yet after CLIP_WAIT_MS: the poster stands in, the clip stays
   // mounted and takes over again at its first frame (late metadata on iOS).
@@ -197,8 +199,12 @@ export function Story() {
   const seq = onClient && (seqFirst || clipDown) && !seqFailed;
   const alpha = onClient && !seq && mode !== null && !clipFailed && clipStuck === null;
   const usePoster = onClient && !seq && (!alpha || clipLate);
+  // Timings: the frame set is cut from the first clip; the clip path uses its own.
+  const clip = HERO_CLIPS[seq ? 0 : clipIdx];
+  const { land: LAND, tStart: T_START, seconds: CLIP_SECONDS } = clip;
+  const FRONT = frontAt(clip, CLIP_END);
   // Media fragment: iOS fetches and decodes that frame for a paused clip.
-  const clipSrc = alpha ? `${HERO_ALPHA_SRC}#t=${reduced ? LAND : T_START}` : null;
+  const clipSrc = alpha ? `${clipUrl(clipIdx)}#t=${reduced ? LAND : T_START}` : null;
   const framed = useRef(false);
   const dbgRef = useRef<Dbg>({
     rs: 0,
@@ -271,7 +277,10 @@ export function Story() {
     video.loop = false;
     video.preload = "auto";
     video.pause();
-    const fail = () => setClipFailed(true);
+    const fail = () => {
+      if (clipIdx + 1 < HERO_CLIPS.length) setClipIdx(clipIdx + 1);
+      else setClipFailed(true);
+    };
     video.addEventListener("error", fail, true);
 
     let primed = false;
@@ -310,7 +319,7 @@ export function Story() {
       unhook();
       video.removeEventListener("error", fail, true);
     };
-  }, [clipSrc]);
+  }, [clipSrc, clipIdx]);
 
   // Clip watchdog (r7.6.5): the clip is only kept once it has visibly
   // advanced. From the first wheel / scroll / touch / key input, if the page
@@ -348,7 +357,7 @@ export function Story() {
       off();
       window.clearTimeout(timer);
     };
-  }, [alpha, reduced, mode]);
+  }, [alpha, reduced, mode, clipSrc]);
 
   // Reduced motion: one seek to the landed (front-facing) frame, no playback.
   useEffect(() => {
@@ -366,7 +375,7 @@ export function Story() {
       video.removeEventListener("loadedmetadata", land);
       video.removeEventListener("cgr-primed", land);
     };
-  }, [clipSrc, reduced]);
+  }, [clipSrc, reduced, LAND]);
 
   useGSAP(
     () => {
@@ -561,7 +570,7 @@ export function Story() {
         }
       };
     },
-    { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster] },
+    { scope: rootRef, dependencies: [onClient, reduced, clipSrc, usePoster, FRONT, T_START] },
   );
 
   // Image-sequence path: SEQ_COUNT colour WebP frames drawn to a 2D canvas.
@@ -693,14 +702,14 @@ export function Story() {
         ? `frame ${d.frame}/${SEQ_COUNT - 1} | loaded ${d.loaded}/${SEQ_COUNT}`
         : `t ${(v ? v.currentTime : d.t).toFixed(2)}/${d.target.toFixed(2)} | rs ${v ? v.readyState : d.rs} | seek ${d.lat ?? "-"}ms x${d.seeks} | primed ${d.primed}`;
       el.textContent =
-        `path ${path} | draws ${d.draws}\n` +
+        `path ${path} | draws ${d.draws}${seq ? "" : ` | clip ${clipIdx}`}\n` +
         `scrollY ${Math.round(window.scrollY)} | p ${(seq ? d.p : Math.min(1, Math.max(0, (d.target - T_START) / (CLIP_SECONDS - 0.05 - T_START)))).toFixed(3)}\n` +
         `${media}\n` +
         `wheel ${w.n} | dy ${Math.round(w.dy * 100) / 100} | dm ${w.mode} | dpr ${window.devicePixelRatio} | rm ${reduced ? 1 : 0}` +
         (why ? `\nfailed ${why}` : "");
     }, 200);
     return () => window.clearInterval(id);
-  }, [debug, path, reduced, failReason, seq, seqFailed, clipStuck]);
+  }, [debug, path, reduced, failReason, seq, seqFailed, clipStuck, T_START, CLIP_SECONDS, clipIdx]);
 
   return (
     <section
@@ -742,6 +751,7 @@ export function Story() {
             {!seq && (!onClient || alpha) ? (
               <>
                 <video
+                  key={clipIdx}
                   ref={videoRef}
                   className="cgr-intro-alphasrc"
                   muted
