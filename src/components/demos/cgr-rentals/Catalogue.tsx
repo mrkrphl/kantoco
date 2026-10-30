@@ -24,15 +24,17 @@ import { CoverFlow } from "@/components/demos/cgr-rentals/CoverFlow";
 import { Lookbook } from "@/components/demos/cgr-rentals/Lookbook";
 import {
   Marquee,
-  RentCursor,
+  RingCursor,
   useReveal,
 } from "@/components/demos/cgr-rentals/Kinetic";
 
 const HOLD_STEPS = [
-  ["Pick", "Choose a gown or tiara and your event date."],
-  ["Check", "See the date open or booked before you message anyone."],
-  ["Hold", "Send a request and keep the CGR code. The shop confirms."],
+  ["I", "Pick", "Choose a gown or tiara and your event date."],
+  ["II", "Check", "See the date open or held before you message anyone."],
+  ["III", "Hold", "Send a request and keep the CGR code. The shop confirms."],
 ] as const;
+
+const NUM = (n: number) => String(n).padStart(2, "0");
 
 export function Catalogue() {
   const [cat, setCat] = useState<GownCategory | "all">("all");
@@ -48,24 +50,30 @@ export function Catalogue() {
     });
   }, [cat, color, size]);
   const revealRef = useReveal<HTMLDivElement>();
+  // Editorial layout (feature card + pull quote) only for the full rail.
+  const editorial = filtered.length === DRESSES.length;
+  const tiara = ACCESSORIES[0];
 
   return (
     <>
-      <RentCursor />
+      <RingCursor />
       <Story />
       <Marquee />
       <CoverFlow items={DRESSES} />
 
       <div ref={revealRef}>
-        <section className="cgr-wrap cgr-steps" aria-labelledby="cgr-steps-title">
-          <h2 className="cgr-h2" id="cgr-steps-title" data-rv>
-            How a hold works
-          </h2>
+        <section className="cgr-wrap cgr-steps" id="holds" aria-labelledby="cgr-steps-title">
+          <div className="cgr-sec-head" data-rv>
+            <p className="cgr-micro">How a hold works</p>
+            <h2 className="cgr-h2" id="cgr-steps-title">
+              Three quiet <em>steps.</em>
+            </h2>
+          </div>
           <ol className="cgr-steps-list">
-            {HOLD_STEPS.map(([t, d], i) => (
+            {HOLD_STEPS.map(([n, t, d]) => (
               <li key={t} className="cgr-step" data-rv>
                 <span className="cgr-step-no" aria-hidden="true">
-                  {i + 1}
+                  {n}
                 </span>
                 <p className="cgr-step-t">{t}</p>
                 <p className="cgr-step-d">{d}</p>
@@ -74,33 +82,33 @@ export function Catalogue() {
           </ol>
         </section>
 
-        <div className="cgr-wrap cgr-sec-head" data-rv>
-          <h2 className="cgr-h2">All gowns</h2>
-          <p className="cgr-mute">{DRESSES.length} sample listings · filter by fit and colour</p>
+        <div className="cgr-wrap cgr-sec-head" id="all-gowns" data-rv>
+          <p className="cgr-micro">The collection · {DRESSES.length} example gowns</p>
+          <h2 className="cgr-h2">
+            All <em>gowns.</em>
+          </h2>
         </div>
 
         <section className="cgr-wrap cgr-filters" aria-label="Gown filters" data-rv>
-          <div className="cgr-filter-block">
-            <p className="cgr-filter-label" id="cgr-cat-label">
-              Category
-            </p>
-            <div className="cgr-chips" role="group" aria-labelledby="cgr-cat-label">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  className={cat === c.id ? "cgr-chip-btn is-on" : "cgr-chip-btn"}
-                  aria-pressed={cat === c.id}
-                  onClick={() => setCat(c.id)}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
+          <div className="cgr-tabs" role="group" aria-label="Category">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className={cat === c.id ? "cgr-tab is-on" : "cgr-tab"}
+                aria-pressed={cat === c.id}
+                onClick={() => setCat(c.id)}
+              >
+                {c.id === "all" ? "All gowns" : c.label}
+              </button>
+            ))}
+            <a className="cgr-tab" href="#accessories">
+              Accessories
+            </a>
           </div>
           <div className="cgr-filter-row">
             <label className="cgr-field">
-              <span>Color</span>
+              <span className="cgr-micro">Colour</span>
               <select
                 value={color}
                 onChange={(e) => setColor(e.target.value as GownColor | "all")}
@@ -113,7 +121,7 @@ export function Catalogue() {
               </select>
             </label>
             <label className="cgr-field">
-              <span>Size</span>
+              <span className="cgr-micro">Size</span>
               <select
                 value={size}
                 onChange={(e) => setSize(e.target.value as GownSize | "all")}
@@ -125,18 +133,61 @@ export function Catalogue() {
                 ))}
               </select>
             </label>
-            <p className="cgr-count" aria-live="polite">
-              {filtered.length} item{filtered.length === 1 ? "" : "s"}
+            <p className="cgr-count cgr-micro" aria-live="polite">
+              {filtered.length} gown{filtered.length === 1 ? "" : "s"}
             </p>
           </div>
         </section>
 
-        <section className="cgr-wrap cgr-grid" aria-label="Gowns">
+        <section
+          className={editorial ? "cgr-wrap cgr-grid is-editorial" : "cgr-wrap cgr-grid"}
+          aria-label="Gowns"
+        >
           {filtered.length === 0 ? (
             <p className="cgr-empty">No gowns match these filters.</p>
           ) : (
-            filtered.map((g) => <ItemCard key={g.slug} item={g} />)
+            filtered.map((g, i) => (
+              <ItemCard key={g.slug} item={g} no={DRESSES.indexOf(g) + 1} feature={editorial && i === 0} />
+            ))
           )}
+          {editorial ? (
+            <>
+              <aside className="cgr-quote" data-rv>
+                <p className="cgr-quote-t">
+                  “Pick the gown, check the date, keep the code. The shop confirms.”
+                </p>
+                <a className="cgr-link" href="#holds">
+                  How holds work
+                </a>
+              </aside>
+              {tiara ? (
+                <article className="cgr-card cgr-card-acc" data-rv>
+                  <a href="#accessories" className="cgr-card-link" data-cursor="link">
+                    <span className="ff">
+                      <span className="ff-img">
+                        <img
+                          src={`${CGR_ASSET}/${tiara.images[0].file}.webp`}
+                          alt=""
+                          width={tiara.images[0].w}
+                          height={tiara.images[0].h}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </span>
+                    </span>
+                    <span className="cgr-card-row">
+                      <span className="cgr-micro">Accessories</span>
+                      <span className="cgr-micro">{ACCESSORIES.length} pieces</span>
+                    </span>
+                    <span className="cgr-card-name">Tiaras, crowns and crystals</span>
+                    <span className="cgr-price">
+                      from {formatPhp(Math.min(...ACCESSORIES.map((a) => a.pricePerDay)))} a day
+                    </span>
+                  </a>
+                </article>
+              ) : null}
+            </>
+          ) : null}
         </section>
 
         <section
@@ -145,23 +196,21 @@ export function Catalogue() {
           aria-labelledby="cgr-acc-title"
         >
           <div className="cgr-sec-head" data-rv>
+            <p className="cgr-micro">Tiaras, crowns and jewellery · {ACCESSORIES.length} examples</p>
             <h2 className="cgr-h2" id="cgr-acc-title">
-              Accessories
+              The crown <em>room.</em>
             </h2>
-            <p className="cgr-mute">
-              Tiaras, crowns and jewelry · {ACCESSORIES.length} sample listings
-            </p>
           </div>
           <Lookbook items={ACCESSORIES} />
           <div className="cgr-grid cgr-grid-acc" id="cgr-acc-grid">
-            {ACCESSORIES.map((g) => (
-              <ItemCard key={g.slug} item={g} />
+            {ACCESSORIES.map((g, i) => (
+              <ItemCard key={g.slug} item={g} no={i + 1} />
             ))}
           </div>
         </section>
 
         <div className="cgr-wrap">
-          <p className="cgr-note cgr-story-note" data-rv>
+          <p className="cgr-note" data-rv>
             {cgr.sampleNote}
           </p>
         </div>
@@ -172,36 +221,31 @@ export function Catalogue() {
   );
 }
 
-function ItemCard({ item: g }: { item: Gown }) {
+function ItemCard({ item: g, no, feature = false }: { item: Gown; no: number; feature?: boolean }) {
   const img = g.images[0];
   return (
-    <article className="cgr-card" data-rv>
-      <Link
-        href={`${CGR_BASE}/gown/${g.slug}`}
-        className="cgr-card-link"
-        data-cursor={g.category === "accessory" ? undefined : "rent"}
-      >
-        <div className="cgr-card-media">
-          <img
-            src={`${CGR_ASSET}/${img.file}.webp`}
-            alt={img.alt}
-            width={img.w}
-            height={img.h}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div className="cgr-card-body">
-          <p className="cgr-card-cat">{CATEGORY_LABEL[g.category]}</p>
-          <h3 className="cgr-card-name">{g.name}</h3>
-          <p className="cgr-card-meta">
-            {g.sizes.join(" · ")} · {g.colors.join(", ")}
-          </p>
-          <p className="cgr-card-price">
-            {formatPhp(g.pricePerDay)}
-            <span> / day · sample</span>
-          </p>
-        </div>
+    <article className={feature ? "cgr-card is-feature" : "cgr-card"} data-rv>
+      <Link href={`${CGR_BASE}/gown/${g.slug}`} className="cgr-card-link" data-cursor="link">
+        <span className="ff">
+          <span className="ff-img">
+            <img
+              src={`${CGR_ASSET}/${img.file}.webp`}
+              alt={img.alt}
+              width={img.w}
+              height={img.h}
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+        </span>
+        <span className="cgr-card-row">
+          <span className="cgr-micro">
+            No. {NUM(no)} · {CATEGORY_LABEL[g.category]}
+          </span>
+          <span className="cgr-micro cgr-card-meta">{g.sizes.join(" · ")}</span>
+        </span>
+        <span className="cgr-card-name">{g.name}</span>
+        <span className="cgr-price">{formatPhp(g.pricePerDay)} a day</span>
       </Link>
     </article>
   );

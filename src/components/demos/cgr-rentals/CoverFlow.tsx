@@ -12,7 +12,6 @@ import {
   type Gown,
 } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
-import { createRipple, isLowEndDevice, type Ripple } from "./ripple";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,7 +21,8 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
  * 3D cover-flow rail (a24-style). CSS 3D transforms on real photos, no models.
  * Inputs: drag / swipe, horizontal wheel or shift+wheel, page scroll (the rail
  * advances as the section passes), arrow keys and the two buttons.
- * Reduced motion: a flat, swipeable row with no 3D or ripple.
+ * Couture pass (r6): 24° tilt, shallow depth, 900ms ease-out snap.
+ * Reduced motion: a flat, swipeable row with no 3D.
  */
 export function CoverFlow({ items }: { items: Gown[] }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -53,11 +53,12 @@ export function CoverFlow({ items }: { items: Gown[] }) {
         const a = Math.abs(o);
         const sgn = Math.sign(o);
         const x = sgn * (Math.min(a, 1) * step1 + Math.max(a - 1, 0) * stepN);
-        const ry = -clamp(o, -1, 1) * 52;
-        const z = -Math.min(a, 3.2) * cardW * 0.42;
+        const ry = -clamp(o, -1, 1) * 24;
+        const z = -Math.min(a, 3.2) * cardW * 0.25;
         c.style.transform = `translate3d(${x.toFixed(1)}px,0,${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`;
         c.style.zIndex = String(100 - Math.round(a * 10));
-        c.style.opacity = a > 3.4 ? "0" : String(clamp(1.15 - a * 0.18, 0, 1));
+        const op = a <= 1 ? 1 - a * 0.5 : a <= 2 ? 0.5 - (a - 1) * 0.28 : 0.22;
+        c.style.opacity = a > 3.4 ? "0" : op.toFixed(3);
         c.style.visibility = a > 3.4 ? "hidden" : "visible";
         c.classList.toggle("is-front", a < 0.5);
       });
@@ -73,7 +74,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
 
     let tween: gsap.core.Tween | null = null;
     let snapTimer = 0;
-    const to = (target: number, dur = 0.7) => {
+    const to = (target: number, dur = 0.9) => {
       tween?.kill();
       tween = gsap.to(st, {
         pos: clamp(target, 0, n - 1),
@@ -84,7 +85,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
     };
     const snapSoon = (ms = 160) => {
       window.clearTimeout(snapTimer);
-      snapTimer = window.setTimeout(() => to(Math.round(st.pos), 0.55), ms);
+      snapTimer = window.setTimeout(() => to(Math.round(st.pos), 0.9), ms);
     };
     const nudge = (d: number) => {
       tween?.kill();
@@ -189,41 +190,6 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       },
     });
 
-    // WebGL ripple on hover: fine pointers on capable devices only. Touch /
-    // coarse pointers, low-end devices and prefers-reduced-data get the CSS
-    // sheen instead (no WebGL context at all).
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches && !isLowEndDevice();
-    let ripple: Ripple | null = null;
-    if (fine) ripple = createRipple();
-    root.dataset.gl = ripple ? "on" : "off";
-    const medias = cards.map((c) => c.querySelector<HTMLElement>(".cgr-cf-media"));
-    const enter = (i: number) => () => {
-      const m = medias[i];
-      hoverRect = m ? m.getBoundingClientRect() : null;
-      if (ripple && m) ripple.attach(m, `${CGR_ASSET}/${items[i].images[0].file}.webp`);
-    };
-    // The card rect is read once on enter, not on every pointermove.
-    let hoverRect: DOMRect | null = null;
-    const move = (i: number) => (e: PointerEvent) => {
-      const m = medias[i];
-      if (!ripple || !m) return;
-      const r = hoverRect ?? (hoverRect = m.getBoundingClientRect());
-      ripple.move((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
-    };
-    const leave = () => {
-      hoverRect = null;
-      ripple?.detach();
-    };
-    const handlers = medias.map((_, i) => ({ en: enter(i), mv: move(i) }));
-    if (fine) {
-      medias.forEach((m, i) => {
-        if (!m) return;
-        m.addEventListener("pointerenter", handlers[i].en);
-        m.addEventListener("pointermove", handlers[i].mv);
-        m.addEventListener("pointerleave", leave);
-      });
-    }
-
     const onResize = () => {
       cardW = cards[0]?.offsetWidth || cardW;
       kick();
@@ -254,13 +220,6 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       view.removeEventListener("wheel", onWheel);
       view.removeEventListener("keydown", onKey);
       view.removeEventListener("focusin", onFocus);
-      medias.forEach((m, i) => {
-        if (!m) return;
-        m.removeEventListener("pointerenter", handlers[i].en);
-        m.removeEventListener("pointermove", handlers[i].mv);
-        m.removeEventListener("pointerleave", leave);
-      });
-      ripple?.destroy();
       delete root.dataset.flow;
       cards.forEach((c) => {
         c.style.transform = "";
@@ -282,11 +241,11 @@ export function CoverFlow({ items }: { items: Gown[] }) {
       aria-labelledby="cgr-cf-title"
     >
       <div className="cgr-wrap cgr-cf-head">
-        <p className="cgr-eyebrow cgr-cf-eyebrow">The rail · {items.length} sample gowns</p>
-        <h2 className="cgr-cf-title" id="cgr-cf-title">
-          Spin the rail.
+        <p className="cgr-micro">The rail · {items.length} example gowns</p>
+        <h2 className="cgr-h2 cgr-cf-title" id="cgr-cf-title">
+          Spin the <em>rail.</em>
         </h2>
-        <p className="cgr-cf-hint">Drag, swipe, scroll or use the arrow keys.</p>
+        <p className="cgr-cf-hint cgr-micro">Drag, swipe, scroll or use the arrow keys</p>
       </div>
       <div
         ref={viewRef}
@@ -306,7 +265,7 @@ export function CoverFlow({ items }: { items: Gown[] }) {
                 }}
                 href={`${CGR_BASE}/gown/${it.slug}`}
                 className="cgr-cf-card"
-                data-cursor="rent"
+                data-cursor="link"
                 draggable={false}
                 aria-label={`${it.name}, ${formatPhp(it.pricePerDay)} per day sample. View and check dates.`}
               >
@@ -327,36 +286,39 @@ export function CoverFlow({ items }: { items: Gown[] }) {
         </div>
       </div>
       <div className="cgr-wrap cgr-cf-foot">
-        <button
-          type="button"
-          className="cgr-cf-arrow"
-          aria-label="Previous gown"
-          onClick={() => goRef.current(active - 1)}
-          disabled={active === 0}
-        >
-          <span aria-hidden="true">←</span>
-        </button>
         <div className="cgr-cf-caption" aria-live="polite">
           {/* Keyed so a new name mounts fresh (fades in) instead of shifting text. */}
           <div key={g.slug} className="cgr-cf-cap-in">
-            <p className="cgr-cf-cat">
-              {CATEGORY_LABEL[g.category]} · {active + 1} / {items.length}
-            </p>
+            <p className="cgr-micro cgr-cf-cat">No. {String(active + 1).padStart(2, "0")} · {CATEGORY_LABEL[g.category]}</p>
             <p className="cgr-cf-name">{g.name}</p>
-            <p className="cgr-cf-price">
-              {formatPhp(g.pricePerDay)} <span>/ day · sample</span>
-            </p>
+            <p className="cgr-price cgr-cf-price">{formatPhp(g.pricePerDay)} a day</p>
           </div>
         </div>
-        <button
-          type="button"
-          className="cgr-cf-arrow"
-          aria-label="Next gown"
-          onClick={() => goRef.current(active + 1)}
-          disabled={active === items.length - 1}
-        >
-          <span aria-hidden="true">→</span>
-        </button>
+        <div className="cgr-cf-bar">
+          <p className="cgr-cf-count cgr-micro" aria-hidden="true">
+            {String(active + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+          </p>
+          <div className="cgr-cf-ctrls">
+            <button
+              type="button"
+              className="cgr-cf-arrow cgr-textbtn"
+              aria-label="Previous gown"
+              onClick={() => goRef.current(active - 1)}
+              disabled={active === 0}
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              className="cgr-cf-arrow cgr-textbtn"
+              aria-label="Next gown"
+              onClick={() => goRef.current(active + 1)}
+              disabled={active === items.length - 1}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

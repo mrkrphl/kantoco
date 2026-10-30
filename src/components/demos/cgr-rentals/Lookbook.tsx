@@ -87,8 +87,8 @@ export function Lookbook({ items }: { items: Gown[] }) {
       setFlipping(true);
       tween = gsap.to(st, {
         flip: t,
-        duration: 0.5 + Math.abs(t - st.flip) * 0.25,
-        ease: "power2.inOut",
+        duration: 1.1 + Math.max(0, Math.abs(t - st.flip) - 1) * 0.25,
+        ease: "power3.inOut",
         onUpdate: kick,
         onComplete: () => {
           kick();
@@ -223,24 +223,24 @@ export function Lookbook({ items }: { items: Gown[] }) {
       <div className="cgr-lb-ctrl">
         <button
           type="button"
-          className="cgr-cf-arrow"
+          className="cgr-cf-arrow cgr-textbtn"
           onClick={() => goRef.current(spread - 1)}
           disabled={spread === 0}
           aria-label="Previous page"
         >
-          <span aria-hidden="true">←</span>
+          Previous
         </button>
-        <p className="cgr-lb-count" aria-live="polite">
+        <p className="cgr-lb-count cgr-micro" aria-live="polite">
           {label}
         </p>
         <button
           type="button"
-          className="cgr-cf-arrow"
+          className="cgr-cf-arrow cgr-textbtn"
           onClick={() => goRef.current(spread + 1)}
           disabled={spread === leaves}
           aria-label="Next page"
         >
-          <span aria-hidden="true">→</span>
+          Next
         </button>
       </div>
     </div>
@@ -250,10 +250,12 @@ export function Lookbook({ items }: { items: Gown[] }) {
 function Cover() {
   return (
     <div className="cgr-lb-cover">
-      <p className="cgr-lb-kick">CGR · Lookbook</p>
-      <p className="cgr-lb-ctitle">The crown room</p>
+      <p className="cgr-lb-kick cgr-micro">CGR · Lookbook</p>
+      <p className="cgr-lb-ctitle">
+        The crown <em>room</em>
+      </p>
       <p className="cgr-lb-csub">Tiaras, crowns and crystals to finish the gown.</p>
-      <p className="cgr-lb-hintc">Tap or drag to turn →</p>
+      <p className="cgr-lb-hintc cgr-micro">Tap or drag to turn</p>
     </div>
   );
 }
@@ -261,9 +263,11 @@ function Cover() {
 function BackCover() {
   return (
     <div className="cgr-lb-cover cgr-lb-backcover">
-      <p className="cgr-lb-ctitle">Pick a piece.</p>
+      <p className="cgr-lb-ctitle">
+        Pick a <em>piece.</em>
+      </p>
       <p className="cgr-lb-csub">Every one can ride along on a gown hold.</p>
-      <a className="cgr-btn cgr-btn-gold" href="#cgr-acc-grid">
+      <a className="cgr-btn" href="#cgr-acc-grid">
         See all accessories
       </a>
     </div>
@@ -285,10 +289,10 @@ function Page({ item, n }: { item: Gown; n: number }) {
           draggable={false}
         />
       </div>
-      <p className="cgr-lb-no">No. {String(n).padStart(2, "0")}</p>
+      <p className="cgr-lb-no cgr-micro">No. {String(n).padStart(2, "0")}</p>
       <p className="cgr-lb-name">{item.name}</p>
-      <p className="cgr-lb-price">{formatPhp(item.pricePerDay)} / day · sample</p>
-      <Link className="cgr-lb-link" href={`${CGR_BASE}/gown/${item.slug}`}>
+      <p className="cgr-lb-price cgr-price">{formatPhp(item.pricePerDay)} a day</p>
+      <Link className="cgr-lb-link cgr-link" href={`${CGR_BASE}/gown/${item.slug}`}>
         View &amp; check dates
       </Link>
     </div>

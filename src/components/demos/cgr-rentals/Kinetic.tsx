@@ -1,114 +1,65 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const WORDS = ["Gowns", "Debut", "Prom", "Wedding", "Cavite"];
+const WORDS = ["Debut", "Pageant", "Prom", "Wedding", "Formal", "Cavite"];
 
 /**
- * Kinetic marquee: loops on its own, speeds up and leans with scroll
- * velocity, flips direction with scroll direction, pauses off screen.
- * Solid colours only (contrast-safe). Reduced motion: one static line.
+ * One slow Bodoni italic line (~90s per loop). CSS-driven (transform only),
+ * paused on hover and whenever the band is off screen (IntersectionObserver).
+ * Reduced motion: one static, centred line.
  */
 export function Marquee() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const { ready, reduced } = useMotionReady();
+  const ref = useRef<HTMLDivElement>(null);
+  const { reduced } = useMotionReady();
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root || !ready || reduced) return;
-    const rows = Array.from(root.querySelectorAll<HTMLElement>(".cgr-mq-row"));
-    const tweens = rows.map((row, i) =>
-      gsap.fromTo(
-        row,
-        { xPercent: i % 2 ? -50 : 0 },
-        { xPercent: i % 2 ? 0 : -50, duration: 26 + i * 6, ease: "none", repeat: -1 },
-      ),
+    const el = ref.current;
+    if (!el || reduced) return;
+    const io = new IntersectionObserver(
+      ([e]) => el.classList.toggle("is-live", e.isIntersecting),
+      { rootMargin: "80px 0px" },
     );
-    const skewTo = rows.map((row) =>
-      gsap.quickTo(row, "skewX", { duration: 0.4, ease: "power3.out" }),
-    );
-    let dir = 1;
-    let skewTimer = 0;
-    const boost = { v: 1 };
-    const st = ScrollTrigger.create({
-      trigger: root,
-      start: "top bottom",
-      end: "bottom top",
-      onToggle: (self) => tweens.forEach((t) => (self.isActive ? t.resume() : t.pause())),
-      onUpdate: (self) => {
-        const v = self.getVelocity();
-        dir = self.direction;
-        const amt = Math.min(Math.abs(v) / 300, 5);
-        gsap.to(boost, {
-          v: dir * (1 + amt),
-          duration: 0.15,
-          overwrite: true,
-          onUpdate: () => tweens.forEach((t) => t.timeScale(boost.v)),
-          onComplete: () => {
-            gsap.to(boost, {
-              v: dir,
-              duration: 1.1,
-              ease: "power2.out",
-              onUpdate: () => tweens.forEach((t) => t.timeScale(boost.v)),
-            });
-          },
-        });
-        const sk = gsap.utils.clamp(-12, 12, -v / 220);
-        skewTo.forEach((q) => q(sk));
-        window.clearTimeout(skewTimer);
-        skewTimer = window.setTimeout(() => skewTo.forEach((q) => q(0)), 120);
-      },
-    });
-    // Start deep into the loop so a reversed (scroll-up) timeScale never hits time 0.
-    tweens.forEach((t) => t.totalTime(t.duration() * 500));
-    if (!st.isActive) tweens.forEach((t) => t.pause());
+    io.observe(el);
     return () => {
-      st.kill();
-      window.clearTimeout(skewTimer);
-      tweens.forEach((t) => t.kill());
-      gsap.killTweensOf(boost);
-      gsap.set(rows, { clearProps: "all" });
+      io.disconnect();
+      el.classList.remove("is-live");
     };
-  }, [ready, reduced]);
+  }, [reduced]);
 
-  const line = (accent: boolean) =>
-    Array.from({ length: 4 }, (_, k) => (
-      <span className="cgr-mq-set" key={k} aria-hidden={k > 0 ? true : undefined}>
-        {WORDS.map((w, i) => (
-          <span key={w} className={(i + (accent ? 1 : 0)) % 2 ? "cgr-mq-w is-gold" : "cgr-mq-w"}>
-            {w}
-            <span className="cgr-mq-dot" aria-hidden="true">
-              ·
-            </span>
+  // Two identical halves; the row slides by exactly one half per loop.
+  const half = (key: string, hidden: boolean) => (
+    <span className="cgr-mq-set" key={key} aria-hidden={hidden || undefined}>
+      {[...WORDS, ...WORDS].map((w, i) => (
+        <span className="cgr-mq-w" key={i}>
+          {w}
+          <span className="cgr-mq-sep" aria-hidden="true">
+            ◆
           </span>
-        ))}
-      </span>
-    ));
+        </span>
+      ))}
+    </span>
+  );
 
   return (
-    <div ref={rootRef} className="cgr-mq">
-      <p className="cgr-sr">Gowns · Debut · Prom · Wedding · Cavite</p>
+    <div ref={ref} className="cgr-mq">
+      <p className="cgr-sr">Gowns for debut, pageant, prom, wedding and formal nights in Cavite.</p>
       <div className="cgr-mq-row" aria-hidden="true">
-        {line(false)}
-      </div>
-      <div className="cgr-mq-row cgr-mq-row--2" aria-hidden="true">
-        {line(true)}
+        {half("a", true)}
+        {half("b", true)}
       </div>
     </div>
   );
 }
 
 /**
- * Cursor ring (Nomi-style companion, kept tiny): a gold ring that follows the
- * pointer with a little lag and grows into a "Rent me" pill over gowns.
- * Fine pointers only, never on touch, off under reduced motion.
+ * Fine champagne ring with a 3px dot that trails the pointer (lerp .12).
+ * 20px at rest, 44px over links / buttons / cards, 36px while pressed.
+ * Fine pointers only; hidden on touch and under reduced motion. The native
+ * cursor stays visible.
  */
-export function RentCursor() {
+export function RingCursor() {
   const ref = useRef<HTMLDivElement>(null);
   const { ready, reduced } = useMotionReady();
 
@@ -117,8 +68,6 @@ export function RentCursor() {
     if (!el || !ready || reduced) return;
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
     if (!mq.matches) return;
-    const root = document.documentElement;
-    root.classList.add("cgr-has-cursor");
     let x = -100;
     let y = -100;
     let cx = x;
@@ -127,8 +76,8 @@ export function RentCursor() {
     let shown = false;
     let mode = "";
     const loop = () => {
-      cx += (x - cx) * 0.22;
-      cy += (y - cy) * 0.22;
+      cx += (x - cx) * 0.12;
+      cy += (y - cy) * 0.12;
       el.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
       raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.2 ? requestAnimationFrame(loop) : 0;
     };
@@ -143,11 +92,9 @@ export function RentCursor() {
         el.classList.add("is-on");
       }
       const t = e.target as Element | null;
-      const next = t?.closest?.("[data-cursor=rent]")
-        ? "rent"
-        : t?.closest?.("a,button,select,input,textarea,label,[role=button]")
-          ? "link"
-          : "";
+      const next = t?.closest?.("a,button,select,input,textarea,label,[role=button],[data-cursor=link]")
+        ? "link"
+        : "";
       if (next !== mode) {
         mode = next;
         el.dataset.mode = mode;
@@ -166,7 +113,6 @@ export function RentCursor() {
     window.addEventListener("pointerup", onUp, { passive: true });
     return () => {
       if (raf) cancelAnimationFrame(raf);
-      root.classList.remove("cgr-has-cursor");
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("pointerdown", onDown);
@@ -177,15 +123,16 @@ export function RentCursor() {
   return (
     <div ref={ref} className="cgr-cursor" aria-hidden="true">
       <span className="cgr-cursor-ring" />
-      <span className="cgr-cursor-label">Rent me</span>
+      <span className="cgr-cursor-dot" />
     </div>
   );
 }
 
 /**
- * Staggered fade-up reveal for children marked [data-rv] inside the ref'd
- * container. Only items below the fold at load are hidden first, so nothing
- * on screen ever blinks (CLS-safe: opacity/transform only).
+ * Masked fade-up reveal (900ms, ease-out) for children marked [data-rv]
+ * inside the ref'd container. 120ms stagger per parent, capped at 3 items.
+ * Only items below the fold at load are hidden first, so nothing on screen
+ * ever blinks (CLS-safe: opacity / transform / clip-path only).
  */
 export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
   const ref = useRef<T>(null);
@@ -201,7 +148,7 @@ export function useReveal<T extends HTMLElement>(deps: unknown[] = []) {
       const parent = el.parentElement ?? root;
       const n = groups.get(parent) ?? 0;
       groups.set(parent, n + 1);
-      el.style.setProperty("--rv-d", `${Math.min(n, 6) * 70}ms`);
+      el.style.setProperty("--rv-d", `${Math.min(n, 2) * 120}ms`);
       el.classList.add("rv");
     });
     const io = new IntersectionObserver(
