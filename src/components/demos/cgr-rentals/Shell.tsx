@@ -1,18 +1,19 @@
 import Link from "next/link";
-import { CGR_BASE, cgr } from "@/lib/cgr-rentals";
-import { DEMO_DISCLAIMER, KANTOCO_MESSENGER } from "@/lib/demos";
+import { CGR_BASE, CGR_FLAGS, cgr } from "@/lib/cgr-rentals";
+import { KANTOCO_MESSENGER } from "@/lib/demos";
 import { MobileMenu } from "@/components/demos/cgr-rentals/MobileMenu";
 
-type Current = "Catalogue" | "Visit" | "Owner" | "Detail" | "Reserve" | "Confirm";
+type Current = "Catalogue" | "Visit" | "Owner" | "Detail" | "Reserve" | "Confirm" | "Fitting";
 
-/** r7.5 nav (stamp r7.5 copy deck): three text links and one cream outline button. */
+/** r7.11 thin nav (Design r7.11 §1): wordmark, three links, one wine button. */
 const NAV = [
   ["Gowns", `${CGR_BASE}#gowns`, "Catalogue"],
   ["Accessories", `${CGR_BASE}#accessories`, ""],
-  ["Visit", `${CGR_BASE}#visit`, "Visit"],
+  ["Visit", "#visit", "Visit"],
 ] as const;
 
-export const CGR_NAV = [...NAV, ["Owner view", `${CGR_BASE}/owner`, "Owner"]] as const;
+/** The mobile menu also lists the unlisted records page (default: no passcode). */
+export const CGR_NAV = [...NAV, ["Owner view", `${CGR_BASE}${CGR_FLAGS.recordsPath}`, "Owner"]] as const;
 
 const RESERVE_HREF = `${CGR_BASE}#gowns`;
 
@@ -29,15 +30,12 @@ export function CgrShell({
       <p className="cgr-bar">
         <span className="cgr-bar-inner">
           <b>{cgr.badge}</b>
-          <span className="cgr-bar-desk"> · {cgr.barDesk}</span>
-          <span className="cgr-bar-mob"> · {cgr.barMob}</span>
         </span>
       </p>
 
       <header className="cgr-head">
         <Link href={CGR_BASE} className="cgr-wm">
           <span className="cgr-wm-name">Cavite Gown Rentals</span>
-          <span className="cgr-wm-sub">Sample site by KantoCo</span>
         </Link>
         <nav className="cgr-head-nav" aria-label="Site">
           <ul className="cgr-nav">
@@ -53,90 +51,77 @@ export function CgrShell({
               </li>
             ))}
           </ul>
-          <Link href={RESERVE_HREF} className="btn btn-line-cream btn-nav">
+          <Link href={RESERVE_HREF} className="r11-btn r11-wine r11-nav">
             Reserve your gown
           </Link>
         </nav>
         <div className="cgr-head-mob">
           <MobileMenu
-            items={CGR_NAV.map(([label, href, key]) => ({
-              label,
-              href,
-              on: Boolean(key) && current === key,
-            }))}
+            items={[
+              { label: "Reserve your gown", href: RESERVE_HREF, on: false },
+              ...CGR_NAV.map(([label, href, key]) => ({
+                label,
+                href,
+                on: Boolean(key) && current === key,
+              })),
+            ]}
           />
         </div>
       </header>
 
       <main className="cgr-main">{children}</main>
 
-      <footer className="cgr-foot dark tulle-dark" id="visit">
-        <svg className="cgr-foot-cap" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 70 C 380 -10 900 0 1440 90 V90 H0 Z" />
-        </svg>
-        <div className="cgr-foot-grid">
+      <footer className="r11-visit" id="visit" aria-labelledby="cgr-visit-h">
+        <div className="r11-visit-top">
           <div>
-            <p className="cgr-foot-k">Visit (listing address)</p>
-            <p>{cgr.address}</p>
-            <a className="ulink" href={cgr.maps} target="_blank" rel="noopener noreferrer">
+            <p className="r11-script" aria-hidden="true">Visit</p>
+            <h2 id="cgr-visit-h" className="r11-addr">
+              {cgr.address}
+            </h2>
+          </div>
+          <div className="r11-act">
+            <p className="r11-small">Open daily, 9 AM to 8 PM (listing hours)</p>
+            <a className="r11-btn r11-ivory r11-sm" href={cgr.messenger} target="_blank" rel="noopener noreferrer">
+              Message the shop
+            </a>
+            <a className="r11-link" href={cgr.maps} target="_blank" rel="noopener noreferrer">
               Open in maps
             </a>
-            <p className="cgr-foot-k cgr-foot-k-gap">Call or message the shop</p>
-            <ul className="cgr-foot-links">
-              {cgr.phones.map((p) => (
-                <li key={p.tel}>
-                  <a className="ulink" href={p.tel}>
-                    {p.label}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a className="ulink" href={cgr.instagram.href} target="_blank" rel="noopener noreferrer">
-                  Instagram, {cgr.instagram.label}
-                </a>
-              </li>
-              <li>
-                <a className="ulink" href={cgr.tiktok.href} target="_blank" rel="noopener noreferrer">
-                  TikTok, {cgr.tiktok.label}
-                </a>
-              </li>
-              <li>
-                <a className="ulink" href={cgr.facebook} target="_blank" rel="noopener noreferrer">
-                  facebook.com/<wbr />CaviteGownRentals
-                </a>
-              </li>
-            </ul>
           </div>
-          <div>
-            <p className="cgr-foot-k">Fittings (listing hours)</p>
-            <p>
-              {cgr.hours[0].day}, {cgr.hours[0].time}
-            </p>
-            <p className="cgr-foot-dim">{cgr.hoursNote}</p>
-          </div>
-          <div>
-            <p className="cgr-foot-k">Talk to us</p>
-            <p>Want a site like this for your shop?</p>
-            <a className="ulink" href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
-              Message KantoCo
+        </div>
+        <ul className="r11-more">
+          {cgr.phones.map((p) => (
+            <li key={p.tel}>
+              <a href={p.tel}>{p.label}</a>
+            </li>
+          ))}
+          <li>
+            <a href={cgr.instagram.href} target="_blank" rel="noopener noreferrer">
+              Instagram
             </a>
-          </div>
-          <div>
-            <p className="cgr-foot-k">This is a sample</p>
-            <p className="cgr-foot-dim">
-              {DEMO_DISCLAIMER} Gowns, rates and dates are examples.
-            </p>
-            <Link className="ulink" href={`${CGR_BASE}/owner`}>
-              Owner view
-            </Link>
-          </div>
-        </div>
-        <p className="cgr-foot-credit">{cgr.credit}</p>
-        <div className="cgr-foot-big" aria-hidden="true">
-          <span className="cgr-foot-word disp">
-            Cavite Gown <em>Rentals</em>
-          </span>
-        </div>
+          </li>
+          <li>
+            <a href={cgr.tiktok.href} target="_blank" rel="noopener noreferrer">
+              TikTok
+            </a>
+          </li>
+          <li>
+            <a href={cgr.facebook} target="_blank" rel="noopener noreferrer">
+              Facebook
+            </a>
+          </li>
+        </ul>
+        <p className="r11-fine">
+          A KantoCo sample site, not live. Gowns, rates and dates are examples. Photos from the shop&apos;s public
+          pages.{" "}
+          <Link href={`${CGR_BASE}${CGR_FLAGS.recordsPath}`}>Owner view</Link> ·{" "}
+          <a href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
+            Want one for your shop?
+          </a>
+        </p>
+        <p className="r11-bigwm" aria-hidden="true">
+          Cavite Gown Rentals
+        </p>
       </footer>
     </div>
   );

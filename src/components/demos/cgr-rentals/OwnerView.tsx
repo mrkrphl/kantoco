@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useState } from "react";
 import {
   CGR_BASE,
   COMMISSION_PHP,
@@ -12,108 +12,155 @@ import {
   type BookingStatus,
 } from "@/lib/cgr-rentals";
 import { updateBookingStatus, useBookings } from "@/components/demos/cgr-rentals/bookings";
-import { humanDate } from "@/components/demos/cgr-rentals/GownDetail";
-import { COUNTED_STATUSES, ownerCommission } from "@/components/demos/cgr-rentals/reserveMath";
+import {
+  humanDate,
+  isFitting,
+  rangeLabel,
+  recordsCommission,
+  slotLabel,
+  sortRecords,
+} from "@/components/demos/cgr-rentals/reserveMath";
 
-/** Statuses that earn the ₱200 commission. Pending and cancelled are ₱0. */
-const COUNTED = new Set<BookingStatus>(COUNTED_STATUSES);
+export { humanDate };
 
+type Filter = "all" | "reserve" | "fitting";
+
+function when(b: Booking): string {
+  return isFitting(b)
+    ? `${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")}`
+    : rangeLabel(b.eventDate, b.returnDate || b.eventDate);
+}
+
+function StatusSelect({ b }: { b: Booking }) {
+  return (
+    <select
+      aria-label={`Status for ${b.ref}`}
+      value={b.status}
+      onChange={(e) => updateBookingStatus(b.ref, e.target.value as BookingStatus)}
+    >
+      {STATUS_OPTIONS.map((s) => (
+        <option key={s} value={s}>
+          {STATUS_LABEL[s]}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/**
+ * r7.11 booking records (spec §7), the owner view. Unlisted (only the
+ * footer's small "Owner view" link), noindex like the whole demo, and no
+ * passcode (CGR_FLAGS.recordsPath / recordsPasscode). Reservations and
+ * fittings from this browser, soonest first, filter chips, a status
+ * select per row; a table at 1366 and cards at 390. The ₱200 commission
+ * shows here only and counts reservations that are confirmed, out or
+ * returned; fittings never count. No invented sample rows.
+ */
 export function OwnerView() {
   const stored = useBookings();
-  const ready = stored !== null;
-  const list: Booking[] = useMemo(() => stored ?? [], [stored]);
-  const billable = useMemo(() => list.filter((b) => COUNTED.has(b.status)), [list]);
-  const pending = list.filter((b) => b.status === "pending").length;
-  const commission = ownerCommission(
-    list.map((b) => b.status),
-    COMMISSION_PHP,
-  );
+  const [filter, setFilter] = useState<Filter>("all");
+  const all = sortRecords(stored ?? []);
+  const fits = all.filter(isFitting);
+  const resv = all.filter((b) => !isFitting(b));
+  const list = filter === "all" ? all : filter === "fitting" ? fits : resv;
+  const total = recordsCommission(all, COMMISSION_PHP);
+
+  const chips: [Filter, string, number][] = [
+    ["all", "All", all.length],
+    ["reserve", "Reservations", resv.length],
+    ["fitting", "Fittings", fits.length],
+  ];
 
   return (
-    <div className="cgr-ow cream grain">
-      <div className="cgr-ow-in">
-        <div className="cgr-ow-head">
-          <div>
-            <p className="mono">owner view, sample admin</p>
-            <h1 className="cgr-ow-h ext">Reservations.</h1>
-            <p className="cgr-ow-lead">Bookings live in this browser&apos;s storage on this device only.</p>
-          </div>
-          <div className="cgr-ow-stat" aria-label="Commission total">
-            <p className="mono">commission (owner side only)</p>
-            <p className="cgr-ow-num ext" data-commission={commission}>
-              {formatPhp(commission)}
-            </p>
-            <p className="mono">
-              {billable.length} confirmed, out or returned × {formatPhp(COMMISSION_PHP)}. pending ({ready ? pending : 0})
-              and cancelled count {formatPhp(0)}.
-            </p>
-          </div>
-        </div>
+    <section className="r11-rec" aria-labelledby="rec-h">
+      <p className="r11-kick">Owner view · sample</p>
+      <h1 id="rec-h">Bookings</h1>
+      <p className="r11-sub" style={{ marginTop: 0 }}>
+        Reservations and fittings, soonest first. Saved in this browser only.
+      </p>
 
-        {!ready ? (
-          <p className="mono">loading…</p>
-        ) : list.length === 0 ? (
-          <div className="cgr-ow-empty">
-            <p>No reservations yet.</p>
-            <Link className="ulink" href={CGR_BASE}>
-              browse the gowns
-            </Link>
-          </div>
-        ) : (
-          <div className="cgr-table-wrap" role="region" aria-label="Bookings" tabIndex={0}>
-            <table className="cgr-table">
-              <thead>
-                <tr>
-                  <th scope="col">ref</th>
-                  <th scope="col">item</th>
-                  <th scope="col">dates</th>
-                  <th scope="col">customer</th>
-                  <th scope="col">status</th>
-                  <th scope="col">commission</th>
-                </tr>
-              </thead>
-              <tbody>
-                {list.map((b) => (
-                  <tr key={b.ref} data-status={b.status}>
-                    <td data-label="ref">
-                      <code>{b.ref}</code>
-                    </td>
-                    <td data-label="item">
-                      <Link className="ulink" href={`${CGR_BASE}/gown/${b.gownSlug}`}>
-                        {b.gownName}
-                      </Link>
-                    </td>
-                    <td data-label="dates">
-                      {humanDate(b.eventDate)} to {humanDate(b.returnDate)}
-                    </td>
-                    <td data-label="customer">
-                      {b.customerName}
-                      <br />
-                      <span className="cgr-ow-dim">{b.customerContact}</span>
-                    </td>
-                    <td data-label="status">
-                      <select
-                        aria-label={`Status for ${b.ref}`}
-                        value={b.status}
-                        onChange={(e) => updateBookingStatus(b.ref, e.target.value as BookingStatus)}
-                      >
-                        {STATUS_OPTIONS.map((s) => (
-                          <option key={s} value={s}>
-                            {STATUS_LABEL[s]}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td data-label="commission" className="cgr-ow-c">
-                      {formatPhp(COUNTED.has(b.status) ? COMMISSION_PHP : 0)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <div className="r11-chips" role="group" aria-label="Show">
+        {chips.map(([id, label, n]) => (
+          <button key={id} type="button" className="r11-chip" aria-pressed={filter === id} onClick={() => setFilter(id)}>
+            {label} <span className="n">{stored ? n : ""}</span>
+          </button>
+        ))}
       </div>
-    </div>
+
+      {!stored ? (
+        <p className="r11-empty">Loading…</p>
+      ) : list.length === 0 ? (
+        <div className="r11-empty">
+          <p>No bookings yet in this browser.</p>
+          <Link className="r11-link" href={`${CGR_BASE}#rail`}>
+            See the gowns
+          </Link>
+        </div>
+      ) : (
+        <>
+          <table className="r11-table">
+            <thead>
+              <tr>
+                <th scope="col">When</th>
+                <th scope="col">Type</th>
+                <th scope="col">Gown</th>
+                <th scope="col">Client</th>
+                <th scope="col">Ref</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((b) => (
+                <tr key={b.ref} data-ref={b.ref} data-kind={isFitting(b) ? "fitting" : "reserve"}>
+                  <td className="d">{when(b)}</td>
+                  <td>
+                    <span className={isFitting(b) ? "r11-tag fit" : "r11-tag"}>{isFitting(b) ? "Fitting" : "Reserve"}</span>
+                  </td>
+                  <td>
+                    {b.gownName}
+                    {isFitting(b) && b.linkedRef ? <div className="s2">For {b.linkedRef}</div> : null}
+                  </td>
+                  <td>
+                    {b.customerName}
+                    <div className="s2">{b.customerContact}</div>
+                  </td>
+                  <td>
+                    <code>{b.ref}</code>
+                  </td>
+                  <td>
+                    <StatusSelect b={b} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul className="r11-cards">
+            {list.map((b) => (
+              <li key={b.ref} className="r11-card2" data-ref={b.ref}>
+                <div className="top">
+                  <span className={isFitting(b) ? "r11-tag fit" : "r11-tag"}>{isFitting(b) ? "Fitting" : "Reserve"}</span>
+                  <code>{b.ref}</code>
+                </div>
+                <p className="d">{when(b)}</p>
+                <p>
+                  {b.gownName}
+                  {isFitting(b) && b.linkedRef ? ` · for ${b.linkedRef}` : ""}
+                </p>
+                <p className="s2">
+                  {b.customerName} · {b.customerContact}
+                </p>
+                <StatusSelect b={b} />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {stored ? (
+        <p className="r11-note" style={{ marginTop: 24 }} data-commission={total}>
+          {formatPhp(COMMISSION_PHP)} per confirmed, out or returned reservation. Fittings never count. Total {formatPhp(total)}.
+        </p>
+      ) : null}
+    </section>
   );
 }
