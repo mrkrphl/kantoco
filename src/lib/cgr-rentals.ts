@@ -40,6 +40,74 @@ export const cgr = {
   asset: CGR_ASSET,
 } as const;
 
+/**
+ * r7.4: face-free photos from the shop's public Facebook page (crop only, no
+ * edits). Photo-only cards: no listing, rate, size or calendar is invented for
+ * them, so every caption says "ask the shop". Sources: photos/SOURCES.md.
+ */
+export type ShopPhoto = { file: string; label: string; alt: string; w: number; h: number };
+
+export const CGR_PHOTOS = `${CGR_ASSET}/photos`;
+
+export const SHOP_PHOTOS = {
+  ivoryVeil: {
+    file: "cgr-ivory-veil",
+    label: "Ivory gown",
+    alt: "Ivory lace gown with a long sheer veil and train, on a white mannequin holding a bouquet.",
+    w: 633,
+    h: 1200,
+  },
+  ivoryBall: {
+    file: "cgr-ivory-ball",
+    label: "Ivory ball gown",
+    alt: "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt, on a white mannequin with a tiara and bouquet.",
+    w: 738,
+    h: 960,
+  },
+  goldCape: {
+    file: "cgr-gold-cape",
+    label: "Gold gown",
+    alt: "Gold beaded column gown with long sheer cape sleeves, on a white mannequin.",
+    w: 400,
+    h: 960,
+  },
+  filipiniana: {
+    file: "cgr-filipiniana-black",
+    label: "Filipiniana",
+    alt: "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train, on a white mannequin.",
+    w: 590,
+    h: 1200,
+  },
+  barongEmbroidery: {
+    file: "cgr-barong-black-embroidery",
+    label: "Barong",
+    alt: "Cream barong with black geometric embroidery down the front and sleeves, shown from the collar down.",
+    w: 985,
+    h: 1200,
+  },
+  barongWoven: {
+    file: "cgr-barong-woven",
+    label: "Barong",
+    alt: "Cream barong with a woven geometric front panel and striped woven sleeves, shown from the collar down.",
+    w: 1000,
+    h: 969,
+  },
+  suitBlue: {
+    file: "cgr-suit-royal-blue",
+    label: "Suit",
+    alt: "Royal-blue suit jacket with black lapels, silver beaded shoulder embroidery and a blue bow with a brooch, on a dress form.",
+    w: 900,
+    h: 1200,
+  },
+  suitTurquoise: {
+    file: "cgr-suit-turquoise",
+    label: "Suit",
+    alt: "Turquoise three-piece suit with beaded shoulder embroidery and a black bow, on a white mannequin.",
+    w: 750,
+    h: 1000,
+  },
+} satisfies Record<string, ShopPhoto>;
+
 export type GownCategory =
   "debut" | "pageant" | "filipiniana" | "formal" | "accessory";
 

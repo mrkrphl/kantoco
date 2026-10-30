@@ -12,6 +12,13 @@
  * photos are used; racks without photos get dashed empty cards (no invented
  * items, rates or photos).
  *
+ * r7.4: face-free shop photos from the public FB page (photos/SOURCES.md) are
+ * photo-only cards: ivory and gold take the gown strip slots that re-used the
+ * red/blue crops, one filipiniana fills the band (sagala keeps its "no photo
+ * yet" placeholders), and two suits + two barong fill the men's rack. They are
+ * not listings: no rate, size or calendar, every caption says ask the shop.
+ * AVIF with a WebP fallback, fixed card boxes (no CLS), lazy-loaded.
+ *
  * A condensed 64px nav (stamp §3.1) slides in under the sample bar while a
  * rack is on screen. It is fixed and moves by transform only (no layout
  * shift) and is hidden (not focusable) otherwise.
@@ -20,7 +27,17 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CGR_ASSET, CGR_BASE, GOWNS, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import {
+  CGR_ASSET,
+  CGR_BASE,
+  CGR_PHOTOS,
+  DRESSES,
+  GOWNS,
+  SHOP_PHOTOS,
+  formatPhp,
+  type Gown,
+  type ShopPhoto,
+} from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { MobileMenu } from "@/components/demos/cgr-rentals/MobileMenu";
 
@@ -28,15 +45,31 @@ gsap.registerPlugin(ScrollTrigger);
 
 const bySlug = (s: string) => GOWNS.find((g) => g.slug === s) as Gown;
 
-/** Far to near (the last card is the nearest, bleeding off the right). */
-const GOWN_STRIP = [
-  "blue-sash-cotillion",
-  "red-sequin-column",
-  "blue-ruffle-debut",
-  "red-lace-corset",
-  "blue-ball-gown",
-  "red-sequin-evening",
-].map(bySlug);
+type StripItem = { kind: "gown"; g: Gown } | { kind: "photo"; p: ShopPhoto };
+const gown = (s: string): StripItem => ({ kind: "gown", g: bySlug(s) });
+const photo = (p: ShopPhoto): StripItem => ({ kind: "photo", p });
+
+/**
+ * Far to near (the last card is the nearest, bleeding off the right). r7.4:
+ * the shop's ivory and gold photos replace the three strip slots whose
+ * listings only re-used the red/blue crops (those listings stay in the rail),
+ * placed where the static composition shows them (phones see the last 3).
+ */
+const GOWN_STRIP: StripItem[] = [
+  gown("blue-ruffle-debut"),
+  gown("blue-ball-gown"),
+  photo(SHOP_PHOTOS.ivoryBall),
+  photo(SHOP_PHOTOS.goldCape),
+  photo(SHOP_PHOTOS.ivoryVeil),
+  gown("red-sequin-evening"),
+];
+
+const MEN_STRIP: ShopPhoto[] = [
+  SHOP_PHOTOS.suitBlue,
+  SHOP_PHOTOS.barongWoven,
+  SHOP_PHOTOS.suitTurquoise,
+  SHOP_PHOTOS.barongEmbroidery,
+];
 
 const ACC_STRIP = [
   "crystal-bracelet",
@@ -55,15 +88,15 @@ const SN_LINKS = [
 
 const SN_MENU = [...SN_LINKS, ["Owner view", `${CGR_BASE}/owner`]] as const;
 
-const GOWN_COUNT = GOWN_STRIP.length;
+const GOWN_COUNT = DRESSES.length;
 const ACC_COUNT = ACC_STRIP.length;
 
 type Cat = { n: string; name: string; count: string; href: string; on?: boolean; empty?: boolean };
 
 const CATS: Cat[] = [
   { n: "01", name: "Gowns", count: `${GOWN_COUNT} pieces`, href: "#rail", on: true },
-  { n: "02", name: "Filipiniana and sagala", count: "ask the shop", href: "#filipiniana", empty: true },
-  { n: "03", name: "Men's formal", count: "ask the shop", href: "#suits", empty: true },
+  { n: "02", name: "Filipiniana and sagala", count: "ask the shop", href: "#filipiniana" },
+  { n: "03", name: "Men's formal", count: "ask the shop", href: "#suits" },
   { n: "04", name: "Accessories", count: `${ACC_COUNT} pieces`, href: "#accessories" },
 ];
 
@@ -87,6 +120,31 @@ function PhotoCard({ g }: { g: Gown }) {
         {formatPhp(g.pricePerDay)} a day · example
       </span>
     </Link>
+  );
+}
+
+/** r7.4: a shop photo with no listing behind it (no link, rate or calendar). */
+function ShopCard({ p }: { p: ShopPhoto }) {
+  return (
+    <div className="cgr-rk-card is-shop">
+      <span className="cgr-rk-im">
+        <picture>
+          <source srcSet={`${CGR_PHOTOS}/${p.file}.avif`} type="image/avif" />
+          <img
+            src={`${CGR_PHOTOS}/${p.file}.webp`}
+            alt={p.alt}
+            width={p.w}
+            height={p.h}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      </span>
+      <span className="cgr-rk-cap">
+        <b>{p.label}</b>
+        ask the shop for rates
+      </span>
+    </div>
   );
 }
 
@@ -266,9 +324,9 @@ export function Rack() {
           </div>
         </div>
         <Strip label="Gowns">
-          {GOWN_STRIP.map((g) => (
-            <PhotoCard key={g.slug} g={g} />
-          ))}
+          {GOWN_STRIP.map((it) =>
+            it.kind === "gown" ? <PhotoCard key={it.g.slug} g={it.g} /> : <ShopCard key={it.p.file} p={it.p} />,
+          )}
         </Strip>
         <span className="cgr-rk-floor" aria-hidden="true" />
       </section>
@@ -290,10 +348,11 @@ export function Rack() {
             Call or message the shop
           </a>
         </div>
-        <Strip>
-          {["Sagala", "Filipiniana", "Sagala", "Filipiniana"].map((w, i) => (
-            <EmptyCard key={i} word={w} />
-          ))}
+        {/* r7.4: one face-free filipiniana photo; no sagala photo exists, so sagala keeps its placeholders. */}
+        <Strip label="Filipiniana and sagala">
+          <EmptyCard word="Sagala" />
+          <ShopCard p={SHOP_PHOTOS.filipiniana} />
+          <EmptyCard word="Sagala" />
         </Strip>
       </section>
 
@@ -314,9 +373,9 @@ export function Rack() {
             </a>
           </div>
         </div>
-        <Strip>
-          {["Suit", "Barong", "Suit", "Barong"].map((w, i) => (
-            <EmptyCard key={i} word={w} />
+        <Strip label="Suits and barong">
+          {MEN_STRIP.map((p) => (
+            <ShopCard key={p.file} p={p} />
           ))}
         </Strip>
         {/* r7.3.1: the "Other racks" kicker is gone; the label lives on as the nav name. */}
@@ -324,7 +383,7 @@ export function Rack() {
           <a href="#gowns">
             01 Gowns <small>{GOWN_COUNT} pieces</small>
           </a>
-          <a href="#filipiniana" className="is-empty">
+          <a href="#filipiniana">
             02 Filipiniana and sagala <small>ask the shop</small>
           </a>
           <a href="#accessories">

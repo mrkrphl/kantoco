@@ -1326,6 +1326,13 @@ html:has(.cgr) {
   object-position: 50% 18%;
 }
 
+/* r7.4: shop photos sit in <picture> (AVIF, WebP fallback) inside the same fixed box. */
+.cgr-rk-im picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .cgr .cgr-rk-cap {
   display: block;
   padding-top: 9px;
