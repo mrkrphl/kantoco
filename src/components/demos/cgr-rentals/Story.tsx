@@ -13,25 +13,29 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
  * Intro clip (round 4): Mavy, shot on black. 8 s, 720x1280, GOP 6, faststart.
+ * (Used when HERO_ALPHA is off or WebGL is missing.)
  * HERO_CLIP = false falls back to the webp poster (no <video>, no mp4 request):
  * the poster walks in from the side inside the arch and spins.
  * - mode "scrub": the clip follows scroll (one seek in flight, 250 ms
  *   stuck-seek replacement). mode "loop": muted, playsinline autoplay loop.
  * - poster: shown while the clip loads and as the reduced-motion still
  *   (mavy-poster.jpg is the 6.5 s frame, facing front).
- * Reduced motion: a static black hero (arch + word + cards), then the bento.
+ * Reduced motion: the landed hero only (poster in the arch frame), no clip.
  */
 const HERO_CLIP = true;
 
 /**
- * Stacked-alpha hero (round 5, OFF): a future mp4 with colour in the top half
- * and a greyscale luma matte (white = opaque) in the bottom half, drawn to a
- * WebGL canvas and scrubbed with the same seek logic, so GOWNS sits behind
- * her. Needs WebGL; without it (or with this false) the plain clip below is
- * used and no alpha file is requested. Spec: 540x1920 (two 540x960 halves),
- * H.264 High yuv420p, 24 fps, 8 s, GOP 6, no B-frames, faststart, no audio.
+ * Stacked-alpha hero (round 6, ON: Mark approved the cutout). The mp4 carries
+ * colour in the top half (premultiplied on black) and a greyscale matte in
+ * the bottom half (white = opaque); heroAlpha.ts draws it to a transparent
+ * WebGL canvas so GOWNS sits behind her, scrubbed with the same seek logic.
+ * The canvas is sized from the file's real videoWidth x videoHeight / 2
+ * (the repo file is 540x1920, two 540x960 halves; the matte already fades
+ * over its bottom 80px, so no second hem fade is applied here). Without
+ * WebGL, or with this false, the plain clip below is used and no alpha file
+ * is requested.
  */
-const HERO_ALPHA = false;
+const HERO_ALPHA = true;
 export const HERO_ALPHA_SRC = `${CGR_ASSET}/mavy-side-spin-alpha.mp4`;
 
 export const HERO_VIDEO: {
@@ -51,9 +55,9 @@ const WORD = "GOWNS";
 
 /**
  * Intro beats as a share of the intro scroll.
- * black → walk: she walks in; walk → front: she spins while the word, cards
- * and copy arrive; front → shrinkEnd: the arch shrinks into its bento cell
- * and the other cells scale in.
+ * black → walk: she walks in; walk → front: she spins; at front the word
+ * and tagline leave; front → shrinkEnd: the framed arch settles into the
+ * centre column of the landed grid and the ruled cells fade up (two groups).
  */
 type Beats = { black: number; walk: number; contentIn: number; front: number; shrinkEnd: number; clipEnd: number };
 const POSTER_BEATS: Beats = { black: 0.04, walk: 0.24, contentIn: 0.22, front: 0.5, shrinkEnd: 0.8, clipEnd: 0.5 };
@@ -73,14 +77,6 @@ const CLIP_BEATS: Beats = {
   shrinkEnd: at(7.4),
   clipEnd: CLIP_END,
 };
-
-/** Floating cards around the arch during the spin. speed = parallax factor. */
-const FLOATS = [
-  { k: "sequin", speed: 1.5 },
-  { k: "tiara", speed: 0.7 },
-  { k: "price", speed: 1.1 },
-  { k: "rent", speed: 1.9 },
-] as const;
 
 const noopSubscribe = () => () => {};
 
@@ -154,44 +150,55 @@ export function Story() {
       const root = rootRef.current;
       if (!root || !ready || reduced) return;
       const q = gsap.utils.selector(root);
-      const stage = q(".cgr-intro-stage")[0] as HTMLElement;
       const arch = q(".cgr-intro-arch")[0] as HTMLElement;
       const frame = q(".cgr-intro-frame")[0] as HTMLElement;
       const media = q(".cgr-intro-media")[0] as HTMLElement;
-      const cell = q(".cgr-bento-arch")[0] as HTMLElement;
+      const box = q(".cgr-bento-archbox")[0] as HTMLElement;
       const word = q(".cgr-intro-word")[0] as HTMLElement;
-      const floats = q(".cgr-float") as HTMLElement[];
-      const col = q(".cgr-intro-col")[0] as HTMLElement | undefined;
-      const cue = q(".cgr-intro-cue")[0] as HTMLElement;
-      const overIn = q(".cgr-intro-over > *") as HTMLElement[];
-      const pill = q(".cgr-intro-renderwrap")[0] as HTMLElement | undefined;
-      const cells = q(".cgr-bento-cell:not(.cgr-bento-arch)") as HTMLElement[];
-      const copy = q(".cgr-bento-copy > *") as HTMLElement[];
+      const wordIn = q(".cgr-intro-word-in")[0] as HTMLElement;
+      const over = q(".cgr-intro-over, .cgr-intro-cta") as HTMLElement[];
+      const overItems = q(".cgr-intro-over > *, .cgr-intro-cta > *") as HTMLElement[];
+      const hair = q(".cgr-intro-hair")[0] as HTMLElement | undefined;
+      const groupA = q(".cgr-bento-copy") as HTMLElement[];
+      const groupB = q(".cgr-bento-cap, .cgr-bento-side") as HTMLElement[];
 
-      // Arch -> bento cell. Uniform scale + inset clip so the media never
-      // stretches; the arch radius eases into the cell's corner radius.
-      const geo = { tx: 0, ty: 0, s: 1, ix: 0, iy: 0, aw: 1 };
+      // Load (time-based, not scroll): GOWNS unmasks top to bottom, then the
+      // tagline block fades up and its hairline draws.
+      const intro = gsap.timeline({ delay: 0.2 });
+      intro.fromTo(
+        wordIn,
+        { autoAlpha: 0, clipPath: "inset(0% 0% 100% 0%)" },
+        { autoAlpha: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "power2.out" },
+        0,
+      );
+      intro.fromTo(
+        overItems,
+        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: (i: number) => Math.min(i, 2) * 0.12 },
+        0.6,
+      );
+      if (hair) {
+        intro.fromTo(hair, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 0.75);
+      }
+
+      // Arch -> centre column. The landing box has the arch's aspect, so the
+      // move is one uniform scale + translate on the frame (transform only;
+      // the arch radius and hairline frame are kept).
+      const geo = { tx: 0, ty: 0, s: 1 };
       const shrink = { k: 0 };
       const measure = () => {
         const a = arch.getBoundingClientRect();
-        const c = cell.getBoundingClientRect();
+        const c = box.getBoundingClientRect();
         if (!a.width || !c.width) return;
-        const s = Math.max(c.width / a.width, c.height / a.height);
-        geo.s = s;
-        geo.aw = a.width;
-        geo.ix = Math.max(0, (a.width - c.width / s) / 2);
-        geo.iy = Math.max(0, (a.height - c.height / s) / 2);
+        geo.s = Math.min(c.width / a.width, c.height / a.height);
         geo.tx = c.left + c.width / 2 - (a.left + a.width / 2);
         geo.ty = c.top + c.height / 2 - (a.top + a.height / 2);
       };
       const paint = () => {
         const k = shrink.k;
         const sc = 1 + (geo.s - 1) * k;
-        const rTop = geo.aw / 2 + (20 / geo.s - geo.aw / 2) * k;
-        const rBot = 22 + (20 / geo.s - 22) * k;
         frame.style.transform =
-          k > 0.0005 ? `translate3d(${geo.tx * k}px, ${geo.ty * k}px, 0) scale(${sc})` : "";
-        frame.style.clipPath = `inset(${geo.iy * k}px ${geo.ix * k}px round ${rTop}px ${rTop}px ${rBot}px ${rBot}px)`;
+          k > 0.0005 ? `translate3d(${(geo.tx * k).toFixed(2)}px, ${(geo.ty * k).toFixed(2)}px, 0) scale(${sc.toFixed(4)})` : "";
       };
       const onRefreshInit = () => {
         frame.style.transform = "";
@@ -205,158 +212,40 @@ export function Story() {
       ScrollTrigger.addEventListener("refreshInit", onRefreshInit);
       ScrollTrigger.addEventListener("refresh", onRefresh);
 
-      gsap.set(cells, { autoAlpha: 0, scale: 0.84 });
-      gsap.set(copy, { autoAlpha: 0, y: 26 });
+      gsap.set([...groupA, ...groupB], { autoAlpha: 0, y: 16 });
+      gsap.set(media, { autoAlpha: 1 });
 
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger: root,
-          start: "top top+=36",
+          start: "top top+=30",
           end: "bottom bottom",
           scrub: 0.5,
           invalidateOnRefresh: true,
         },
       });
       const B = useVideo ? CLIP_BEATS : POSTER_BEATS;
-      const win = B.front - B.contentIn;
       const span = B.shrinkEnd - B.front;
-      // Start all black: nothing but a small scroll cue.
-      gsap.set([word, ...floats, ...overIn], { autoAlpha: 0 });
-      gsap.set(media, { autoAlpha: 1 });
       if (!useVideo) {
-        // Poster only: she walks in from the side inside the arch, then spins.
+        // Poster only: she walks in from the side inside the arch.
         tl.fromTo(
           media,
           { xPercent: -125, x: 0 },
-          { xPercent: 0, x: 0, duration: B.walk - B.black, ease: "power1.out" },
+          { xPercent: 0, x: 0, duration: B.walk - B.black, ease: "power2.out" },
           B.black,
         );
-        tl.to(
-          media,
-          { keyframes: { y: [0, -10, 0, -10, 0, -8, 0] }, duration: B.walk - B.black, ease: "none" },
-          B.black,
-        );
-        if (col) {
-          tl.fromTo(
-            col,
-            { rotationY: 0, transformPerspective: 900 },
-            { rotationY: 360, duration: B.front - B.walk - 0.04, ease: "power1.inOut" },
-            B.walk,
-          );
-        }
       }
       // (The clip carries its own walk and spin; only the content moves.)
-      tl.to(cue, { autoAlpha: 0, duration: 0.05 }, B.black);
-      // Content arrives around her while she turns, complete when she faces front.
-      // The word grows into place from slightly smaller, so it never overflows
-      // the stage mid-tween (r4 entered at 1.25x and got cropped at both edges).
-      tl.fromTo(
-        word,
-        { autoAlpha: 0, scale: 0.92 },
-        { autoAlpha: 1, scale: 1, duration: 0.7 * win, ease: "power2.out" },
-        B.contentIn,
-      );
-      floats.forEach((f, i) => {
-        const sp = FLOATS[i]?.speed ?? 1;
-        tl.fromTo(
-          f,
-          { yPercent: 90 * sp },
-          { yPercent: -60 * sp, rotation: (i % 2 ? 1 : -1) * 6 * sp, duration: win + 0.5 * span },
-          B.contentIn,
-        );
-        tl.fromTo(f, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 * win }, B.contentIn + 0.1 * win + i * 0.14 * win);
-      });
-      tl.fromTo(
-        overIn,
-        { autoAlpha: 0, y: 24 },
-        { autoAlpha: 1, y: 0, duration: 0.28 * win, stagger: 0.1 * win, ease: "power2.out" },
-        B.front - 0.5 * win,
-      );
-      tl.to(overIn, { autoAlpha: 0, duration: 0.2 * span }, B.front + 0.07 * span);
-      // Facing front -> the arch shrinks into its bento cell.
-      tl.to(shrink, { k: 1, duration: span, ease: "power2.inOut", onUpdate: paint }, B.front);
-      tl.to(word, { autoAlpha: 0, scale: 0.9, duration: 0.6 * span }, B.front);
-      if (pill) tl.to(pill, { autoAlpha: 0, duration: 0.3 * span }, B.front);
-      tl.to(
-        floats,
-        { autoAlpha: 0, scale: 0.6, duration: 0.47 * span, stagger: 0.07 * span, ease: "power1.in" },
-        B.front + 0.07 * span,
-      );
-      // The other bento cells scale in around it.
-      tl.to(
-        cells,
-        { autoAlpha: 1, scale: 1, duration: 0.47 * span, stagger: 0.12 * span, ease: "back.out(1.6)" },
-        B.front + 0.53 * span,
-      );
-      tl.to(
-        copy,
-        { autoAlpha: 1, y: 0, duration: 0.33 * span, stagger: 0.07 * span, ease: "power2.out" },
-        B.front + 0.67 * span,
-      );
+      // At the front beat GOWNS and the tagline fade out (~600ms of scroll).
+      tl.fromTo(word, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3 * span, ease: "power3.inOut" }, B.front - 0.15 * span);
+      tl.fromTo(over, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25 * span, ease: "power3.inOut" }, B.front - 0.15 * span);
+      // The framed arch settles into the landed grid.
+      tl.to(shrink, { k: 1, duration: span, ease: "power3.inOut", onUpdate: paint }, B.front);
+      // Landed cells: fade + y 16 -> 0, two groups (0 / 180ms feel).
+      tl.to(groupA, { autoAlpha: 1, y: 0, duration: 0.45 * span, ease: "power3.out" }, B.front + 0.45 * span);
+      tl.to(groupB, { autoAlpha: 1, y: 0, duration: 0.45 * span, ease: "power3.out" }, B.front + 0.6 * span);
       tl.to({}, { duration: 0.08 }, 0.92);
-
-      // Floats: pointer repels them and they spring back (fine pointers);
-      // tap/click pops one (works on touch too).
-      const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-      const bodies = floats.map(() => ({ x: 0, y: 0, vx: 0, vy: 0 }));
-      let mx = -1e4;
-      let my = -1e4;
-      let popRaf = 0;
-      const step = () => {
-        popRaf = 0;
-        let moving = false;
-        // Read every rect first, then write: one layout per frame, no thrash.
-        const rects = floats.map((p) => p.getBoundingClientRect());
-        floats.forEach((p, i) => {
-          const b = bodies[i];
-          const r = rects[i];
-          const dx = r.left + r.width / 2 - mx;
-          const dy = r.top + r.height / 2 - my;
-          const d = Math.hypot(dx, dy) || 1;
-          let fx = -b.x * 0.09;
-          let fy = -b.y * 0.09;
-          if (d < 150) {
-            const f = ((150 - d) / 150) * 4;
-            fx += (dx / d) * f;
-            fy += (dy / d) * f;
-          }
-          b.vx = (b.vx + fx) * 0.8;
-          b.vy = (b.vy + fy) * 0.8;
-          b.x += b.vx;
-          b.y += b.vy;
-          p.style.translate = `${b.x.toFixed(1)}px ${b.y.toFixed(1)}px`;
-          if (Math.abs(b.vx) + Math.abs(b.vy) + Math.abs(b.x) + Math.abs(b.y) > 0.3) moving = true;
-        });
-        if (moving) popRaf = requestAnimationFrame(step);
-      };
-      const kick = () => {
-        if (!popRaf) popRaf = requestAnimationFrame(step);
-      };
-      const onMove = (e: PointerEvent) => {
-        mx = e.clientX;
-        my = e.clientY;
-        kick();
-      };
-      const onLeave = () => {
-        mx = -1e4;
-        my = -1e4;
-        kick();
-      };
-      const onPop = (e: Event) => {
-        const el = (e.currentTarget as HTMLElement).firstElementChild as HTMLElement | null;
-        if (!el) return;
-        gsap.fromTo(
-          el,
-          { scale: 1.3, rotate: gsap.utils.random(-12, 12) },
-          { scale: 1, rotate: 0, duration: 0.6, ease: "elastic.out(1.1, 0.35)", overwrite: true },
-        );
-      };
-      if (fine) {
-        stage.addEventListener("pointermove", onMove);
-        stage.addEventListener("pointerleave", onLeave);
-      }
-      floats.forEach((p) => p.addEventListener("pointerdown", onPop));
 
       // Clip scrub: the whole clip maps to 0..clipEnd of the intro scroll.
       // Same seek pacing as r3: rAF-throttled, one seek in flight, 250 ms stuck-seek replacement.
@@ -385,7 +274,7 @@ export function Story() {
         void video.play().then(() => video.pause()).catch(() => {});
         const st = ScrollTrigger.create({
           trigger: root,
-          start: "top top+=36",
+          start: "top top+=30",
           end: "bottom bottom",
           onUpdate: (self) => {
             target = Math.min(1, self.progress / CLIP_BEATS.clipEnd);
@@ -402,255 +291,268 @@ export function Story() {
 
       return () => {
         cleanupVideo();
+        intro.kill();
         ScrollTrigger.removeEventListener("refresh", onRefresh);
         ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
-        stage.removeEventListener("pointermove", onMove);
-        stage.removeEventListener("pointerleave", onLeave);
-        floats.forEach((p) => p.removeEventListener("pointerdown", onPop));
-        if (popRaf) cancelAnimationFrame(popRaf);
         frame.style.transform = "";
-        frame.style.clipPath = "";
       };
     },
     { scope: rootRef, dependencies: [ready, reduced, mode, useVideo, onClient, alpha] },
   );
 
   const hours = cgr.hours[0];
+
+  return (
+    <>
+      <section
+        ref={rootRef}
+        className="cgr-intro"
+        aria-labelledby="cgr-hero-title"
+        data-motion={reduced ? "static" : "on"}
+        data-media={useVideo ? "video" : "poster"}
+        data-clip={HERO_CLIP ? "on" : "off"}
+        data-alpha={alpha ? "on" : "off"}
+      >
+        <div className="cgr-intro-stage">
+          <p className="cgr-intro-word" aria-hidden="true">
+            <span className="cgr-intro-word-in">{WORD}</span>
+          </p>
+
+          {/* Landed hero: three ruled columns. The arch lands in .cgr-bento-archbox. */}
+          <div className="cgr-bento">
+            <div className="cgr-bento-cell cgr-bento-copy">
+              <p className="cgr-micro cgr-overline">Cavite Gown Rentals · A KantoCo sample</p>
+              <h1 className="cgr-intro-title" id="cgr-hero-title">
+                Rent the look. <em>Hold the date.</em>
+              </h1>
+              <p className="cgr-intro-lead">
+                Debut, pageant and formal gowns with tiaras to match. Pick a gown, check your date and
+                hold it with a reference code.
+              </p>
+              <p className="cgr-price">
+                from {formatPhp(2200)} a day <span className="cgr-micro">Example rate</span>
+              </p>
+              <div className="cgr-actions">
+                <a className="cgr-btn" href="#gowns">
+                  Browse gowns
+                </a>
+                <a className="cgr-link" href="#holds">
+                  How holds work
+                </a>
+              </div>
+              <Facts className="cgr-facts cgr-facts--stage" hours={`${hours.day} · ${hours.time}`} />
+            </div>
+
+            <div className="cgr-bento-cell cgr-bento-arch">
+              <div className="cgr-bento-archbox">
+                {reduced && HERO_CLIP ? (
+                  <span className="cgr-arch-still">
+                    <img
+                      className="cgr-intro-still"
+                      src={HERO_VIDEO.poster}
+                      alt="Mavy faces front in a deep red sequin gown with a sheer red veil."
+                      width={720}
+                      height={1280}
+                      fetchPriority="high"
+                      decoding="async"
+                    />
+                  </span>
+                ) : null}
+              </div>
+              <p className="cgr-bento-cap cgr-micro" aria-hidden="true">
+                <span>Intro clip, last frame</span>
+                <span>Sample render</span>
+              </p>
+            </div>
+
+            <div className="cgr-bento-cell cgr-bento-side">
+              <LandedSide />
+            </div>
+          </div>
+
+          <div className="cgr-intro-arch" aria-hidden={reduced || undefined}>
+            <div className="cgr-intro-frame">
+              <div className="cgr-intro-media" data-fit={HERO_VIDEO.fit}>
+                {reduced ? null : useVideo && clipSrc ? (
+                  <>
+                    <video
+                      ref={videoRef}
+                      key={alpha ? "alpha" : "clip"}
+                      className={alpha ? "cgr-intro-alphasrc" : "cgr-intro-video"}
+                      poster={alpha ? undefined : HERO_VIDEO.poster}
+                      muted
+                      playsInline
+                      preload="auto"
+                      aria-hidden={alpha ? true : undefined}
+                      aria-label={
+                        alpha
+                          ? undefined
+                          : "Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
+                      }
+                    >
+                      {onClient ? <source src={clipSrc} type="video/mp4" /> : null}
+                    </video>
+                    {alpha ? (
+                      <canvas
+                        ref={canvasRef}
+                        className="cgr-intro-canvas"
+                        role="img"
+                        aria-label="Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
+                      />
+                    ) : null}
+                  </>
+                ) : (
+                  <img
+                    className="cgr-intro-still"
+                    src={HERO_VIDEO.poster}
+                    alt="Deep red sequin gown, sample render."
+                    width={720}
+                    height={1280}
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="cgr-intro-over">
+            <p className="cgr-micro cgr-intro-render" data-ready={hasFrames ? "on" : "off"}>
+              The intro clip · Sample render
+            </p>
+            <p className="cgr-intro-tag" aria-hidden="true">
+              Rent the look. <em>Hold the date.</em>
+            </p>
+            <span className="cgr-intro-hair" aria-hidden="true" />
+            <p className="cgr-micro cgr-intro-place">Example gowns · Dasmariñas, Cavite</p>
+          </div>
+
+          <div className="cgr-intro-cta">
+            <a className="cgr-link" href="#gowns">
+              Browse gowns
+            </a>
+            <p className="cgr-intro-cue cgr-micro" aria-hidden="true">
+              Scroll
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Phone: the rest of the landed hero follows the sticky stage. */}
+      <section className="cgr-wrap cgr-landed-more" aria-label="At a glance">
+        <Facts className="cgr-facts" hours={`${hours.day} · ${hours.time}`} />
+        <LandedSide />
+      </section>
+    </>
+  );
+}
+
+function Facts({ className, hours }: { className: string; hours: string }) {
+  return (
+    <dl className={className}>
+      <div>
+        <dt className="cgr-micro">Hours</dt>
+        <dd>{hours}</dd>
+      </div>
+      <div>
+        <dt className="cgr-micro">Where</dt>
+        <dd>Salawag, Dasmariñas</dd>
+      </div>
+      <div>
+        <dt className="cgr-micro">Holds</dt>
+        <dd>Pick a date, get a CGR code</dd>
+      </div>
+    </dl>
+  );
+}
+
+const STRIP = [
+  { d: "Thu", n: 12, booked: true },
+  { d: "Fri", n: 13, booked: false },
+  { d: "Sat", n: 14, booked: false },
+  { d: "Sun", n: 15, booked: false },
+  { d: "Mon", n: 16, booked: false },
+];
+
+function LandedSide() {
   const red = getGown("red-sequin-evening");
   const topA = getGown("blue-ball-gown");
   const topB = getGown("red-lace-corset");
   const tiara = getGown("ruby-pageant-crown");
-  const strip = [
-    { d: "Thu", n: 12, booked: true },
-    { d: "Fri", n: 13, booked: false },
-    { d: "Sat", n: 14, booked: false },
-    { d: "Sun", n: 15, booked: false },
-    { d: "Mon", n: 16, booked: false },
-  ];
-
   return (
-    <section
-      ref={rootRef}
-      className="cgr-intro"
-      aria-labelledby="cgr-hero-title"
-      data-motion={reduced ? "static" : "on"}
-      data-media={useVideo ? "video" : "poster"}
-      data-clip={HERO_CLIP ? "on" : "off"}
-      data-alpha={alpha ? "on" : "off"}
-    >
-      <div className="cgr-intro-stage">
-        <p className="cgr-intro-word" aria-hidden="true">
-          {WORD}
+    <div className="cgr-side">
+      <div className="cgr-side-row">
+        <p className="cgr-micro cgr-side-h">
+          Most held this month <span>Example</span>
         </p>
-
-        {/* Bento end state. The arch lands in .cgr-bento-arch. */}
-        <div className="cgr-bento">
-          <div className="cgr-bento-cell cgr-bento-copy">
-            <p className="cgr-intro-kicker">
-              <span>Cavite Gown Rentals</span> · sample
-            </p>
-            <h1 className="cgr-intro-title" id="cgr-hero-title">
-              Rent the look. Hold the date.
-            </h1>
-            <p className="cgr-intro-lead">{cgr.tagline}</p>
-            <div className="cgr-intro-actions">
-              <a className="cgr-btn cgr-btn-gold" href="#gowns">
-                Browse gowns
-              </a>
-              <a className="cgr-btn cgr-btn-onDark" href="#accessories">
-                Accessories
-              </a>
-            </div>
-            <dl className="cgr-intro-facts">
-              <div>
-                <dt>Hours</dt>
-                <dd>
-                  {hours.day} · {hours.time}
-                </dd>
-              </div>
-              <div>
-                <dt>Where</dt>
-                <dd>Salawag, Dasmariñas</dd>
-              </div>
-              <div>
-                <dt>Holds</dt>
-                <dd>Pick a date, get a CGR code</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="cgr-bento-cell cgr-bento-arch" aria-hidden="true" />
-
-          <div className="cgr-bento-cell cgr-bento-gowns">
-            <p className="cgr-bento-h">Top gowns</p>
-            <div className="cgr-bento-pair">
-              {[topA, topB].map((g) =>
-                g ? (
-                  <Link key={g.slug} href={`${CGR_BASE}/gown/${g.slug}`} className="cgr-bento-thumb" data-cursor="rent">
-                    <span className="cgr-bento-thumb-img">
-                      <img
-                        src={`${CGR_ASSET}/${g.images[0].file}.webp`}
-                        alt=""
-                        width={g.images[0].w}
-                        height={g.images[0].h}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </span>
-                    <span className="cgr-bento-thumb-t">{g.name}</span>
-                    <span className="cgr-bento-thumb-p">{formatPhp(g.pricePerDay)}/day</span>
-                  </Link>
-                ) : null,
-              )}
-            </div>
-          </div>
-
-          <div className="cgr-bento-cell cgr-bento-date">
-            <p className="cgr-bento-h">Check a date</p>
-            <ol className="cgr-bento-strip" aria-label="Sample dates for the red sequin gown, November">
-              {strip.map((s) => (
-                <li key={s.n} className={s.booked ? "is-booked" : undefined}>
-                  <span>{s.d}</span>
-                  <b>{s.n}</b>
-                  <span className="cgr-sr">{s.booked ? "booked" : "open"}</span>
-                </li>
-              ))}
-            </ol>
-            {red ? (
-              <Link className="cgr-bento-link" href={`${CGR_BASE}/gown/${red.slug}`}>
-                See open dates →
-              </Link>
-            ) : null}
-          </div>
-
-          <div className="cgr-bento-cell cgr-bento-acc">
-            {tiara ? (
-              <span className="cgr-bento-acc-img">
-                <img
-                  src={`${CGR_ASSET}/${tiara.images[0].file}.webp`}
-                  alt=""
-                  width={tiara.images[0].w}
-                  height={tiara.images[0].h}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </span>
-            ) : null}
-            <p className="cgr-bento-h">Accessories</p>
-            <a className="cgr-bento-link" href="#accessories">
-              Tiaras &amp; crowns →
-            </a>
-          </div>
-        </div>
-
-        <div className="cgr-intro-arch">
-          <div className="cgr-intro-frame">
-            <div className="cgr-intro-media" data-fit={HERO_VIDEO.fit}>
-              {useVideo && clipSrc ? (
-                <>
-                  <video
-                    ref={videoRef}
-                    key={alpha ? "alpha" : "clip"}
-                    className={alpha ? "cgr-intro-alphasrc" : "cgr-intro-video"}
-                    poster={alpha ? undefined : HERO_VIDEO.poster}
-                    muted
-                    playsInline
-                    preload="auto"
-                    aria-hidden={alpha ? true : undefined}
-                    aria-label={
-                      alpha
-                        ? undefined
-                        : "Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
-                    }
-                  >
-                    {onClient ? <source src={clipSrc} type="video/mp4" /> : null}
-                  </video>
-                  {alpha ? (
-                    <canvas
-                      ref={canvasRef}
-                      className="cgr-intro-canvas"
-                      role="img"
-                      aria-label="Sample render: Mavy walks in from the left in a red sequin gown, turns once and faces front."
-                    />
-                  ) : null}
-                </>
-              ) : HERO_CLIP ? (
-                <img
-                  className="cgr-intro-still"
-                  src={HERO_VIDEO.poster}
-                  alt="Mavy faces front in a deep red sequin gown with a sheer red veil."
-                  width={720}
-                  height={1280}
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              ) : (
-                <>
-                  <img
-                    className="cgr-intro-back"
-                    src={HERO_VIDEO.poster}
-                    alt=""
-                    width={1024}
-                    height={2048}
-                    decoding="async"
-                    aria-hidden="true"
-                  />
-                  <div className="cgr-intro-col">
+        <div className="cgr-side-pair">
+          {[topA, topB].map((g, i) =>
+            g ? (
+              <Link key={g.slug} href={`${CGR_BASE}/gown/${g.slug}`} className="cgr-side-thumb" data-cursor="link">
+                <span className="ff">
+                  <span className="ff-img">
                     <img
-                      src={HERO_VIDEO.poster}
-                      alt="Deep red sequin evening gown, close on the beaded bodice and sequin skirt."
-                      width={1024}
-                      height={2048}
-                      fetchPriority="high"
+                      src={`${CGR_ASSET}/${g.images[0].file}.webp`}
+                      alt=""
+                      width={g.images[0].w}
+                      height={g.images[0].h}
+                      loading="lazy"
                       decoding="async"
                     />
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="cgr-intro-shade" aria-hidden="true" />
-          </div>
-
-          <div className="cgr-floats" aria-hidden="true">
-            <span className="cgr-float cgr-float-sequin">
-              <span className="cgr-float-in">
-                <img src={`${CGR_ASSET}/gown-red-skirt.webp`} alt="" width={300} height={910} decoding="async" />
-              </span>
-            </span>
-            <span className="cgr-float cgr-float-tiara">
-              <span className="cgr-float-in">
-                <img src={`${CGR_ASSET}/accessory-tiara-rose.webp`} alt="" width={248} height={230} decoding="async" />
-              </span>
-            </span>
-            <span className="cgr-float cgr-float-price">
-              <span className="cgr-float-in">
-                <small>from</small> ₱2,200<small>/day</small>
-              </span>
-            </span>
-            <span className="cgr-float cgr-float-rent">
-              <span className="cgr-float-in">Rent now ↗</span>
-            </span>
-          </div>
+                  </span>
+                </span>
+                <span className="cgr-micro">No. {String(i + 1).padStart(2, "0")}</span>
+                <span className="cgr-side-name">{g.name}</span>
+                <span className="cgr-price">{formatPhp(g.pricePerDay)} a day</span>
+              </Link>
+            ) : null,
+          )}
         </div>
+      </div>
 
-        {/* Bottom-left corner of the stage: never over the word or her head. */}
-        <div className="cgr-intro-renderwrap">
-          {useVideo && hasFrames ? <p className="cgr-intro-render">Sample render</p> : null}
-        </div>
-
-        <p className="cgr-intro-cue" aria-hidden="true">
-          Scroll
+      <div className="cgr-side-row">
+        <p className="cgr-micro cgr-side-h">
+          Next open dates <span>Example</span>
         </p>
+        <ol className="cgr-strip" aria-label="Example dates for the red sequin gown, November">
+          {STRIP.map((s) => (
+            <li key={s.n} className={s.booked ? "is-booked" : s.n === 13 ? "is-pick" : undefined}>
+              <span className="cgr-micro">{s.d}</span>
+              <b>{s.n}</b>
+              <span className="cgr-sr">{s.booked ? "held" : "open"}</span>
+            </li>
+          ))}
+        </ol>
+        {red ? (
+          <Link className="cgr-link" href={`${CGR_BASE}/gown/${red.slug}`}>
+            See open dates
+          </Link>
+        ) : null}
+      </div>
 
-        <div className="cgr-intro-over">
-          <p className="cgr-intro-tag" aria-hidden="true">
-            Rent the look. <em>Hold the date.</em>
-          </p>
-          <a className="cgr-btn cgr-btn-gold" href="#gowns">
-            Browse gowns
+      <div className="cgr-side-row cgr-side-acc">
+        {tiara ? (
+          <span className="ff ff-sq">
+            <span className="ff-img">
+              <img
+                src={`${CGR_ASSET}/${tiara.images[0].file}.webp`}
+                alt=""
+                width={tiara.images[0].w}
+                height={tiara.images[0].h}
+                loading="lazy"
+                decoding="async"
+              />
+            </span>
+          </span>
+        ) : null}
+        <div>
+          <p className="cgr-micro cgr-side-h">Accessories</p>
+          <p className="cgr-side-name">Tiaras, crowns and crystals</p>
+          <a className="cgr-link" href="#accessories">
+            See accessories
           </a>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
