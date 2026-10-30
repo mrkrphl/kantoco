@@ -419,11 +419,11 @@ export function GownDetail({ gown }: { gown: Gown }) {
 
       <div className="cgr-dt-bar dark">
         {holdHref ? (
-          <Link className="btn btn-hot" href={holdHref}>
+          <Link className="btn btn-wine" href={holdHref}>
             Hold for {ctaLabel}
           </Link>
         ) : (
-          <span className="btn btn-hot is-disabled" aria-disabled="true">
+          <span className="btn btn-wine is-disabled" aria-disabled="true">
             Pick a date
           </span>
         )}

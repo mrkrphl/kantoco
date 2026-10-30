@@ -176,7 +176,7 @@ export function ReserveForm({ gown, initialDate }: { gown: Gown; initialDate: st
               </p>
             ) : null}
             <div className="cgr-bk-actions">
-              <button type="submit" className="btn btn-hot" disabled={!canSave}>
+              <button type="submit" className="btn btn-wine" disabled={!canSave}>
                 Save hold request
               </button>
               <Link className="ulink" href={`${CGR_BASE}/gown/${gown.slug}`}>

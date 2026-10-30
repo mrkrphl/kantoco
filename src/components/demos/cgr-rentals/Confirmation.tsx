@@ -75,7 +75,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
               ) : null}
             </dl>
             <div className="cgr-bk-actions">
-              <Link className="btn btn-hot" href={`${CGR_BASE}/owner`}>
+              <Link className="btn btn-wine" href={`${CGR_BASE}/owner`}>
                 Open owner view
               </Link>
               <Link className="ulink" href={CGR_BASE}>
