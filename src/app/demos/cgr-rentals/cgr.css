@@ -3311,3 +3311,109 @@ tr[data-status="cancelled"] .cgr-ow-c {
   visibility: hidden;
   animation: cgr-fontgate 0s linear 3s forwards;
 }
+
+/* ---- r7.6.4 reviews (Testimonials.tsx): Cormorant pull-quotes, Figtree
+   attribution, no avatars or star images. Hidden when the list is empty. */
+.cgr-tm {
+  background: var(--ivory);
+  color: var(--wine-ink);
+  padding: clamp(64px, 9vw, 128px) var(--gut);
+}
+.cgr-tm-in {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+.cgr-tm-head {
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+.cgr .cgr-tm-kick {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin: 0 0 12px;
+}
+.cgr .cgr-tm-h {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--t-h2);
+  line-height: 0.95;
+  margin: 0;
+}
+.cgr .cgr-tm-h em {
+  font-style: italic;
+  font-weight: 400;
+}
+.cgr-tm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 3.4vw, 48px) clamp(28px, 4vw, 64px);
+}
+.cgr-tm-card[hidden] {
+  display: none;
+}
+.cgr-tm-card figure {
+  margin: 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+.cgr-tm-mark {
+  position: absolute;
+  top: 2px;
+  left: -4px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--wine);
+  opacity: 0.22;
+}
+.cgr .cgr-tm-q {
+  margin: 0;
+}
+.cgr .cgr-tm-q p {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.6rem);
+  line-height: 1.32;
+  margin: 0 0 16px;
+  padding-left: 30px;
+  overflow-wrap: anywhere;
+}
+.cgr .cgr-tm-by {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mute);
+  padding-left: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+}
+.cgr .cgr-tm-by b {
+  font-weight: 500;
+  color: var(--wine-ink);
+}
+.cgr .cgr-tm-by > * + *::before {
+  content: "·";
+  margin: 0 8px;
+  color: var(--cream-3);
+}
+.cgr-tm-foot {
+  margin-top: clamp(32px, 4vw, 56px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+}
+@media (max-width: 760px) {
+  .cgr-tm-list {
+    grid-template-columns: 1fr;
+  }
+}
