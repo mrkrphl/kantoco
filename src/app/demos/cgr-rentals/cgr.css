@@ -398,7 +398,15 @@ html:has(.cgr) {
 .cgr-nav-a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
+  /* 44px-wide hit area for short links ("Visit") without moving the layout:
+     padding grows the box, the matching negative margin cancels it, and the
+     underline stays on the text (content-box origin). */
+  min-width: 44px;
+  padding-inline: 6px;
+  margin-inline: -6px;
+  background-origin: content-box;
   font-weight: 600;
   font-size: 16px;
   text-decoration: none;
