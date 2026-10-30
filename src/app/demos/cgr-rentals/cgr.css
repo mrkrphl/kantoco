@@ -650,7 +650,7 @@ html:has(.cgr) {
 
 /* r7.2 rotator (rotator.md): "for your" is fixed, the noun swaps in a
    one-cell grid so the box is always as wide as the longest noun
-   ("graduation ball"): no layout shift. Hidden nouns are visibility hidden. */
+   (r7.2.1: longest is "formal night"): no layout shift. Hidden nouns are visibility hidden. */
 .cgr-intro-hand {
   position: absolute;
   left: 36.1vw;
@@ -661,9 +661,19 @@ html:has(.cgr) {
   white-space: nowrap;
   transform: rotate(-9deg);
   transform-origin: 0 50%;
-  /* r7.2.1: soft, tight shadow only; no plate behind the script. */
-  text-shadow: 0 1px 6px rgb(0 0 0 / 0.28);
+  /* r7.2.1: cream like the shop's logo (vermilion stays on CTAs and small
+     accents). It crosses the cream GOWNS letters, so a soft dark halo, not a
+     plate, keeps it legible there. */
+  text-shadow:
+    0 0 1px rgb(0 0 0 / 0.95),
+    0 0 2px rgb(0 0 0 / 0.9),
+    0 0 5px rgb(0 0 0 / 0.7),
+    0 1px 14px rgb(0 0 0 / 0.5);
   pointer-events: none;
+}
+
+.cgr .cgr-intro-hand {
+  color: var(--cream);
 }
 
 .cgr-hand-fix {
@@ -2665,6 +2675,28 @@ tr[data-status="cancelled"] .cgr-ow-c {
   font-size: 17px;
 }
 
+/* r7.2.1: shop contact links (tel, IG, TikTok, FB). Each row is a 44px tap. */
+.cgr .cgr-foot-k-gap {
+  margin-top: 18px;
+}
+
+.cgr-foot-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cgr .cgr-foot-links .ulink {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+.cgr-foot-links li + li {
+  margin-top: 4px;
+}
+
 .cgr .cgr-foot-credit {
   position: relative;
   z-index: 2;
@@ -2704,7 +2736,9 @@ tr[data-status="cancelled"] .cgr-ow-c {
   }
 
   .cgr-foot-grid {
-    grid-template-columns: 1fr 1fr;
+    /* r7.2.1: minmax(0) so the longer contact links wrap instead of
+       widening column 1 and clipping column 2. Same two columns. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px 20px;
   }
 

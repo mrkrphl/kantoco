@@ -84,6 +84,31 @@ export function CgrShell({
             <a className="ulink" href={cgr.maps} target="_blank" rel="noopener noreferrer">
               open in maps
             </a>
+            <p className="mono cgr-foot-k cgr-foot-k-gap">call or message the shop</p>
+            <ul className="cgr-foot-links">
+              {cgr.phones.map((p) => (
+                <li key={p.tel}>
+                  <a className="ulink" href={p.tel}>
+                    {p.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a className="ulink" href={cgr.instagram.href} target="_blank" rel="noopener noreferrer">
+                  instagram, {cgr.instagram.label}
+                </a>
+              </li>
+              <li>
+                <a className="ulink" href={cgr.tiktok.href} target="_blank" rel="noopener noreferrer">
+                  tiktok, {cgr.tiktok.label}
+                </a>
+              </li>
+              <li>
+                <a className="ulink" href={cgr.facebook} target="_blank" rel="noopener noreferrer">
+                  facebook.com/<wbr />CaviteGownRentals
+                </a>
+              </li>
+            </ul>
           </div>
           <div>
             <p className="mono cgr-foot-k">fittings (listing hours)</p>

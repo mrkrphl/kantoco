@@ -40,7 +40,7 @@ const HERO_POSTER = `${CGR_ASSET}/mavy-poster.jpg`;
 
 const WORD = "GOWNS";
 /** Rotator nouns (stamp r7.2/rotator.md §1), in order; it ends back on debut. */
-const NOUNS = ["debut", "pageant", "wedding", "prom", "JS prom", "ball", "photoshoot", "graduation ball"];
+const NOUNS = ["debut", "pageant", "filipiniana", "sagala", "gala night", "wedding", "prom", "formal night"];
 /** Hold, crossfade (s) and blur for each swap (rotator.md §3). */
 const ROT_HOLD = 1.9;
 const ROT_FADE = 0.6;
@@ -447,7 +447,7 @@ export function Story() {
         <div className="cgr-intro-copy">
           <div className="cgr-intro-text">
             <p className="cgr-intro-lead">
-              Debut, pageant and formal gowns for rent in Dasmariñas, Cavite. Every gown shows its open dates
+              Cavite Gown Rentals rents gowns and suits for any formal occasion in Dasmariñas, Cavite. Every gown shows its open dates
               <span className="cgr-intro-lead-more">, and a hold is a request, not a payment</span>.
             </p>
             <p className="mono cgr-intro-rate">
@@ -461,7 +461,7 @@ export function Story() {
           </Magnet>
         </div>
         <p className="sr-only">
-          Gowns for your debut, pageant, wedding, prom, JS prom, ball, photoshoot or graduation ball.
+          Gowns for your debut, pageant, filipiniana, sagala, gala night, wedding, prom or formal night.
         </p>
 
         <p className="cgr-intro-cue mono" aria-hidden="true">

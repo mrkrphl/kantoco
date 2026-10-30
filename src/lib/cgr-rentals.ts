@@ -9,20 +9,27 @@ export const BOOKINGS_KEY = "cgr-rentals-bookings-v1";
 export const cgr = {
   title: "Cavite Gown Rentals · KantoCo sample",
   description:
-    "KantoCo sample for Cavite Gown Rentals: debut, pageant and formal gowns for rent on Jose Abad Santos Ave, Salawag, Dasmariñas, with a booking preview. Not the shop's official site.",
+    "KantoCo sample for Cavite Gown Rentals, which rents gowns and suits for any formal occasion at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, with a booking preview. Not the shop's official site.",
   badge: DEMO_BADGE,
   barDesk:
     "A KantoCo sample for Cavite Gown Rentals. Not the shop's official site. Prices & sizes are sample data.",
   barMob: "KantoCo sample · not live",
   name: "Cavite Gown Rentals",
   shortName: "CGR",
-  eyebrow: "Gown rentals · Dasmariñas, Cavite",
+  eyebrow: "Gown and suit rentals · Dasmariñas, Cavite",
   tagline:
-    "Debut, pageant and formal gowns plus tiaras on Jose Abad Santos Ave, each with its own sample calendar and a reference code for every hold.",
+    "Gowns and suits for any formal occasion, plus tiaras, at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, each gown with its own sample calendar and a reference code for every hold.",
   facebook: "https://www.facebook.com/CaviteGownRentals",
+  /** Public contact links from the shop's Facebook page. Links only; nothing is sent. */
+  phones: [
+    { label: "0977 087 8589", tel: "tel:+639770878589" },
+    { label: "0995 477 1665", tel: "tel:+639954771665" },
+  ],
+  instagram: { label: "cavite_gown_rentals", href: "https://www.instagram.com/cavite_gown_rentals/" },
+  tiktok: { label: "@cavitegownrentals", href: "https://www.tiktok.com/@cavitegownrentals" },
   messenger: "https://m.me/CaviteGownRentals",
-  maps: "https://www.google.com/maps/search/?api=1&query=Cavite+Gown+Rentals+Jose+Abad+Santos+Ave+Salawag+Dasmarinas",
-  address: "071 Lolit Bldg, Jose Abad Santos Ave, Salawag, Dasmariñas, Cavite",
+  maps: "https://www.google.com/maps/search/?api=1&query=Cavite+Gown+Rentals+%2371+Jose+Abad+Santos+Ave+Salawag+Dasmarinas+City+Cavite",
+  address: "#71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite",
   hoursNote:
     "Sample hours from the shop's public listing. Confirm on Facebook before you go.",
   hours: [{ day: "Mon–Sun", time: "9:00 AM – 8:00 PM" }] as const,
