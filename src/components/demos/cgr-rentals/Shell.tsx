@@ -5,7 +5,7 @@ import { MobileMenu } from "@/components/demos/cgr-rentals/MobileMenu";
 
 type Current = "Catalogue" | "Visit" | "Owner" | "Detail" | "Reserve" | "Confirm";
 
-/** Round 7 nav (stamp §4 Nav): three text links and one hot button. */
+/** r7.5 nav (stamp r7.5 copy deck): three text links and one cream outline button. */
 const NAV = [
   ["Gowns", `${CGR_BASE}#gowns`, "Catalogue"],
   ["Accessories", `${CGR_BASE}#accessories`, ""],
@@ -36,8 +36,8 @@ export function CgrShell({
 
       <header className="cgr-head">
         <Link href={CGR_BASE} className="cgr-wm">
-          <span className="cgr-wm-name">cavite gown rentals</span>
-          <span className="cgr-wm-sub mono">sample site by kantoco</span>
+          <span className="cgr-wm-name">Cavite Gown Rentals</span>
+          <span className="cgr-wm-sub">Sample site by KantoCo</span>
         </Link>
         <nav className="cgr-head-nav" aria-label="Site">
           <ul className="cgr-nav">
@@ -53,14 +53,11 @@ export function CgrShell({
               </li>
             ))}
           </ul>
-          <Link href={HOLD_HREF} className="btn btn-nav">
+          <Link href={HOLD_HREF} className="btn btn-line-cream btn-nav">
             Hold a gown
           </Link>
         </nav>
         <div className="cgr-head-mob">
-          <Link href={HOLD_HREF} className="btn btn-nav">
-            Hold
-          </Link>
           <MobileMenu
             items={CGR_NAV.map(([label, href, key]) => ({
               label,
@@ -73,18 +70,18 @@ export function CgrShell({
 
       <main className="cgr-main">{children}</main>
 
-      <footer className="cgr-foot dark grain" id="visit">
+      <footer className="cgr-foot dark tulle-dark" id="visit">
         <svg className="cgr-foot-cap" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0 70 C 380 -10 900 0 1440 90 V90 H0 Z" />
         </svg>
         <div className="cgr-foot-grid">
           <div>
-            <p className="mono cgr-foot-k">visit (listing address)</p>
+            <p className="cgr-foot-k">Visit (listing address)</p>
             <p>{cgr.address}</p>
             <a className="ulink" href={cgr.maps} target="_blank" rel="noopener noreferrer">
-              open in maps
+              Open in maps
             </a>
-            <p className="mono cgr-foot-k cgr-foot-k-gap">call or message the shop</p>
+            <p className="cgr-foot-k cgr-foot-k-gap">Call or message the shop</p>
             <ul className="cgr-foot-links">
               {cgr.phones.map((p) => (
                 <li key={p.tel}>
@@ -95,12 +92,12 @@ export function CgrShell({
               ))}
               <li>
                 <a className="ulink" href={cgr.instagram.href} target="_blank" rel="noopener noreferrer">
-                  instagram, {cgr.instagram.label}
+                  Instagram, {cgr.instagram.label}
                 </a>
               </li>
               <li>
                 <a className="ulink" href={cgr.tiktok.href} target="_blank" rel="noopener noreferrer">
-                  tiktok, {cgr.tiktok.label}
+                  TikTok, {cgr.tiktok.label}
                 </a>
               </li>
               <li>
@@ -111,33 +108,34 @@ export function CgrShell({
             </ul>
           </div>
           <div>
-            <p className="mono cgr-foot-k">fittings (listing hours)</p>
+            <p className="cgr-foot-k">Fittings (listing hours)</p>
             <p>
               {cgr.hours[0].day}, {cgr.hours[0].time}
             </p>
-            <p className="mono cgr-foot-dim">{cgr.hoursNote.toLowerCase()}</p>
+            <p className="cgr-foot-dim">{cgr.hoursNote}</p>
           </div>
           <div>
-            <p className="mono cgr-foot-k">talk to us</p>
+            <p className="cgr-foot-k">Talk to us</p>
             <p>Want a site like this for your shop?</p>
             <a className="ulink" href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
-              message kantoco
+              Message KantoCo
             </a>
           </div>
           <div>
-            <p className="mono cgr-foot-k">this is a sample</p>
-            <p className="mono cgr-foot-dim">
-              {DEMO_DISCLAIMER.toLowerCase()} gowns, rates and dates are examples.
+            <p className="cgr-foot-k">This is a sample</p>
+            <p className="cgr-foot-dim">
+              {DEMO_DISCLAIMER} Gowns, rates and dates are examples.
             </p>
             <Link className="ulink" href={`${CGR_BASE}/owner`}>
-              owner view
+              Owner view
             </Link>
           </div>
         </div>
-        <p className="mono cgr-foot-credit">{cgr.credit.toLowerCase()}</p>
+        <p className="cgr-foot-credit">{cgr.credit}</p>
         <div className="cgr-foot-big" aria-hidden="true">
-          <span className="cgr-foot-word ext">CAVITE GOWN RENTALS</span>
-          <span className="hand cgr-foot-hand">see you</span>
+          <span className="cgr-foot-word disp">
+            Cavite Gown <em>Rentals</em>
+          </span>
         </div>
       </footer>
     </div>

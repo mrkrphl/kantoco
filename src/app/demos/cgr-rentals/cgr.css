@@ -1,12 +1,15 @@
 /* ==========================================================================
-   CGR rentals (KantoCo sample) · Round 7 "loud editorial"
-   Source of truth: Design stamp r7/direction.md + frames + src/tokens.css.
-   Black / oxblood / cream, one vermilion accent (r7.1: #e8452c replaces the
-   r7 hot pink #ff4f9e). r7.2 type: Anton display, Archivo body (normal
-   width), Space Mono meta, Great Vibes script twice. Square corners except the magnet, lens and disc.
-   The accent is never text on cream (3.25) and only large text on oxblood
-   (3.72); small text in it sits on black / ink only (5.32 / 4.96), and ink on
-   an accent fill is 4.96. Animate transform / opacity / clip only.
+   CGR rentals (KantoCo sample) · Round 7.5 "ivory and wine"
+   Source of truth: Design stamp r7.5 (spec.md, direction.md, tokens.css,
+   src/r75.css, src/sections.css). A black intro, then ivory, cream and blush
+   rooms in wine. Cormorant Garamond Light display (italic 400 accents),
+   Figtree body, Great Vibes for the hero rotator only. The r7 hot accent is gone.
+   Textures are drawn in CSS / inline SVG (a tulle net and a lace scallop),
+   nothing generated. Contrast (stamp contrast.md, all AA): wine on ivory
+   11.49, on cream 10.65, on blush 9.19; wine-ink on ivory 12.91; mute on
+   ivory 5.82, on blush 4.66; ivory on wine 11.49; cream-2 / cream-3 on black
+   10.38 / 7.12; blush on wine 9.19. Slow ease-outs, fades and small rises
+   only. Animate transform / opacity only.
    ========================================================================== */
 
 
@@ -20,38 +23,61 @@ body:has(.cgr) {
 }
 
 .cgr {
-  --black: #000;
-  --ink: #120a09;
-  --ink-2: #6b5550;
-  --ox: #520e14;
-  --ox-deep: #3a0a0f;
+  --black: #0b0708;
+  --ivory: #f7f1e6;
   --cream: #f2e8d8;
   --cream-2: #c9b8a4;
-  --hot: #e8452c;
+  --cream-3: #a8978a;
+  --blush: #ebd5ce;
+  --blush-2: #e2c2b9;
+  --wine: #5b1a2a;
+  --wine-deep: #3d0f1b;
+  --wine-ink: #4a1824;
+  --mute: #7a5359;
+  /* r7-r7.4 names, remapped so the inner pages follow the new palette. */
+  --ink: var(--wine-ink);
+  --ink-2: var(--mute);
+  --ox: var(--wine);
+  --ox-deep: var(--wine-deep);
+  /* The accent: wine on light grounds, blush on black and wine grounds. */
+  --accent: var(--wine);
 
-  --font-display: var(--nf-display), "Arial Narrow", sans-serif;
-  --font-body: var(--nf-body), Arial, sans-serif;
-  --font-mono: var(--nf-mono), ui-monospace, monospace;
+  --font-display: var(--nf-display), Georgia, serif;
+  --font-body: var(--nf-body), system-ui, Arial, sans-serif;
+  --font-mono: var(--font-body);
   --font-hand: var(--nf-hand), cursive;
 
-  /* Stamp §1: 30vw for the word (tokens.css said 34vw; the stamp wins). */
-  --fs-word: clamp(150px, 30vw, 560px);
-  --fs-mega: clamp(56px, 8.4vw, 132px);
-  --fs-h2: clamp(40px, 5.6vw, 88px);
-  --fs-h3: clamp(26px, 2.4vw, 36px);
-  --fs-lead: clamp(18px, 1.5vw, 22px);
-  --fs-body: 17px;
-  --fs-mono: 12px;
-  --fs-hand: clamp(64px, 8vw, 128px);
-  --gut: clamp(20px, 4.4vw, 64px);
+  --t-hero: clamp(2.5rem, min(7.2vw, 10.6vh), 7rem);
+  --t-h2: clamp(2.4rem, 5.4vw, 5.25rem);
+  --t-h3: clamp(1.5rem, 2.1vw, 1.875rem);
+  --t-body: clamp(0.95rem, 0.9rem + 0.2vw, 1.0625rem);
+  --fs-mega: clamp(52px, 7.6vw, 120px);
+  --fs-h2: var(--t-h2);
+  --fs-h3: var(--t-h3);
+  --fs-lead: clamp(17px, 1.3vw, 20px);
+  --fs-body: 16px;
+  --fs-mono: 13px;
+  --gut: clamp(20px, 5.3vw, 72px);
 
-  --ease-punch: cubic-bezier(0.7, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-drift: cubic-bezier(0.45, 0, 0.55, 1);
-  --shadow-hard: 10px 10px 0 var(--ink);
+  --ease-silk: cubic-bezier(0.16, 0.84, 0.3, 1);
+  --ease-veil: cubic-bezier(0.45, 0.05, 0.35, 0.95);
+  --ease-fade: cubic-bezier(0.33, 0, 0.2, 1);
+  /* r7 names, now the silk and veil curves (the punch ease is removed). */
+  --ease-punch: var(--ease-silk);
+  --ease-out: var(--ease-silk);
+  --ease-drift: var(--ease-veil);
+  --dur-hover: 450ms;
+  --dur-fade: 900ms;
+  --dur-reveal: 1400ms;
+  --shadow-hard: 0 30px 60px -30px rgb(61 15 27 / 0.35);
+  --shadow-mat: 0 30px 60px -30px rgb(61 15 27 / 0.35);
+  --line: rgb(91 26 42 / 0.16);
+
+  --net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='24'%3E%3Cpath d='M0 4L7 0L14 4M0 12L7 16L14 12M0 4V12M14 4V12M7 16V24' fill='none' stroke='%235B1A2A' stroke-opacity='.075' stroke-width='.6'/%3E%3C/svg%3E");
+  --net-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='24'%3E%3Cpath d='M0 4L7 0L14 4M0 12L7 16L14 12M0 4V12M14 4V12M7 16V24' fill='none' stroke='%23F2E8D8' stroke-opacity='.05' stroke-width='.6'/%3E%3C/svg%3E");
 
   --bar-h: 24px;
-  --head-h: 84px;
+  --head-h: 64px;
 
   min-height: 100vh;
   display: flex;
@@ -60,23 +86,23 @@ body:has(.cgr) {
   color: var(--cream);
   font-family: var(--font-body);
   font-size: var(--fs-body);
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Anton and Great Vibes ship one weight: never fake bold or italic. */
+  /* Only the loaded weights and styles: never fake bold or italic. */
   font-synthesis: none;
   color-scheme: dark;
   overflow-x: clip;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 640px) {
   .cgr {
-    --head-h: 64px;
+    --head-h: 56px;
   }
 }
 
 html:has(.cgr) {
-  background: #000;
+  background: #0b0708;
 }
 
 .cgr *,
@@ -112,7 +138,7 @@ html:has(.cgr) {
 }
 
 .cgr :focus-visible {
-  outline: 3px solid var(--hot);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -129,21 +155,26 @@ html:has(.cgr) {
 }
 
 /* ---------- Type roles ---------- */
-.cgr .ext {
+.cgr :is(.disp, .ext) {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.005em;
-  line-height: 0.88;
-  text-transform: uppercase;
+  font-weight: 300;
+  line-height: 0.98;
+  letter-spacing: -0.012em;
+  text-transform: none;
 }
 
+.cgr :is(.disp, .ext) em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* r7 "mono" meta, now small Figtree in sentence case. */
 .cgr .mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--fs-mono);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.45;
   letter-spacing: 0;
-  text-transform: lowercase;
 }
 
 .cgr .hand {
@@ -151,108 +182,183 @@ html:has(.cgr) {
   font-weight: 400;
   line-height: 1;
   letter-spacing: 0;
-  color: var(--hot);
+  color: var(--cream);
 }
 
-/* ---------- Surfaces + grain ---------- */
+.cgr .cgr-cap {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--mute);
+}
+
+.cgr .cgr-cap b {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.15;
+  color: var(--wine);
+}
+
+/* ---------- Surfaces + tulle ---------- */
+.cgr .ivory {
+  background-color: var(--ivory);
+  color: var(--wine-ink);
+}
+
+.cgr .creamy,
 .cgr .cream {
-  background: var(--cream);
-  color: var(--ink);
+  background-color: var(--cream);
+  color: var(--wine-ink);
 }
 
 .cgr .ox {
-  background: var(--ox);
-  color: var(--cream);
+  --accent: var(--blush);
+  background-color: var(--wine);
+  color: var(--ivory);
+}
+
+.cgr .dark {
+  --accent: var(--blush);
+}
+
+.cgr .tulle {
+  background-image: var(--net);
+}
+
+.cgr .tulle-dark {
+  background-image: var(--net-dark);
 }
 
 .cgr :where(.grain) {
   position: relative;
 }
 
+/* r7 "grain" surfaces (inner pages) now carry the tulle net instead of noise. */
 .cgr .grain::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 60;
+  z-index: 0;
   pointer-events: none;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-image: var(--net);
 }
 
-/* Dark surfaces: the same tile with white grains (black grains vanish under
-   screen). One static SVG background, no binary, no animation. */
 .cgr .grain.dark::after,
 .cgr .grain.ox::after {
-  mix-blend-mode: screen;
-  opacity: 0.07;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-image: var(--net-dark);
 }
 
-/* ---------- Buttons + links ---------- */
+/* ---------- Buttons + links (stamp r75.css .btn) ---------- */
 .cgr .btn {
+  --btn-bg: var(--wine);
+  --btn-fg: var(--ivory);
+  --btn-hover: var(--wine-deep);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 60px;
-  padding: 0 30px;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 24px;
   border: 0;
-  border-radius: 0;
-  background: var(--hot);
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 17px;
-  letter-spacing: 0.03em;
+  border-radius: 2px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.01em;
   line-height: 1.1;
   text-decoration: none;
+  text-transform: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
-  text-transform: uppercase;
+  transition: background-color var(--dur-hover) var(--ease-silk), color var(--dur-hover) var(--ease-silk),
+    box-shadow var(--dur-hover) var(--ease-silk);
 }
 
 .cgr .btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--ink);
+  background: var(--btn-hover);
 }
 
+/* On a wine ground the filled CTA turns ivory (wine on ivory 11.49). */
+.cgr .ox .btn:not(.btn-line, .btn-line-cream, .btn-ghost) {
+  --btn-bg: var(--ivory);
+  --btn-fg: var(--wine);
+  --btn-hover: var(--blush);
+}
+
+.cgr .btn-wine,
 .cgr .btn-ox {
-  background: var(--ox);
-  color: var(--cream);
-  min-height: 64px;
-  font-size: 19px;
+  --btn-bg: var(--wine);
+  --btn-fg: var(--ivory);
 }
 
-.cgr .btn-hot {
-  background: var(--hot);
-  color: var(--ink);
+.cgr .dark .btn-wine {
+  box-shadow: inset 0 0 0 1px rgb(242 232 216 / 0.18);
 }
 
+.cgr .btn-line,
 .cgr .btn-ghost {
   background: transparent;
-  color: inherit;
-  box-shadow: inset 0 0 0 2px currentColor;
-  min-height: 48px;
-  font-size: 15px;
+  color: var(--wine);
+  box-shadow: inset 0 0 0 1px var(--wine);
 }
 
+.cgr .btn-line:hover,
 .cgr .btn-ghost:hover {
-  box-shadow: inset 0 0 0 2px currentColor, 4px 4px 0 currentColor;
+  background: var(--wine);
+  color: var(--ivory);
+}
+
+.cgr :is(.ox, .dark) .btn-ghost,
+.cgr .btn-line-cream {
+  background: transparent;
+  color: var(--cream);
+  box-shadow: inset 0 0 0 1px rgb(242 232 216 / 0.55);
+}
+
+.cgr :is(.ox, .dark) .btn-ghost:hover,
+.cgr .btn-line-cream:hover {
+  background: var(--cream);
+  color: var(--black);
 }
 
 .cgr .btn-nav {
-  min-height: 46px;
-  padding: 0 20px;
-  font-size: 15px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+}
+
+.cgr .btn .arrow,
+.cgr .cgr-rk-racks .arrow {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 1px;
+  background: currentColor;
+}
+
+.cgr .btn .arrow::after,
+.cgr .cgr-rk-racks .arrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+  transform-origin: 100% 0;
 }
 
 .cgr .btn:disabled,
 .cgr .btn.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .cgr .ulink {
@@ -262,52 +368,30 @@ html:has(.cgr) {
   background: none;
   border: 0;
   padding: 0;
-  font-weight: 600;
-  font-size: 17px;
+  font-weight: 500;
+  font-size: 16px;
   text-decoration: underline;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 1px;
   text-underline-offset: 6px;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .cgr .ulink:hover {
-  text-decoration-thickness: 4px;
+  text-decoration-color: var(--accent);
 }
 
-/* Magnet CTA (one of three round things). */
-.cgr .magnet {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 136px;
-  height: 136px;
-  border-radius: 50%;
-  background: var(--hot);
-  color: var(--ink);
-  text-align: center;
-  text-decoration: none;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.05;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.cgr .magnet-l {
-  display: block;
-  pointer-events: none;
-}
-
-/* Line reveal (Kinetic useReveal). */
+/* Line reveal (Kinetic useReveal): a 14px rise and a fade on the silk ease. */
 .cgr .rv {
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 0.7s var(--ease-punch) var(--rv-d, 0ms);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--dur-reveal) var(--ease-silk) var(--rv-d, 0ms),
+    transform var(--dur-reveal) var(--ease-silk) var(--rv-d, 0ms);
 }
 
 .cgr .rv.rv-in {
-  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transform: none;
 }
 
 /* ---------- Sample bar ---------- */
@@ -321,13 +405,12 @@ html:has(.cgr) {
   justify-content: center;
   padding: 0 var(--gut);
   background: var(--black);
-  border-bottom: 1px solid rgb(242 232 216 / 0.14);
+  border-bottom: 1px solid rgb(242 232 216 / 0.1);
   color: var(--cream-2);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   line-height: 1;
   white-space: nowrap;
-  text-transform: lowercase;
 }
 
 .cgr-bar-inner {
@@ -336,9 +419,9 @@ html:has(.cgr) {
 }
 
 .cgr-bar b {
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: var(--cream);
-  text-transform: uppercase;
   margin-right: 8px;
 }
 
@@ -356,7 +439,7 @@ html:has(.cgr) {
   }
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header (stamp r75.css nav) ---------- */
 .cgr-head {
   position: relative;
   z-index: 80;
@@ -368,6 +451,7 @@ html:has(.cgr) {
   padding: 0 var(--gut);
   background: var(--black);
   color: var(--cream);
+  border-bottom: 1px solid rgb(242 232 216 / 0.08);
 }
 
 .cgr[data-page="home"] .cgr-head {
@@ -380,40 +464,41 @@ html:has(.cgr) {
 
 .cgr-wm {
   display: inline-flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 12px;
   min-height: 44px;
-  justify-content: center;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .cgr-wm-name {
   display: block;
-  max-width: 7.5em;
+  align-self: center;
   font-family: var(--font-display);
+  font-style: italic;
   font-weight: 400;
-  font-size: 22px;
-  line-height: 0.95;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-size: 23px;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .cgr .cgr-wm-sub {
   display: block;
-  margin-top: 5px;
-  font-size: 11px;
-  color: var(--cream-2);
-  text-transform: uppercase;
+  align-self: center;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--cream-3);
 }
 
 .cgr-head-nav {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 34px;
 }
 
 .cgr-nav {
   display: flex;
-  gap: 30px;
+  gap: 34px;
 }
 
 .cgr-nav-a {
@@ -421,38 +506,32 @@ html:has(.cgr) {
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  /* 44px-wide hit area for short links ("Visit") without moving the layout:
-     padding grows the box, the matching negative margin cancels it, and the
-     underline stays on the text (content-box origin). */
+  /* 44px-wide hit area for short links ("Visit") without moving the layout. */
   min-width: 44px;
   padding-inline: 6px;
   margin-inline: -6px;
   background-origin: content-box;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--cream-2);
   text-decoration: none;
   background-image: linear-gradient(currentColor, currentColor);
   background-repeat: no-repeat;
-  background-position: 0 calc(100% - 8px);
-  background-size: 0 2px;
-  transition: background-size 0.35s var(--ease-punch);
+  background-position: 0 calc(100% - 10px);
+  background-size: 0 1px;
+  transition: background-size var(--dur-hover) var(--ease-silk), color var(--dur-hover) var(--ease-silk);
 }
 
 .cgr-nav-a:hover,
 .cgr-nav-a[aria-current="page"] {
-  background-size: 100% 2px;
+  color: var(--cream);
+  background-size: 100% 1px;
 }
 
 .cgr-head-mob {
   display: none;
   align-items: center;
   gap: 10px;
-}
-
-.cgr-head-mob .btn-nav {
-  min-height: 44px;
-  padding: 0 14px;
-  font-size: 14px;
 }
 
 @media (max-width: 899px) {
@@ -463,9 +542,15 @@ html:has(.cgr) {
   .cgr-head-mob {
     display: flex;
   }
+}
+
+@media (max-width: 640px) {
+  .cgr-wm {
+    gap: 8px;
+  }
 
   .cgr-wm-name {
-    font-size: 17px;
+    font-size: 21px;
   }
 
   .cgr .cgr-wm-sub {
@@ -473,21 +558,19 @@ html:has(.cgr) {
   }
 }
 
-/* Mobile menu */
+/* Mobile menu: a 44px cream outline "Menu" button. */
 .cgr-menu-btn {
   min-width: 44px;
   min-height: 44px;
-  padding: 0 4px;
+  padding: 0 14px;
   background: none;
   border: 0;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgb(242 232 216 / 0.3);
   color: var(--cream);
-  text-decoration: underline;
-  text-underline-offset: 5px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-}
-
-.cgr .cgr-menu-btn {
-  font-size: 13px;
 }
 
 .cgr-menu-panel {
@@ -496,6 +579,7 @@ html:has(.cgr) {
   z-index: 85;
   padding: 24px var(--gut) 40px;
   background: var(--black);
+  background-image: var(--net-dark);
   overflow-y: auto;
 }
 
@@ -513,16 +597,19 @@ html:has(.cgr) {
   align-items: center;
   min-height: 56px;
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 300;
   font-size: 40px;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 1;
+  color: var(--cream);
   text-decoration: none;
-  border-bottom: 2px solid var(--ox);
+  border-bottom: 1px solid rgb(242 232 216 / 0.12);
 }
 
 .cgr-menu-a[aria-current="page"] {
-  color: var(--hot);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--blush);
 }
 
 .cgr-main {
@@ -548,9 +635,16 @@ html:has(.cgr) {
 }
 
 /* ==========================================================================
-   01 / 02  Intro: sticky stage, GOWNS, Mavy, S-curve breakout
+   01  Intro (r7.5 stamp r75.css .hero): black stage, tulle net, wine bloom,
+   ghost "gowns", Mavy in her own column, h1 + rotator + lead + CTAs on the
+   left, an ivory lace scallop along the bottom. The r7.1 scroll story stays:
+   the sticky stage scrubs the alpha clip over 400svh; nothing else moves
+   except the ghost word (24px), so the text never meets the figure.
+   The stage is the stamp's 100svh hero less the 24px sample bar; the header
+   (64px, 56px on phones) is laid over its top, as in the stamp.
    ========================================================================== */
 .cgr-intro {
+  --t-hero: clamp(2.5rem, min(7.2vw, 10.6vh), 7rem);
   position: relative;
   height: 400svh;
   background: var(--black);
@@ -562,9 +656,9 @@ html:has(.cgr) {
   height: calc(100svh - var(--bar-h));
   min-height: 560px;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 36vw 13% at 33% 98%, rgb(255 240 230 / 0.1), transparent 70%),
-    var(--black);
+  isolation: isolate;
+  background-color: var(--black);
+  background-image: var(--net-dark);
   color: var(--cream);
 }
 
@@ -577,45 +671,50 @@ html:has(.cgr) {
   top: 0;
 }
 
-/* r7.2 (font.md): Anton GOWNS at 570px @1440 (39.6vw), left -44px, caps
-   filling the ~95-585px band behind Mavy. */
+.cgr-intro-bloom {
+  position: absolute;
+  z-index: -1;
+  right: -6vw;
+  top: 8vh;
+  width: 62vw;
+  height: 110vh;
+  background: radial-gradient(closest-side, rgb(91 26 42 / 0.55), rgb(61 15 27 / 0.25) 55%, transparent);
+  pointer-events: none;
+}
+
+/* Ghost word: Cormorant italic at 7% cream, behind Mavy. Same place in both
+   motion modes (sized by the viewport, never by data-motion), so the
+   hydration pass moves nothing. */
 .cgr-intro-word {
   position: absolute;
-  left: -3.06vw;
-  top: 8.2%;
-  z-index: 2;
-  font-size: 39.6vw;
-  color: var(--cream);
+  z-index: 0;
+  right: -3vw;
+  top: calc(var(--head-h) + 9vh);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: min(27vw, 50vh);
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: rgb(242 232 216 / 0.07);
   white-space: nowrap;
-  will-change: transform;
   pointer-events: none;
   user-select: none;
+  will-change: transform;
 }
 
-.cgr-curve {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  fill: var(--ox);
-  pointer-events: none;
-}
-
-.cgr-curve-phone {
-  display: none;
-}
-
+/* Mavy: the stamp's .hero-figure box (540/960), right column, standing on
+   the scallop. Soft left edge so the walk-in fades in instead of being cut. */
 .cgr-mavy {
   position: absolute;
-  left: 17.4vw;
-  bottom: -6px;
-  z-index: 6;
-  height: 97.8%;
-  aspect-ratio: 9 / 16;
-  will-change: transform;
-  filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.55));
+  z-index: 1;
+  right: calc(var(--gut) + 4vw);
+  bottom: 0;
+  height: calc(100% - var(--head-h) - 10px);
+  aspect-ratio: 540 / 960;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 100%);
 }
 
 .cgr-mavy-idle {
@@ -632,6 +731,7 @@ html:has(.cgr) {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: bottom;
 }
 
 .cgr-intro-video {
@@ -648,43 +748,57 @@ html:has(.cgr) {
   pointer-events: none;
 }
 
-/* r7.2 rotator (rotator.md): "for your" is fixed, the noun swaps in a
-   one-cell grid so the box is always as wide as the longest noun
-   (r7.2.1: longest is "formal night"): no layout shift. Hidden nouns are visibility hidden. */
-.cgr-intro-hand {
+/* Copy column: h1 + rotator at the top, lead + rate + CTAs at the bottom. */
+.cgr-intro-copy {
   position: absolute;
-  left: 36.1vw;
-  top: 31.5%;
-  z-index: 7;
-  font-size: clamp(64px, 10.4vw, 150px);
-  line-height: 0.9;
+  z-index: 2;
+  left: var(--gut);
+  top: calc(var(--head-h) + 5.5vh);
+  bottom: 6vh;
+  width: min(54vw, 760px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cgr-intro-top {
+  position: relative;
+}
+
+.cgr .cgr-intro-h {
+  font-size: var(--t-hero);
+  color: var(--cream);
+  /* Room for the ñ tilde and the italic overhang at lh .98. */
+  padding-top: 0.06em;
+}
+
+.cgr-intro-h .l {
+  display: block;
+}
+
+/* Rotator: Great Vibes "for your ___" beside "Cavite." The noun swaps in a
+   one-cell grid, so the box never changes size (no layout shift). */
+.cgr .cgr-intro-hand {
+  position: absolute;
+  left: calc(var(--t-hero) * 3.55 + 28px);
+  bottom: 0.05em;
+  font-size: min(3.8vw, 7.6vh);
+  line-height: 1.05;
   white-space: nowrap;
-  transform: rotate(-9deg);
-  transform-origin: 0 50%;
-  /* r7.2.1: cream like the shop's logo (vermilion stays on CTAs and small
-     accents). It crosses the cream GOWNS letters, so a soft dark halo, not a
-     plate, keeps it legible there. */
-  text-shadow:
-    0 0 1px rgb(0 0 0 / 0.95),
-    0 0 2px rgb(0 0 0 / 0.9),
-    0 0 5px rgb(0 0 0 / 0.7),
-    0 1px 14px rgb(0 0 0 / 0.5);
+  color: var(--cream);
+  opacity: 0.92;
   pointer-events: none;
 }
 
-.cgr .cgr-intro-hand {
-  color: var(--cream);
-}
-
 .cgr-hand-fix {
-  display: block;
-  width: max-content;
+  display: inline;
 }
 
 .cgr-hand-stack {
   display: inline-grid;
   justify-items: start;
-  margin-left: 0.55em;
+  align-items: end;
+  vertical-align: bottom;
 }
 
 .cgr-hand-stack > span {
@@ -699,355 +813,170 @@ html:has(.cgr) {
   visibility: inherit;
 }
 
-/* r7.2 (font.md): one row, magnet beside the lead, mono note under it.
-   DOM order is lead then magnet; row-reverse puts the magnet on the left. */
-.cgr-intro-copy {
-  position: absolute;
-  left: 52.8vw;
-  right: 3.33vw;
-  bottom: 48px;
-  z-index: 8;
+.cgr-intro-bottom {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 30px;
-}
-
-.cgr-intro-text {
-  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .cgr-intro-lead {
-  max-width: 520px;
-  font-size: clamp(18px, 1.6vw, 24px);
+  max-width: 30em;
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--cream-2);
+}
+
+.cgr-intro-rate {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--cream-3);
+}
+
+.cgr-intro-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.cgr-intro-txt {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
   font-weight: 500;
-  line-height: 1.3;
+  color: var(--cream);
+  text-decoration: none;
 }
 
-.cgr .cgr-intro-rate {
-  margin-top: 14px;
-  color: var(--cream-2);
+.cgr-intro-txt span {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgb(242 232 216 / 0.4);
+  transition: border-color var(--dur-hover) var(--ease-silk);
 }
 
+.cgr-intro-txt:hover span {
+  border-color: var(--cream);
+}
 
-
-.cgr .cgr-intro-cue {
+/* Ivory lace scallop with pin holes: the edge where the intro meets the page. */
+.cgr-scallop {
   position: absolute;
-  left: var(--gut);
-  bottom: 34px;
-  z-index: 8;
-  color: var(--cream-2);
-}
-
-.cgr-intro-end {
-  position: absolute;
-  inset: 0;
-  z-index: 7;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16'%3E%3Cpath d='M0 16V9A16 9 0 0 1 32 9V16Z' fill='%23F7F1E6'/%3E%3Ccircle cx='16' cy='7.2' r='1.3' fill='%230B0708'/%3E%3Ccircle cx='9' cy='9.6' r='.9' fill='%230B0708'/%3E%3Ccircle cx='23' cy='9.6' r='.9' fill='%230B0708'/%3E%3C/svg%3E")
+    repeat-x left bottom / 32px 16px;
   pointer-events: none;
 }
 
-.cgr-intro-end a {
-  pointer-events: auto;
+/* Motion on: the copy waits for the load timeline (fade + 14px rise). The
+   stage keeps its geometry; only opacity / transform change. */
+.cgr-intro[data-motion="on"] :is(.cgr-intro-h .l, .cgr-intro-hand, .cgr-intro-bottom > *) {
+  opacity: 0;
+  visibility: hidden;
 }
 
-/* r7.2: Anton 96px @1440, line-height 1.14 so the tilde on the Ñ clears
-   the line above (DOM stays sentence case; CSS uppercases). */
-.cgr .cgr-intro-h {
-  position: absolute;
-  left: var(--gut);
-  top: 61.2%;
-  font-size: clamp(40px, 6.67vw, 112px);
-  line-height: 1.14;
-  color: var(--cream);
-  white-space: nowrap;
-}
-
-.cgr-intro-h .ln {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.04em;
-  /* The reveal clips each line; extend the clip box up so the Ñ tilde (ink
-     ~1.07em above the baseline in Anton) is never cut, without moving the
-     1.14 line spacing. */
-  padding-top: 0.14em;
-  margin-top: -0.14em;
-}
-
-/* Desktop: "Dasmariñas," and "Cavite." share line 2. */
-@media (min-width: 900px) {
-  .cgr-intro-h .ln-2,
-  .cgr-intro-h .ln-3 {
-    display: inline-block;
-    vertical-align: top;
-  }
-}
-
-.cgr-intro-h .ln > span {
-  display: block;
-}
-
-.cgr-intro-h em {
-  font-style: normal;
-  color: var(--hot);
-}
-
-.cgr-intro-sub {
-  position: absolute;
-  left: var(--gut);
-  top: 88.1%;
-  width: min(560px, 40vw);
-  font-size: 20px;
-  line-height: 1.35;
-  font-weight: 500;
-}
-
-
-/* Before GSAP takes over: hide what the load / scrub timelines reveal. */
-@media (scripting: enabled) {
-  .cgr-intro[data-motion="on"] .cgr-intro-copy > * {
-    opacity: 0;
+/* Phones (stamp r75.css <=640): Mavy top right under the nav, the copy
+   block at the bottom, the rotator above the h1. */
+@media (max-width: 640px) {
+  .cgr-intro-bloom {
+    right: -30vw;
+    top: 0;
+    width: 110vw;
+    height: 70vh;
   }
 
-  .cgr-intro[data-motion="on"] .cgr-hand-fix,
-  .cgr-intro[data-motion="on"] .cgr-hand-stack > span[data-i="0"] {
-    clip-path: inset(-40% 100% -40% -20%);
-  }
-
-  .cgr-intro[data-motion="on"] .cgr-intro-h .ln > span {
-    clip-path: inset(100% 0 0 0);
-  }
-
-  .cgr-intro[data-motion="on"] .cgr-intro-sub {
-    opacity: 0;
-  }
-}
-
-/* Reduced motion: the landed d02 composition, no scrub, no idle. */
-.cgr-intro[data-motion="static"] .cgr-intro-word {
-  transform: translate(-8vw, calc(-0.075 * (100svh - var(--bar-h))));
-}
-
-.cgr-intro[data-motion="static"] .cgr-mavy {
-  transform: translateX(41vw) scale(0.943);
-}
-
-.cgr-intro[data-motion="static"] .cgr-intro-copy,
-.cgr-intro[data-motion="static"] .cgr-intro-cue {
-  display: none;
-}
-
-/* r7.2: the hand stays as a still "for your / debut", full size, same spot. */
-.cgr-intro[data-motion="static"] .cgr-intro-hand {
-  display: block;
-  clip-path: none;
-}
-
-/* r7.4.1: desktop composition frame. The hero was drawn at 1440x900 (stage
-   1440x876, 1.644:1) with sizes and x offsets in vw but the h1, lead and
-   Mavy placed by stage height, so a wide, short window (1366x620, 2.2:1)
-   stacked the h1 and lead on GOWNS and the script. --fw is the frame width
-   (100vw, capped at 1.644 x the stage height, and so GOWNS, 0.348 x --fw
-   tall, ends 240px above the stage bottom for the lead and CTA) and --fx
-   centres it; at 1440x900
-   and taller --fw is 100vw, so nothing moves there. Story.tsx uses the same
-   frame width for the scrubbed x moves. */
-.cgr-intro {
-  --fh: max(560px, calc(100svh - var(--bar-h)));
-  --fw: 100vw;
-  --fx: 0px;
-}
-
-@media (min-width: 900px) {
-  .cgr-intro {
-    /* GOWNS top: 8.2% of the stage, but never inside the header text
-       (72px is its 1440x900 top) */
-    --wt: max(calc(0.082 * var(--fh)), calc(var(--head-h) - 12px));
-    --fw: min(100vw, calc(var(--fh) * 1.644), calc((var(--fh) - 240px - var(--wt)) / 0.348));
-    --fx: calc((100vw - var(--fw)) / 2);
-  }
-
-  .cgr .cgr-intro .cgr-intro-word {
-    top: var(--wt);
-    left: calc(var(--fx) - 0.0306 * var(--fw));
-    font-size: calc(0.396 * var(--fw));
-  }
-
-  .cgr .cgr-intro .cgr-mavy {
-    left: calc(var(--fx) + 0.174 * var(--fw));
-  }
-
-  .cgr .cgr-intro .cgr-intro-hand {
-    left: calc(var(--fx) + 0.361 * var(--fw));
-    font-size: clamp(64px, calc(0.104 * var(--fw)), 150px);
-  }
-
-  .cgr .cgr-intro .cgr-intro-copy {
-    left: calc(var(--fx) + 0.528 * var(--fw));
-    /* the lead runs to the window edge, not the frame edge, so it stays a
-       few lines tall when the frame is narrower than the window */
-    right: calc(0.0333 * var(--fw));
-  }
-
-  .cgr .cgr-intro .cgr-intro-lead {
-    font-size: clamp(18px, calc(0.016 * var(--fw)), 24px);
-  }
-
-  .cgr .cgr-intro .cgr-intro-cue {
-    left: calc(var(--fx) + var(--gut));
-  }
-
-  .cgr .cgr-intro .cgr-intro-h {
-    left: calc(var(--fx) + var(--gut));
-    font-size: clamp(40px, calc(0.0667 * var(--fw)), 112px);
-  }
-
-  /* The lead keeps three lines (420px floor) and its top is capped so those
-     three lines always end inside the stage. */
-  .cgr .cgr-intro .cgr-intro-sub {
-    left: calc(var(--fx) + var(--gut));
-    top: min(88.1%, calc(100% - 4.05em - 10px));
-    width: min(560px, max(calc(0.389 * var(--fw)), 420px));
-    font-size: clamp(15px, calc(0.0139 * var(--fw)), 20px);
-  }
-
-  /* Reduced motion shows the landed frame while the header is still on
-     screen (in motion it has scrolled away by then), so the lifted cream
-     GOWNS sat under the cream logo and nav. Static GOWNS starts below the
-     header and is capped to end above the h1 (Anton caps fill ~0.88em). */
-  .cgr .cgr-intro[data-motion="static"] .cgr-intro-word {
-    transform: translate(calc(-0.08 * var(--fw)), calc(var(--head-h) + 8px - var(--wt)));
-  }
-
-  /* The size cap keys off the media query, not data-motion: SSR renders
-     data-motion="on", so a size change at hydration would be a layout
-     shift. Transforms (above) don't count toward CLS. */
-  @media (prefers-reduced-motion: reduce) {
-    .cgr .cgr-intro .cgr-intro-word {
-      font-size: min(calc(0.396 * var(--fw)), calc((0.612 * var(--fh) - var(--head-h) - 26px) / 0.88));
-    }
-  }
-
-  .cgr .cgr-intro[data-motion="static"] .cgr-mavy {
-    transform: translateX(calc(0.41 * var(--fw))) scale(0.943);
-  }
-}
-
-@media (max-width: 899px) {
-  .cgr-intro-stage {
-    background:
-      radial-gradient(ellipse 51vw 7% at 51% 98%, rgb(255 240 230 / 0.12), transparent 70%),
-      var(--black);
-  }
-
-  /* r7.2: 164px @390 (42vw), left -12px. */
   .cgr-intro-word {
-    left: -3.08vw;
-    top: 10.2%;
-    font-size: 42vw;
+    right: -4vw;
+    top: calc(var(--head-h) + 2px);
+    font-size: min(44vw, 24vh);
   }
 
-  .cgr-curve-desk {
-    display: none;
-  }
-
-  .cgr-curve-phone {
-    display: block;
-  }
-
-  /* r7.1: box centred at 43% (its width is 0.44 x stage height) so she
-     lands at ~56% after the 13vw glide, fully in frame at 360-430 (was
-     left 30.8vw: half off the right edge). No CSS translate: GSAP owns
-     transform and clears it. */
   .cgr-mavy {
-    left: calc(43% - 0.22 * max(560px, 100svh - var(--bar-h)));
-    bottom: -4px;
-    height: 78.2%;
-  }
-
-  .cgr-intro-hand {
-    left: 3.6vw;
-    top: 35.9%;
-    font-size: clamp(56px, 16.9vw, 80px);
+    right: -9vw;
+    top: calc(var(--head-h) + 6px);
+    bottom: auto;
+    height: calc(100% - var(--head-h) - 318px);
   }
 
   .cgr-intro-copy {
-    left: 20px;
-    right: 18px;
-    bottom: 30px;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 12px;
+    top: auto;
+    bottom: 28px;
+    left: var(--gut);
+    right: var(--gut);
+    width: auto;
+    height: 300px;
+    justify-content: flex-end;
+  }
+
+  .cgr .cgr-intro-h {
+    font-size: clamp(2.1rem, 10vw, 2.6rem);
+  }
+
+  .cgr-intro-h .l {
+    display: inline;
+  }
+
+  .cgr .cgr-intro-hand {
+    left: 0;
+    bottom: calc(100% + 36px);
+    width: 36vw;
+    font-size: 40px;
+    white-space: normal;
+  }
+
+  /* Each noun carries its own "for your" on phones, so the phrase wraps as
+     one and sits on the h1 whatever the noun's length (graduation ball takes
+     three lines, debut two). The cell is bottom-aligned. */
+  .cgr-hand-fix {
+    display: none;
+  }
+
+  .cgr-hand-stack {
+    display: grid;
+  }
+
+  .cgr-hand-stack > span {
+    white-space: normal;
+  }
+
+  .cgr-hand-stack > span::before {
+    content: "for your ";
   }
 
   .cgr-intro-lead {
-    width: 236px;
-    font-size: 16px;
-    line-height: 1.35;
-    text-shadow: 0 1px 12px #000;
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.5;
   }
 
-  /* Phone frame: the lead ends at "open dates." */
-  .cgr .cgr-intro-lead-more {
+  .cgr-intro-rate {
     display: none;
   }
 
-  .cgr .cgr-intro-copy .magnet {
-    width: 104px;
-    height: 104px;
-    font-size: 14px;
+  .cgr-intro-cta {
+    gap: 18px;
+    margin-top: 18px;
   }
 
-  .cgr .cgr-intro-rate,
-  .cgr .cgr-intro-cue {
-    display: none;
-  }
-
-
-
-
-  /* r7.3: "Gown and suit rentals" is the longest of the three lines
-     (~8.9em in Anton), so 9.8vw keeps it inside 20px gutters at 360-899px
-     (38px @390, 35px @360). Line-height 1.14 + the extended clip stay. */
-  .cgr .cgr-intro-h {
-    left: 20px;
-    top: 64.4%;
-    font-size: clamp(32px, 9.8vw, 56px);
-  }
-
-  .cgr-intro-sub {
-    left: 20px;
-    right: 20px;
-    top: 85.6%;
-    width: auto;
-    font-size: 16px;
-  }
-
-  .cgr-intro[data-motion="static"] .cgr-intro-word {
-    transform: translate(-8vw, calc(-0.035 * (100svh - var(--bar-h))));
-  }
-
-  .cgr-intro[data-motion="static"] .cgr-mavy {
-    transform: translate(13vw, calc(-0.2 * (100svh - var(--bar-h)))) scale(0.85);
+  .cgr-intro-cta .btn {
+    min-height: 44px;
   }
 }
 
 /* ==========================================================================
-   03  Racks (r7.3): catalogue, Filipiniana band, men's formal, accessories.
-   Replaces the r7 mood board. Stamp: kantoco-cgr/r7.3 (r73.css).
+   02  Racks (r7.5 stamp sections.css): the ivory catalogue with its tilted
+   strip, rack list, lens and blush accessories band; then the cream men's
+   room with ivory-matted photos. Phones and tablets (<=899) get a staggered
+   two-column grid, so every photo is on screen (the r7.4 phone fan pushed the
+   first gown and the first suit off the left edge).
    ========================================================================== */
 .cgr {
-  --ivory: #f7f1e6;
-  --line: rgb(18 10 9 / 0.14);
-  --line-d: rgb(242 232 216 / 0.16);
-  --fs-sec: clamp(76px, 9.17vw, 132px);
-  --fs-cat: clamp(28px, 2.8vw, 40px);
   --sn-h: 64px;
-}
-
-.cgr .ivory {
-  background: var(--ivory);
-  color: var(--ink);
 }
 
 /* ---------- Condensed nav (fixed, transform-only) ---------- */
@@ -1063,32 +992,33 @@ html:has(.cgr) {
   justify-content: space-between;
   gap: 24px;
   padding: 0 var(--gut);
-  background: var(--ivory);
-  color: var(--ink);
+  background-color: var(--ivory);
+  color: var(--wine-ink);
   border-bottom: 1px solid var(--line);
   transform: translateY(-110%);
   visibility: hidden;
   transition:
-    transform 0.32s var(--ease-out),
-    visibility 0s linear 0.32s,
-    background-color 0.2s linear,
-    color 0.2s linear;
+    transform var(--dur-fade) var(--ease-silk),
+    visibility 0s linear var(--dur-fade),
+    background-color var(--dur-hover) linear,
+    color var(--dur-hover) linear;
 }
 
 .cgr-sn[data-on="true"] {
   transform: none;
   visibility: visible;
   transition:
-    transform 0.32s var(--ease-out),
+    transform var(--dur-fade) var(--ease-silk),
     visibility 0s,
-    background-color 0.2s linear,
-    color 0.2s linear;
+    background-color var(--dur-hover) linear,
+    color var(--dur-hover) linear;
 }
 
 .cgr-sn[data-tone="dark"] {
-  background: var(--black);
+  --accent: var(--blush);
+  background-color: var(--black);
   color: var(--cream);
-  border-color: var(--line-d);
+  border-color: rgb(242 232 216 / 0.14);
 }
 
 .cgr .cgr-sn-wm {
@@ -1096,16 +1026,22 @@ html:has(.cgr) {
   align-items: center;
   min-height: 44px;
   font-family: var(--font-display);
-  font-size: 18px;
-  text-transform: uppercase;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1;
   text-decoration: none;
-  letter-spacing: 0.01em;
+  color: var(--wine);
+}
+
+.cgr-sn[data-tone="dark"] .cgr-sn-wm {
+  color: var(--cream);
 }
 
 .cgr-sn-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 30px;
 }
 
 .cgr .cgr-sn-a {
@@ -1114,7 +1050,7 @@ html:has(.cgr) {
   justify-content: center;
   min-height: 44px;
   min-width: 44px;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 15px;
   text-decoration: none;
 }
@@ -1122,19 +1058,11 @@ html:has(.cgr) {
 .cgr .cgr-sn-a:hover {
   text-decoration: underline;
   text-underline-offset: 6px;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 1px;
 }
 
-/* Active link: --hot on ivory is decoration only (thick underline + ink
-   text keeps AA); the colour cue is the hot bar under it. */
 .cgr .cgr-sn-a[data-active="true"] {
-  box-shadow: inset 0 -3px 0 var(--hot);
-}
-
-.cgr .cgr-sn .btn-nav {
-  min-height: 44px;
-  padding: 0 16px;
-  font-size: 14px;
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .cgr-sn-mob {
@@ -1145,6 +1073,7 @@ html:has(.cgr) {
 
 .cgr .cgr-sn .cgr-menu-btn {
   color: inherit;
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 .cgr .cgr-sn .cgr-menu-panel {
@@ -1166,577 +1095,619 @@ html:has(.cgr) {
   }
 
   .cgr .cgr-sn-wm {
-    font-size: 16px;
+    font-size: 20px;
   }
 }
 
 /* ---------- Section frame ---------- */
 .cgr .cgr-rk {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
-  min-height: max(100svh, 860px);
-  padding: 112px var(--gut) 96px;
-  scroll-margin-top: var(--bar-h);
+  isolation: isolate;
+  color: var(--wine-ink);
 }
 
-.cgr .cgr-rk-men {
-  background: var(--black);
-  color: var(--cream);
-  padding-top: 186px;
-}
-
-.cgr .cgr-rk-fil {
-  min-height: 640px;
-  padding-top: 96px;
-}
-
-.cgr .cgr-rk-acc {
-  padding-top: 190px;
-}
-
-.cgr-rk-text {
-  position: relative;
-  z-index: 5;
-  width: min(560px, 40vw);
-}
-
-.cgr-rk-men .cgr-rk-text {
-  width: min(580px, 41vw);
-}
-
-/* r7.3.1: the small uppercase eyebrows above these headings are removed, so
-   the heading now opens the text column with no top margin. */
 .cgr .cgr-rk-h {
-  margin-top: 0;
-  font-size: var(--fs-sec);
-  line-height: 0.9;
+  font-size: var(--t-h2);
+  color: var(--wine);
 }
 
-.cgr .cgr-rk-fil .cgr-rk-h {
-  font-size: clamp(64px, 8.06vw, 116px);
+.cgr .cgr-rk-lede {
+  max-width: 28em;
+  margin-top: 20px;
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--wine-ink);
 }
 
-.cgr .cgr-rk-lead {
-  margin-top: 24px;
-  max-width: 31em;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--ink-2);
+.cgr .cgr-rk-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 28px;
 }
 
-.cgr-rk-men .cgr-rk-lead {
-  margin-top: 18px;
-  color: var(--cream-2);
+/* ---------- Catalogue ---------- */
+.cgr .cgr-rk-cat {
+  min-height: 900px;
+  padding: 84px var(--gut) calc(170px + 56px);
 }
 
-.cgr-rk-fil .cgr-rk-lead {
-  margin-top: 16px;
+.cgr .cgr-rk-text {
+  position: relative;
+  z-index: 2;
+  width: min(460px, 35vw);
 }
 
-.cgr-rk-fil .ulink {
-  margin-top: 8px;
-}
-
-.cgr-rk-pt {
-  margin-top: 26px;
-}
-
-.cgr .cgr-rk-ptag {
-  display: inline-block;
-  padding: 5px 9px;
-  border: 1px dashed currentColor;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-}
-
-.cgr-rk-men .cgr-rk-ptag {
-  color: var(--cream-2);
-}
-
-/* Category rows */
-.cgr-rk-list {
-  margin-top: 34px;
-}
-
-.cgr .cgr-rk-cats {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.cgr .cgr-rk-racks {
+  margin-top: 28px;
   border-top: 1px solid var(--line);
 }
 
-.cgr-rk-cats li {
+.cgr .cgr-rk-racks li {
   border-bottom: 1px solid var(--line);
 }
 
-.cgr .cgr-rk-cats a,
-.cgr .cgr-rk-row {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  align-items: baseline;
-  gap: 12px;
-  min-height: 44px;
-  padding: 15px 0 13px 16px;
-  text-decoration: none;
-}
-
-.cgr .cgr-rk-cats a:hover .cgr-rk-nm {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
-}
-
-.cgr .cgr-rk-n,
-.cgr .cgr-rk-ct {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--ink-2);
-}
-
-.cgr .cgr-rk-ct {
-  text-align: right;
-  white-space: nowrap;
-}
-
-.cgr .cgr-rk-nm {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--fs-cat);
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.cgr-rk-cats li.is-on {
-  box-shadow: inset 4px 0 0 var(--hot);
-}
-
-/* Active row: the hot inset bar is the marker; the number goes ink (hot
-   12px text on ivory would miss AA). */
-.cgr .cgr-rk-cats li.is-on .cgr-rk-n {
-  color: var(--ink);
-}
-
-.cgr .cgr-rk-cats li.is-empty .cgr-rk-nm {
-  color: var(--ink-2);
-}
-
-.cgr .cgr-rk-ph {
-  padding: 2px 6px;
-  border: 1px dashed currentColor;
-}
-
-.cgr-rk-ctas {
+.cgr .cgr-rk-racks a {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 26px;
-  margin-top: 36px;
+  gap: 16px;
+  min-height: 44px;
+  padding: 11px 16px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 27px;
+  line-height: 1.1;
+  color: var(--wine);
+  text-decoration: none;
+  transition: background-color var(--dur-hover) var(--ease-silk);
 }
 
-.cgr .cgr-rk-ctas .btn {
-  min-height: 56px;
+.cgr .cgr-rk-racks a:hover {
+  background-color: rgb(235 213 206 / 0.55);
 }
 
-.cgr .cgr-rk-ghost {
-  min-height: 56px;
-  color: var(--cream);
-  font-size: 17px;
-  box-shadow: inset 0 0 0 1.5px currentColor;
+.cgr .cgr-rk-racks li.is-on a {
+  margin-left: calc(-1 * var(--gut));
+  padding-left: calc(var(--gut) + 16px);
+  background-color: var(--blush);
+  font-style: italic;
+  font-weight: 400;
 }
 
-/* ---------- 3D strip ---------- */
-.cgr-rk-stage {
+.cgr .cgr-rk-racks .n {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--mute);
+}
+
+.cgr .cgr-rk-racks .arrow {
+  flex: none;
+  width: 14px;
+  opacity: 0.55;
+}
+
+/* Tilted strip (r7.3 geometry, softened): -40deg about the right edge,
+   faded in from the left. */
+.cgr .cgr-rk-stage {
   position: absolute;
   z-index: 1;
-  left: 45.8%;
+  left: calc(var(--gut) + min(460px, 35vw) + 8px);
   right: 0;
-  top: 64px;
-  bottom: 0;
-  overflow: hidden;
+  top: 56px;
+  height: 640px;
   perspective: 1500px;
   perspective-origin: 10% 46%;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 150px);
-  mask-image: linear-gradient(90deg, transparent 0, #000 150px);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70px);
+  mask-image: linear-gradient(90deg, transparent 0, #000 70px);
 }
 
-.cgr-rk-strip {
+/* r7.5: the strip is sized to the stage so all five gowns stay in view at
+   every desktop width (the stamp's 270px cards at -40deg put the first gown
+   behind the fade and the last past the right edge at 1366). */
+.cgr .cgr-rk-strip {
   position: absolute;
-  right: -150px;
-  top: max(70px, calc(50% - 350px));
+  top: 40px;
+  right: 16px;
+  transform: rotateY(-34deg);
   transform-origin: 100% 50%;
-  transform: rotateY(-40deg);
-  transform-style: preserve-3d;
 }
 
-.cgr-rk-track {
+.cgr .cgr-rk-track {
   display: flex;
-  gap: 20px;
-  transform-style: preserve-3d;
+  align-items: flex-start;
+  gap: 16px;
+  will-change: transform;
 }
 
 .cgr .cgr-rk-card {
   flex: none;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  height: 580px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.32s var(--ease-out);
-}
-
-.cgr a.cgr-rk-card:hover,
-.cgr a.cgr-rk-card:focus-visible {
-  transform: translateZ(40px);
-}
-
-.cgr a.cgr-rk-card:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 4px;
-}
-
-.cgr-rk-im {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--ink);
-}
-
-.cgr-rk-im img {
   display: block;
+  width: clamp(110px, 12.4vw, 220px);
+  padding: 8px 8px 0;
+  background: var(--blush);
+  box-shadow: var(--shadow-mat);
+  color: var(--wine-ink);
+  text-decoration: none;
+  transition: transform var(--dur-fade) var(--ease-silk), box-shadow var(--dur-fade) var(--ease-silk);
+}
+
+.cgr .cgr-rk-card:last-child {
+  width: clamp(124px, 14vw, 250px);
+}
+
+.cgr .cgr-rk-im {
+  position: relative;
+  display: block;
+  aspect-ratio: 27 / 47;
+  overflow: hidden;
+  background: var(--ivory);
+}
+
+.cgr .cgr-rk-card:last-child .cgr-rk-im {
+  aspect-ratio: 30 / 52;
+}
+
+.cgr .cgr-rk-im img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 18%;
-}
-
-/* r7.4: shop photos sit in <picture> (AVIF, WebP fallback) inside the same fixed box. */
-.cgr-rk-im picture {
-  display: block;
-  width: 100%;
-  height: 100%;
+  object-position: 50% 20%;
 }
 
 .cgr .cgr-rk-cap {
   display: block;
-  padding-top: 9px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  padding: 10px 4px 12px;
+  font-size: 13px;
   line-height: 1.35;
-  color: var(--ink-2);
-  white-space: nowrap;
+  color: var(--mute);
 }
 
 .cgr .cgr-rk-cap b {
   display: block;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--ink);
-}
-
-.cgr-rk-men .cgr-rk-cap {
-  color: var(--cream-2);
-}
-
-.cgr .cgr-rk-men .cgr-rk-cap b {
-  color: var(--cream);
-}
-
-/* Empty cards (no photo in the repo) */
-.cgr .cgr-rk-card.is-none {
-  height: 600px;
-}
-
-.cgr-rk-card.is-none .cgr-rk-im {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  background: transparent;
-  border: 1.5px dashed rgb(242 232 216 / 0.34);
-}
-
-.cgr-rk-fil .cgr-rk-card.is-none .cgr-rk-im {
-  border-color: rgb(18 10 9 / 0.26);
-}
-
-.cgr .cgr-rk-tag {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--cream-2);
-}
-
-.cgr .cgr-rk-fil .cgr-rk-tag {
-  color: var(--ink-2);
-}
-
-.cgr .cgr-rk-word {
+  margin-bottom: 2px;
   font-family: var(--font-display);
-  font-size: 84px;
-  line-height: 0.9;
-  text-transform: uppercase;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--cream-2);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.15;
+  color: var(--wine);
 }
 
-.cgr .cgr-rk-fil .cgr-rk-word {
-  font-size: 62px;
-  -webkit-text-stroke-color: var(--ink-2);
+.cgr a.cgr-rk-card:hover,
+.cgr a.cgr-rk-card:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 40px 70px -30px rgb(61 15 27 / 0.45);
 }
 
-.cgr-rk-fil .cgr-rk-stage {
-  top: 0;
-}
-
-.cgr-rk-fil .cgr-rk-strip {
-  top: 70px;
-}
-
-.cgr .cgr-rk-fil .cgr-rk-card.is-none {
-  width: 280px;
-  height: 420px;
-}
-
-.cgr-rk-men .cgr-rk-strip {
-  top: max(60px, calc(50% - 360px));
-}
-
-/* Accessories: small crops, never upscaled past the stamp's 330 x 300. */
-.cgr-rk-acc .cgr-rk-stage {
-  top: 0;
-}
-
-.cgr-rk-acc .cgr-rk-strip {
-  right: -170px;
-  top: 250px;
-}
-
-.cgr .cgr-rk-acc .cgr-rk-card {
-  width: 330px;
-  height: 300px;
-}
-
-/* The crops are small (248-696px wide): scale-down never enlarges them. */
-.cgr-rk-acc .cgr-rk-im img {
-  object-fit: scale-down;
-  object-position: 50% 50%;
-}
-
-.cgr-rk-floor {
+.cgr .cgr-rk-note {
   position: absolute;
-  z-index: 0;
-  left: 44.4%;
-  right: 0;
-  top: calc(100% - 68px);
-  height: 1px;
-  background: var(--line);
-}
-
-.cgr-rk-acc .cgr-rk-floor {
-  top: 720px;
-}
-
-/* Men's: "Other racks" row */
-.cgr-rk-other {
-  position: absolute;
-  z-index: 5;
-  left: var(--gut);
+  z-index: 4;
   right: var(--gut);
-  bottom: 40px;
+  top: 724px;
+  max-width: 14em;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--mute);
+}
+
+/* The lens follows the pointer in viewport space (GSAP x / y). */
+.cgr .cgr-lens {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgb(247 241 230 / 0.9);
+  box-shadow: 0 0 0 1px rgb(91 26 42 / 0.25), 0 24px 50px -18px rgb(61 15 27 / 0.55);
+  background-color: var(--ivory);
+  background-repeat: no-repeat;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-fade) var(--ease-silk), visibility 0s linear var(--dur-fade);
+}
+
+.cgr .cgr-lens[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dur-fade) var(--ease-silk), visibility 0s;
+}
+
+/* Blush accessories band along the bottom of the catalogue. */
+.cgr .cgr-rk-band {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 170px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 40px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line-d);
+  align-items: center;
+  gap: 56px;
+  padding: 24px var(--gut);
+  background: var(--blush);
 }
 
-.cgr .cgr-rk-other a {
+.cgr .cgr-rk-band-t {
+  flex: 0 1 340px;
+}
+
+.cgr .cgr-rk-band h3 {
+  font-size: var(--t-h3);
+  color: var(--wine);
+}
+
+.cgr .cgr-rk-band .cgr-cap {
+  margin-top: 8px;
+}
+
+.cgr .cgr-rk-thumbs {
+  display: flex;
+  gap: 14px;
+}
+
+.cgr .cgr-rk-thumbs a {
+  display: block;
+  box-shadow: 0 0 0 1px rgb(91 26 42 / 0.12);
+}
+
+.cgr .cgr-rk-thumbs img {
+  width: 96px;
+  height: 118px;
+  object-fit: cover;
+  background: var(--ivory);
+  transition: transform var(--dur-fade) var(--ease-silk);
+}
+
+.cgr .cgr-rk-thumbs a:hover img {
+  transform: translateY(-4px);
+}
+
+.cgr .cgr-more {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   min-height: 44px;
-  padding-top: 6px;
-  font-family: var(--font-display);
-  font-size: 26px;
-  line-height: 1.2;
-  text-transform: uppercase;
+  margin-left: auto;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--wine);
   text-decoration: none;
-  color: var(--cream);
+  white-space: nowrap;
 }
 
-.cgr .cgr-rk-other a.is-empty {
-  color: var(--cream-2);
+.cgr .cgr-more {
+  background-image: linear-gradient(rgb(91 26 42 / 0.4), rgb(91 26 42 / 0.4));
+  background-repeat: no-repeat;
+  background-position: 0 calc(50% + 12px);
+  background-size: 100% 1px;
 }
 
-.cgr .cgr-rk-other a:hover {
+/* ---------- Men's ---------- */
+.cgr .cgr-rk-men {
+  min-height: max(860px, 62.96vw);
+  padding: 92px var(--gut) 120px;
+}
+
+.cgr .cgr-men-pics {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cgr .cgr-mat {
+  padding: 10px;
+  background: var(--ivory);
+  box-shadow: var(--shadow-mat);
+}
+
+.cgr .cgr-mat picture,
+.cgr .cgr-mat img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cgr .cgr-mat img {
+  object-fit: cover;
+}
+
+.cgr .cgr-mat-a {
+  position: absolute;
+  left: -2.93vw;
+  top: 80px;
+  width: 38.07vw;
+  height: min(640px, 46.85vw);
+}
+
+.cgr .cgr-mat-b {
+  position: absolute;
+  left: 28.55vw;
+  top: calc(80px + min(390px, 28.55vw));
+  width: 19.77vw;
+  height: 21.23vw;
+  will-change: transform;
+}
+
+.cgr .cgr-men-cap1 {
+  position: absolute;
+  left: var(--gut);
+  top: calc(80px + min(640px, 46.85vw) + 22px);
+  max-width: 24vw;
+}
+
+.cgr .cgr-men-text {
+  position: relative;
+  z-index: 2;
+  margin-left: calc(54.17vw - var(--gut));
+  width: min(560px, 41vw);
+}
+
+.cgr .cgr-men-text .cgr-rk-h {
+  font-size: clamp(56px, 7vw, 96px);
+}
+
+.cgr .cgr-men-suits {
+  display: flex;
+  gap: 2.93vw;
+  margin-top: 44px;
+}
+
+.cgr .cgr-men-suits figure {
+  width: min(230px, 16.84vw);
+}
+
+.cgr .cgr-mat-s {
+  aspect-ratio: 230 / 300;
+}
+
+.cgr .cgr-men-suits figcaption {
+  margin-top: 12px;
+}
+
+.cgr .cgr-pitch {
+  position: absolute;
+  z-index: 2;
+  right: var(--gut);
+  bottom: 32px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mute);
+}
+
+.cgr .cgr-pitch a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--wine);
   text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
+  text-decoration-color: rgb(91 26 42 / 0.35);
+  text-underline-offset: 4px;
 }
 
-.cgr .cgr-rk-other small {
-  margin-left: 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: lowercase;
-  color: var(--cream-2);
-}
-
-/* ---------- Phone: text, strip, list, button (static strip) ---------- */
+/* ---------- Tablets + phones: staggered two-column grids ---------- */
 @media (max-width: 899px) {
-  .cgr .cgr-rk,
-  .cgr .cgr-rk-men,
-  .cgr .cgr-rk-fil,
-  .cgr .cgr-rk-acc {
+  .cgr .cgr-rk-cat {
     min-height: 0;
-    padding: 96px 20px 56px;
-    display: flex;
-    flex-direction: column;
+    padding: 64px var(--gut) 0;
   }
 
-  .cgr-rk-text,
-  .cgr-rk-men .cgr-rk-text {
-    display: contents;
+  .cgr .cgr-rk-text {
+    width: auto;
   }
 
-  .cgr .cgr-rk-h,
-  .cgr .cgr-rk-fil .cgr-rk-h {
-    margin-top: 0;
-    font-size: clamp(60px, 19.5vw, 76px);
+  .cgr .cgr-rk-racks a {
+    font-size: 24px;
   }
 
-  .cgr .cgr-rk-fil .cgr-rk-h {
-    font-size: clamp(52px, 16.4vw, 64px);
-  }
-
-  .cgr .cgr-rk-lead {
-    margin-top: 16px;
-    font-size: 17px;
-  }
-
-  .cgr .cgr-rk-men .cgr-rk-lead {
-    margin-top: 14px;
-  }
-
-  .cgr-rk-pt {
-    margin-top: 20px;
-  }
-
-  .cgr .cgr-rk-ptag {
-    font-size: 11px;
-  }
-
-  .cgr-rk-stage {
+  .cgr .cgr-rk-stage {
     position: relative;
-    order: 5;
     left: auto;
     right: auto;
     top: auto;
-    bottom: auto;
-    margin: 24px -20px 0;
-    height: 400px;
-    perspective: 900px;
-    perspective-origin: 0% 50%;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70px);
-    mask-image: linear-gradient(90deg, transparent 0, #000 70px);
+    height: auto;
+    margin-top: 40px;
+    padding-bottom: 40px;
+    perspective: none;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
-  .cgr-rk-strip,
-  .cgr-rk-men .cgr-rk-strip,
-  .cgr-rk-fil .cgr-rk-strip {
-    right: -70px;
-    top: 10px;
-    transform: rotateY(-30deg);
+  .cgr .cgr-rk-strip {
+    position: static;
+    transform: none;
   }
 
-  .cgr-rk-track {
-    gap: 12px;
+  .cgr .cgr-rk-track {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    will-change: auto;
   }
 
-  .cgr .cgr-rk-card {
-    width: 190px;
-    height: 330px;
+  .cgr .cgr-rk-card,
+  .cgr .cgr-rk-card:last-child {
+    width: auto;
+    padding: 6px 6px 0;
   }
 
-  .cgr .cgr-rk-card.is-none,
-  .cgr .cgr-rk-fil .cgr-rk-card.is-none {
-    width: 190px;
-    height: 300px;
+  /* Second column sits a little lower: the stagger. */
+  .cgr .cgr-rk-card:nth-child(even) {
+    transform: translateY(36px);
   }
 
-  .cgr .cgr-rk-word {
-    font-size: 54px;
+  .cgr .cgr-rk-card:last-child .cgr-rk-im {
+    aspect-ratio: 27 / 47;
   }
 
-  .cgr .cgr-rk-fil .cgr-rk-word {
-    font-size: 38px;
+  .cgr a.cgr-rk-card:hover,
+  .cgr a.cgr-rk-card:focus-visible {
+    transform: none;
   }
 
-  .cgr-rk-men .cgr-rk-stage,
-  .cgr-rk-fil .cgr-rk-stage {
-    height: 340px;
+  .cgr a.cgr-rk-card:nth-child(even):hover,
+  .cgr a.cgr-rk-card:nth-child(even):focus-visible {
+    transform: translateY(36px);
   }
 
-  .cgr .cgr-rk-acc .cgr-rk-card {
-    width: 220px;
-    height: 200px;
+  .cgr .cgr-rk-cap {
+    padding: 8px 2px 10px;
+    font-size: 12px;
   }
 
-  .cgr-rk-acc .cgr-rk-stage {
-    height: 280px;
+  .cgr .cgr-rk-cap b {
+    font-size: 17px;
   }
 
-  .cgr-rk-acc .cgr-rk-strip {
-    right: -70px;
-    top: 20px;
+  .cgr .cgr-rk-note,
+  .cgr .cgr-lens {
+    display: none;
   }
 
-  .cgr-rk-list,
-  .cgr-rk-men .cgr-rk-ctas {
-    order: 6;
-    margin-top: 10px;
+  .cgr .cgr-rk-band {
+    position: relative;
+    margin: 0 calc(-1 * var(--gut));
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 36px var(--gut) 28px;
   }
 
-  .cgr-rk-fil .ulink {
-    order: 6;
+  .cgr .cgr-rk-band-t {
+    flex: none;
   }
 
-  .cgr-rk-ctas {
-    margin-top: 26px;
+  .cgr .cgr-rk-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
   }
 
+  .cgr .cgr-rk-thumbs img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 96 / 118;
+  }
+
+  .cgr .cgr-more {
+    margin-left: 0;
+  }
+
+  .cgr .cgr-rk-men {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 64px var(--gut) 40px;
+  }
+
+  .cgr .cgr-men-pics {
+    position: relative;
+    inset: auto;
+    order: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 40px;
+    pointer-events: auto;
+  }
+
+  .cgr .cgr-mat-a,
+  .cgr .cgr-mat-b {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    will-change: auto;
+  }
+
+  .cgr .cgr-mat-b {
+    transform: translateY(36px);
+  }
+
+  .cgr .cgr-men-cap1 {
+    position: static;
+    grid-column: 1 / -1;
+    max-width: none;
+    margin-top: 44px;
+  }
+
+  .cgr .cgr-men-text {
+    order: 1;
+    margin-left: 0;
+    width: auto;
+  }
+
+  .cgr .cgr-men-text .cgr-rk-h {
+    font-size: var(--t-h2);
+  }
+
+  .cgr .cgr-men-suits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 36px;
+  }
+
+  .cgr .cgr-men-suits figure {
+    width: auto;
+  }
+
+  .cgr .cgr-men-suits figure:nth-child(even) {
+    transform: translateY(36px);
+  }
+
+  .cgr .cgr-men-suits figure:nth-child(even) figcaption {
+    margin-bottom: 36px;
+  }
+
+  .cgr .cgr-pitch {
+    position: static;
+    order: 3;
+    margin-top: 36px;
+  }
+}
+
+@media (max-width: 640px) {
   .cgr .cgr-rk-ctas .btn {
-    flex: 1;
-  }
-
-  .cgr-rk-cat .cgr-rk-ctas .ulink {
-    display: none;
-  }
-
-  .cgr-rk-floor,
-  .cgr-rk-other {
-    display: none;
+    padding: 0 18px;
   }
 }
 
 /* Reduced motion: static strips, no hover travel, instant nav. */
 @media (prefers-reduced-motion: reduce) {
   .cgr .cgr-rk-card,
+  .cgr .cgr-rk-thumbs img,
+  .cgr .cgr-lens,
   .cgr-sn,
   .cgr-sn[data-on="true"] {
     transition: none;
   }
 
   .cgr a.cgr-rk-card:hover,
-  .cgr a.cgr-rk-card:focus-visible {
+  .cgr a.cgr-rk-card:focus-visible,
+  .cgr .cgr-rk-thumbs a:hover img {
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 899px) {
+  .cgr a.cgr-rk-card:nth-child(even):hover,
+  .cgr a.cgr-rk-card:nth-child(even):focus-visible {
+    transform: translateY(36px);
   }
 }
 
@@ -1865,7 +1836,7 @@ html:has(.cgr) {
 
 .cgr-cf-card.is-front,
 .cgr-cf:not([data-flow]) .cgr-cf-card:focus-visible {
-  box-shadow: 14px 14px 0 var(--hot);
+  box-shadow: 14px 14px 0 var(--accent);
 }
 
 .cgr-cf-media,
@@ -2016,7 +1987,7 @@ html:has(.cgr) {
   }
 
   .cgr-cf-card.is-front {
-    box-shadow: 10px 10px 0 var(--hot);
+    box-shadow: 10px 10px 0 var(--accent);
   }
 
   .cgr-cf[data-flow] .cgr-cf-track {
@@ -2111,7 +2082,7 @@ html:has(.cgr) {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  border: 3px solid var(--hot);
+  border: 3px solid var(--accent);
   box-shadow: 0 0 0 2px var(--ink), 0 18px 40px rgb(0 0 0 / 0.45);
   background-color: var(--ink);
   background-repeat: no-repeat;
@@ -2126,7 +2097,7 @@ html:has(.cgr) {
   left: 72%;
   top: 96%;
   padding: 3px 8px;
-  background: var(--hot);
+  background: var(--accent);
   color: var(--ink);
   white-space: nowrap;
 }
@@ -2144,7 +2115,7 @@ html:has(.cgr) {
   align-items: center;
   min-height: 44px;
   padding: 0 12px;
-  background: var(--hot);
+  background: var(--accent);
   color: var(--ink);
   text-decoration: none;
 }
@@ -2190,7 +2161,7 @@ html:has(.cgr) {
 }
 
 .cgr-dt-thumb[aria-pressed="true"] {
-  box-shadow: 10px 10px 0 var(--hot);
+  box-shadow: 10px 10px 0 var(--accent);
 }
 
 .cgr-dt-thumb img {
@@ -2338,9 +2309,9 @@ html:has(.cgr) {
 }
 
 .cgr-cal-day.is-on span {
-  background: var(--hot);
-  color: var(--ink);
-  font-weight: 800;
+  background: var(--wine);
+  color: var(--ivory);
+  font-weight: 600;
   animation: cgr-disc 0.35s var(--ease-punch);
 }
 
@@ -2532,7 +2503,7 @@ html:has(.cgr) {
 }
 
 .cgr-steps-n li.is-on {
-  color: var(--hot);
+  color: var(--accent);
   -webkit-text-stroke: 0;
   animation: cgr-step 0.45s var(--ease-punch);
 }
@@ -2603,7 +2574,7 @@ html:has(.cgr) {
   font-size: clamp(24px, 2.4vw, 34px);
   letter-spacing: -0.02em;
   line-height: 1.1;
-  caret-color: var(--hot);
+  caret-color: var(--accent);
   color-scheme: dark;
 }
 
@@ -2614,7 +2585,7 @@ html:has(.cgr) {
 
 .uf input:focus {
   outline: none;
-  border-bottom: 3px solid var(--hot);
+  border-bottom: 3px solid var(--accent);
   padding-bottom: 9px;
 }
 
@@ -2647,14 +2618,14 @@ html:has(.cgr) {
 
 .cgr .cgr-bk-status.is-no {
   color: var(--cream);
-  text-decoration: underline 2px var(--hot);
+  text-decoration: underline 2px var(--accent);
   text-underline-offset: 4px;
 }
 
 .cgr-bk-err {
   margin-top: 20px;
   padding: 12px 14px;
-  border-left: 4px solid var(--hot);
+  border-left: 4px solid var(--accent);
   background: var(--ox-deep);
   color: var(--cream);
 }
@@ -2769,7 +2740,7 @@ html:has(.cgr) {
 .cgr-cn-ref {
   margin-top: 24px;
   font-size: var(--fs-mega);
-  color: var(--hot);
+  color: var(--accent);
   overflow-wrap: anywhere;
 }
 
@@ -3114,7 +3085,7 @@ tr[data-status="cancelled"] .cgr-ow-c {
 }
 
 /* ==========================================================================
-   Footer (black, curved cap, giant wordmark, "see you")
+   Footer (black + tulle, curved cap, giant Cormorant wordmark)
    ========================================================================== */
 .cgr-foot {
   position: relative;
@@ -3201,30 +3172,18 @@ tr[data-status="cancelled"] .cgr-ow-c {
   pointer-events: none;
 }
 
-.cgr-foot-word {
-  margin-left: -20px;
-  font-size: clamp(110px, 16vw, 230px);
+.cgr .cgr-foot-word {
+  display: block;
+  margin-left: -0.04em;
+  font-size: clamp(84px, 12.4vw, 190px);
+  line-height: 0.9;
   color: var(--cream);
   white-space: nowrap;
-  transform: translateY(0.12em);
+  transform: translateY(0.1em);
 }
 
-.cgr-foot-hand {
-  position: absolute;
-  left: 78.5vw;
-  top: 0;
-  z-index: 2;
-  font-size: clamp(64px, 7.6vw, 110px);
-  white-space: nowrap;
-  transform: rotate(-8deg);
-}
-
-/* r7.3: cream like the hero script (vermilion stays on CTAs and accents);
-   beats .cgr .hand. */
-.cgr .cgr-foot-hand {
-  color: var(--cream);
-  /* Same soft dark halo as .cgr-intro-hand: the script crosses the cream wordmark. */
-  text-shadow: 0 0 1px rgb(0 0 0 / 0.95), 0 0 2px rgb(0 0 0 / 0.9), 0 0 5px rgb(0 0 0 / 0.7), 0 1px 14px rgb(0 0 0 / 0.5);
+.cgr .cgr-foot-word em {
+  color: var(--blush);
 }
 
 @media (max-width: 899px) {
@@ -3248,17 +3207,11 @@ tr[data-status="cancelled"] .cgr-ow-c {
     padding-top: 50px;
   }
 
-  .cgr-foot-word {
-    margin-left: -8px;
-    font-size: 30vw;
-  }
-
-  .cgr-foot-hand {
-    left: 54vw;
-    top: 10px;
-    font-size: 64px;
+  .cgr .cgr-foot-word {
+    font-size: 15.5vw;
   }
 }
+
 
 /* ==========================================================================
    Reduced motion: instant opacity reveals, nothing travels
@@ -3275,6 +3228,7 @@ tr[data-status="cancelled"] .cgr-ow-c {
   .cgr .rv {
     clip-path: none;
     opacity: 0;
+    transform: none;
     transition: opacity 0.01ms linear;
   }
 
@@ -3291,11 +3245,12 @@ tr[data-status="cancelled"] .cgr-ow-c {
 }
 
 
-/* r7.3.1 Font gate (FontGate.tsx). Until the next/font faces load, the
-   first-screen nodes whose position depends on a text width stay visibility
-   hidden (their text is invisible in the block period anyway), so the swap to
-   Anton, Space Mono and Great Vibes moves nothing visible: CLS 0. The
-   animation is a failsafe that shows them after 3s if a font never arrives. */
+/* r7.3.1 Font gate (FontGate.tsx), r7.5 list. Until the next/font faces load
+   (Cormorant Garamond, Figtree, Great Vibes), the first-screen nodes whose
+   position depends on a text width stay visibility hidden (their text is
+   invisible in the block period anyway), so the swap moves nothing visible:
+   CLS 0. The animation is a failsafe that shows them after 3s if a font
+   never arrives. */
 @keyframes cgr-fontgate {
   to {
     visibility: visible;
@@ -3306,10 +3261,8 @@ tr[data-status="cancelled"] .cgr-ow-c {
     .cgr-bar-inner,
     .cgr-head-nav,
     .cgr-head-mob,
-    .cgr-intro-h,
-    .magnet-l,
-    .cgr-hand-fix,
-    .cgr-hand-stack
+    .cgr-intro-copy,
+    .cgr-intro-hand
   ) {
   visibility: hidden;
   animation: cgr-fontgate 0s linear 3s forwards;

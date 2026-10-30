@@ -1,42 +1,33 @@
 import type { Metadata } from "next";
-import { Anton, Archivo, Great_Vibes, Space_Mono } from "next/font/google";
+import { Cormorant_Garamond, Figtree, Great_Vibes } from "next/font/google";
 import { cgr } from "@/lib/cgr-rentals";
 import { FontGate } from "@/components/demos/cgr-rentals/FontGate";
 import "./cgr.css";
 
-// Round 7.2 type (Design stamp r7.2/font.md). Self-hosted by next/font at
+// Round 7.5 type (Design stamp r7.5/spec.md). Self-hosted by next/font at
 // build time: no font files live in the repo.
-// - Display: Anton 400 (single weight) for the edge-bleeding headings, the
-//   h1, buttons, the magnet and the wordmark. latin-ext carries ñ and ₱.
-// - Body: Archivo at normal width (variable wght, no wdth axis).
-// - Mono: Space Mono 400/700 for meta lines (unchanged).
-// - Script: Great Vibes for the hero rotator and the footer "see you" only;
-//   it never sets a price.
-// Display, body and mono use display "block": a fallback face can't match
-// Anton's metrics, so a late swap would move GOWNS and the nav (r7 measured
-// CLS ~0.005 with swap). next/font preloads them, so the block period is
-// short. The script accent is absolutely placed, so it keeps swap.
-// r7.3.1: block alone still lays the invisible text out with fallback metrics,
-// so FontGate keeps the few width-dependent first-screen nodes hidden until
-// these faces load (no layout shift at 1440 or 390).
-const display = Anton({
+// - Display: Cormorant Garamond (variable wght 300-700, normal + italic).
+//   Light 300 for the h1 and h2s, italic 400 for the accent words, italic
+//   500 for small italic labels. latin carries ñ.
+// - Body: Figtree (variable wght) at 400 / 500: lead, labels, buttons. latin-ext
+//   carries the ₱ sign.
+// - Script: Great Vibes for the hero rotator only.
+// Anton, Archivo and Space Mono are retired (r7.2-7.4.1).
+// Display and body use display "block" (a fallback face can't match their
+// metrics, so a late swap would move the h1 and the nav); FontGate keeps the
+// width-dependent first-screen nodes hidden until these faces load (CLS 0).
+// The script accent is absolutely placed, so it keeps swap.
+const display = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
-  weight: "400",
+  style: ["normal", "italic"],
   display: "block",
   variable: "--nf-display",
 });
 
-const body = Archivo({
+const body = Figtree({
   subsets: ["latin", "latin-ext"],
   display: "block",
   variable: "--nf-body",
-});
-
-const mono = Space_Mono({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "700"],
-  display: "block",
-  variable: "--nf-mono",
 });
 
 const hand = Great_Vibes({
@@ -46,7 +37,15 @@ const hand = Great_Vibes({
   variable: "--nf-hand",
 });
 
-const FAMILIES = [display.style.fontFamily, body.style.fontFamily, mono.style.fontFamily, hand.style.fontFamily];
+const first = (f: string) => f.split(",")[0].trim();
+
+/** The faces the first screen sets, as CSS font shorthand (style weight size family). */
+const FACES = [
+  { font: `300 16px ${first(display.style.fontFamily)}`, text: "Aa" },
+  { font: `italic 400 16px ${first(display.style.fontFamily)}`, text: "Aa" },
+  { font: `400 16px ${first(body.style.fontFamily)}`, text: "Aa\u20b1" },
+  { font: `400 16px ${first(hand.style.fontFamily)}`, text: "Aa" },
+];
 
 export const metadata: Metadata = {
   title: cgr.title,
@@ -70,10 +69,7 @@ export default function CgrRentalsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <FontGate
-      className={`cgr-fonts ${display.variable} ${body.variable} ${mono.variable} ${hand.variable}`}
-      families={FAMILIES}
-    >
+    <FontGate className={`cgr-fonts ${display.variable} ${body.variable} ${hand.variable}`} faces={FACES}>
       {children}
     </FontGate>
   );
