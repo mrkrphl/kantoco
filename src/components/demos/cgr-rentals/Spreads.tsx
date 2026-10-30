@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { ACCESSORIES, CGR_BASE, CGR_PHOTOS, SHOP_PHOTOS, formatPhp, getGown, type GownImage } from "@/lib/cgr-rentals";
+import { ACCESSORIES, CGR_BASE, formatPhp, getGown, type GownImage } from "@/lib/cgr-rentals";
 import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
 /**
  * r7.11 home spreads (Design r7.11 home.html): one photo on a cream mat
  * (contain, never cropped), one script word, one line, one button.
  * Order: 01 Evening (red, first), 02 Bridal, 03 Filipiniana, the Crowns
- * band, 04 Barong. Bridal, Filipiniana and the crowns open their own
- * reservable gown pages (default #4, steering). Barong has no uncropped
- * photo on #33 (both are top-trimmed), so it gets no page; its button goes
- * to the visit block instead of an "Ask about…" line.
+ * band, 04 Suits. Bridal, Filipiniana and the crowns open their own
+ * reservable gown pages (default #4, steering). Suits has no uncropped
+ * photo on #33 (r7.11.1), so it is type only, with no page; its button
+ * goes to the visit block instead of an "Ask about…" line.
  */
 type Spread = {
   id: string;
@@ -65,7 +65,6 @@ const SPREADS: Spread[] = [
   },
 ];
 
-const BARONG = SHOP_PHOTOS.barongEmbroidery;
 const FROM_ACC = Math.min(...ACCESSORIES.map((g) => g.pricePerDay));
 
 function Photo({ img }: { img: GownImage }) {
@@ -122,33 +121,22 @@ export function Spreads() {
         </div>
       </section>
 
-      <section id="suits" className="r11-spread flip" aria-labelledby="suits-h">
-        <figure className="r11-ph r11-mat">
-          {/* eslint-disable-next-line @next/next/no-img-element -- local webp, fixed box */}
-          <img
-            src={`${CGR_PHOTOS}/${BARONG.file}.webp`}
-            alt={BARONG.alt}
-            width={BARONG.w}
-            height={BARONG.h}
-            loading="lazy"
-            decoding="async"
-          />
-        </figure>
-        <div className="r11-txt">
-          <p className="r11-kick" aria-hidden="true">
-            04
-          </p>
-          <p className="r11-script" aria-hidden="true">
-            Barong
-          </p>
-          <h2 id="suits-h" className="r11-line-t">
-            <span className="sr-only">Barong: </span>
-            For grooms, fathers and escorts.
-          </h2>
-          <a className="r11-btn r11-wine r11-sm" href="#visit">
-            Visit the shop
-          </a>
-        </div>
+      <section id="suits" className="r11-suits" aria-labelledby="suits-h">
+        <p className="r11-kick" aria-hidden="true">
+          04
+        </p>
+        <p className="r11-suits-word" aria-hidden="true">
+          <span className="r11-script">Suits</span>
+          <span className="r11-suits-amp">&amp;</span>
+          <span className="r11-suits-alt">barong</span>
+        </p>
+        <h2 id="suits-h" className="r11-line-t">
+          <span className="sr-only">Suits and barong: </span>
+          For grooms, fathers and escorts.
+        </h2>
+        <a className="r11-btn r11-wine r11-sm" href="#visit">
+          Visit the shop
+        </a>
       </section>
     </>
   );

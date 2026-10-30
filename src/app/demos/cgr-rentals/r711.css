@@ -396,3 +396,26 @@ html:has(.cgr) { background: #f7f1e6; }
    copy of the bookings loads, so the footer never jumps into view. */
 .cgr .r11-fl, .cgr .r11-rec { min-height: calc(100svh - var(--sample-h) - var(--head-h)); align-content: start; }
 .cgr .r11-chip .n { display: inline-block; min-width: 2ch; font-variant-numeric: tabular-nums; } /* count lands without a width jump */
+
+/* ---------- r7.11.1: Suits, type only (no photo) ----------
+   Ivory ground, wine type between two hairlines. Static: no motion at all,
+   so reduced motion needs nothing extra. Text only, so no image shift. */
+.cgr .r11-suits {
+  padding: var(--sec-y) var(--gut);
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px;
+  background: var(--ivory);
+}
+.cgr .r11-suits-word {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; column-gap: 0.3em;
+  padding: 28px clamp(8px, 4vw, 64px);
+  border-top: 1px solid var(--wine); border-bottom: 1px solid var(--wine);
+  color: var(--wine); line-height: 0.95; max-width: 100%;
+}
+.cgr .r11-suits-word .r11-script { font-size: clamp(76px, 11vw, 168px); margin: 0; }
+.cgr .r11-suits-amp { font: italic 400 clamp(40px, 5vw, 76px)/1 var(--font-display); color: var(--wine-ink); }
+.cgr .r11-suits-alt { font: italic 400 clamp(52px, 7.4vw, 112px)/1 var(--font-display); color: var(--wine); letter-spacing: -0.01em; }
+.cgr .r11-suits .r11-line-t { max-width: 24ch; }
+@media (max-width: 700px) {
+  .cgr .r11-suits { padding: 96px var(--gut); gap: 22px; }
+  .cgr .r11-suits-word { padding: 20px 0; width: 100%; }
+}

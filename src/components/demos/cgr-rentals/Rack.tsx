@@ -381,8 +381,6 @@ export function Rack() {
         <div className="cgr-sp-body">
           <div className="cgr-sp-art">
             <Num n="05" />
-            <Ph p={SHOP_PHOTOS.barongEmbroidery} className="frame ph-a" pos="50% 30%" />
-            <Ph p={SHOP_PHOTOS.barongWoven} className="mat ph-b" pos="50% 20%" />
             <Sw w="Barong" />
           </div>
           <div className="cgr-sp-text">

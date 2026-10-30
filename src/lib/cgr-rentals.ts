@@ -110,20 +110,6 @@ export const SHOP_PHOTOS = {
     w: 590,
     h: 1200,
   },
-  barongEmbroidery: {
-    file: "cgr-barong-black-embroidery",
-    label: "Barong",
-    alt: "Cream barong with black geometric embroidery down the front and sleeves, shown from the collar down.",
-    w: 985,
-    h: 1200,
-  },
-  barongWoven: {
-    file: "cgr-barong-woven",
-    label: "Barong",
-    alt: "Cream barong with a woven geometric front panel and striped woven sleeves, shown from the collar down.",
-    w: 1000,
-    h: 969,
-  },
   suitBlue: {
     file: "cgr-suit-royal-blue",
     label: "Suit",
