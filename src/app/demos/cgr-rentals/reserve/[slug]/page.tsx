@@ -7,12 +7,14 @@ export function generateStaticParams() {
   return GOWNS.map((g) => ({ slug: g.slug }));
 }
 
+const isIso = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+
 export default async function ReservePage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ date?: string }>;
+  searchParams: Promise<{ date?: string; from?: string; to?: string }>;
 }) {
   const { slug } = await params;
   const sp = await searchParams;
@@ -20,20 +22,22 @@ export default async function ReservePage({
   if (RETIRED_SLUGS.has(slug)) redirect(`${CGR_BASE}#gowns`);
   const gown = getGown(slug);
   if (!gown) notFound();
-  // r7.9: an old slug (before the listings were renamed to match their
-  // photos) goes to the gown's current page.
+  // r7.9: an old slug goes to the gown's current page, keeping its dates.
   if (gown.slug !== slug) {
-    const q = typeof sp.date === "string" ? `?date=${encodeURIComponent(sp.date)}` : "";
+    const qp = new URLSearchParams();
+    for (const k of ["date", "from", "to"] as const) {
+      const v = sp[k];
+      if (typeof v === "string") qp.set(k, v);
+    }
+    const q = qp.size ? `?${qp.toString()}` : "";
     redirect(`${CGR_BASE}/reserve/${gown.slug}${q}`);
   }
-  // Client fills a default (today + 7) when no valid ?date= is given.
-  const initialDate =
-    typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date)
-      ? sp.date
-      : "";
+  // r7.11: dates stay picked as ?from=&to=; the older ?date= still works.
+  const initialDate = isIso(sp.from) ? sp.from : isIso(sp.date) ? sp.date : "";
+  const initialReturn = isIso(sp.to) ? sp.to : "";
   return (
     <CgrShell current="Reserve">
-      <ReserveForm gown={gown} initialDate={initialDate} />
+      <ReserveForm gown={gown} initialDate={initialDate} initialReturn={initialReturn} />
     </CgrShell>
   );
 }

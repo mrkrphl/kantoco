@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Figtree, Pinyon_Script } from "next/font/google";
 import { cgr } from "@/lib/cgr-rentals";
 import { FontGate } from "@/components/demos/cgr-rentals/FontGate";
 import "./cgr.css";
+import "./r711.css";
 
 // Round 7.6 type (Design stamp r7.6/spec.md). Self-hosted by next/font at
 // build time: no font files live in the repo.
