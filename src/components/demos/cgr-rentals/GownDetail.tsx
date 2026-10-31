@@ -6,9 +6,11 @@ import { CGR_BASE, SLUG_ALIASES, type Gown } from "@/lib/cgr-rentals";
 import { useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 import { Calendar, type DayKind } from "@/components/demos/cgr-rentals/Calendar";
+import { DB_ON, dbTakenDays, useDbRead } from "@/components/demos/cgr-rentals/db";
 import {
   addDaysIso,
   defaultReturn,
+  horizonIso,
   humanDate,
   reserveState,
   takenDays,
@@ -58,9 +60,17 @@ export function GownDetail({
   const isAcc = gown.category === "accessory";
   const noun = isAcc ? "piece" : "gown";
 
-  const taken = (a: string, b: string) => takenDays(gown.slug, a, b, gown.bookedDates, rows ?? [], SLUG_ALIASES);
+  // r8.2: with the database on, struck-out days come from taken_days for
+  // today..today+366 (one call); this device's rows don't hold a gown then.
+  const last = today ? horizonIso(today) : "";
+  const dbDays = useDbRead(DB_ON && today ? `${gown.slug}|${today}` : null, () => dbTakenDays(gown.slug, today ?? "", last));
+  const dbRows = Array.isArray(dbDays)
+    ? dbDays.map((d) => ({ ref: "", gownSlug: gown.slug, eventDate: d, returnDate: d, status: "pending" as const }))
+    : [];
+  const taken = (a: string, b: string) =>
+    takenDays(gown.slug, a, b, gown.bookedDates, DB_ON ? dbRows : (rows ?? []), SLUG_ALIASES);
   const kindOf = (d: string): DayKind => {
-    if (today && d < today) return "off";
+    if (today && (d < today || d > last)) return "off";
     return taken(d, d).length ? "booked" : "open";
   };
 
@@ -81,6 +91,15 @@ export function GownDetail({
   } else if (state === "past") {
     status = "That date has already passed. Pick a day from today onward.";
     tone = "no";
+  } else if (state === "too_far") {
+    status = "Reservations open up to a year ahead. Pick an earlier day.";
+    tone = "no";
+  } else if (state === "too_long") {
+    status = "Online reservations can be up to 30 days.";
+    tone = "no";
+  }
+  if (DB_ON && dbDays === "unavailable" && state === "ok") {
+    status = `${humanDate(pick.from)} looks free. Live dates can’t load right now; the next step checks again.`;
   }
 
   const href = `${CGR_BASE}/reserve/${gown.slug}?from=${pick.from}&to=${pick.to}`;

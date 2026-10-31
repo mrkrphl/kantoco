@@ -7,8 +7,21 @@ import { CGR_BASE, CGR_FLAGS, FITTING_SLOTS, getGown, type Booking } from "@/lib
 import { addBooking, loadBookings, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { Calendar, type DayKind } from "@/components/demos/cgr-rentals/Calendar";
 import { Side, Steps, useStepFocus } from "@/components/demos/cgr-rentals/FlowBits";
+import { BookingUnavailable, Honeypot } from "@/components/demos/cgr-rentals/DbBits";
+import {
+  DB_ON,
+  dbCreateFitting,
+  dbFittingTimes,
+  dbMessage,
+  dbSummary,
+  dbTakenSlots,
+  summaryToBooking,
+  useDbRead,
+  type Summary,
+} from "@/components/demos/cgr-rentals/db";
 import {
   REF_PATTERN,
+  horizonIso,
   exampleTakenFor,
   fittingDayState,
   humanDate,
@@ -29,6 +42,12 @@ type Errs = Partial<Record<"code" | "name" | "contact", string>>;
  * slots (r8.0: no "example" note); a slot is taken only when a saved fitting
  * has the same day and time (FITTING_SLOTS.exampleTaken is empty), re-checked on submit (state "slot taken"). Fittings
  * never hold a gown and never count toward the commission.
+ *
+ * r8.2: with the database on (DB_ON) the times come from fitting_times, a
+ * slot is taken per taken_slots(day), and the save is create_fitting (which
+ * re-checks under a lock; a lost race shows "just taken"). A code is looked
+ * up on this device first (older on-device codes still work), then with
+ * booking_summary. Days are open up to a year ahead.
  */
 export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: string }) {
   const router = useRouter();
@@ -47,26 +66,48 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
   const [saving, setSaving] = useState(false);
   const alertRef = useRef<HTMLDivElement>(null);
   const slotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  // r8.2 database mode
+  const [down, setDown] = useState(false);
+  const [sendErr, setSendErr] = useState("");
+  const [website, setWebsite] = useState("");
+  const [typed, setTyped] = useState<Summary | null>(null); // a code typed on step 01
+  const [bump, setBump] = useState(0);
+  const [looking, setLooking] = useState(false);
 
-  const linked: Booking | undefined =
+  const localLinked: Booking | undefined =
     rows && linkRef ? rows.find((b) => b.ref === linkRef && !isFitting(b)) : undefined;
+  const askDb = DB_ON && rows !== null && !!linkRef && !localLinked && REF_PATTERN.test(linkRef) && typed?.ref !== linkRef;
+  const fromUrl = useDbRead(askDb ? `sum|${linkRef}` : null, () => dbSummary(linkRef));
+  const sum = typed?.ref === linkRef ? typed : fromUrl && fromUrl !== "unavailable" ? fromUrl : null;
+  const dbLinked = sum && sum.kind === "reserve" ? summaryToBooking(sum) : undefined;
+  const linked: Booking | undefined = localLinked ?? dbLinked;
   const gown = getGown(linked?.gownSlug ?? gownSlug);
   const event = linked?.eventDate ?? "";
-  const refMissing = !!(rows && refCode && !linked && linkRef === refCode.trim().toUpperCase());
+  const linkPending = askDb && fromUrl === undefined;
+  const refMissing = !!(rows && refCode && !linked && !linkPending && linkRef === refCode.trim().toUpperCase());
+
+  const dbTimes = useDbRead(DB_ON ? "times" : null, () => dbFittingTimes());
+  const times: readonly string[] =
+    DB_ON && Array.isArray(dbTimes) && dbTimes.length ? dbTimes : FITTING_SLOTS.times;
+  const dbSlots = useDbRead(DB_ON && step === "time" && day ? `slots|${day}|${bump}` : null, () => dbTakenSlots(day));
 
   const dState = today ? fittingDayState(day, today, event) : "missing";
   const exTaken = day ? exampleTakenFor(day, FITTING_SLOTS.exampleTaken) : [];
-  const isTaken = (s: string) => slotTaken(day, s, rows ?? [], exTaken);
-  const free: string[] = FITTING_SLOTS.times.filter((s) => !isTaken(s));
+  const isTaken = (s: string) =>
+    DB_ON ? Array.isArray(dbSlots) && dbSlots.includes(s) : slotTaken(day, s, rows ?? [], exTaken);
+  const free: string[] = times.filter((s) => !isTaken(s));
   const errCount = Object.keys(errs).length;
 
   const title = step === "time" ? (lost ? "Slot taken · Fitting" : "Time · Fitting") : dState === "before-event" ? "Before your event · Fitting" : "Day · Fitting";
   const h1Ref = useStepFocus(`${step}`, title);
   useEffect(() => {
-    if (tries && (errCount || lost)) alertRef.current?.focus();
-  }, [tries, errCount, lost]);
+    if ((tries && (errCount || lost)) || sendErr) alertRef.current?.focus();
+  }, [tries, errCount, lost, sendErr]);
 
-  if (!rows || !today) {
+  if (DB_ON && (down || fromUrl === "unavailable" || dbTimes === "unavailable" || dbSlots === "unavailable")) {
+    return <BookingUnavailable what="Fitting booking" />;
+  }
+  if (!rows || !today || linkPending || (DB_ON && dbTimes === undefined)) {
     return (
       <section className="r11-fl">
         <div className="r11-main">
@@ -94,15 +135,34 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
     );
   }
 
-  const kindOf = (d: string): DayKind => (d < today || (event && d >= event) ? "off" : "open");
+  const last = horizonIso(today);
+  const kindOf = (d: string): DayKind => (d < today || d > last || (event && d >= event) ? "off" : "open");
 
-  const toTime = (e: React.FormEvent) => {
+  const toTime = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (looking) return;
     const c = code.trim().toUpperCase();
     if (!linked && c) {
-      const hit = rows.find((b) => b.ref === c && !isFitting(b));
+      let hit: Booking | undefined = rows.find((b) => b.ref === c && !isFitting(b));
+      if (!hit && DB_ON && REF_PATTERN.test(c)) {
+        setLooking(true);
+        const r = await dbSummary(c);
+        setLooking(false);
+        if (!r.ok) {
+          setDown(true);
+          return;
+        }
+        if (r.data && r.data.kind === "reserve") {
+          setTyped(r.data);
+          hit = summaryToBooking(r.data);
+        }
+      }
       if (!REF_PATTERN.test(c) || !hit) {
-        setErrs({ code: "That code is not saved in this browser. Check it, or leave it empty." });
+        setErrs({
+          code: DB_ON
+            ? "We can’t find that reservation code. Check it, or leave it empty."
+            : "That code is not saved in this browser. Check it, or leave it empty.",
+        });
         setTries((t) => t + 1);
         return;
       }
@@ -114,11 +174,43 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
     }
     if (dState !== "ok") return;
     setErrs({});
+    setSendErr("");
     setStep("time");
+  };
+
+  const bookDb = async () => {
+    setSaving(true);
+    setSendErr("");
+    // A code saved only on this device isn't in the database: send its name
+    // and contact. A database code: the database copies them itself.
+    const r = await dbCreateFitting({
+      day,
+      slot,
+      name: localLinked ? localLinked.customerName : linked ? "" : name.trim(),
+      contact: localLinked ? localLinked.customerContact : linked ? "" : contact.trim(),
+      linkedRef: linked?.ref ?? null,
+      slug: gown.slug,
+      website,
+    });
+    if (r.ok) {
+      router.push(`${CGR_BASE}/confirmation?ref=${encodeURIComponent(r.ref)}`);
+      return;
+    }
+    setSaving(false);
+    if (r.error === "unavailable") setDown(true);
+    else if (r.error === "taken") {
+      setLost(slot);
+      setSlot("");
+      setBump((n) => n + 1);
+    } else if (r.error === "past" || r.error === "before-event" || r.error === "too_far" || r.error === "missing") {
+      setStep("day");
+      setSendErr(dbMessage(r.error));
+    } else setSendErr(dbMessage(r.error));
   };
 
   const book = (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const next: Errs = {};
     if (!linked) {
       if (!name.trim()) next.name = "Please add your name.";
@@ -127,6 +219,10 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
     setErrs(next);
     setTries((t) => t + 1);
     if (Object.keys(next).length || !slot) return;
+    if (DB_ON) {
+      void bookDb();
+      return;
+    }
     const latest = loadBookings();
     if (slotTaken(day, slot, latest, exTaken)) {
       setLost(slot);
@@ -164,7 +260,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
     const ns = free[nextIdx];
     setSlot(ns);
     setLost("");
-    slotRefs.current[(FITTING_SLOTS.times as readonly string[]).indexOf(ns)]?.focus();
+    slotRefs.current[times.indexOf(ns)]?.focus();
   };
 
   const side = (
@@ -201,6 +297,9 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
     } else if (dState === "past") {
       status = "That day has already passed. Please pick a day from today onward.";
       tone = "no";
+    } else if (dState === "too_far") {
+      status = "Fittings open up to a year ahead. Please pick an earlier day.";
+      tone = "no";
     }
     return (
       <section className="r11-fl" aria-label="Book a fitting">
@@ -214,7 +313,13 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
           </p>
           {refMissing ? (
             <p className="r11-alert" role="status">
-              {refCode} is not saved in this browser. You can still book a fitting.
+              {DB_ON ? `We can’t find ${refCode}.` : `${refCode} is not saved in this browser.`} You can still book a
+              fitting.
+            </p>
+          ) : null}
+          {sendErr ? (
+            <p className="r11-alert" role="status" data-db-error="">
+              {sendErr}
             </p>
           ) : null}
           {errs.code ? (
@@ -267,12 +372,16 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
             </p>
           </div>
           {dState === "ok" ? (
-            <button type="submit" className="r11-btn r11-wine">
-              Continue
+            <button type="submit" className="r11-btn r11-wine" aria-busy={looking || undefined}>
+              {looking ? "Checking your code…" : "Continue"}
             </button>
           ) : (
             <button type="button" className="r11-btn r11-wine" disabled aria-disabled="true">
-              {dState === "before-event" ? "Pick an earlier day" : dState === "past" ? "Pick another day" : "Pick a day"}
+              {dState === "before-event" || dState === "too_far"
+                ? "Pick an earlier day"
+                : dState === "past"
+                  ? "Pick another day"
+                  : "Pick a day"}
             </button>
           )}
         </form>
@@ -304,21 +413,29 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
             Change day
           </button>
         </p>
-        {lost || errCount ? (
-          <div ref={alertRef} className="r11-alert" role="alert" tabIndex={-1}>
+        {lost || errCount || sendErr ? (
+          <div ref={alertRef} className="r11-alert" role="alert" tabIndex={-1} data-db-error={sendErr ? "" : undefined}>
             {lost
               ? `Sorry, ${slotLabel(lost)} was just taken. Please choose another time.`
               : errCount === 2
                 ? "Two details are missing. Please check the fields marked below."
-                : "One detail is missing. Please check the field marked below."}
+                : errCount
+                  ? "One detail is missing. Please check the field marked below."
+                  : sendErr}
           </div>
         ) : null}
+        <Honeypot value={website} onChange={setWebsite} />
         <div style={{ width: "100%" }}>
           <p id="slots-l" className="sr-only">
             Fitting times
           </p>
-          <div className="r11-slots" role="radiogroup" aria-labelledby="slots-l">
-            {FITTING_SLOTS.times.map((s, i) => {
+          <div
+            className="r11-slots"
+            role="radiogroup"
+            aria-labelledby="slots-l"
+            aria-busy={DB_ON && dbSlots === undefined ? true : undefined}
+          >
+            {times.map((s, i) => {
               const tk = isTaken(s);
               return (
                 <button
@@ -334,7 +451,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
                   tabIndex={!tk && s === tabSlot ? 0 : -1}
                   onKeyDown={(e) => onSlotKey(e, s)}
                   onClick={() => {
-                    if (tk) return;
+                    if (tk || (DB_ON && dbSlots === undefined)) return;
                     setSlot(s);
                     setLost("");
                   }}
@@ -355,6 +472,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
                 autoComplete="name"
                 placeholder="Ana Santos"
                 value={name}
+                maxLength={80}
                 aria-invalid={errs.name ? true : undefined}
                 aria-describedby={errs.name ? "f-name-e" : undefined}
                 onChange={(e) => setName(e.target.value)}
@@ -372,6 +490,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
                 autoComplete="tel"
                 placeholder="0917 000 0000"
                 value={contact}
+                maxLength={80}
                 aria-invalid={errs.contact ? true : undefined}
                 aria-describedby={`f-contact-h${errs.contact ? " f-contact-e" : ""}`}
                 onChange={(e) => setContact(e.target.value)}
