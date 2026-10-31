@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CGR_BASE, SLUG_ALIASES, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import { CGR_BASE, SLUG_ALIASES, type Gown } from "@/lib/cgr-rentals";
 import { addBooking, loadBookings, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { Side, Steps, useStepFocus } from "@/components/demos/cgr-rentals/FlowBits";
 import {
@@ -93,6 +93,8 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
   };
 
   const days = from ? rentalDays(from, to) : null;
+  // r8.0: the customer total stays rate x days (customerTotal) but no
+  // amount is shown to customers; the summary shows the days only.
   const total = from ? customerTotal(gown.pricePerDay, from, to) : null;
   // Rows come from the URL dates alone (not the async check), so the
   // summary never grows after load (CLS 0).
@@ -101,10 +103,10 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
       ? [
           ["Event day", humanDate(from)],
           ["Return", humanDate(to)],
-          [`${days} days at ${formatPhp(gown.pricePerDay)}`, total !== null ? formatPhp(total) : ""],
+          ["Rental", `${days} ${days === 1 ? "day" : "days"}`],
         ]
       : [];
-  const mob = from && total !== null ? `${rangeLabel(from, to)} · ${formatPhp(total)}` : `${formatPhp(gown.pricePerDay)} a day`;
+  const mob = from && total !== null ? `${rangeLabel(from, to)} · ${days} ${days === 1 ? "day" : "days"}` : "Pick your dates";
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +220,7 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
           <textarea
             id={ids.o}
             name="notes"
-            placeholder="Debut, size M, I’d like it hemmed"
+            placeholder="Debut, I’d like it hemmed"
             value={f.notes}
             onChange={(e) => set("notes", e.target.value)}
           />
@@ -286,7 +288,7 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
         <Steps labels={["Date", "Details", "Done"]} at={step === "details" ? 1 : 0} label="Reserve steps" />
         {main}
       </div>
-      <Side gown={gown} rows={sideRows} mob={mob} note="Example rates. No payment now." />
+      <Side gown={gown} rows={sideRows} mob={mob} note="No payment on this site." />
     </section>
   );
 }

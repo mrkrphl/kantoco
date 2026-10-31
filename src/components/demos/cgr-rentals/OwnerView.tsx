@@ -48,8 +48,8 @@ function StatusSelect({ b }: { b: Booking }) {
 }
 
 /**
- * r7.11 booking records (spec §7), the owner view. Unlisted (only the
- * footer's small "Owner view" link), noindex like the whole demo, and no
+ * r7.11 booking records (spec §7), the owner view. Unlisted (r8.0: no
+ * public link at all; reached by its URL only), noindex like the whole demo, and no
  * passcode (CGR_FLAGS.recordsPath / recordsPasscode). Reservations and
  * fittings from this browser, soonest first, filter chips, a status
  * select per row; a table at 1366 and cards at 390. The ₱200 commission
@@ -73,7 +73,7 @@ export function OwnerView() {
 
   return (
     <section className="r11-rec" aria-labelledby="rec-h">
-      <p className="r11-kick">Owner view · sample</p>
+      <p className="r11-kick">Owner view</p>
       <h1 id="rec-h">Bookings</h1>
       <p className="r11-sub" style={{ marginTop: 0 }}>
         Reservations and fittings, soonest first. Saved in this browser only.
@@ -158,7 +158,8 @@ export function OwnerView() {
 
       {stored ? (
         <p className="r11-note" style={{ marginTop: 24 }} data-commission={total}>
-          {formatPhp(COMMISSION_PHP)} per confirmed, out or returned reservation. Fittings never count. Total {formatPhp(total)}.
+          Commission: {formatPhp(COMMISSION_PHP)} per confirmed, out or returned reservation. Fittings never count. Total{" "}
+          {formatPhp(total)}.
         </p>
       ) : null}
     </section>

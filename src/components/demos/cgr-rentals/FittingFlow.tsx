@@ -25,9 +25,9 @@ type Errs = Partial<Record<"code" | "name" | "contact", string>>;
  * page's "Book a fitting" (?gown=). The reservation code is optional
  * (CGR_FLAGS.fittingCodeRequired = false); without one we ask a name and a
  * contact. Days: from today (Manila) and before the event; states past and
- * before-event. Times are a radiogroup of EXAMPLE slots
- * (FITTING_SLOTS.exampleData); a slot is taken when another fitting has the
- * same day and time, re-checked on submit (state "slot taken"). Fittings
+ * before-event. Times are a radiogroup of four unlabelled
+ * slots (r8.0: no "example" note); a slot is taken only when a saved fitting
+ * has the same day and time (FITTING_SLOTS.exampleTaken is empty), re-checked on submit (state "slot taken"). Fittings
  * never hold a gown and never count toward the commission.
  */
 export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: string }) {
@@ -175,7 +175,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
         ...(day && dState === "ok" ? ([["Fitting", `${humanDate(day)}${slot ? `, ${slotLabel(slot)}` : ""}`]] as [string, string][]) : []),
       ]}
       mob={linked ? `${linked.ref} · event ${humanDate(event)}` : "Fitting at the shop"}
-      note="Fittings are free in this sample. Nothing is final until the shop messages you."
+      note="Nothing is final until the shop messages you."
     />
   );
 
@@ -288,7 +288,7 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
       <form className="r11-main" onSubmit={book} noValidate>
         <Steps labels={["Day", "Time", "Done"]} at={1} label="Fitting steps" />
         <h1 ref={h1Ref} tabIndex={-1}>
-          What time suits <em>you?</em>
+          Choose a <em>time.</em>
         </h1>
         <p className="r11-sub">
           {humanDate(day)} at the shop.{" "}
@@ -315,9 +315,9 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
         ) : null}
         <div style={{ width: "100%" }}>
           <p id="slots-l" className="sr-only">
-            Fitting time
+            Fitting times
           </p>
-          <div className="r11-slots" role="radiogroup" aria-labelledby="slots-l" aria-describedby="slots-n">
+          <div className="r11-slots" role="radiogroup" aria-labelledby="slots-l">
             {FITTING_SLOTS.times.map((s, i) => {
               const tk = isTaken(s);
               return (
@@ -345,11 +345,6 @@ export function FittingFlow({ refCode, gownSlug }: { refCode: string; gownSlug: 
               );
             })}
           </div>
-          {FITTING_SLOTS.exampleData ? (
-            <p id="slots-n" className="r11-note" style={{ marginTop: 12 }}>
-              Example times for this sample. The shop sets the real ones.
-            </p>
-          ) : null}
         </div>
         {!linked ? (
           <div className="r11-row">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { CGR_BASE, STATUS_LABEL, cgr, formatPhp, getGown, type Booking } from "@/lib/cgr-rentals";
+import { CGR_BASE, STATUS_LABEL, cgr, getGown, type Booking } from "@/lib/cgr-rentals";
 import { useBookings } from "@/components/demos/cgr-rentals/bookings";
 import { Side, Steps } from "@/components/demos/cgr-rentals/FlowBits";
 import {
@@ -69,8 +69,8 @@ export function Confirmation({ refCode }: { refCode: string }) {
         <div className="r11-main">
           <h1 tabIndex={-1}>We can’t find that code.</h1>
           <p className="r11-sub" style={{ marginTop: 0 }}>
-            {refCode ? `${refCode} is not saved in this browser.` : "No code was given."} Bookings in this sample are saved
-            in this browser only.
+            {refCode ? `${refCode} is not saved in this browser.` : "No code was given."} Bookings are saved in this
+            browser only, so open it on the phone you booked with.
           </p>
           <Link className="r11-btn r11-wine" href={`${CGR_BASE}#rail`}>
             Back to the gowns
@@ -94,7 +94,8 @@ export function Confirmation({ refCode }: { refCode: string }) {
     : [
         ["Event day", humanDate(b.eventDate)],
         ["Return", humanDate(b.returnDate || b.eventDate)],
-        ...(gown && total !== null ? ([[`${days} days at ${formatPhp(gown.pricePerDay)}`, formatPhp(total)]] as [string, string][]) : []),
+        // r8.0: total (rate x days) stays internal; customers see the days only.
+        ...(gown && total !== null ? ([["Rental", `${days} ${days === 1 ? "day" : "days"}`]] as [string, string][]) : []),
       ];
   const gap = fit ? gapPhrase(b.fittingDate ?? "", event) : "";
 
@@ -142,7 +143,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
           gown={gown}
           rows={sideRows}
           mob={fit ? `Fitting ${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")}` : rangeLabel(b.eventDate, b.returnDate || b.eventDate)}
-          note={fit ? "Example times. Sample only." : "Example rates. No payment now."}
+          note="No payment on this site."
         />
       ) : null}
     </section>
