@@ -50,13 +50,13 @@ export function Rail({ items }: { items: Gown[] }) {
           if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
         }}
       >
-        <div className="r11-card side" aria-hidden="true">
+        <div className="r11-card side l" aria-hidden="true">
           <GownImg img={at(-1).images[0]} alt="" loading="lazy" decoding="async" />
         </div>
-        <div className="r11-card r11-fade" key={g.slug}>
+        <div className="r11-card c r11-fade" key={g.slug}>
           <GownImg img={g.images[0]} loading="lazy" decoding="async" draggable={false} />
         </div>
-        <div className="r11-card side" aria-hidden="true">
+        <div className="r11-card side r" aria-hidden="true">
           <GownImg img={at(1).images[0]} alt="" loading="lazy" decoding="async" />
         </div>
       </div>

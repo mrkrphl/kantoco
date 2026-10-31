@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Round 8.0 (Design r8, spec.md §2 + §3). Loaded after cgr.css and r711.css.
+   - The SAMPLE | NOT LIVE bar is gone (Mark, 31 Oct): its height token is 0,
+     so the sticky head, anchors and first screen sit at the top.
+   - Scroll beats live in HomeMotion.tsx. This file only holds the landed
+     layout (no JS = everything visible) and the masks the beats need.
+   ========================================================================== */
+.cgr { --sample-h: 0px; }
+
+/* Sideways sweeps (script words, the giant "Suits & barong") never make a
+   horizontal scrollbar. clip, not hidden: no scroll container, so sticky works. */
+.cgr .r11-spread, .cgr .r11-acc, .cgr .r11-suits, .cgr .r11-reviews { overflow-x: clip; }
+
+/* B7 Suits: a tall section with a sticky frame (not a pin). */
+.cgr .r11-suits {
+  height: 170svh; padding: 0; display: block; text-align: left; gap: 0;
+  background: var(--ivory);
+}
+.cgr .r11-suits-frame {
+  position: sticky; top: calc(var(--sample-h) + var(--head-h));
+  height: calc(100svh - var(--sample-h) - var(--head-h));
+  overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 32px;
+  padding: 0 var(--gut);
+}
+.cgr .r11-suits-big {
+  font: 400 clamp(120px, 17vw, 260px)/0.95 var(--font-hand); color: var(--wine);
+  white-space: nowrap; letter-spacing: 0; margin: 0;
+}
+.cgr .r11-suits-row { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+.cgr .r11-suits .r11-line-t { max-width: 24ch; }
+@media (max-width: 700px) {
+  .cgr .r11-suits { height: 150svh; padding: 0; }
+  .cgr .r11-suits-frame { gap: 24px; }
+  .cgr .r11-suits-big { font-size: 31vw; white-space: normal; line-height: 0.9; }
+  .cgr .r11-suits-row { gap: 24px; }
+}
+
+/* B8 Rail: the beat drives the cards' transform/opacity; no CSS lag on top. */
+.cgr .r11-rail .r11-card.side { transition: none; }
+
+/* B9 Reviews: each word sits in its own mask so a line rises out of its box. */
+.cgr .r11-q { display: inline; }
+.cgr .r11-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.cgr .r11-w > span { display: inline-block; }
+
+/* B10 Visit: the wordmark rises out of its own floor. */
+.cgr .r11-bigwm { overflow: hidden; }
+.cgr .r11-bigwm > span { display: block; }
+
+/* Reduced motion: the finished state from first paint (no sticky frame).
+   HomeMotion only fades text blocks in once, 200ms, opacity. */
+@media (prefers-reduced-motion: reduce) {
+  .cgr .r11-suits { height: auto; }
+  .cgr .r11-suits-frame { position: relative; top: 0; height: auto; padding: var(--sec-y) var(--gut); }
+}
+
+/* r8: every footer link is at least a 44px square tap (TikTok was 42 wide). */
+.cgr .r11-more a{min-width:44px;justify-content:center}

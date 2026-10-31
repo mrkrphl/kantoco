@@ -7,6 +7,15 @@ import { REVIEWS_URL, SOURCE_LABEL, TESTIMONIALS, type Testimonial } from "./tes
 const FIRST_ID = 7;
 const LONG = 140;
 
+/** The quote as words, with the curly quotes on the first and last word (verbatim text, no edits). */
+function words(q: string): string[] {
+  const w = q.split(/\s+/).filter(Boolean);
+  if (!w.length) return w;
+  w[0] = `\u201c${w[0]}`;
+  w[w.length - 1] = `${w[w.length - 1]}\u201d`;
+  return w;
+}
+
 function order(items: Testimonial[]): Testimonial[] {
   const lead = items.filter((t) => t.id === FIRST_ID);
   return [...lead, ...items.filter((t) => t.id !== FIRST_ID)];
@@ -37,7 +46,22 @@ export function Testimonials({ items = TESTIMONIALS }: { items?: Testimonial[] }
         {list.map((t, k) => (
           <figure key={t.id} data-on={k === i ? "true" : "false"} aria-hidden={k === i ? undefined : true}>
             <blockquote className={t.quote.length > LONG ? "long" : undefined}>
-              <p data-quote-id={t.id}>&ldquo;{t.quote}&rdquo;</p>
+              <p data-quote-id={t.id}>
+                {/* r8.0: the visual quote is split into word masks so the
+                    lines can rise out of their own boxes (HomeMotion B9);
+                    screen readers get the whole verbatim quote once. */}
+                <span className="sr-only">&ldquo;{t.quote}&rdquo;</span>
+                <span className="r11-q" aria-hidden="true">
+                  {words(t.quote).map((w, j) => (
+                    <span key={j}>
+                      {j ? " " : null}
+                      <span className="r11-w">
+                        <span>{w}</span>
+                      </span>
+                    </span>
+                  ))}
+                </span>
+              </p>
             </blockquote>
             <figcaption>
               {t.name} · {SOURCE_LABEL[t.source]} · {t.date}
