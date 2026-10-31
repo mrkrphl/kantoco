@@ -163,3 +163,26 @@ test("rate x days: customer total for a reserved range", () => {
   assert.equal(customerTotal(2800, "2026-11-13", "2026-11-13"), 2800);
   assert.equal(customerTotal(250, "2026-11-01", "2026-11-03"), 750);
 });
+
+/* ---------- r8.2: the database's limits, mirrored on screen ---------- */
+import { MAX_STAY_DAYS, HORIZON_DAYS, horizonIso } from "../src/components/demos/cgr-rentals/reserveMath.ts";
+
+test("stay is at most 30 days (return - event), like the database", () => {
+  assert.equal(MAX_STAY_DAYS, 30);
+  const today = "2026-10-31";
+  assert.equal(reserveState("2026-11-01", "2026-12-01", today, []), "ok"); // 30 days apart
+  assert.equal(reserveState("2026-11-01", "2026-12-02", today, []), "too_long"); // 31 apart
+  // past wins over too_long; too_long wins over taken
+  assert.equal(reserveState("2026-10-01", "2026-12-02", today, []), "past");
+  assert.equal(reserveState("2026-11-01", "2026-12-02", today, ["2026-11-02"]), "too_long");
+});
+
+test("bookable horizon is today + 366 days (Manila), for reservations and fittings", () => {
+  assert.equal(HORIZON_DAYS, 366);
+  const today = "2026-10-31";
+  assert.equal(horizonIso(today), "2027-11-01");
+  assert.equal(reserveState("2027-11-01", "2027-11-02", today, []), "ok");
+  assert.equal(reserveState("2027-11-02", "2027-11-03", today, []), "too_far");
+  assert.equal(fittingDayState("2027-11-01", today), "ok");
+  assert.equal(fittingDayState("2027-11-02", today), "too_far");
+});

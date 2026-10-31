@@ -130,7 +130,16 @@ export function takenDays(
   );
 }
 
-export type ReserveState = "ok" | "missing" | "past" | "taken";
+/** r8.2: the database's limits, mirrored on screen. */
+export const MAX_STAY_DAYS = 30; // return day - event day
+export const HORIZON_DAYS = 366; // furthest bookable day = today + 366
+
+/** Last bookable day (Manila) for a reservation or a fitting. */
+export function horizonIso(today: string): string {
+  return addDaysIso(today, HORIZON_DAYS);
+}
+
+export type ReserveState = "ok" | "missing" | "past" | "too_long" | "too_far" | "taken";
 
 /** Step 01 of the reserve flow: is [event, return] still bookable today (Manila)? */
 export function reserveState(
@@ -141,11 +150,13 @@ export function reserveState(
 ): ReserveState {
   if (!ISO_RE.test(event) || !ISO_RE.test(ret) || ret < event) return "missing";
   if (event < today) return "past";
+  if ((rentalDays(event, ret) ?? 0) - 1 > MAX_STAY_DAYS) return "too_long";
+  if (event > horizonIso(today)) return "too_far";
   if (taken.length) return "taken";
   return "ok";
 }
 
-export type FittingDayState = "ok" | "missing" | "past" | "before-event";
+export type FittingDayState = "ok" | "missing" | "past" | "too_far" | "before-event";
 
 /**
  * A fitting day must be today or later (Manila) and, when it is for a
@@ -155,6 +166,7 @@ export type FittingDayState = "ok" | "missing" | "past" | "before-event";
 export function fittingDayState(day: string, today: string, eventDate?: string | null): FittingDayState {
   if (!ISO_RE.test(day)) return "missing";
   if (day < today) return "past";
+  if (day > horizonIso(today)) return "too_far";
   if (eventDate && ISO_RE.test(eventDate) && day >= eventDate) return "before-event";
   return "ok";
 }
