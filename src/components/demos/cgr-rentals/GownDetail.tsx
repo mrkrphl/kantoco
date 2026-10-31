@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CGR_BASE, SLUG_ALIASES, formatPhp, type Gown } from "@/lib/cgr-rentals";
+import { CGR_BASE, SLUG_ALIASES, type Gown } from "@/lib/cgr-rentals";
 import { useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 import { Calendar, type DayKind } from "@/components/demos/cgr-rentals/Calendar";
@@ -95,8 +95,8 @@ export function GownDetail({
       </button>
     );
 
-  const sizes = gown.sizes.length ? gown.sizes.join(", ") : "One size";
-  const sizeLine = gown.sizes.length > 1 ? `${gown.sizes[0]} to ${gown.sizes[gown.sizes.length - 1]} (example)` : `${sizes} (example)`;
+  // r8.0: no invented sizes (Design r8 §3); the shop fits you in person.
+  const sizeLine = "Ask the shop for your size";
 
   return (
     <>
@@ -127,9 +127,6 @@ export function GownDetail({
             ← {isAcc ? "All accessories" : "All gowns"}
           </Link>
           <h1 id="gd-h">{gown.name}</h1>
-          <p className="r11-price">
-            {formatPhp(gown.pricePerDay)} a day<small>example rate</small>
-          </p>
           <div id="dates" style={{ width: "100%" }}>
             <Calendar
               value={pick.from}

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { CGR_BASE, CGR_FLAGS, cgr } from "@/lib/cgr-rentals";
-import { KANTOCO_MESSENGER } from "@/lib/demos";
+import { CGR_BASE, cgr } from "@/lib/cgr-rentals";
 import { MobileMenu } from "@/components/demos/cgr-rentals/MobileMenu";
 
 type Current = "Catalogue" | "Visit" | "Owner" | "Detail" | "Reserve" | "Confirm" | "Fitting";
@@ -12,8 +11,8 @@ const NAV = [
   ["Visit", "#visit", "Visit"],
 ] as const;
 
-/** The mobile menu also lists the unlisted records page (default: no passcode). */
-export const CGR_NAV = [...NAV, ["Owner view", `${CGR_BASE}${CGR_FLAGS.recordsPath}`, "Owner"]] as const;
+/** r8.0: the owner view stays at its own unlisted URL; no public link to it. */
+export const CGR_NAV = NAV;
 
 const RESERVE_HREF = `${CGR_BASE}#gowns`;
 
@@ -27,12 +26,6 @@ export function CgrShell({
   const home = current === "Catalogue";
   return (
     <div className="cgr" data-page={home ? "home" : "inner"}>
-      <p className="cgr-bar">
-        <span className="cgr-bar-inner">
-          <b>{cgr.badge}</b>
-        </span>
-      </p>
-
       <header className="cgr-head">
         <Link href={CGR_BASE} className="cgr-wm">
           <span className="cgr-wm-name">Cavite Gown Rentals</span>
@@ -80,7 +73,6 @@ export function CgrShell({
             </h2>
           </div>
           <div className="r11-act">
-            <p className="r11-small">Open daily, 9 AM to 8 PM (listing hours)</p>
             <a className="r11-btn r11-ivory r11-sm" href={cgr.messenger} target="_blank" rel="noopener noreferrer">
               Message the shop
             </a>
@@ -111,16 +103,9 @@ export function CgrShell({
             </a>
           </li>
         </ul>
-        <p className="r11-fine">
-          A KantoCo sample site, not live. Gowns, rates and dates are examples. Photos from the shop&apos;s public
-          pages.{" "}
-          <Link href={`${CGR_BASE}${CGR_FLAGS.recordsPath}`}>Owner view</Link> ·{" "}
-          <a href={KANTOCO_MESSENGER} target="_blank" rel="noopener noreferrer">
-            Want one for your shop?
-          </a>
-        </p>
+        <p className="r11-fine">Photos from the shop&apos;s public pages.</p>
         <p className="r11-bigwm" aria-hidden="true">
-          Cavite Gown Rentals
+          <span>Cavite Gown Rentals</span>
         </p>
       </footer>
     </div>

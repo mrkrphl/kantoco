@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ACCESSORIES, CGR_BASE, formatPhp, getGown, type GownImage } from "@/lib/cgr-rentals";
+import { CGR_BASE, getGown, type GownImage } from "@/lib/cgr-rentals";
 import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
 
 /**
@@ -10,6 +10,11 @@ import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
  * reservable gown pages (default #4, steering). Suits has no uncropped
  * photo on #33 (r7.11.1), so it is type only, with no page; its button
  * goes to the visit block instead of an "Ask about…" line.
+ *
+ * r8.0 (Design r8 §3): no rates on the home page. Each line is plain copy
+ * (the gown name for Evening, its look for Bridal and Filipiniana). The
+ * scroll beats live in HomeMotion.tsx; this markup is the landed state, so
+ * without JS (or with reduced motion) everything is simply there.
  */
 type Spread = {
   id: string;
@@ -39,7 +44,7 @@ const SPREADS: Spread[] = [
     id: "gowns",
     no: "01",
     word: "Evening",
-    line: `${evening.name}, ${formatPhp(evening.pricePerDay)} a day.`,
+    line: `${evening.name}.`,
     img: evening.images[0],
     cta: "Reserve this gown",
     href: gownPage(evening.slug),
@@ -48,7 +53,7 @@ const SPREADS: Spread[] = [
     id: "bridal",
     no: "02",
     word: "Bridal",
-    line: `${bridal.name}, ${formatPhp(bridal.pricePerDay)} a day.`,
+    line: "Ivory ball gown, with a full skirt.",
     img: bridal.images[0],
     cta: "Reserve this gown",
     href: gownPage(bridal.slug),
@@ -64,8 +69,6 @@ const SPREADS: Spread[] = [
     href: gownPage(fili.slug),
   },
 ];
-
-const FROM_ACC = Math.min(...ACCESSORIES.map((g) => g.pricePerDay));
 
 function Photo({ img }: { img: GownImage }) {
   return (
@@ -113,7 +116,7 @@ export function Spreads() {
           </p>
           <h2 id="accessories-h" className="r11-line-t">
             <span className="sr-only">Accessories: </span>
-            Tiaras and crystal sets, from {formatPhp(FROM_ACC)} a day.
+            Tiaras and crystal sets for your gown.
           </h2>
           <Link className="r11-btn r11-line r11-sm" href={gownPage(crowns.slug)}>
             Reserve a tiara
@@ -122,21 +125,25 @@ export function Spreads() {
       </section>
 
       <section id="suits" className="r11-suits" aria-labelledby="suits-h">
-        <p className="r11-kick" aria-hidden="true">
-          04
-        </p>
-        <p className="r11-suits-word" aria-hidden="true">
-          <span className="r11-script">Suits</span>
-          <span className="r11-suits-amp">&amp;</span>
-          <span className="r11-suits-alt">barong</span>
-        </p>
-        <h2 id="suits-h" className="r11-line-t">
-          <span className="sr-only">Suits and barong: </span>
-          For grooms, fathers and escorts.
-        </h2>
-        <a className="r11-btn r11-wine r11-sm" href="#visit">
-          Visit the shop
-        </a>
+        {/* r8.0: a tall section with a sticky frame (no pin); "Suits & barong"
+            sweeps in on one line. Reduced motion: height auto, static. */}
+        <div className="r11-suits-frame">
+          <p className="r11-kick" aria-hidden="true">
+            04
+          </p>
+          <p className="r11-suits-big" aria-hidden="true">
+            Suits &amp; barong
+          </p>
+          <div className="r11-suits-row">
+            <h2 id="suits-h" className="r11-line-t">
+              <span className="sr-only">Suits and barong: </span>
+              For grooms, fathers and escorts.
+            </h2>
+            <a className="r11-btn r11-wine r11-sm" href="#visit">
+              Visit the shop
+            </a>
+          </div>
+        </div>
       </section>
     </>
   );

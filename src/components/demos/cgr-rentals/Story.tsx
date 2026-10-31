@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { CGR_ASSET, CGR_FLAGS, formatPhp } from "@/lib/cgr-rentals";
+import { CGR_ASSET } from "@/lib/cgr-rentals";
 import { useMotionReady } from "@/components/motion/useMotionReady";
 import { createAlphaRenderer, supportsAlphaCanvas, type RenderMode } from "./heroAlpha";
 import { HERO_CLIPS, HERO_SEQ, frontAt, seqFile } from "./heroSeq.manifest";
@@ -49,6 +49,14 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  * that errors (the new file not in the repo yet) hands over to the r7.6
  * clip, so the preview works before and after the binaries land.
  *
+ * r8.0 (Design r8 §2, steered by Chip / Mark's 30 Oct ask): no walk-in on
+ * load. The hero text is there at first paint and Mavy is not; she enters
+ * only on scroll, from the side, spinning to the middle, exactly as r7.6.1.
+ * The stamp's B1 load timeline (giant word / loop / CTA entrance and the
+ * frames 1-11 walk-in) is not built; B2 keeps this scrub and adds the giant
+ * word's -3vw drift and 1.1 scale. The fallback chain (seq-2d, video-gl,
+ * video-2d, poster) and ?cgrdebug=1 are unchanged.
+ *
  * r7.6.4 (desktop): the same clip, two renderers (heroAlpha.ts). Desktop
  * (hover + fine pointer) paints with the 2D canvas, phones with WebGL. A
  * lost WebGL context, a draw error or a blank frame where she must be in
@@ -89,10 +97,11 @@ const seqSrc = (i: number) => `${CGR_ASSET}/${HERO_SEQ.dir}/${seqFile(HERO_SEQ, 
 const WORDS = ["debut", "wedding", "birthday", "party"] as const;
 const WORD_ANY = "any event";
 const WORDS_SR = "Gowns for your debut, wedding, birthday, party or any event.";
-/** --script-drift: the giant word's x travel over the intro scroll (px), to the right, away from the lead. */
-const DRIFT = 48;
-const ALT =
-  "Sample render: Mavy in a deep red sequin gown with a sheer red veil walks in, then turns once as you scroll.";
+/** r8.0 B2 (Design r8 §2): over the intro scroll the giant word drifts left by
+    3vw and grows to 1.1 (transform only; the copy never moves). */
+const DRIFT_VW = 3;
+const GW_SCALE = 1.1;
+const ALT = "Mavy in a deep red sequin gown with a sheer red veil steps in from the side and turns once as you scroll.";
 
 /**
  * Clip timelines (land, tStart, length, front) live in heroSeq.manifest.ts:
@@ -445,7 +454,12 @@ export function Story() {
           },
         },
       });
-      tl.fromTo(gw, { x: 0 }, { x: DRIFT, duration: 1 }, 0);
+      tl.fromTo(
+        gw,
+        { x: 0, scale: 1 },
+        { x: () => (-DRIFT_VW * window.innerWidth) / 100, scale: GW_SCALE, duration: 1 },
+        0,
+      );
       // r7.9 (QA): she stays fully off-stage, at opacity 0, until the walk-in
       // actually starts (clip ~0.75 s, seq frame 1), so no stray fragment of
       // the first frames shows at 0%. Opacity only: no layout moves.
@@ -769,9 +783,6 @@ export function Story() {
           <h1 className="cgr-intro-h" id="cgr-hero-title">
             Gown and suit rentals in Dasmariñas, Cavite.
           </h1>
-          {CGR_FLAGS.heroShowsRate ? (
-            <p className="cgr-intro-rate">From {formatPhp(2200)} a day, example rate</p>
-          ) : null}
           <a className="r11-btn r11-wine r11-sm" href="#gowns">
             Reserve your gown
           </a>
