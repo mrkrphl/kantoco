@@ -1,5 +1,3 @@
-import { DEMO_BADGE } from "@/lib/demos";
-
 export const CGR_ASSET = "/demos/cgr-rentals";
 export const CGR_BASE = "/demos/cgr-rentals";
 export const COMMISSION_PHP = 200;
@@ -12,13 +10,13 @@ export const BOOKINGS_KEY = "cgr-rentals-bookings-v1";
 export const CGR_FLAGS = {
   /** Booking records: an unlisted, noindex page (robots in layout.tsx). */
   recordsPath: "/owner",
-  /** null = no passcode. A string asks for it first (client-side only: a sample gate, not security). */
+  /** null = no passcode. A string asks for it first (client-side only: a soft gate, not security). */
   recordsPasscode: null as string | null,
   /** false = a fitting can be booked with or without a reservation code. */
   fittingCodeRequired: false,
-  /** Fitting times are example data (see FITTING_SLOTS). */
-  slotsAreExample: true,
-  /** The example rate stays out of the hero. */
+  /** r8.0: fitting times are a plain, unlabelled list (see FITTING_SLOTS). */
+  slotsAreExample: false,
+  /** r8.0: no rates anywhere on the customer side (Mark, 31 Oct). */
   heroShowsRate: false,
   /** Reviews: one at a time (false = the r7.7 three-up spreads). */
   reviewsOneAtATime: true,
@@ -27,30 +25,27 @@ export const CGR_FLAGS = {
 } as const;
 
 /**
- * Fitting times (r7.11). EXAMPLE DATA: the shop sets the real ones. On
- * Saturdays the 1:00 PM slot shows as taken, so the sample has a taken state.
+ * Fitting times. r8.0: four unlabelled times until the shop gives its own
+ * (no "set by the shop" wording: CGR has not given hours). A slot shows as
+ * taken only when a saved fitting already holds it (records, not constants).
  */
 export const FITTING_SLOTS = {
-  exampleData: true,
+  exampleData: false,
   times: ["10:00", "13:00", "15:00", "17:00"],
-  /** Weekday (0 Sun..6 Sat) -> times already taken in the example. */
-  exampleTaken: { 6: ["13:00"] } as Record<number, string[]>,
+  /** Weekday (0 Sun..6 Sat) -> fixed taken times. r8.0: none; taken comes from records. */
+  exampleTaken: {} as Record<number, string[]>,
 } as const;
 
 /** Public listing facts only. Never contact the shop. */
 export const cgr = {
-  title: "Cavite Gown Rentals · KantoCo sample",
+  title: "Cavite Gown Rentals · Gown and suit rentals in Dasmariñas, Cavite",
   description:
-    "KantoCo sample for Cavite Gown Rentals, which rents gowns and suits for any formal occasion at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, with a booking preview. Not the shop's official site.",
-  badge: DEMO_BADGE,
-  barDesk:
-    "A KantoCo sample for Cavite Gown Rentals. Not the shop's official site. Prices & sizes are sample data.",
-  barMob: "KantoCo sample, not the shop's site",
+    "Cavite Gown Rentals rents gowns, suits and tiaras for any formal occasion at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite. Pick a gown, check its dates and reserve.",
   name: "Cavite Gown Rentals",
   shortName: "CGR",
   eyebrow: "Gown and suit rentals · Dasmariñas, Cavite",
   tagline:
-    "Gowns and suits for any formal occasion, plus tiaras, at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, each gown with its own sample calendar and a reference code for every reservation.",
+    "Gowns and suits for any formal occasion, plus tiaras, at #71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite, each gown with its own calendar and a reference code for every reservation.",
   facebook: "https://www.facebook.com/CaviteGownRentals",
   /** Public contact links from the shop's Facebook page. Links only; nothing is sent. */
   phones: [
@@ -63,12 +58,8 @@ export const cgr = {
   maps: "https://www.google.com/maps/search/?api=1&query=Cavite+Gown+Rentals+%2371+Jose+Abad+Santos+Ave+Salawag+Dasmarinas+City+Cavite",
   address: "#71 Jose Abad Santos Ave., Salawag, Dasmariñas City, Cavite",
   hoursNote:
-    "Sample hours from the shop's public listing. Confirm on Facebook before you go.",
+    "Hours from the shop's public listing (not shown, r8.0). Confirm on Facebook before you go.",
   hours: [{ day: "Mon–Sun", time: "9:00 AM – 8:00 PM" }] as const,
-  sampleNote:
-    "Sample data only. Prices, sizes and booked dates are mocked for this KantoCo preview. Photos are from the shop's public Facebook page and listings; some show customers wearing the gowns.",
-  credit:
-    "Photos: Cavite Gown Rentals' public Facebook page (facebook.com/CaviteGownRentals) and related public listing stills, some showing customers in the gowns. Used for this private KantoCo sample only. No shop contact.",
   asset: CGR_ASSET,
 } as const;
 
@@ -141,7 +132,7 @@ export type Gown = {
   category: GownCategory;
   colors: GownColor[];
   sizes: GownSize[];
-  /** Sample rental rate in PHP per day. Not from the shop. */
+  /** Placeholder rate in PHP per day, internal only (r8.0): never shown to customers; keeps rate x days for the records. */
   pricePerDay: number;
   blurb: string;
   /**
@@ -149,7 +140,7 @@ export type Gown = {
    * photo (photos/cgr-gown-*), shown with object-fit: contain; never a crop.
    */
   images: GownImage[];
-  /** Mock ISO dates already held for this item. */
+  /** Fixed ISO dates held for this item. r8.0: none; taken days come from records. */
   bookedDates: string[];
   sample: true;
 };
@@ -198,7 +189,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M", "L", "XL"],
     pricePerDay: 2500,
     blurb:
-      "Wine-red sequin gown with a deep V neckline, red beaded appliqué down the bodice, sheer long sleeves and a high side slit. Sample listing for pageant and gala nights.",
+      "Wine-red sequin, a deep V neckline, beaded appliqué down the bodice, sheer long sleeves and a high side slit.",
     images: [
       {
         file: "photos/cgr-gown-wine-sequin-01",
@@ -207,7 +198,7 @@ export const GOWNS: Gown[] = [
         h: 1426,
       },
     ],
-    bookedDates: ["2026-11-08", "2026-11-09", "2026-11-15", "2026-11-22", "2026-12-06"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -218,7 +209,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M", "L"],
     pricePerDay: 3200,
     blurb:
-      "Deep teal off-shoulder gown with satin puff sleeves, silver-green embroidery down the bodice and a long satin train. Sample listing for pageants and pictorials.",
+      "Deep teal off-shoulder gown with satin puff sleeves, silver-green embroidery down the bodice and a long satin train. For pageants and pictorials.",
     images: [
       {
         file: "photos/cgr-gown-teal-puff-03",
@@ -239,7 +230,7 @@ export const GOWNS: Gown[] = [
         h: 800,
       },
     ],
-    bookedDates: ["2026-11-06", "2026-11-28"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -250,7 +241,7 @@ export const GOWNS: Gown[] = [
     sizes: ["M", "L", "XL"],
     pricePerDay: 2200,
     blurb:
-      "Navy off-shoulder gown with satin puff sleeves, gold and copper sequin swirls and a sheer navy train. Sample listing for formal dinners and proms.",
+      "Navy off-shoulder gown with satin puff sleeves, gold and copper sequin swirls and a sheer navy train. For formal dinners and proms.",
     images: [
       {
         file: "photos/cgr-gown-navy-gold-01",
@@ -259,7 +250,7 @@ export const GOWNS: Gown[] = [
         h: 1200,
       },
     ],
-    bookedDates: ["2026-11-07", "2026-11-21"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -270,7 +261,7 @@ export const GOWNS: Gown[] = [
     sizes: ["XS", "S", "M", "L"],
     pricePerDay: 3000,
     blurb:
-      "Royal blue sequin mermaid gown with sweeping silver swirls, a sweetheart bodice and sheer puff sleeves. Sample listing for pageant nights.",
+      "Royal blue sequin mermaid gown with sweeping silver swirls, a sweetheart bodice and sheer puff sleeves. For pageant nights.",
     images: [
       {
         file: "photos/cgr-gown-royal-blue-01",
@@ -279,7 +270,7 @@ export const GOWNS: Gown[] = [
         h: 900,
       },
     ],
-    bookedDates: ["2026-11-01", "2026-11-14", "2026-11-15", "2026-11-28"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -290,7 +281,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M", "L"],
     pricePerDay: 3200,
     blurb:
-      "Powder blue off-shoulder tulle gown with feather-trimmed straps, a corset bodice, 3D floral appliqué and a front slit. Sample listing for 18th birthdays.",
+      "Powder blue off-shoulder tulle gown with feather-trimmed straps, a corset bodice, 3D floral appliqué and a front slit. For 18th birthdays.",
     images: [
       {
         file: "photos/cgr-gown-powder-blue-01",
@@ -305,7 +296,7 @@ export const GOWNS: Gown[] = [
         h: 1200,
       },
     ],
-    bookedDates: ["2026-11-06", "2026-11-20"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -316,7 +307,7 @@ export const GOWNS: Gown[] = [
     sizes: ["XS", "S", "M", "L", "XL"],
     pricePerDay: 2600,
     blurb:
-      "Periwinkle gown covered in silver beading, with a deep V neckline, a waist cut-out and a sheer floor-length cape. Sample listing for galas and grand entrances.",
+      "Periwinkle gown covered in silver beading, with a deep V neckline, a waist cut-out and a sheer floor-length cape. For galas and grand entrances.",
     images: [
       {
         file: "photos/cgr-gown-periwinkle-cape-01",
@@ -325,7 +316,7 @@ export const GOWNS: Gown[] = [
         h: 1100,
       },
     ],
-    bookedDates: ["2026-11-12", "2026-11-29"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -336,7 +327,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M"],
     pricePerDay: 2700,
     blurb:
-      "Violet beaded bodice with a feathered neckline, a gold-beaded skirt and a sheer violet overskirt. Sample listing for pageant and gala looks.",
+      "Violet beaded bodice with a feathered neckline, a gold-beaded skirt and a sheer violet overskirt. For pageant and gala looks.",
     images: [
       {
         file: "photos/cgr-gown-violet-gold-01",
@@ -345,7 +336,7 @@ export const GOWNS: Gown[] = [
         h: 1200,
       },
     ],
-    bookedDates: ["2026-11-20", "2026-12-05"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -356,7 +347,7 @@ export const GOWNS: Gown[] = [
     sizes: ["XS", "S", "M", "L"],
     pricePerDay: 2400,
     blurb:
-      "Lilac off-shoulder tulle gown with a beaded floral bodice and a full, soft skirt. Sample listing for debuts and cotillions.",
+      "Lilac off-shoulder tulle gown with a beaded floral bodice and a full, soft skirt. For debuts and cotillions.",
     images: [
       {
         file: "photos/cgr-gown-lilac-tulle-01",
@@ -365,7 +356,7 @@ export const GOWNS: Gown[] = [
         h: 1100,
       },
     ],
-    bookedDates: ["2026-11-19", "2026-11-26"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -376,7 +367,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M", "L", "XL"],
     pricePerDay: 3500,
     blurb:
-      "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt. Sample listing for weddings and debuts.",
+      "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt. For weddings and debuts.",
     images: [
       {
         file: "photos/cgr-ivory-ball",
@@ -385,7 +376,7 @@ export const GOWNS: Gown[] = [
         h: 960,
       },
     ],
-    bookedDates: ["2026-11-14", "2026-11-28", "2026-12-12"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -396,7 +387,7 @@ export const GOWNS: Gown[] = [
     sizes: ["S", "M", "L"],
     pricePerDay: 2800,
     blurb:
-      "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train. Sample listing for galas and Filipiniana nights.",
+      "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train. For galas and Filipiniana nights.",
     images: [
       {
         file: "photos/cgr-filipiniana-black",
@@ -405,7 +396,7 @@ export const GOWNS: Gown[] = [
         h: 1200,
       },
     ],
-    bookedDates: ["2026-11-13", "2026-11-27"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -416,12 +407,12 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 500,
     blurb:
-      "Tall gold crystal tiaras for debut and pageant looks, to wear with any gown. Sample accessory listing.",
+      "Tall gold crystal tiaras for debut and pageant looks, to wear with any gown.",
     images: [
       { file: "accessories-tiaras", alt: "Gold crystal tiaras on a display rack.", w: 490, h: 332 },
       { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
     ],
-    bookedDates: ["2026-11-08", "2026-11-22"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -432,12 +423,12 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 650,
     blurb:
-      "Gold band with red stones, made for coronation nights. Sample accessory listing.",
+      "Gold band with red stones, made for coronation nights.",
     images: [
       { file: "accessory-tiara-ruby", alt: "Gold crown with red stones and a gold spike tiara behind it.", w: 445, h: 250 },
       { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
     ],
-    bookedDates: ["2026-11-15"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -448,7 +439,7 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 550,
     blurb:
-      "Silver tiara set with pink and gold stones. Sample accessory listing.",
+      "Silver tiara set with pink and gold stones.",
     images: [
       { file: "accessory-tiara-rose", alt: "Silver tiara with pink and gold stones, close-up.", w: 248, h: 230 },
       { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
@@ -464,13 +455,13 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 1200,
     blurb:
-      "Red, blue and pink stone tiaras rented as a set for courts and entourages. Sample accessory listing.",
+      "Red, blue and pink stone tiaras rented as a set for courts and entourages.",
     images: [
       { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
       { file: "accessory-tiara-ruby", alt: "Gold crown with red stones and a gold spike tiara behind it.", w: 445, h: 250 },
       { file: "accessory-tiara-rose", alt: "Silver tiara with pink and gold stones, close-up.", w: 248, h: 230 },
     ],
-    bookedDates: ["2026-11-28"],
+    bookedDates: [],
     sample: true,
   },
   {
@@ -481,7 +472,7 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 300,
     blurb:
-      "Sparkle choker for formal and off-shoulder necklines. Sample accessory listing.",
+      "Sparkle choker for formal and off-shoulder necklines.",
     images: [
       { file: "accessory-choker", alt: "Crystal choker on a dark ground.", w: 592, h: 272 },
     ],
@@ -496,7 +487,7 @@ export const GOWNS: Gown[] = [
     sizes: ["One size"],
     pricePerDay: 250,
     blurb:
-      "Crystal cuff bracelet to finish a formal look. Sample accessory listing.",
+      "Crystal cuff bracelet to finish a formal look.",
     images: [
       { file: "accessory-bracelet", alt: "Crystal bracelet on a dark ground.", w: 336, h: 208 },
     ],
