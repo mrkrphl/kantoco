@@ -29,5 +29,18 @@ were applied in order with the Supabase MCP during round r8.1.
    `kantoco.ph@gmail.com`, type your own password, tick "Auto Confirm User".
 2. Authentication -> Sign In / Providers -> Email: turn off
    "Allow new users to sign up".
+3. Open `/demos/cgr-rentals/owner` and sign in with that email and password.
+
+## Owner page (r8.3)
+- Email + password sign-in with `@supabase/ssr` cookies; `src/proxy.ts` refreshes
+  the session on `/owner` only. The page checks the user on the server
+  (`auth.getUser()` + the `owners` list via RLS) before rendering any booking.
+- Signed out: sign-in screen. Signed in but not in `owners`: "This account
+  isn't an owner." No booking data is sent in either case. There is no sign-up.
+- Owners can change a booking's status, edit or add fitting times (shown or
+  hidden), download a CSV (`/owner/export`, owners only, 403 otherwise) and
+  sign out. The PHP 200 commission line counts confirmed, out and returned
+  reservations; fittings never count.
+- Without the two env vars the page keeps the on-device fallback.
 
 Never commit keys. The site uses only the publishable key, from env.
