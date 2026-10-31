@@ -76,7 +76,7 @@ export const SHOP_PHOTOS = {
   ivoryVeil: {
     file: "cgr-ivory-veil",
     label: "Ivory gown",
-    alt: "Ivory lace gown with a long sheer veil and train, on a white mannequin holding a bouquet.",
+    alt: "Ivory lace gown with a long sheer veil and train, on a white mannequin with a bouquet.",
     w: 633,
     h: 1200,
   },

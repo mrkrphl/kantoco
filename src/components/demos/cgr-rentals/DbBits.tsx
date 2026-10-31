@@ -15,7 +15,7 @@ export function BookingUnavailable({ what = "Booking" }: { what?: string }) {
         <h1 tabIndex={-1}>{what} is resting for a moment.</h1>
         <p className="r11-sub" style={{ marginTop: 0 }}>
           Online booking is unavailable right now. Nothing was saved. Please try again in a little while, or
-          message the shop and they’ll hold your date.
+          message the shop to reserve your date.
         </p>
         <div className="r11-acts">
           <button type="button" className="r11-btn r11-wine" onClick={() => window.location.reload()}>

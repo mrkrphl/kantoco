@@ -56,3 +56,24 @@
 
 /* r8: every footer link is at least a 44px square tap (TikTok was 42 wide). */
 .cgr .r11-more a{min-width:44px;justify-content:center}
+
+/* r8.3 owner sign-in and the database owner view. Taps stay 44px. */
+.cgr .own-form { display: flex; flex-direction: column; gap: 20px; max-width: 440px; margin-top: 28px; }
+.cgr .own-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; margin-top: 16px; }
+.cgr .own-bar .s2 { color: var(--mute); font-size: 14px; flex-basis: 100%; overflow-wrap: anywhere; }
+.cgr .own-live { min-height: 24px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--wine-ink); }
+.cgr .own-times { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 32px; max-width: 760px; }
+.cgr .own-times h2 { font: 400 clamp(28px, 2.6vw, 36px)/1.1 var(--font-display); color: var(--wine-ink); margin: 0 0 8px; }
+.cgr .own-times .s2 { color: var(--mute); font-size: 14px; }
+.cgr .own-slots { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.cgr .own-slot { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.cgr .own-slot .r11-field { width: auto; flex: 0 1 180px; }
+.cgr .own-slot input[type="time"] { min-height: 44px; }
+.cgr .own-slot .msg { flex-basis: 100%; margin: 0; font-size: 14px; color: #8a1f33; font-weight: 600; }
+.cgr .own-shown { min-width: 196px; justify-content: center; }
+.cgr .own-save { min-width: 112px; }
+.cgr .own-add { border-bottom: 0; margin-top: 8px; }
+@media (max-width: 720px) {
+  .cgr .own-slot .r11-field { flex: 1 1 100%; }
+  .cgr .own-save { flex: 1 1 auto; }
+}
