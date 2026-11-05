@@ -8,7 +8,14 @@ import { ownerClient, ownerSession, OWNER_DB_ON } from "@/lib/cgr-supabase";
 const OWNER_PATH = `${CGR_BASE}/owner`;
 const REF = /^CGR-[A-HJ-NP-Z2-9]{4}$/;
 const SLOT = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
-const STATUSES = ["pending", "confirmed", "out", "returned", "cancelled"] as const;
+/** r8.4c: each kind has its own statuses. Fittings: Came in / No-show (D4, DEFAULT). */
+const STATUSES: Record<"reserve" | "fitting", readonly string[]> = {
+  reserve: ["pending", "confirmed", "out", "returned", "cancelled"],
+  fitting: ["pending", "confirmed", "came_in", "no_show", "cancelled"],
+};
+
+/** Every owner page reads the same rows, so a change refreshes all of them. */
+const refresh = () => revalidatePath(OWNER_PATH, "layout");
 
 export type SignInState = { error?: string; email?: string };
 
@@ -42,7 +49,7 @@ export async function signOut(): Promise<void> {
 export type ActionResult = { ok: boolean; message: string };
 
 export async function setStatus(kind: string, ref: string, status: string): Promise<ActionResult> {
-  if (!REF.test(ref) || !(STATUSES as readonly string[]).includes(status) || (kind !== "reserve" && kind !== "fitting")) {
+  if (!REF.test(ref) || (kind !== "reserve" && kind !== "fitting") || !STATUSES[kind].includes(status)) {
     return { ok: false, message: "That change wasn't valid." };
   }
   const s = await ownerSession();
@@ -56,8 +63,8 @@ export async function setStatus(kind: string, ref: string, status: string): Prom
     return { ok: false, message: "Couldn't save that change. Please try again." };
   }
   if (!data || data.length === 0) return { ok: false, message: "That booking wasn't found." };
-  revalidatePath(OWNER_PATH);
-  return { ok: true, message: `${ref} saved.` };
+  refresh();
+  return { ok: true, message: "Saved." };
 }
 
 /** Add a fitting time (from = null) or change one: its time and whether customers see it. */
@@ -77,6 +84,36 @@ export async function saveSlot(from: string | null, slot: string, active: boolea
     return { ok: false, message: "Couldn't save that time. Please try again." };
   }
   if (!data || data.length === 0) return { ok: false, message: "That time wasn't found." };
-  revalidatePath(OWNER_PATH);
+  refresh();
   return { ok: true, message: "Fitting times saved." };
+}
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * r8.4: the pickup and return days the owner agreed with the client. Either
+ * can be blank. PLACEHOLDER, rule from Mark pending: nothing is worked out
+ * from the event date; the owner types both days in.
+ */
+export async function setHandover(ref: string, pickupOn: string, returnOn: string): Promise<ActionResult> {
+  if (!REF.test(ref) || (pickupOn && !DAY.test(pickupOn)) || (returnOn && !DAY.test(returnOn))) {
+    return { ok: false, message: "Use a full date for pickup and return." };
+  }
+  if (pickupOn && returnOn && returnOn < pickupOn) {
+    return { ok: false, message: "Return can't be before pickup." };
+  }
+  const s = await ownerSession();
+  if (s.state !== "owner") return { ok: false, message: "Please sign in again as an owner." };
+  const { data, error } = await s.sb
+    .from("reservations")
+    .update({ pickup_on: pickupOn || null, return_on: returnOn || null })
+    .eq("ref", ref)
+    .select("ref");
+  if (error) {
+    if (error.code === "23514") return { ok: false, message: "Return can't be before pickup." };
+    return { ok: false, message: "Couldn't save those dates. Please try again." };
+  }
+  if (!data || data.length === 0) return { ok: false, message: "That reservation wasn't found." };
+  refresh();
+  return { ok: true, message: "Pickup and return days saved." };
 }
