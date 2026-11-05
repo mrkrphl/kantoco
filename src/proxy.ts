@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * r8.3: keeps the owner sign-in cookies fresh. Runs only on /owner pages and
+ * r8.3: keeps the owner sign-in cookies fresh. Runs only on /owner and (r8.4)
+ * /admin pages and
  * does nothing without the Supabase env vars. It never decides access: the
  * owner page, its actions and the CSV route each check the session again.
  */
@@ -33,5 +34,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/demos/cgr-rentals/owner", "/demos/cgr-rentals/owner/:path*"],
+  matcher: [
+    "/demos/cgr-rentals/owner",
+    "/demos/cgr-rentals/owner/:path*",
+    "/demos/cgr-rentals/admin",
+    "/demos/cgr-rentals/admin/:path*",
+  ],
 };

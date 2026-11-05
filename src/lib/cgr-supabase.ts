@@ -1,10 +1,11 @@
 /**
  * r8.3: server-side Supabase for the owner pages (sign-in, bookings, CSV).
  * Session cookies come from @supabase/ssr; every check runs on the server
- * with auth.getUser(), which asks Supabase to verify the session. Owner
- * status is whatever row-level security returns from public.owners: owners
- * see the list, everyone else gets nothing back. Only the publishable key
- * is used here, read from env (never in code).
+ * with auth.getUser(), which asks Supabase to verify the session. Only the
+ * publishable key is used here, read from env (never in code).
+ * r8.4: the owners list is admin-only now, so the session asks owner_me()
+ * for the caller's own row (role admin|owner, status active|paused). A
+ * paused owner gets nothing: RLS and every owner RPC check status too.
  */
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -39,7 +40,10 @@ export type OwnerSession =
   | { state: "signed_out" }
   | { state: "unavailable" }
   | { state: "not_owner"; email: string }
-  | { state: "owner"; email: string; sb: OwnerClient };
+  | { state: "paused"; email: string }
+  | { state: "owner"; email: string; role: OwnerRole; sb: OwnerClient };
+
+export type OwnerRole = "admin" | "owner";
 
 export async function ownerSession(): Promise<OwnerSession> {
   try {
@@ -54,10 +58,12 @@ export async function ownerSession(): Promise<OwnerSession> {
       return { state: "signed_out" };
     }
     const email = data.user.email ?? "";
-    const owners = await sb.from("owners").select("email").limit(1);
-    if (owners.error) return { state: "unavailable" };
-    if (!owners.data || owners.data.length === 0) return { state: "not_owner", email };
-    return { state: "owner", email, sb };
+    const me = await sb.rpc("owner_me");
+    if (me.error) return { state: "unavailable" };
+    const row = me.data as { role?: string; status?: string } | null;
+    if (!row || !row.role) return { state: "not_owner", email };
+    if (row.status !== "active") return { state: "paused", email };
+    return { state: "owner", email, role: row.role === "admin" ? "admin" : "owner", sb };
   } catch {
     return { state: "unavailable" };
   }
@@ -77,8 +83,11 @@ export type OwnerRow = {
   customerName: string;
   customerContact: string;
   notes: string;
-  status: "pending" | "confirmed" | "out" | "returned" | "cancelled";
+  status: "pending" | "confirmed" | "out" | "returned" | "cancelled" | "came_in" | "no_show";
   createdAt: string;
+  /** r8.4, reservations: the day the client picks up and brings back, set by the owner. */
+  pickupOn?: string;
+  returnOn?: string;
 };
 
 export type OwnerSlot = { slot: string; active: boolean };
@@ -90,7 +99,7 @@ export async function loadOwnerData(sb: OwnerClient): Promise<OwnerData | null> 
   const [res, fit, gowns, slots] = await Promise.all([
     sb
       .from("reservations")
-      .select("ref,gown_slug,event_date,return_date,customer_name,customer_contact,notes,status,created_at"),
+      .select("ref,gown_slug,event_date,return_date,customer_name,customer_contact,notes,status,created_at,pickup_on,return_on"),
     sb
       .from("fittings")
       .select("ref,linked_ref,gown_slug,fitting_date,slot,customer_name,customer_contact,notes,status,created_at"),
@@ -113,6 +122,8 @@ export async function loadOwnerData(sb: OwnerClient): Promise<OwnerData | null> 
       notes: r.notes ?? "",
       status: r.status,
       createdAt: r.created_at,
+      pickupOn: r.pickup_on ?? undefined,
+      returnOn: r.return_on ?? undefined,
     })),
     ...(fit.data ?? []).map((f) => ({
       kind: "fitting" as const,
@@ -132,4 +143,52 @@ export async function loadOwnerData(sb: OwnerClient): Promise<OwnerData | null> 
     })),
   ];
   return { rows, slots: (slots.data ?? []) as OwnerSlot[] };
+}
+
+/** r8.4: one row of the admin's owners list (admin_list_owners). */
+export type AdminOwner = {
+  email: string;
+  role: OwnerRole;
+  status: "active" | "paused";
+  added_at: string;
+  paused_at: string | null;
+  has_login: boolean;
+  /** r8.4d: when Supabase Auth sent the latest invite, or null if none. */
+  invited_at: string | null;
+  is_you: boolean;
+};
+
+/** Maps a "cgr:code" error from the owner/admin RPCs to its code. */
+export function cgrCode(err: { message?: string } | null | undefined): string {
+  const m = /cgr:([a-z_]+)/.exec(err?.message ?? "");
+  return m ? m[1] : "unknown";
+}
+
+/**
+ * r8.4: owner_dashboard(): today's fittings, pickups and (r8.4c, D7) returns,
+ * the next 7 days and this week's counts. Pickup and return days come only
+ * from what the shop typed in (pickup_on / return_on); the rule is not set.
+ */
+export type OwnerDashboard = {
+  today: string;
+  week_start: string;
+  week_end: string;
+  fittings_today: { ref: string; slot: string; name: string; gown: string | null; status: string }[];
+  pickups_today: { ref: string; name: string; gown: string | null; status: string }[];
+  returns_today: { ref: string; name: string; gown: string | null; status: string }[];
+  next_7_days: { day: string; kind: "fitting" | "pickup" | "return"; ref: string; name: string; gown: string | null; status: string; slot?: string }[];
+  this_week: { reservations: number; fittings: number };
+};
+
+export async function loadOwnerDashboard(sb: OwnerClient): Promise<OwnerDashboard | null> {
+  const { data, error } = await sb.rpc("owner_dashboard");
+  return error || !data ? null : (data as OwnerDashboard);
+}
+
+/** r8.4c: the admin-only commission line (D1). Owners get null (the RPC refuses them). */
+export type AdminCommission = { count: number; per_php: number; total_php: number };
+
+export async function loadAdminCommission(sb: OwnerClient): Promise<AdminCommission | null> {
+  const { data, error } = await sb.rpc("admin_commission");
+  return error || !data ? null : (data as AdminCommission);
 }
