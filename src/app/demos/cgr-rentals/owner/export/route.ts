@@ -1,4 +1,5 @@
 import { COMMISSION_PHP } from "@/lib/cgr-rentals";
+import { ownerStatusLabel } from "@/lib/cgr-owner-format";
 import { loadOwnerData, ownerSession, OWNER_DB_ON, type OwnerRow } from "@/lib/cgr-supabase";
 
 export const dynamic = "force-dynamic";
@@ -43,15 +44,17 @@ const HEAD = [
   "customer_contact",
   "notes",
   "created_pht",
-  "commission_php",
+  "pickup_on",
+  "return_on",
 ];
 
-function line(r: OwnerRow): string {
+/** r8.4: the ₱200 commission column is for the admin only (Mark's pick). */
+function line(r: OwnerRow, admin: boolean): string {
   const counts = r.kind === "reserve" && COUNTS.has(r.status);
-  return [
+  const cells: (string | number)[] = [
     r.kind === "fitting" ? "fitting" : "reservation",
     r.ref,
-    r.status,
+    ownerStatusLabel(r.status),
     r.gownName,
     r.kind === "reserve" ? r.eventDate : "",
     r.returnDate,
@@ -62,10 +65,11 @@ function line(r: OwnerRow): string {
     r.customerContact,
     r.notes,
     manilaStamp(r.createdAt),
-    counts ? COMMISSION_PHP : 0,
-  ]
-    .map(cell)
-    .join(",");
+    r.pickupOn ?? "",
+    r.returnOn ?? "",
+  ];
+  if (admin) cells.push(counts ? COMMISSION_PHP : 0);
+  return cells.map(cell).join(",");
 }
 
 export async function GET() {
@@ -81,7 +85,9 @@ export async function GET() {
     (a, b) => (a.fittingDate ?? a.eventDate).localeCompare(b.fittingDate ?? b.eventDate) || a.ref.localeCompare(b.ref),
   );
   const today = manilaStamp(new Date().toISOString()).slice(0, 10);
-  const body = "\uFEFF" + [HEAD.map(cell).join(","), ...rows.map(line)].join("\r\n") + "\r\n";
+  const admin = s.role === "admin";
+  const head = admin ? [...HEAD, "commission_php"] : HEAD;
+  const body = "\uFEFF" + [head.map(cell).join(","), ...rows.map((r) => line(r, admin))].join("\r\n") + "\r\n";
   return new Response(body, {
     headers: {
       ...PRIVATE,
