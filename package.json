@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:cgr": "node --test tests/cgr-reserve.test.mjs"
+    "test:cgr": "node --test tests/cgr-reserve.test.mjs tests/cgr-owner-format.test.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
