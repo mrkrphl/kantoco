@@ -885,17 +885,18 @@ html.js-anim .pf-paw {
   }
 
   .pf-frame img {
-    object-fit: cover;
-    object-position: center 40%;
+    /* Natural framing: the frame is the sign photo's own 1340:510, so nothing is cropped. */
+    object-fit: contain;
+    object-position: 50% 50%;
   }
 
   .pf-sticker {
     position: relative;
     right: auto;
     bottom: auto;
-    width: min(82%, 420px);
+    width: min(48%, 260px);
     max-width: none;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     align-self: flex-end;
     margin-top: -28px;
     padding: 12px 12px 10px;
@@ -903,24 +904,25 @@ html.js-anim .pf-paw {
     min-height: 0;
     margin-bottom: 8px;
     display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
     overflow: hidden;
   }
 
   .pf-sticker picture {
     min-height: 0;
-    height: 100%;
+    height: auto;
     overflow: hidden;
     display: block;
   }
 
+  /* Dog photo at its natural 2:3 (800x1200): whole dog, no crop. */
   .pf-sticker img {
-    aspect-ratio: auto;
+    aspect-ratio: 800 / 1200;
     width: 100%;
-    height: 100%;
+    height: auto;
     min-height: 0;
-    object-fit: cover;
-    object-position: 50% 30%;
+    object-fit: contain;
+    object-position: 50% 50%;
   }
 
   .pf-sticker .pf-pic-credit {
@@ -977,7 +979,8 @@ html.js-anim .pf-paw {
   }
 
   .pf-cardph img {
-    object-fit: cover;
+    /* Box is the cat photo's own 1600:1067. */
+    object-fit: contain;
   }
 
   .pf-locale {
@@ -1024,11 +1027,13 @@ html.js-anim .pf-paw {
     position: relative;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    /* Window photo at its natural 870x1150 portrait: both decals and the full frame show. */
+    aspect-ratio: 870 / 1150;
     background-color: #a5a4a4;
     background-image: url("/demos/pet-forum-vet/window-decals.webp");
-    background-size: cover;
-    background-position: 50% 38%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
   }
 
   .pf-win picture,
@@ -1042,8 +1047,8 @@ html.js-anim .pf-paw {
   }
 
   .pf-win img {
-    object-fit: cover;
-    object-position: 50% 38%;
+    object-fit: contain;
+    object-position: 50% 50%;
   }
 
   .pf-inset {
