@@ -120,7 +120,9 @@ html:has(.cgr-plain),body:has(.cgr-plain){background:#f5f5f5}
 @media (max-width:520px){.cgr-plain .com{padding:14px 16px}.cgr-plain .csv{padding:14px 16px}}
 .cgr-plain .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .cgr-plain .own>li{flex-wrap:wrap;gap:6px 12px}
-.cgr-plain .own .em{font-weight:600;overflow-wrap:anywhere}
+.cgr-plain .own .em{font-weight:600;overflow-wrap:normal}
+.cgr-plain .own .em span{white-space:nowrap}
+@media (max-width:480px){.cgr-plain .own .em{font-size:14px}}
 .cgr-plain .own .role{color:var(--sub)}
 .cgr-plain .own .ac{display:flex;gap:16px;flex-wrap:wrap;width:100%;margin-top:-4px}
 .cgr-plain .own .mine{color:var(--sub);width:100%}

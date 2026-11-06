@@ -199,7 +199,17 @@ export function AdminPanel({ owners }: { owners: AdminOwner[] }) {
                 data-role={o.role}
               >
                 <div className="grow">
-                  <p className="em">{o.email}</p>
+                  <p className="em">
+                    {o.email.includes("@") ? (
+                      <>
+                        <span>{o.email.slice(0, o.email.indexOf("@") + 1)}</span>
+                        <wbr />
+                        <span>{o.email.slice(o.email.indexOf("@") + 1)}</span>
+                      </>
+                    ) : (
+                      o.email
+                    )}
+                  </p>
                   <p className="role">
                     {o.role === "admin" ? "Admin" : "Owner"}
                     {o.is_you ? " · You" : ""}
