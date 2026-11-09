@@ -64,3 +64,11 @@ test("attribution from query string", () => {
 test("slugify keeps a stable catalogue slug", () => {
   assert.equal(slugify("Wine Sequin Slit Gown"), "wine-sequin-slit-gown");
 });
+
+import { addonPlain } from "../src/lib/cgr-catalogue.ts";
+
+test("addon plain words omit blank prices", () => {
+  assert.equal(addonPlain([{ name: "Gold crystal tiara", price_per_day: 500 }]), "Gold crystal tiara (₱500/day)");
+  assert.equal(addonPlain([{ name: "Crystal choker", price_per_day: null }]), "Crystal choker");
+  assert.equal(addonPlain([]), "");
+});

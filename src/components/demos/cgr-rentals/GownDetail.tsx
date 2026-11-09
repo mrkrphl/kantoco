@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AddonPicker, type ChosenAddon } from "@/components/demos/cgr-rentals/AddonPicker";
 import { CGR_BASE, SLUG_ALIASES, type Gown } from "@/lib/cgr-rentals";
 import { useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
@@ -52,6 +53,12 @@ export function GownDetail({
   const rows = useBookings();
   const today = useToday();
   const [img, setImg] = useState(0);
+  const [addons, setAddons] = useState<ChosenAddon[]>([]);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`cgr-addons:${gown.slug}`, JSON.stringify(addons));
+    } catch { /* ignore */ }
+  }, [addons, gown.slug]);
   const [pick, setPick] = useState<{ from: string; to: string }>(() =>
     initialDate
       ? { from: initialDate, to: initialReturn && initialReturn >= initialDate ? initialReturn : defaultReturn(initialDate) }
@@ -163,6 +170,9 @@ export function GownDetail({
               <p className="r11-note">Reserve online, get first pick of fitting slots.</p>
             )}
           </div>
+          {gown.category !== "accessory" ? (
+            <AddonPicker value={addons} onChange={setAddons} />
+          ) : null}
           {cta}
         </div>
       </section>

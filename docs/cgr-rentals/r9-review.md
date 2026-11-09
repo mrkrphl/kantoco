@@ -31,3 +31,15 @@ Reviewed without a paid model or cloud agent (hard rule: $0). Checklist against 
 - Public catalogue depends on publishable key + RPC; if env missing, falls back to hardcoded GOWNS (look preserved).
 - QR links the branch preview host; production domain later needs the same shop-link URL updated.
 - Accessories-as-add-ons on gown detail / Reserve form is partial: accessories remain catalogue items; full add-on picker on Reserve is a follow-up.
+
+## r9.1 follow-up (local free review)
+
+- Tab bar clearance: `--tab-h` + `padding-bottom` on `.pg` including safe-area.
+- Dev indicator off (`devIndicators: false`).
+- Catalogue form stacked at 390; slug auto; bucket line removed; remove confirm; list actions on one row.
+- #6 root cause: r9 stills used a 2-item local harness, not `list_catalogue` / `owner_list_gowns`. DB already had 16 available. Harness now loads the public list RPC.
+- 0995 → 0927: `0995 477 1665` was added in commit `af839a43` (30 Oct 2026, “from the shop's Facebook page”). Public Maps/aggregator listing checked read-only shows **0977 087 8589** and **0927 447 0021**; 0995 was not found on that listing, so footer now uses 0977 + 0927 only.
+- Sticky gown CTA: padding under `.r11-gd` / `.r11-lower` + scroll-margin on `#dates`.
+- Accessory add-ons: picker on gown detail + Reserve; stored on reservation; owner card shows plain words; prices only when owner-set.
+- Shop-link: go-live URL swap note on the page and in PR notes.
+- SMTP still OFF.

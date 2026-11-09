@@ -7,6 +7,7 @@ import { CGR_BASE, SLUG_ALIASES, type Gown } from "@/lib/cgr-rentals";
 import { addBooking, loadBookings, useBookings, useToday } from "@/components/demos/cgr-rentals/bookings";
 import { Side, Steps, useStepFocus } from "@/components/demos/cgr-rentals/FlowBits";
 import { BookingUnavailable, Honeypot } from "@/components/demos/cgr-rentals/DbBits";
+import { AddonPicker, type ChosenAddon } from "@/components/demos/cgr-rentals/AddonPicker";
 import { DB_ON, dbCreateReservation, dbMessage, dbTakenDays, useDbRead } from "@/components/demos/cgr-rentals/db";
 import {
   customerTotal,
@@ -76,6 +77,14 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
   const [errs, setErrs] = useState<Partial<Record<"name" | "contact", string>>>({});
   const [tries, setTries] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [addons, setAddons] = useState<ChosenAddon[]>(() => {
+    try {
+      const raw = sessionStorage.getItem(`cgr-addons:${gown.slug}`);
+      return raw ? (JSON.parse(raw) as ChosenAddon[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const alertRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -161,6 +170,7 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
       notes: f.notes.trim(),
       website,
       ...attrib,
+      addons,
     });
     if (r.ok) {
       try {
@@ -310,7 +320,8 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
             onChange={(e) => set("notes", e.target.value)}
           />
         </div>
-        <div className="r11-acts">
+        {gown.category !== "accessory" ? <AddonPicker value={addons} onChange={setAddons} /> : null}
+      <div className="r11-acts">
           <button type="submit" className="r11-btn r11-wine">
             Reserve your {noun}
           </button>

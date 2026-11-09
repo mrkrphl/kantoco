@@ -88,6 +88,8 @@ export type OwnerRow = {
   /** r8.4, reservations: the day the client picks up and brings back, set by the owner. */
   pickupOn?: string;
   returnOn?: string;
+  /** r9.1 accessory add-ons chosen at reserve */
+  addons?: { slug: string; name: string; price_per_day: number | null }[];
 };
 
 export type OwnerSlot = { slot: string; active: boolean };
@@ -99,7 +101,7 @@ export async function loadOwnerData(sb: OwnerClient): Promise<OwnerData | null> 
   const [res, fit, gowns, slots] = await Promise.all([
     sb
       .from("reservations")
-      .select("ref,gown_slug,event_date,return_date,customer_name,customer_contact,notes,status,created_at,pickup_on,return_on"),
+      .select("ref,gown_slug,event_date,return_date,customer_name,customer_contact,notes,status,created_at,pickup_on,return_on,addons"),
     sb
       .from("fittings")
       .select("ref,linked_ref,gown_slug,fitting_date,slot,customer_name,customer_contact,notes,status,created_at"),
@@ -124,6 +126,7 @@ export async function loadOwnerData(sb: OwnerClient): Promise<OwnerData | null> 
       createdAt: r.created_at,
       pickupOn: r.pickup_on ?? undefined,
       returnOn: r.return_on ?? undefined,
+      addons: Array.isArray(r.addons) ? r.addons : [],
     })),
     ...(fit.data ?? []).map((f) => ({
       kind: "fitting" as const,

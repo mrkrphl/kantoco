@@ -11,7 +11,6 @@ import {
   type ItemStatus,
   type ItemType,
 } from "@/lib/cgr-catalogue";
-import { CATALOGUE_BUCKET } from "@/lib/cgr-catalogue";
 import { plural } from "@/lib/cgr-owner-format";
 import {
   removeGown,
@@ -19,11 +18,6 @@ import {
   upsertGown,
   uploadCataloguePhoto,
 } from "@/app/demos/cgr-rentals/owner/catalogue/actions";
-
-/**
- * r9 owner Catalogue: list, add, edit, pause, remove. Photos compress on the
- * phone before upload to the free Storage bucket. Shown uncropped (contain).
- */
 
 type Draft = {
   slug: string;
@@ -77,29 +71,60 @@ function splitList(s: string): string[] {
     .slice(0, 12);
 }
 
-export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
+/** Unique slug: base from name, then -2, -3… against existing slugs. */
+function uniqueSlug(name: string, taken: Set<string>, keep?: string): string {
+  const base = slugify(name);
+  if (keep && keep === base) return keep;
+  if (!taken.has(base) || keep === base) return base;
+  for (let n = 2; n < 100; n++) {
+    const s = `${base}-${n}`.slice(0, 60);
+    if (!taken.has(s) || s === keep) return s;
+  }
+  return `${base}-${Date.now().toString(36).slice(-4)}`.slice(0, 60);
+}
+
+export function CataloguePanel({
+  items: initial,
+  startAdd = false,
+  startEditSlug,
+  startRemoveSlug,
+}: {
+  items: CatalogueItem[];
+  /** Local harness stills only. */
+  startAdd?: boolean;
+  startEditSlug?: string;
+  startRemoveSlug?: string;
+}) {
   const [items, setItems] = useState(initial);
-  const [mode, setMode] = useState<"list" | "add" | "edit">("list");
-  const [draft, setDraft] = useState<Draft>(empty());
+  const seedEdit = startEditSlug ? initial.find((i) => i.slug === startEditSlug) : undefined;
+  const [mode, setMode] = useState<"list" | "add" | "edit">(
+    startAdd ? "add" : seedEdit ? "edit" : "list",
+  );
+  const [draft, setDraft] = useState<Draft>(seedEdit ? fromItem(seedEdit) : empty());
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, start] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState<CatalogueItem | null>(
+    startRemoveSlug ? initial.find((i) => i.slug === startRemoveSlug) ?? null : null,
+  );
 
+  const taken = useMemo(() => new Set(items.map((i) => i.slug)), [items]);
   const counts = useMemo(() => {
     const a = items.filter((i) => i.status === "available").length;
-    const p = items.length - a;
-    return { a, p };
+    return { a, p: items.length - a };
   }, [items]);
 
   function openAdd() {
     setDraft(empty());
     setMode("add");
     setMsg(null);
+    setRemoving(null);
   }
   function openEdit(i: CatalogueItem) {
     setDraft(fromItem(i));
     setMode("edit");
     setMsg(null);
+    setRemoving(null);
   }
 
   async function onFiles(files: FileList | null) {
@@ -108,9 +133,12 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
     setMsg(null);
     try {
       const next = [...draft.photos];
+      const slug =
+        mode === "edit"
+          ? draft.slug
+          : uniqueSlug(draft.name || "item", taken, draft.slug || undefined);
       for (const file of Array.from(files).slice(0, 6)) {
         const { blob, w, h } = await compressPhoto(file);
-        const slug = draft.slug || slugify(draft.name || "item");
         const fd = new FormData();
         fd.set("file", new File([blob], "photo.webp", { type: "image/webp" }));
         fd.set("slug", slug);
@@ -123,7 +151,7 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
         }
         next.push(res.photo);
       }
-      setDraft((d) => ({ ...d, photos: next, slug: d.slug || slugify(d.name || "item") }));
+      setDraft((d) => ({ ...d, photos: next, slug: d.slug || slug }));
     } catch {
       setMsg({ ok: false, text: "Could not compress that photo. Try another." });
     } finally {
@@ -137,7 +165,8 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
       setMsg({ ok: false, text: "Name is required." });
       return;
     }
-    const slug = (draft.slug || slugify(name)).toLowerCase();
+    const slug =
+      mode === "edit" ? draft.slug : uniqueSlug(name, taken, draft.slug || undefined);
     const price = draft.price.trim() === "" ? null : Number(draft.price);
     if (price != null && (!Number.isFinite(price) || price <= 0)) {
       setMsg({ ok: false, text: "Price must be blank or a positive number." });
@@ -195,15 +224,18 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
     });
   }
 
-  function remove(i: CatalogueItem) {
-    if (!confirm(`Remove ${i.name}? Live bookings will block this.`)) return;
+  function confirmRemove() {
+    if (!removing) return;
+    const i = removing;
     start(async () => {
       const res = await removeGown(i.slug);
       if (!res.ok) {
         setMsg({ ok: false, text: res.ok ? "Could not remove." : res.error });
+        setRemoving(null);
         return;
       }
       setItems((prev) => prev.filter((x) => x.slug !== i.slug));
+      setRemoving(null);
       setMsg({ ok: true, text: "Removed." });
     });
   }
@@ -212,7 +244,7 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
     return (
       <div className="sec card wrap cat" data-cat={mode}>
         <h1>{mode === "add" ? "Add an item" : "Edit item"}</h1>
-        <p className="sub">Photos are compressed on your phone before upload. The public site hides a blank price.</p>
+        <p className="sub">Photos are compressed on your phone before upload. A blank price stays hidden on the public site.</p>
         {msg ? (
           <p className={msg.ok ? "note" : "alert"} role="status">
             {msg.text}
@@ -223,24 +255,9 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
           <input
             id="cn"
             className="inp"
+            placeholder="e.g. Wine sequin slit gown"
             value={draft.name}
-            onChange={(e) =>
-              setDraft((d) => ({
-                ...d,
-                name: e.target.value,
-                slug: mode === "add" ? slugify(e.target.value) : d.slug,
-              }))
-            }
-          />
-        </div>
-        <div className="fld">
-          <label htmlFor="cs">Slug</label>
-          <input
-            id="cs"
-            className="inp"
-            value={draft.slug}
-            disabled={mode === "edit"}
-            onChange={(e) => setDraft((d) => ({ ...d, slug: e.target.value.toLowerCase() }))}
+            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
           />
         </div>
         <div className="fld">
@@ -261,32 +278,36 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
         </div>
         <div className="fld">
           <label htmlFor="cc">Colors</label>
-          <input id="cc" className="inp" placeholder="red, gold" value={draft.colors} onChange={(e) => setDraft((d) => ({ ...d, colors: e.target.value }))} />
+          <input id="cc" className="inp" placeholder="e.g. red, gold" value={draft.colors} onChange={(e) => setDraft((d) => ({ ...d, colors: e.target.value }))} />
         </div>
         <div className="fld">
           <label htmlFor="cz">Sizes</label>
-          <input id="cz" className="inp" placeholder="S, M, L" value={draft.sizes} onChange={(e) => setDraft((d) => ({ ...d, sizes: e.target.value }))} />
+          <input id="cz" className="inp" placeholder="e.g. S, M, L" value={draft.sizes} onChange={(e) => setDraft((d) => ({ ...d, sizes: e.target.value }))} />
         </div>
         <div className="fld">
           <label htmlFor="co">Occasions</label>
-          <input id="co" className="inp" placeholder="Debut, Pageant" value={draft.occasions} onChange={(e) => setDraft((d) => ({ ...d, occasions: e.target.value }))} />
+          <input id="co" className="inp" placeholder="e.g. Debut, Pageant" value={draft.occasions} onChange={(e) => setDraft((d) => ({ ...d, occasions: e.target.value }))} />
         </div>
         <div className="fld">
           <label htmlFor="cp">Rental price per day (optional)</label>
-          <input id="cp" className="inp" inputMode="numeric" value={draft.price} onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))} />
+          <input id="cp" className="inp" inputMode="numeric" placeholder="Leave blank to hide on the site" value={draft.price} onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))} />
         </div>
         <div className="fld">
           <label htmlFor="cb">Short blurb</label>
-          <textarea id="cb" className="inp" rows={3} value={draft.blurb} onChange={(e) => setDraft((d) => ({ ...d, blurb: e.target.value }))} />
+          <textarea id="cb" className="inp" rows={4} placeholder="A short line guests will read on the gown page" value={draft.blurb} onChange={(e) => setDraft((d) => ({ ...d, blurb: e.target.value }))} />
         </div>
         <div className="fld">
           <label htmlFor="cno">Notes (owners only)</label>
-          <textarea id="cno" className="inp" rows={2} value={draft.notes} onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))} />
+          <textarea id="cno" className="inp" rows={3} placeholder="Private notes — not shown on the public site" value={draft.notes} onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))} />
         </div>
         <div className="fld">
-          <label htmlFor="cph">Photos</label>
-          <input id="cph" type="file" accept="image/*" capture="environment" multiple disabled={uploading || busy} onChange={(e) => onFiles(e.target.files)} />
-          <div className="taps" style={{ marginTop: 10 }}>
+          <span id="cph-lab">Photos</span>
+          <label className="filebtn" htmlFor="cph">
+            {uploading ? "Uploading…" : "Add photos"}
+            <input id="cph" type="file" accept="image/*" capture="environment" multiple disabled={uploading || busy} onChange={(e) => onFiles(e.target.files)} aria-labelledby="cph-lab" />
+          </label>
+          <p className="hint">Up to 5 MB per photo. Shown uncropped.</p>
+          <div className="thumbs">
             {draft.photos.map((ph, i) => (
               <div key={ph.path + i} className="ph" title={ph.alt}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -319,9 +340,6 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
             Cancel
           </button>
         </div>
-        <p className="sub" style={{ marginTop: 8 }}>
-          Bucket: {CATALOGUE_BUCKET}. Max 5 MB per file on the free plan.
-        </p>
       </div>
     );
   }
@@ -333,7 +351,7 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
         {plural(items.length, "item", "items")}
         {items.length ? ` · ${counts.a} available · ${counts.p} paused` : ""}
       </p>
-      <div className="acts">
+      <div className="acts acts-top">
         <button type="button" className="btn btn-wine" onClick={openAdd}>
           Add an item
         </button>
@@ -342,6 +360,24 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
         <p className={msg.ok ? "note" : "alert"} role="status" data-note={msg.ok ? "ok" : "err"}>
           {msg.text}
         </p>
+      ) : null}
+      {removing ? (
+        <div className="confirm" role="alertdialog" aria-labelledby="rm-h" data-remove="confirm">
+          <h2 id="rm-h" style={{ fontSize: 18, margin: 0 }}>
+            Remove {removing.name}?
+          </h2>
+          <p className="sub" style={{ marginTop: 8 }}>
+            Live bookings will block this. Paused items can be removed if nothing is holding them.
+          </p>
+          <div className="acts">
+            <button type="button" className="btn btn-wine" disabled={busy} onClick={confirmRemove}>
+              {busy ? "Removing…" : "Remove"}
+            </button>
+            <button type="button" className="btn btn-plain" disabled={busy} onClick={() => setRemoving(null)}>
+              Keep
+            </button>
+          </div>
+        </div>
       ) : null}
       {!items.length ? (
         <p className="sub">No items yet. Add a gown or accessory to show it on the public site.</p>
@@ -372,7 +408,7 @@ export function CataloguePanel({ items: initial }: { items: CatalogueItem[] }) {
                     <button type="button" className="tbtn" disabled={busy} onClick={() => pauseToggle(i)}>
                       {i.status === "available" ? "Pause" : "Make available"}
                     </button>
-                    <button type="button" className="tbtn red" disabled={busy} onClick={() => remove(i)}>
+                    <button type="button" className="tbtn red" disabled={busy} onClick={() => setRemoving(i)}>
                       Remove
                     </button>
                   </div>

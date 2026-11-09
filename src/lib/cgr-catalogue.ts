@@ -209,3 +209,17 @@ export function monthlyCommission(count: number, per = 200): { count: number; pe
 export function canRemoveGown(liveStatuses: string[]): boolean {
   return !liveStatuses.some((s) => s === "pending" || s === "confirmed" || s === "out");
 }
+
+/** Plain words for chosen add-ons on owner cards (price only if owner set one). */
+export function addonPlain(
+  list: { name: string; price_per_day?: number | null }[] | undefined,
+): string {
+  if (!list?.length) return "";
+  return list
+    .map((a) =>
+      a.price_per_day != null
+        ? `${a.name} (₱${Number(a.price_per_day).toLocaleString("en-PH")}/day)`
+        : a.name,
+    )
+    .join(", ");
+}

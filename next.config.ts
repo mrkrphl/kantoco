@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // r9.1: hide the Next.js "N" badge so it doesn't cover the owner Today tab.
+  devIndicators: false,
   async headers() {
     return [
       {

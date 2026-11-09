@@ -27,6 +27,9 @@ export default function ShopLinkPage() {
           <a href={url}>{url}</a>
         </p>
         <p className="shop-note">SAMPLE · NOT LIVE · KantoCo pitch page</p>
+        <p className="shop-note" style={{ textTransform: "none", letterSpacing: 0, marginTop: 12 }}>
+          Go-live: swap this QR URL to the production domain (same path, keep <code>?src=qr</code>) before printing for the counter.
+        </p>
       </main>
     </CgrShell>
   );

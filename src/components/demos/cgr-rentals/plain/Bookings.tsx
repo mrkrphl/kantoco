@@ -20,6 +20,7 @@ import {
   telHref,
   type SortMode,
 } from "@/lib/cgr-owner-format";
+import { addonPlain } from "@/components/demos/cgr-rentals/AddonPicker";
 import type { AdminCommission, OwnerRow } from "@/lib/cgr-supabase";
 import { setHandover, setStatus } from "@/app/demos/cgr-rentals/owner/actions";
 
@@ -58,6 +59,9 @@ function Row({ r }: { r: OwnerRow }) {
         <div>
           <div className="n">{r.customerName}</div>
           <div className="g">{r.gownName}</div>
+          {r.kind === "reserve" && r.addons?.length ? (
+            <div className="addon-line">With {addonPlain(r.addons)}</div>
+          ) : null}
         </div>
         <span className={`st ${statusTone(r.status)}`.trim()}>{ownerStatusLabel(r.status)}</span>
       </div>

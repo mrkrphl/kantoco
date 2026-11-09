@@ -68,6 +68,7 @@ export async function dbCreateReservation(a: {
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
+  addons?: { slug: string; name?: string; price_per_day?: number | null }[];
 }): Promise<CreateOut> {
   const r = await rpc<CreateOut>("create_reservation", {
     p_slug: a.slug,
@@ -81,6 +82,7 @@ export async function dbCreateReservation(a: {
     p_utm_source: a.utm_source ?? "",
     p_utm_medium: a.utm_medium ?? "",
     p_utm_campaign: a.utm_campaign ?? "",
+    p_addons: (a.addons ?? []).map((x) => ({ slug: x.slug })),
   });
   return r.ok ? r.data : { ok: false, error: "unavailable" };
 }
