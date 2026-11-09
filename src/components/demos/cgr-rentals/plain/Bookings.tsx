@@ -262,11 +262,8 @@ export function Bookings({
             {peso(commission.per_php)} × {plural(commission.count, "site booking")} = {peso(commission.total_php)}.
           </p>
           <p className="sub">
-            Site bookings = reservations from this site that are not cancelled (source ad, facebook, messenger, qr,
-            direct or other). Fittings never count. The header above counts every reservation and fitting of any
-            status; this line uses the same reservation rows, filtered.
+            Counts site reservations this month that aren&apos;t cancelled. Fittings don&apos;t count.
           </p>
-          <p className="sub">Owners never see this line. Export includes source for attribution.</p>
           <div className="acts">
             <a className="btn btn-plain" href={`${CGR_BASE}/owner/export?kind=commission`}>
               Download CSV

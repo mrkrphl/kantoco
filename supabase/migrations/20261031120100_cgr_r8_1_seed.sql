@@ -1,4 +1,5 @@
 -- r9.2: prices left null (never verified word-for-word on CGR public listings).
+-- r9.3: accessory photos stay empty (no uncropped source in repo; see 20261109250000).
 -- CGR r8.1 seed: the live catalogue (src/lib/cgr-rentals.ts at 3f6dfab), its old slugs, and the 4 current fitting times.
 insert into public.gowns (slug, name, price_per_day) values
   ('red-sequin-evening', 'Wine sequin slit gown', null),

@@ -400,6 +400,8 @@ export const GOWNS: Gown[] = [
     bookedDates: [],
     sample: true,
   },
+  // r9.3: accessories are text-only — repo only has cropped/cut-out photos
+  // (ATTRIBUTION.md); no uncropped FB source is committed, so images stay [].
   {
     slug: "gold-crystal-tiaras",
     name: "Gold crystal tiara",
@@ -409,10 +411,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Tall gold crystal tiaras for debut and pageant looks, to wear with any gown.",
-    images: [
-      { file: "accessories-tiaras", alt: "Gold crystal tiaras on a display rack.", w: 490, h: 332 },
-      { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
@@ -425,10 +424,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Gold band with red stones, made for coronation nights.",
-    images: [
-      { file: "accessory-tiara-ruby", alt: "Gold crown with red stones and a gold spike tiara behind it.", w: 445, h: 250 },
-      { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
@@ -441,10 +437,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Silver tiara set with pink and gold stones.",
-    images: [
-      { file: "accessory-tiara-rose", alt: "Silver tiara with pink and gold stones, close-up.", w: 248, h: 230 },
-      { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
@@ -457,11 +450,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Red, blue and pink stone tiaras rented as a set for courts and entourages.",
-    images: [
-      { file: "accessories-tiaras-2", alt: "Red, blue and pink stone tiaras on display stands.", w: 696, h: 482 },
-      { file: "accessory-tiara-ruby", alt: "Gold crown with red stones and a gold spike tiara behind it.", w: 445, h: 250 },
-      { file: "accessory-tiara-rose", alt: "Silver tiara with pink and gold stones, close-up.", w: 248, h: 230 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
@@ -474,9 +463,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Sparkle choker for formal and off-shoulder necklines.",
-    images: [
-      { file: "accessory-choker", alt: "Crystal choker on a dark ground.", w: 592, h: 272 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
@@ -489,9 +476,7 @@ export const GOWNS: Gown[] = [
     pricePerDay: 0,
     blurb:
       "Crystal cuff bracelet to finish a formal look.",
-    images: [
-      { file: "accessory-bracelet", alt: "Crystal bracelet on a dark ground.", w: 336, h: 208 },
-    ],
+    images: [],
     bookedDates: [],
     sample: true,
   },
