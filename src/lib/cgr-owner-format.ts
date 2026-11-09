@@ -13,7 +13,7 @@ export type DbStatus = "pending" | "confirmed" | "out" | "returned" | "cancelled
  * unchanged.
  */
 export const OWNER_STATUS_LABEL: Record<DbStatus, string> = {
-  pending: "Reserved",
+  pending: "New",
   confirmed: "Confirmed",
   out: "Picked up",
   returned: "Returned",
@@ -100,14 +100,56 @@ export function ownerRange(start: string, end: string, now: Date = new Date()): 
   return `${ownerDay(start, now)} to ${ownerDay(end, now)}`;
 }
 
-type Searchable = { ref: string; customerName: string; gownName: string; linkedRef?: string };
+/** Digits only, for phone search and tel: links. */
+export function phoneDigits(s: string): string {
+  return (s ?? "").replace(/\D+/g, "");
+}
+
+/** Next status in the New → Confirmed → Picked up → Returned flow (plus Cancelled). */
+export function nextReservationStatus(status: string): string | null {
+  if (status === "pending") return "confirmed";
+  if (status === "confirmed") return "out";
+  if (status === "out") return "returned";
+  return null;
+}
+
+export function nextReservationLabel(status: string): string | null {
+  const n = nextReservationStatus(status);
+  return n ? ownerStatusLabel(n) : null;
+}
+
+/** Build a Messenger deep link from a contact string when it looks like a phone. */
+export function messengerHref(contact: string): string | null {
+  const d = phoneDigits(contact);
+  if (d.length < 10) return null;
+  // m.me doesn't take phone numbers; use Facebook's share-less wa.me-style fallback: fb-messenger:// or leave null.
+  // Owners tap "Message" which opens sms: when Messenger isn't available.
+  return null;
+}
+
+export function telHref(contact: string): string | null {
+  const d = phoneDigits(contact);
+  if (d.length < 7) return null;
+  return `tel:+${d.startsWith("63") ? d : d.startsWith("0") ? "63" + d.slice(1) : d}`;
+}
+
+export function smsHref(contact: string): string | null {
+  const d = phoneDigits(contact);
+  if (d.length < 7) return null;
+  const e164 = d.startsWith("63") ? d : d.startsWith("0") ? "63" + d.slice(1) : d;
+  return `sms:+${e164}`;
+}
+
+type Searchable = { ref: string; customerName: string; customerContact?: string; gownName: string; linkedRef?: string };
 
 /** Search box: customer, gown or reference (with or without "CGR-"), any case. */
 export function matchesSearch(row: Searchable, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
-  const hay = [row.customerName, row.gownName, row.ref, row.ref.replace(/^CGR-/i, ""), row.linkedRef ?? ""]
-    .join(" \u0000 ")
+  const dig = phoneDigits(q);
+  if (dig.length >= 3 && phoneDigits(row.customerContact ?? "").includes(dig)) return true;
+  const hay = [row.customerName, row.customerContact ?? "", row.gownName, row.ref, row.ref.replace(/^CGR-/i, ""), row.linkedRef ?? ""]
+    .join(" \0 ")
     .toLowerCase();
   // Each typed word must start a word in the booking ("a" finds "Client A",
   // not every gown with an "a" in it); the full phrase also counts.

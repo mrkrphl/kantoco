@@ -124,7 +124,7 @@ export type GownColor = "red" | "blue" | "purple" | "green" | "silver" | "gold" 
 
 export type GownSize = "XS" | "S" | "M" | "L" | "XL" | "One size";
 
-export type GownImage = { file: string; alt: string; w: number; h: number };
+export type GownImage = { file: string; alt: string; w: number; h: number; /** Full URL or site path when not under CGR_ASSET */ path?: string };
 
 export type Gown = {
   slug: string;
