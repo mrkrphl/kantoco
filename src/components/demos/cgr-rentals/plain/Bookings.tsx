@@ -7,13 +7,17 @@ import {
   FITTING_STATUSES,
   RESERVATION_STATUSES,
   matchesSearch,
+  nextReservationLabel,
+  nextReservationStatus,
   ownerDay,
   ownerDayTime,
   ownerStamp,
   ownerStatusLabel,
   plural,
+  smsHref,
   sortBookings,
   statusTone,
+  telHref,
   type SortMode,
 } from "@/lib/cgr-owner-format";
 import type { AdminCommission, OwnerRow } from "@/lib/cgr-supabase";
@@ -61,6 +65,59 @@ function Row({ r }: { r: OwnerRow }) {
         {r.kind === "fitting"
           ? `Fitting · ${ownerDayTime(r.fittingDate ?? "", r.slot ?? "")}`
           : `Event · ${ownerDay(r.eventDate)}`}
+      </div>
+      <div className="taps" aria-label="Contact">
+        {telHref(r.customerContact) ? (
+          <a className="tap wine" href={telHref(r.customerContact)!}>
+            Call
+          </a>
+        ) : null}
+        {smsHref(r.customerContact) ? (
+          <a className="tap" href={smsHref(r.customerContact)!}>
+            Messenger / Text
+          </a>
+        ) : r.customerContact.toLowerCase().includes("m.me") || r.customerContact.toLowerCase().includes("facebook.com") ? (
+          <a className="tap" href={r.customerContact.startsWith("http") ? r.customerContact : `https://${r.customerContact}`} target="_blank" rel="noopener noreferrer">
+            Messenger
+          </a>
+        ) : null}
+        {r.kind === "reserve" && nextReservationStatus(status) ? (
+          <button
+            type="button"
+            className="tap wine"
+            disabled={busy}
+            onClick={() =>
+              start(async () => {
+                const n = nextReservationStatus(status)!;
+                const a = await setStatus(r.kind, r.ref, n);
+                if (a.ok) {
+                  setSt(n);
+                  setMsg({ ok: true, text: `Marked ${nextReservationLabel(status)}.` });
+                } else setMsg({ ok: false, text: a.message });
+              })
+            }
+          >
+            Mark {nextReservationLabel(status)}
+          </button>
+        ) : null}
+        {r.kind === "reserve" && status !== "cancelled" && status !== "returned" ? (
+          <button
+            type="button"
+            className="tap"
+            disabled={busy}
+            onClick={() =>
+              start(async () => {
+                const a = await setStatus(r.kind, r.ref, "cancelled");
+                if (a.ok) {
+                  setSt("cancelled");
+                  setMsg({ ok: true, text: "Cancelled." });
+                } else setMsg({ ok: false, text: a.message });
+              })
+            }
+          >
+            Cancel
+          </button>
+        ) : null}
       </div>
       {r.kind === "reserve" ? (
         <>
@@ -197,13 +254,16 @@ export function Bookings({
             </h2>
           </div>
           <p>
-            Commission: {peso(commission.per_php)} per confirmed, out or returned reservation. Fittings never count.
-            Total {peso(commission.total_php)}.
+            {(commission.month ? `Month ${commission.month} (Manila): ` : "")}
+            {peso(commission.per_php)} × {plural(commission.count, "site booking")} = {peso(commission.total_php)}.
+            Fittings never count.
           </p>
-          <p className="sub">
-            Owners don&rsquo;t see this. {peso(commission.total_php)} is{" "}
-            {plural(commission.count, "counted reservation")} × {peso(commission.per_php)}.
-          </p>
+          <p className="sub">Owners never see this line. Export includes source for attribution.</p>
+          <div className="acts">
+            <a className="btn btn-plain" href={`${CGR_BASE}/owner/export?kind=commission`}>
+              Download CSV
+            </a>
+          </div>
         </section>
       ) : null}
 
@@ -227,7 +287,7 @@ export function Bookings({
             <input
               id="bk-q"
               type="search"
-              placeholder="Customer or gown name"
+              placeholder="Customer, phone or gown"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />

@@ -64,6 +64,10 @@ export async function dbCreateReservation(a: {
   contact: string;
   notes: string;
   website: string;
+  source?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
 }): Promise<CreateOut> {
   const r = await rpc<CreateOut>("create_reservation", {
     p_slug: a.slug,
@@ -73,6 +77,10 @@ export async function dbCreateReservation(a: {
     p_contact: a.contact,
     p_notes: a.notes,
     p_website: a.website,
+    p_source: a.source ?? "direct",
+    p_utm_source: a.utm_source ?? "",
+    p_utm_medium: a.utm_medium ?? "",
+    p_utm_campaign: a.utm_campaign ?? "",
   });
   return r.ok ? r.data : { ok: false, error: "unavailable" };
 }
