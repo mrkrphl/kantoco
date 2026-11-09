@@ -66,7 +66,7 @@ test("ranges read as from-to, or one day", () => {
 
 test("status words map from the DB values", () => {
   assert.deepEqual(OWNER_STATUS_LABEL, {
-    pending: "Reserved",
+    pending: "New",
     confirmed: "Confirmed",
     out: "Picked up",
     returned: "Returned",
@@ -75,7 +75,7 @@ test("status words map from the DB values", () => {
     no_show: "No-show",
   });
   assert.equal(ownerStatusLabel("out"), "Picked up");
-  assert.equal(ownerStatusLabel("pending"), "Reserved");
+  assert.equal(ownerStatusLabel("pending"), "New");
   assert.equal(ownerStatusLabel("weird"), "weird");
   assert.ok(!FITTING_STATUSES.includes("out") && !FITTING_STATUSES.includes("returned"));
   for (const word of Object.values(OWNER_STATUS_LABEL)) assert.ok(!/hold/i.test(word));

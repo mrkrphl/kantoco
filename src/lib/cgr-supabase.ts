@@ -186,7 +186,7 @@ export async function loadOwnerDashboard(sb: OwnerClient): Promise<OwnerDashboar
 }
 
 /** r8.4c: the admin-only commission line (D1). Owners get null (the RPC refuses them). */
-export type AdminCommission = { count: number; per_php: number; total_php: number };
+export type AdminCommission = { count: number; per_php: number; total_php: number; month?: string; rows?: { ref: string; created_at: string; customer_name: string; gown_slug: string; status: string; source: string; commission_php: number }[] };
 
 export async function loadAdminCommission(sb: OwnerClient): Promise<AdminCommission | null> {
   const { data, error } = await sb.rpc("admin_commission");
