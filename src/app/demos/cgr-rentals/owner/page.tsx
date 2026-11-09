@@ -30,7 +30,7 @@ export default async function OwnerPage() {
   const s = g.owner;
   const dash = await loadOwnerDashboard(s.sb);
   return (
-    <PlainShell page="owner" current="owner" admin={s.role === "admin"} signedIn>
+    <PlainShell page="owner" current="today" admin={s.role === "admin"} signedIn>
       {dash ? <OwnerHome dash={dash} /> : <OwnerUnavailable />}
     </PlainShell>
   );

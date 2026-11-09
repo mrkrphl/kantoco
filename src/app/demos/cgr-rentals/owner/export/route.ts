@@ -1,6 +1,6 @@
 import { COMMISSION_PHP } from "@/lib/cgr-rentals";
 import { ownerStatusLabel } from "@/lib/cgr-owner-format";
-import { loadOwnerData, ownerSession, OWNER_DB_ON, type OwnerRow } from "@/lib/cgr-supabase";
+import { loadAdminCommission, loadOwnerData, ownerSession, OWNER_DB_ON, type OwnerRow } from "@/lib/cgr-supabase";
 
 export const dynamic = "force-dynamic";
 

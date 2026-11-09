@@ -19,7 +19,7 @@ export default async function TimesPage() {
   const s = g.owner;
   const data = await loadOwnerData(s.sb);
   return (
-    <PlainShell page="times" current="owner" admin={s.role === "admin"} signedIn>
+    <PlainShell page="times" current="times" admin={s.role === "admin"} signedIn>
       {data ? <FittingTimes slots={data.slots} /> : <OwnerUnavailable />}
     </PlainShell>
   );
