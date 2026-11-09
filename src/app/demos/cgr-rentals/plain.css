@@ -141,6 +141,16 @@ html:has(.cgr-plain),body:has(.cgr-plain){background:#f5f5f5}
 .cgr-plain .slots .tm input{margin-top:0}
 .cgr-plain .slots .chk{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
 .cgr-plain .slots .chk input{width:20px;height:20px;accent-color:var(--wine)}
+/* r9.4: Fitting times — checkbox label must not overlap Save at 390 */
+.cgr-plain .slots > li > .btn{flex:0 0 auto}
+.cgr-plain .slots .chk.grow{flex:1 1 160px;min-width:0}
+@media (max-width:520px){
+  .cgr-plain .slots > li{align-items:flex-start}
+  .cgr-plain .slots .tm{flex:1 1 100%;max-width:100%}
+  .cgr-plain .slots .chk.grow{flex:1 1 100%;width:100%;order:2}
+  .cgr-plain .slots > li > .btn{order:3;margin-top:4px}
+}
+
 .cgr-plain .addrow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:16px 20px 20px;border-top:1px solid var(--line)}
 .cgr-plain .addrow .fld{flex:0 1 200px}
 .cgr-plain .addrow label{display:block;font-weight:600}

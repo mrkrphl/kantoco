@@ -15,3 +15,15 @@ Prices, sizes and booked dates in the sample app are **mock / sample data**.
 Public listings did not publish rental rates.
 
 No shop contact. Unlisted, noindex preview only.
+
+## r9.4 accessory originals (Mark approved adding full uncropped FB photos)
+
+Searched the box (`fb-photos/raw`, `raw2`, `_scratch`, `cgr-work`, prior crop sources). **No full uncropped Facebook originals** for the six accessory listings are present. The committed `accessories-tiaras*.webp` / `accessory-*.webp` files remain crops/cutouts and stay unused. ATTRIBUTION historically recorded no FB photo URLs for these items, so they stay **text rows** until Mark drops the originals (or FB photo URLs) on the box.
+
+Needed (CGR public FB page only; no minors; full frame, natural framing):
+- gold-crystal-tiaras
+- ruby-pageant-crown
+- rose-stone-tiara
+- crown-display-set
+- crystal-choker
+- crystal-bracelet

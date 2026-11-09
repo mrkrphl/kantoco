@@ -1,3 +1,9 @@
+## r9.4 (2026-11-10)
+
+- Fitting times at 390: checkbox label no longer overlaps Save (plain.css stack).
+- D3: Today still shows Came in for confirmed fittings (OwnerHome plan; verified in stills).
+- Accessory uncropped FB originals: not on the box; no FB URLs in ATTRIBUTION — six accessories stay text-only pending Mark's files/URLs. Proof `proof-r9.4/`.
+
 ## r9.3 (2026-11-09)
 
 - No cropped/cut-out photos on CGR: accessories lack uncropped sources in repo → text-only listings (GOWNS + DB photos cleared). Crowns home band type-only. Commission admin subcopy = one line. Proof `proof-r9.3/`. Red first in list_catalogue. Migration `20261109250000_cgr_r9_3_uncrop_accessories.sql`.
