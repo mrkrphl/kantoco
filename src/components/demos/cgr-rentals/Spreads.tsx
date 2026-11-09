@@ -6,10 +6,10 @@ import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
  * r7.11 home spreads (Design r7.11 home.html): one photo on a cream mat
  * (contain, never cropped), one script word, one line, one button.
  * Order: 01 Evening (red, first), 02 Bridal, 03 Filipiniana, the Crowns
- * band, 04 Suits. Bridal, Filipiniana and the crowns open their own
- * reservable gown pages (default #4, steering). Suits has no uncropped
- * photo on #33 (r7.11.1), so it is type only, with no page; its button
- * goes to the visit block instead of an "Ask about…" line.
+ * band, 04 Suits. Bridal and Filipiniana open their own reservable gown
+ * pages. Crowns (r9.3) and Suits have no uncropped photo on #33, so both
+ * are type only; Crowns still links to the gold-crystal-tiaras page
+ * (text listing). Suits' button goes to the visit block.
  *
  * r8.0 (Design r8 §3): no rates on the home page. Each line is plain copy
  * (the gown name for Evening, its look for Bridal and Filipiniana). The
@@ -108,8 +108,8 @@ export function Spreads() {
         <SpreadSec key={s.id} s={s} />
       ))}
 
+      {/* r9.3: no uncropped accessory photo in the repo — type only, like Suits. */}
       <section id="accessories" className="r11-acc" aria-labelledby="accessories-h">
-        <Photo img={crowns.images[0]} />
         <div className="r11-txt">
           <p className="r11-script" aria-hidden="true">
             Crowns

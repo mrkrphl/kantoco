@@ -128,25 +128,33 @@ export function GownDetail({
     <>
       <section className="r11-gd" aria-labelledby="gd-h">
         <div className="r11-ph">
-          <figure className="r11-mat">
-            <GownImg img={gown.images[img]} fetchPriority="high" decoding="async" />
-          </figure>
-          {gown.images.length > 1 ? (
-            <div className="r11-thumbs" role="group" aria-label="Photos">
-              {gown.images.map((im, i) => (
-                <button
-                  key={im.file}
-                  type="button"
-                  className="r11-thumb"
-                  aria-pressed={i === img}
-                  aria-label={`Photo ${i + 1} of ${gown.images.length}`}
-                  onClick={() => setImg(i)}
-                >
-                  <GownImg img={im} alt="" loading="lazy" decoding="async" />
-                </button>
-              ))}
-            </div>
-          ) : null}
+          {gown.images.length ? (
+            <>
+              <figure className="r11-mat">
+                <GownImg img={gown.images[img]} fetchPriority="high" decoding="async" />
+              </figure>
+              {gown.images.length > 1 ? (
+                <div className="r11-thumbs" role="group" aria-label="Photos">
+                  {gown.images.map((im, i) => (
+                    <button
+                      key={im.file}
+                      type="button"
+                      className="r11-thumb"
+                      aria-pressed={i === img}
+                      aria-label={`Photo ${i + 1} of ${gown.images.length}`}
+                      onClick={() => setImg(i)}
+                    >
+                      <GownImg img={im} alt="" loading="lazy" decoding="async" />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <figure className="r11-mat r11-mat-text" aria-label="No photo">
+              <p className="r11-no-photo">No photo yet — ask the shop.</p>
+            </figure>
+          )}
         </div>
         <div className="r11-info">
           <Link className="r11-back" href={isAcc ? `${CGR_BASE}#accessories` : `${CGR_BASE}#rail`}>

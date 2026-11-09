@@ -12,6 +12,28 @@ import { GownImg } from "@/components/demos/cgr-rentals/GownImg";
  * a swipe step it; nothing moves on its own. Photos are contained, never
  * cropped. Reduced motion: no fade.
  */
+
+/** r9.3: text row when the piece has no uncropped photo in the repo. */
+function RailPhoto({ gown, side = false }: { gown: Gown; side?: boolean }) {
+  const img = gown.images[0];
+  if (!img) {
+    return (
+      <div className="r11-rail-text" aria-hidden={side || undefined}>
+        <p>{gown.name}</p>
+      </div>
+    );
+  }
+  return (
+    <GownImg
+      img={img}
+      alt={side ? "" : undefined}
+      loading="lazy"
+      decoding="async"
+      draggable={side ? undefined : false}
+    />
+  );
+}
+
 export function Rail({ items }: { items: Gown[] }) {
   const n = items.length;
   const [i, setI] = useState(0);
@@ -51,13 +73,13 @@ export function Rail({ items }: { items: Gown[] }) {
         }}
       >
         <div className="r11-card side l" aria-hidden="true">
-          <GownImg img={at(-1).images[0]} alt="" loading="lazy" decoding="async" />
+          <RailPhoto gown={at(-1)} side />
         </div>
         <div className="r11-card c r11-fade" key={g.slug}>
-          <GownImg img={g.images[0]} loading="lazy" decoding="async" draggable={false} />
+          <RailPhoto gown={g} />
         </div>
         <div className="r11-card side r" aria-hidden="true">
-          <GownImg img={at(1).images[0]} alt="" loading="lazy" decoding="async" />
+          <RailPhoto gown={at(1)} side />
         </div>
       </div>
       <div className="r11-rail-meta">
