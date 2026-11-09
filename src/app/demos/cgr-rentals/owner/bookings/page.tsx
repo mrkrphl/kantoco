@@ -24,7 +24,7 @@ export default async function BookingsPage() {
     admin ? loadAdminCommission(s.sb) : Promise.resolve(null),
   ]);
   return (
-    <PlainShell page="bookings" current="owner" admin={admin} signedIn>
+    <PlainShell page="bookings" current="bookings" admin={admin} signedIn>
       {data ? (
         <Bookings rows={data.rows} today={manilaToday()} commission={admin ? commission : null} />
       ) : (

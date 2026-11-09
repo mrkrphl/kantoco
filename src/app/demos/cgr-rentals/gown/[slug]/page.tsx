@@ -1,9 +1,12 @@
 import { notFound, redirect } from "next/navigation";
-import { CGR_BASE, GOWNS, RETIRED_SLUGS, getGown } from "@/lib/cgr-rentals";
+import { CGR_BASE, GOWNS, RETIRED_SLUGS, getGown, type Gown } from "@/lib/cgr-rentals";
 import { CgrShell } from "@/components/demos/cgr-rentals/Shell";
 import { GownDetail } from "@/components/demos/cgr-rentals/GownDetail";
+import { getCatalogueItem, listCatalogue, toPublicGown } from "@/lib/cgr-catalogue";
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
   return GOWNS.map((g) => ({ slug: g.slug }));
 }
 
@@ -18,11 +21,15 @@ export default async function GownPage({
 }) {
   const { slug } = await params;
   const sp = await searchParams;
-  // r7.9.1: a listing that was taken down goes back to the catalogue.
   if (RETIRED_SLUGS.has(slug)) redirect(`${CGR_BASE}#gowns`);
-  const gown = getGown(slug);
+  const dbItem = await getCatalogueItem(slug);
+  let gown: Gown | undefined = dbItem ? (toPublicGown(dbItem) as unknown as Gown) : getGown(slug);
+  if (!gown) {
+    // Try alias / retired mapping via hardcoded, then DB list
+    const all = await listCatalogue();
+    gown = all.map(toPublicGown).find((g) => g.slug === slug) as unknown as Gown | undefined;
+  }
   if (!gown) notFound();
-  // r7.9: an old slug goes to the gown's current page, keeping its dates.
   if (gown.slug !== slug) {
     const qp = new URLSearchParams();
     for (const k of ["date", "from", "to"] as const) {
@@ -32,7 +39,6 @@ export default async function GownPage({
     const q = qp.size ? `?${qp.toString()}` : "";
     redirect(`${CGR_BASE}/gown/${gown.slug}${q}`);
   }
-  // r7.11: dates stay picked as ?from=&to=; the older ?date= still works.
   const initialDate = isIso(sp.from) ? sp.from : isIso(sp.date) ? sp.date : "";
   const initialReturn = isIso(sp.to) ? sp.to : "";
   return (
