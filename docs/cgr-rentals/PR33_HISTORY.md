@@ -1,3 +1,7 @@
+## r9.3 (2026-11-09)
+
+- No cropped/cut-out photos on CGR: accessories lack uncropped sources in repo → text-only listings (GOWNS + DB photos cleared). Crowns home band type-only. Commission admin subcopy = one line. Proof `proof-r9.3/`. Red first in list_catalogue. Migration `20261109250000_cgr_r9_3_uncrop_accessories.sql`.
+
 ## Round 9.2: blank unverified prices, commission reconcile, confirmation copy
 
 - Blanked every gown/accessory `price_per_day` (sample data only; not on CGR public listings). Seed + GOWNS updated so rebuilds stay blank. Accessories kept (CGR FB crops).

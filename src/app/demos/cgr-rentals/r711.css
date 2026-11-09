@@ -183,6 +183,40 @@ html:has(.cgr) { background: #f7f1e6; }
 .cgr .r11-rail-flow { display: flex; align-items: center; justify-content: center; gap: 28px; height: min(64vh, 560px); }
 .cgr .r11-card { height: 100%; aspect-ratio: 3 / 5; display: flex; align-items: center; justify-content: center; background: #2a0a13; padding: 14px; transition: opacity 900ms var(--ease-silk), transform 900ms var(--ease-silk); }
 .cgr .r11-card img { max-height: 100%; max-width: 100%; width: auto; height: auto; object-fit: contain; }
+/* r9.3: text-only rail card when a piece has no uncropped photo */
+.cgr .r11-rail-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(70vw, 280px);
+  height: 100%;
+  max-height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--cream);
+  color: var(--ink, #1a1210);
+  text-align: center;
+}
+.cgr .r11-rail.r11-dark .r11-rail-text {
+  background: #2a2220;
+  color: var(--ivory);
+}
+.cgr .r11-rail-text p {
+  margin: 0;
+  font: 400 18px/1.3 var(--font-display);
+}
+.cgr .r11-mat-text {
+  min-height: 160px;
+  width: 100%;
+}
+.cgr .r11-no-photo {
+  margin: 0;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--muted, #6b5e57);
+  font: 400 15px/1.4 var(--font-body, system-ui);
+}
+
 .cgr .r11-card.side { opacity: 0.45; transform: scale(0.72); }
 .cgr .r11-rail-meta { margin: 28px auto 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .cgr .r11-rail-nm { font: 400 30px/1.2 var(--font-display); color: var(--ivory); min-height: 1.2em; }

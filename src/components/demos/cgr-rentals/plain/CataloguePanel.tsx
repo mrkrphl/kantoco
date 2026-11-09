@@ -386,12 +386,12 @@ export function CataloguePanel({
           {items.map((i) => (
             <li key={i.slug} data-slug={i.slug} data-status={i.status}>
               <div className="row">
-                <div className="ph">
-                  {i.photos[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                {i.photos[0] ? (
+                  <div className="ph">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={i.photos[0].path} alt={i.photos[0].alt} width={i.photos[0].w} height={i.photos[0].h} />
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
                 <div className="grow">
                   <div className="n">{i.name}</div>
                   <div className="g">
