@@ -1,3 +1,19 @@
+## Round 9: owner catalogue, bookings polish, attribution
+
+Head **`(pending push)`** (parent `da999a25`). One text push for the round (Hobby daily deploy limit). Preview: (pending).
+
+- **Owner Catalogue:** add / edit / pause / remove. Types Gown, Filipiniana, Barong/Suit, Kids, Accessory. Fields: name, type, photos (phone upload → free `cgr-catalogue` Storage bucket, compressed client-side, shown with object-fit contain), colors, sizes, occasions, optional rental price (hidden on public when blank), notes, available/paused. Public Rail + gown pages read `list_catalogue` / `get_catalogue_item` (available only). RLS: owners/admins write; public reads available. Accessories remain catalogue items (add-on picker on Reserve is a follow-up).
+- **Owner site:** search bookings by customer or phone; Call + Messenger/Text taps; one-tap New → Confirmed → Picked up → Returned (+ Cancel). Bottom tabs: Today, Bookings, Catalogue, Fitting times. Pending label is **New**.
+- **Attribution:** source + UTM on each reservation (`ad` / `facebook` / `messenger` / `qr` / `direct` / `other`). Admin-only monthly commission count × ₱200 with CSV (`/owner/export?kind=commission`). Owners never see the line (RPC refuses).
+- **Conversion:** gown detail “Free on your date” + “Reserve online, get first pick of fitting slots”; confirmation keeps a large selectable ref; `/demos/cgr-rentals/shop-link` QR generated in-browser (free `qrcode` package, no paid API).
+- **Email:** new-booking mail allowlist designed (kantoco.ph@gmail.com + test alias only). **Stopped before SMTP** — no credentials configured, no mail sent.
+- **Proof:** `proof-r9/preview/` (390 + 1366): catalogue list/add/edit, today, bookings (+ admin commission), public catalogue, gown detail, shop-link. Owner UI stills used a local harness (no password created). Counts: 0 reservations, 0 fittings, 16 catalogue gowns (seeded listings), owners = kantoco.ph@gmail.com only, 0 auth users, 0 storage objects.
+- **Checks:** tsc clean, eslint clean on touched files, `npm run test:cgr` 37/37. Second-model review (local free): `docs/cgr-rentals/r9-review.md`.
+- **Open / skipped:** Mark still sets Supabase Site URL + redirect for invites; SMTP for booking emails waits on Mark; accessories-as-Reserve-add-ons follow-up; no merge.
+
+
+---
+
 ## Round 8.4: plain owner area, admin, invites
 
 Commits `cd59dfc` → **`872157e`** (parent `c6ba972`), text-only, up to 4 files each. **No preview yet:** Vercel refused the build for `872157e` with "Deployment rate limited — retry in 24 hours" (status posted 08:38:52 PHT, 5 Nov; Hobby daily build limit). Nothing was upgraded. The r8.4 proof below comes from local `next build` and the dev server. The preview needs a fresh push or redeploy after the limit resets.
