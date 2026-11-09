@@ -419,3 +419,10 @@ html:has(.cgr) { background: #f7f1e6; }
   .cgr .r11-suits { padding: 96px var(--gut); gap: 22px; }
   .cgr .r11-suits-word { padding: 20px 0; width: 100%; }
 }
+
+.cgr .shop-link{max-width:420px;margin:40px auto;padding:24px;text-align:center}
+.cgr .shop-link h1{font-size:28px;margin:0 0 8px}
+.cgr .shop-link p{color:var(--mute);margin:0 0 16px;line-height:1.45}
+.cgr .shop-qr,.cgr .shop-qr-ph{display:block;width:280px;height:280px;margin:16px auto;background:#fff;border:1px solid #eadfce;border-radius:12px}
+.cgr .shop-url{font-size:12px;word-break:break-all}
+.cgr .shop-note{font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-top:24px}
