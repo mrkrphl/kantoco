@@ -43,3 +43,12 @@ Reviewed without a paid model or cloud agent (hard rule: $0). Checklist against 
 - Accessory add-ons: picker on gown detail + Reserve; stored on reservation; owner card shows plain words; prices only when owner-set.
 - Shop-link: go-live URL swap note on the page and in PR notes.
 - SMTP still OFF.
+
+## r9.2 follow-up (local free review)
+
+- **Prices:** All catalogue per-day rates blanked (DB + GOWNS + seed). Source was inventedsample data in `src/lib/cgr-rentals.ts` / r8.1 seed (`20261031120100`), never word-for-word on CGR FB or Maps listings (ATTRIBUTION.md). Site shows "Price on request".
+- **Accessories kept:** tiaras/choker/bracelet photos are CGR FB crops per ATTRIBUTION.md — not removed.
+- **Confirmation:** headline "Reserve request sent." Ref unchanged.
+- **Commission root cause:** `admin_commission` counted confirmed/out/returned only and ignored source; harness also invented count=3 vs 2 bookings. Fixed RPC to count site-sourced reservations that are not cancelled; UI states definitions; harness + `countSiteCommission` test reconcile header vs commission.
+- **Reserve addon:** full width of form column.
+- SMTP still OFF. No merge.

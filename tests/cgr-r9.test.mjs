@@ -7,6 +7,7 @@ import {
   canRemoveGown,
   sourceFromSearch,
   slugify,
+  countSiteCommission,
 } from "../src/lib/cgr-catalogue.ts";
 import {
   nextReservationStatus,
@@ -71,4 +72,19 @@ test("addon plain words omit blank prices", () => {
   assert.equal(addonPlain([{ name: "Gold crystal tiara", price_per_day: 500 }]), "Gold crystal tiara (₱500/day)");
   assert.equal(addonPlain([{ name: "Crystal choker", price_per_day: null }]), "Crystal choker");
   assert.equal(addonPlain([]), "");
+});
+
+test("site commission: not cancelled site reservations only; fittings ignored", () => {
+  const month = "2026-11";
+  const rows = [
+    { kind: "reserve", status: "pending", source: "qr", createdAt: "2026-11-02T10:00:00Z" },
+    { kind: "reserve", status: "confirmed", source: "direct", createdAt: "2026-11-05T10:00:00Z" },
+    { kind: "reserve", status: "cancelled", source: "qr", createdAt: "2026-11-06T10:00:00Z" },
+    { kind: "reserve", status: "confirmed", source: "walk_in", createdAt: "2026-11-07T10:00:00Z" },
+    { kind: "fitting", status: "confirmed", source: "direct", createdAt: "2026-11-08T10:00:00Z" },
+    { kind: "reserve", status: "out", source: "facebook", createdAt: "2026-10-31T10:00:00Z" },
+  ];
+  // pending + confirmed site in Nov = 2; cancelled, non-site, fitting, Oct out excluded
+  assert.equal(countSiteCommission(rows, month), 2);
+  assert.deepEqual(monthlyCommission(2), { count: 2, per_php: 200, total_php: 400 });
 });

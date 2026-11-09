@@ -447,3 +447,12 @@ html:has(.cgr) { background: #f7f1e6; }
 .cgr .addon-pick label { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; min-height: 44px; font-size: 15px; }
 .cgr .addon-pick .ap { color: var(--mute, #6b645c); font-size: 13px; }
 .cgr-plain .addon-line { font-size: 14px; color: var(--sub); margin-top: 4px; }
+
+/* r9.2: accessories picker spans the Reserve form column */
+.cgr .r11-main form .addon-pick,
+.cgr .r11-main > .addon-pick {
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+}

@@ -69,7 +69,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
 
   useEffect(() => {
     if (!rows || pending) return;
-    document.title = `${b ? (fit ? "Fitting booked" : "Reserved") : "Code not found"} · Cavite Gown Rentals`;
+    document.title = `${b ? (fit ? "Fitting booked" : "Reserve request sent") : "Code not found"} · Cavite Gown Rentals`;
   }, [rows, pending, b, fit]);
 
   if (askDb && sum === "unavailable") return <BookingUnavailable what="Looking up your code" />;
@@ -133,7 +133,6 @@ export function Confirmation({ refCode }: { refCode: string }) {
   const event = linked?.eventDate ?? (fit ? b.eventDate : "");
   const days = !fit ? rentalDays(b.eventDate, b.returnDate || b.eventDate) : null;
   const total = !fit && gown ? customerTotal(gown.pricePerDay, b.eventDate, b.returnDate || b.eventDate) : null;
-  const noun = gown?.category === "accessory" ? "piece" : "gown";
 
   const sideRows: [string, string][] = fit
     ? [
@@ -155,7 +154,7 @@ export function Confirmation({ refCode }: { refCode: string }) {
         <p className="r11-script" aria-hidden="true">
           {fit ? "See you soon" : "Thank you"}
         </p>
-        <h1 tabIndex={-1}>{fit ? "Your fitting is booked." : `Your ${noun} is reserved.`}</h1>
+        <h1 tabIndex={-1}>{fit ? "Your fitting is booked." : "Reserve request sent."}</h1>
         <p className="r11-sub" style={{ marginTop: 0 }}>
           {fit
             ? `${humanDate(b.fittingDate ?? "")}, ${slotLabel(b.slot ?? "")} at the shop${gap ? `, ${gap}` : ""}. The shop will message you to confirm.`

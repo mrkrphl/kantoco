@@ -174,8 +174,9 @@ export const SIZES: { id: GownSize | "all"; label: string }[] = [
 ];
 
 /**
- * Catalogue. Prices, sizes, booked dates and listing names are SAMPLE DATA.
- * Public refs did not list rental rates. r7.9: gown photos are the shop's own
+ * Catalogue. Prices are blank (0 = ask the shop): public CGR listings never
+ * published per-day rates word for word (ATTRIBUTION.md). Sizes and booked
+ * dates stay sample. r7.9: gown photos are the shop's own
  * public Facebook photos at natural framing (no detail crops), one gown per
  * listing; names and blurbs describe the gown in the photo. Sources:
  * photos/SOURCES.md.
@@ -187,7 +188,7 @@ export const GOWNS: Gown[] = [
     category: "pageant",
     colors: ["red"],
     sizes: ["S", "M", "L", "XL"],
-    pricePerDay: 2500,
+    pricePerDay: 0,
     blurb:
       "Wine-red sequin, a deep V neckline, beaded appliqué down the bodice, sheer long sleeves and a high side slit.",
     images: [
@@ -207,7 +208,7 @@ export const GOWNS: Gown[] = [
     category: "pageant",
     colors: ["green"],
     sizes: ["S", "M", "L"],
-    pricePerDay: 3200,
+    pricePerDay: 0,
     blurb:
       "Deep teal off-shoulder gown with satin puff sleeves, silver-green embroidery down the bodice and a long satin train. For pageants and pictorials.",
     images: [
@@ -239,7 +240,7 @@ export const GOWNS: Gown[] = [
     category: "formal",
     colors: ["blue", "gold"],
     sizes: ["M", "L", "XL"],
-    pricePerDay: 2200,
+    pricePerDay: 0,
     blurb:
       "Navy off-shoulder gown with satin puff sleeves, gold and copper sequin swirls and a sheer navy train. For formal dinners and proms.",
     images: [
@@ -259,7 +260,7 @@ export const GOWNS: Gown[] = [
     category: "pageant",
     colors: ["blue"],
     sizes: ["XS", "S", "M", "L"],
-    pricePerDay: 3000,
+    pricePerDay: 0,
     blurb:
       "Royal blue sequin mermaid gown with sweeping silver swirls, a sweetheart bodice and sheer puff sleeves. For pageant nights.",
     images: [
@@ -279,7 +280,7 @@ export const GOWNS: Gown[] = [
     category: "debut",
     colors: ["blue"],
     sizes: ["S", "M", "L"],
-    pricePerDay: 3200,
+    pricePerDay: 0,
     blurb:
       "Powder blue off-shoulder tulle gown with feather-trimmed straps, a corset bodice, 3D floral appliqué and a front slit. For 18th birthdays.",
     images: [
@@ -305,7 +306,7 @@ export const GOWNS: Gown[] = [
     category: "formal",
     colors: ["blue", "silver"],
     sizes: ["XS", "S", "M", "L", "XL"],
-    pricePerDay: 2600,
+    pricePerDay: 0,
     blurb:
       "Periwinkle gown covered in silver beading, with a deep V neckline, a waist cut-out and a sheer floor-length cape. For galas and grand entrances.",
     images: [
@@ -325,7 +326,7 @@ export const GOWNS: Gown[] = [
     category: "pageant",
     colors: ["purple", "gold"],
     sizes: ["S", "M"],
-    pricePerDay: 2700,
+    pricePerDay: 0,
     blurb:
       "Violet beaded bodice with a feathered neckline, a gold-beaded skirt and a sheer violet overskirt. For pageant and gala looks.",
     images: [
@@ -345,7 +346,7 @@ export const GOWNS: Gown[] = [
     category: "debut",
     colors: ["purple"],
     sizes: ["XS", "S", "M", "L"],
-    pricePerDay: 2400,
+    pricePerDay: 0,
     blurb:
       "Lilac off-shoulder tulle gown with a beaded floral bodice and a full, soft skirt. For debuts and cotillions.",
     images: [
@@ -365,7 +366,7 @@ export const GOWNS: Gown[] = [
     category: "bridal",
     colors: ["silver"],
     sizes: ["S", "M", "L", "XL"],
-    pricePerDay: 3500,
+    pricePerDay: 0,
     blurb:
       "Ivory ball gown with a beaded bodice, lace sleeves and a full skirt. For weddings and debuts.",
     images: [
@@ -385,7 +386,7 @@ export const GOWNS: Gown[] = [
     category: "filipiniana",
     colors: ["gold"],
     sizes: ["S", "M", "L"],
-    pricePerDay: 2800,
+    pricePerDay: 0,
     blurb:
       "Black beaded gown with structured puff sleeves, a gold appliqué bodice and a long pleated train. For galas and Filipiniana nights.",
     images: [
@@ -405,7 +406,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["gold"],
     sizes: ["One size"],
-    pricePerDay: 500,
+    pricePerDay: 0,
     blurb:
       "Tall gold crystal tiaras for debut and pageant looks, to wear with any gown.",
     images: [
@@ -421,7 +422,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["red", "gold"],
     sizes: ["One size"],
-    pricePerDay: 650,
+    pricePerDay: 0,
     blurb:
       "Gold band with red stones, made for coronation nights.",
     images: [
@@ -437,7 +438,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["silver", "mixed"],
     sizes: ["One size"],
-    pricePerDay: 550,
+    pricePerDay: 0,
     blurb:
       "Silver tiara set with pink and gold stones.",
     images: [
@@ -453,7 +454,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["mixed"],
     sizes: ["One size"],
-    pricePerDay: 1200,
+    pricePerDay: 0,
     blurb:
       "Red, blue and pink stone tiaras rented as a set for courts and entourages.",
     images: [
@@ -470,7 +471,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["silver"],
     sizes: ["One size"],
-    pricePerDay: 300,
+    pricePerDay: 0,
     blurb:
       "Sparkle choker for formal and off-shoulder necklines.",
     images: [
@@ -485,7 +486,7 @@ export const GOWNS: Gown[] = [
     category: "accessory",
     colors: ["silver"],
     sizes: ["One size"],
-    pricePerDay: 250,
+    pricePerDay: 0,
     blurb:
       "Crystal cuff bracelet to finish a formal look.",
     images: [

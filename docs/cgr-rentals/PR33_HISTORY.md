@@ -1,3 +1,11 @@
+## Round 9.2: blank unverified prices, commission reconcile, confirmation copy
+
+- Blanked every gown/accessory `price_per_day` (sample data only; not on CGR public listings). Seed + GOWNS updated so rebuilds stay blank. Accessories kept (CGR FB crops).
+- Confirmation headline: "Reserve request sent."
+- Commission RPC: site-sourced reservations that are not cancelled (Manila month); fittings never. Header counts all bookings; commission filters the same reservation rows. Test: `countSiteCommission`.
+- Reserve accessories picker full width.
+- Proof: `proof-r9.2/preview/`. SMTP OFF. No merge.
+
 ## Round 9.1: owner UX, add-ons, phone fix, stills
 
 Paige QA via Chip on r9. Single commit (one push_files / one Vercel build) on `cursor/cgr-rentals-app`.

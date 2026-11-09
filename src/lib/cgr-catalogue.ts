@@ -204,6 +204,46 @@ export function monthlyCommission(count: number, per = 200): { count: number; pe
   const n = Math.max(0, Math.floor(count));
   return { count: n, per_php: per, total_php: n * per };
 }
+/**
+ * r9.2 admin commission definition (same as private.admin_commission):
+ * site-sourced reservations that are not cancelled, in the Manila month.
+ * Fittings never count. Sources: ad | facebook | messenger | qr | direct | other.
+ */
+export type CommissionRowLike = {
+  kind?: string;
+  status: string;
+  source?: string | null;
+  createdAt?: string;
+  created_at?: string;
+};
+
+export function isSiteSource(source: string | null | undefined): boolean {
+  return ["ad", "facebook", "messenger", "qr", "direct", "other"].includes(
+    (source ?? "").toLowerCase(),
+  );
+}
+
+export function countSiteCommission(
+  rows: readonly CommissionRowLike[],
+  monthYm: string,
+): number {
+  const start = `${monthYm}-01`;
+  // next month
+  const [y, m] = monthYm.split("-").map(Number);
+  const end =
+    m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, "0")}-01`;
+  let n = 0;
+  for (const r of rows) {
+    if (r.kind && r.kind !== "reserve") continue;
+    if (r.status === "cancelled") continue;
+    if (!isSiteSource(r.source)) continue;
+    const created = (r.createdAt ?? r.created_at ?? "").slice(0, 10);
+    if (!created || created < start || created >= end) continue;
+    n += 1;
+  }
+  return n;
+}
+
 
 /** Deletion guard: live bookings block remove. */
 export function canRemoveGown(liveStatuses: string[]): boolean {

@@ -260,7 +260,11 @@ export function Bookings({
           <p>
             {(commission.month ? `Month ${commission.month} (Manila): ` : "")}
             {peso(commission.per_php)} × {plural(commission.count, "site booking")} = {peso(commission.total_php)}.
-            Fittings never count.
+          </p>
+          <p className="sub">
+            Site bookings = reservations from this site that are not cancelled (source ad, facebook, messenger, qr,
+            direct or other). Fittings never count. The header above counts every reservation and fitting of any
+            status; this line uses the same reservation rows, filtered.
           </p>
           <p className="sub">Owners never see this line. Export includes source for attribution.</p>
           <div className="acts">
