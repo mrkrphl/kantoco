@@ -143,6 +143,15 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
   const submitDb = async () => {
     setSaving(true);
     setSendErr("");
+    const attrib = (() => {
+      try {
+        const raw = sessionStorage.getItem("cgr-attrib");
+        if (!raw) return { source: "direct" as const, utm_source: "", utm_medium: "", utm_campaign: "" };
+        return JSON.parse(raw);
+      } catch {
+        return { source: "direct" as const, utm_source: "", utm_medium: "", utm_campaign: "" };
+      }
+    })();
     const r = await dbCreateReservation({
       slug: gown.slug,
       event: from,
@@ -151,6 +160,7 @@ export function ReserveForm({ gown, initialDate, initialReturn = "" }: { gown: G
       contact: f.contact.trim(),
       notes: f.notes.trim(),
       website,
+      ...attrib,
     });
     if (r.ok) {
       try {

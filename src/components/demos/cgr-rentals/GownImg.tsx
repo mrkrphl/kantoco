@@ -15,7 +15,7 @@ export function useGownSrc(img: GownImage | null | undefined) {
   const file = img?.file ?? "";
   const [failed, setFailed] = useState<string | null>(null);
   const missing = !!file && failed === file;
-  const src = img ? `${CGR_ASSET}/${img.file}.webp` : "";
+  const src = img ? (img.path ? img.path : `${CGR_ASSET}/${img.file}.webp`) : "";
 
   const onError = useCallback(() => {
     if (file) setFailed(file);

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
-import { GOWNS } from "@/lib/cgr-rentals";
+import { useEffect, useRef } from "react";
+import { sourceFromSearch } from "@/lib/cgr-catalogue";
+import { GOWNS, type Gown } from "@/lib/cgr-rentals";
 import { Story } from "@/components/demos/cgr-rentals/Story";
 import { Spreads } from "@/components/demos/cgr-rentals/Spreads";
 import { Rail } from "@/components/demos/cgr-rentals/Rail";
@@ -16,14 +17,20 @@ import { useHomeMotion } from "@/components/demos/cgr-rentals/HomeMotion";
  * one line, one action. r8.0: the scroll beats (HomeMotion) give each
  * screen one entrance.
  */
-export function Catalogue() {
+export function Catalogue({ items = GOWNS }: { items?: Gown[] }) {
   const root = useRef<HTMLDivElement>(null);
   useHomeMotion(root);
+  useEffect(() => {
+    try {
+      const a = sourceFromSearch(new URLSearchParams(window.location.search));
+      if (a.source !== "direct" || a.utm_source) sessionStorage.setItem("cgr-attrib", JSON.stringify(a));
+    } catch { /* ignore */ }
+  }, []);
   return (
     <div className="cgr-home" ref={root}>
       <Story />
       <Spreads />
-      <Rail items={GOWNS} />
+      <Rail items={items} />
       <Testimonials />
     </div>
   );

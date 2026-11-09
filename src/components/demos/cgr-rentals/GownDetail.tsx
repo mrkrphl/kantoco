@@ -157,6 +157,11 @@ export function GownDetail({
             <p className={`r11-status ${tone}`} role="status">
               {status}
             </p>
+            {state === "ok" ? (
+              <p className="r11-note">Free on your date. Reserve online, get first pick of fitting slots.</p>
+            ) : (
+              <p className="r11-note">Reserve online, get first pick of fitting slots.</p>
+            )}
           </div>
           {cta}
         </div>
